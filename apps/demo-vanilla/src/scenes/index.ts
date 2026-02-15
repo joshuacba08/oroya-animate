@@ -1,13 +1,13 @@
 import type { DemoSceneDef } from '../types';
-import { helloCubeControls, createHelloCubeScene } from './hello-cube';
-import { colorPaletteControls, createColorPaletteScene } from './color-palette';
-import { solarSystemControls, createSolarSystemScene } from './solar-system';
-import { shapeGridControls, createShapeGridScene } from './shape-grid';
 import { cameraViewpointsControls, createCameraViewpointsScene } from './camera-viewpoints';
-import { proceduralCityControls, createProceduralCityScene } from './procedural-city';
-import { gradientShowcaseControls, createGradientShowcaseScene } from './gradient-showcase';
 import { circleOverlayControls, createCircleOverlayScene } from './circle-overlay';
-import { generativeArtControls, createGenerativeArtScene } from './generative-art';
+import { colorPaletteControls, createColorPaletteScene } from './color-palette';
+import { createGenerativeArtScene, generativeArtControls } from './generative-art';
+import { createGradientShowcaseScene, gradientShowcaseControls } from './gradient-showcase';
+import { createHelloCubeScene, helloCubeControls } from './hello-cube';
+import { createProceduralCityScene, proceduralCityControls } from './procedural-city';
+import { createShapeGridScene, shapeGridControls } from './shape-grid';
+import { createSolarSystemScene, solarSystemControls } from './solar-system';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {

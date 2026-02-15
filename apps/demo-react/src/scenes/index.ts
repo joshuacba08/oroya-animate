@@ -1,20 +1,20 @@
 import type { DemoSceneDef } from '../types';
-import { helloCubeControls, createHelloCubeScene } from './HelloCube';
-import { colorPaletteControls, createColorPaletteScene } from './ColorPalette';
-import { solarSystemControls, createSolarSystemScene } from './SolarSystem';
-import { shapeGridControls, createShapeGridScene } from './ShapeGrid';
 import { cameraViewpointsControls, createCameraViewpointsScene } from './CameraViewpoints';
-import { proceduralCityControls, createProceduralCityScene } from './ProceduralCity';
-import { interactiveDemoControls, createInteractiveDemoScene } from './InteractiveDemo';
-import { hoverShowcaseControls, createHoverShowcaseScene } from './HoverShowcase';
-import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
-import { wheelAndBubblingControls, createWheelAndBubblingScene } from './WheelAndBubbling';
-import { svgShowcaseControls, createSvgShowcaseScene } from './SvgShowcase';
-import { svgAnimationsControls, createSvgAnimationsScene } from './SvgAnimations';
-import { svgInteractiveControls, createSvgInteractiveScene } from './SvgInteractive';
-import { gradientShowcaseControls, createGradientShowcaseScene } from './GradientShowcase';
 import { circleOverlayControls, createCircleOverlayScene } from './CircleOverlay';
-import { generativeArtControls, createGenerativeArtScene } from './GenerativeArt';
+import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
+import { colorPaletteControls, createColorPaletteScene } from './ColorPalette';
+import { createGenerativeArtScene, generativeArtControls } from './GenerativeArt';
+import { createGradientShowcaseScene, gradientShowcaseControls } from './GradientShowcase';
+import { createHelloCubeScene, helloCubeControls } from './HelloCube';
+import { createHoverShowcaseScene, hoverShowcaseControls } from './HoverShowcase';
+import { createInteractiveDemoScene, interactiveDemoControls } from './InteractiveDemo';
+import { createProceduralCityScene, proceduralCityControls } from './ProceduralCity';
+import { createShapeGridScene, shapeGridControls } from './ShapeGrid';
+import { createSolarSystemScene, solarSystemControls } from './SolarSystem';
+import { createSvgAnimationsScene, svgAnimationsControls } from './SvgAnimations';
+import { createSvgInteractiveScene, svgInteractiveControls } from './SvgInteractive';
+import { createSvgShowcaseScene, svgShowcaseControls } from './SvgShowcase';
+import { createWheelAndBubblingScene, wheelAndBubblingControls } from './WheelAndBubbling';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
