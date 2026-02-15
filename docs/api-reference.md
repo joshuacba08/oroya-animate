@@ -114,7 +114,13 @@ export type { BoxGeometryDef, SphereGeometryDef, Path2DGeometryDef, Path2DComman
 export { Material } from './components/Material';
 export type { ColorRGB, MaterialDef } from './components/Material';
 export { Camera, CameraType } from './components/Camera';
-export type { PerspectiveCameraDef, CameraDef } from './components/Camera';
+export type { PerspectiveCameraDef, OrthographicCameraDef, CameraDef } from './components/Camera';
+export { Animation } from './components/Animation';
+export type { SvgAnimateDef, SvgAnimateTransformDef, SvgAnimationDef } from './components/Animation';
+export type {
+  SvgFilterDef, SvgFilterEffect, SvgBlurEffect, SvgDropShadowEffect,
+  SvgClipPathDef, SvgMaskDef,
+} from './components/Material';
 
 // Primitives
 export { createBox, createSphere, createPath2D } from './geometry/primitives';
@@ -230,6 +236,8 @@ classDiagram
 | `children` | `Node[]` | `readonly` | Array de nodos hijos |
 | `components` | `Map<ComponentType, Component>` | `readonly` | Mapa de componentes. Máximo uno por tipo |
 | `transform` | `Transform` | getter | Acceso directo al componente Transform |
+| `cssClass` | `string \| undefined` | read/write | Clase(s) CSS que el renderer SVG emite como atributo `class` en el elemento |
+| `cssId` | `string \| undefined` | read/write | ID semántico que el renderer SVG emite como atributo `id` en el elemento |
 
 #### Métodos
 
@@ -306,10 +314,15 @@ classDiagram
         +type = ComponentType.Camera
         +definition: CameraDef
     }
+    class Animation {
+        +type = ComponentType.Animation
+        +animations: SvgAnimationDef[]
+    }
     Component <|-- Transform
     Component <|-- Geometry
     Component <|-- Material
     Component <|-- Camera
+    Component <|-- Animation
 ```
 
 #### `ComponentType` (Enum)
@@ -320,6 +333,8 @@ classDiagram
 | `Geometry` | `'Geometry'` | `Geometry` — define la forma |
 | `Material` | `'Material'` | `Material` — define la apariencia |
 | `Camera` | `'Camera'` | `Camera` — define el punto de vista |
+| `Interactive` | `'Interactive'` | `Interactive` — habilita eventos de interacción |
+| `Animation` | `'Animation'` | `Animation` — animaciones SVG nativas |
 
 > **Regla ECS:** Cada nodo puede tener **máximo un componente** de cada tipo. Agregar un segundo componente del mismo tipo reemplaza al anterior.
 
@@ -507,11 +522,93 @@ new Material(definition?: MaterialDef)  // default: {}
 | `strokeWidth` | `number` | `undefined` | SVG | Ancho del trazo en píxeles |
 | `fillGradient` | `GradientDef` | `undefined` | SVG | Gradiente para relleno. Tiene prioridad sobre `fill` |
 | `strokeGradient` | `GradientDef` | `undefined` | SVG | Gradiente para trazo. Tiene prioridad sobre `stroke` |
+| `filter` | `SvgFilterDef` | `undefined` | SVG | Filtro SVG (blur, drop-shadow). Genera un `<filter>` en `<defs>` |
+| `clipPath` | `SvgClipPathDef` | `undefined` | SVG | Recorte vectorial. Genera un `<clipPath>` en `<defs>` |
+| `mask` | `SvgMaskDef` | `undefined` | SVG | Máscara de luminancia. Genera un `<mask>` en `<defs>` |
 
 #### `GradientDef` (Union type)
 
 ```typescript
 type GradientDef = LinearGradientDef | RadialGradientDef;
+```
+
+#### SVG Filters (`SvgFilterDef`)
+
+Permite aplicar filtros SVG nativos a un nodo.
+
+```typescript
+interface SvgFilterDef {
+  effects: SvgFilterEffect[];
+}
+
+type SvgFilterEffect = SvgBlurEffect | SvgDropShadowEffect;
+```
+
+##### `SvgBlurEffect`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `type` | `'blur'` | Discriminante |
+| `stdDeviation` | `number` | Radio de desenfoque gaussiano |
+
+##### `SvgDropShadowEffect`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `'dropShadow'` | — | Discriminante |
+| `dx` | `number` | — | Desplazamiento horizontal de la sombra |
+| `dy` | `number` | — | Desplazamiento vertical de la sombra |
+| `stdDeviation` | `number` | — | Radio de desenfoque de la sombra |
+| `floodColor` | `string` | `undefined` | Color de la sombra (e.g., `'black'`, `'#333'`) |
+| `floodOpacity` | `number` | `undefined` | Opacidad de la sombra (0–1) |
+
+#### `SvgClipPathDef`
+
+Recorta el nodo a una región vectorial definida por un path SVG.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `path` | `Path2DCommand[]` | Comandos del path de recorte |
+
+#### `SvgMaskDef`
+
+Aplica una máscara de luminancia al nodo.
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `path` | `Path2DCommand[]` | — | Comandos del path de la máscara |
+| `fill` | `string` | `undefined` | Color de relleno de la máscara (e.g., `'white'`) |
+| `opacity` | `number` | `undefined` | Opacidad del path de la máscara |
+
+#### Ejemplo: Filtros, clip-path y máscara
+
+```typescript
+// Blur
+const blurred = new Material({
+  fill: { r: 1, g: 0, b: 0 },
+  filter: { effects: [{ type: 'blur', stdDeviation: 3 }] },
+});
+
+// Drop shadow con color personalizado
+const shadowed = new Material({
+  fill: { r: 0, g: 0.5, b: 1 },
+  filter: {
+    effects: [{ type: 'dropShadow', dx: 4, dy: 4, stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6 }],
+  },
+});
+
+// Clip path
+const clipped = new Material({
+  fill: { r: 0, g: 1, b: 0 },
+  clipPath: {
+    path: [
+      { command: 'M', args: [0, 0] },
+      { command: 'L', args: [100, 0] },
+      { command: 'L', args: [50, 100] },
+      { command: 'Z', args: [] },
+    ],
+  },
+});
 ```
 
 #### `LinearGradientDef`
@@ -592,7 +689,7 @@ new Camera(definition: CameraDef)
 | Valor | String | Estado |
 |-------|--------|--------|
 | `Perspective` | `'Perspective'` | ✅ Implementado |
-| `Orthographic` | `'Orthographic'` | 🔜 Planificado |
+| `Orthographic` | `'Orthographic'` | ✅ Implementado |
 
 #### `PerspectiveCameraDef`
 
@@ -636,6 +733,37 @@ cam.transform.position = { x: 0, y: 5, z: 10 };
 scene.add(cam);
 ```
 
+#### `OrthographicCameraDef`
+
+| Campo | Tipo | Descripción | Valor típico |
+|-------|------|-------------|-------------|
+| `type` | `CameraType.Orthographic` | Discriminante | — |
+| `left` | `number` | Borde izquierdo del frustum | `-400` |
+| `right` | `number` | Borde derecho del frustum | `400` |
+| `top` | `number` | Borde superior del frustum | `-300` |
+| `bottom` | `number` | Borde inferior del frustum | `300` |
+| `near` | `number` | Plano de corte cercano | `0.1` |
+| `far` | `number` | Plano de corte lejano | `1000` |
+
+> **SVG:** Cuando una escena tiene un nodo con `OrthographicCameraDef`, el renderer SVG calcula automáticamente el `viewBox` a partir de `left`, `right`, `top` y `bottom`, más el offset de posición de la cámara. Un `viewBox` explícito en las opciones tiene prioridad.
+
+#### Ejemplo: Cámara ortográfica para SVG
+
+```typescript
+const cam = new Node('ortho-cam');
+cam.addComponent(new Camera({
+  type: CameraType.Orthographic,
+  left: -400, right: 400,
+  top: -300, bottom: 300,
+  near: 0.1, far: 1000,
+}));
+cam.transform.position = { x: 50, y: 25, z: 0 };
+scene.add(cam);
+
+// viewBox se calcula como "-350 -275 800 600" (offset por posición de cámara)
+const svg = renderToSVG(scene, { width: 800, height: 600 });
+```
+
 > **Nota:** Si no se agrega ninguna cámara, `ThreeRenderer` crea un fallback en `(0, 0, 5)` con FOV 75.
 
 ---
@@ -645,6 +773,103 @@ scene.add(cam);
 **Archivo fuente:** [Interactive.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Interactive.ts)
 
 Marca un nodo como interactivo, permitiendo que responda a eventos de puntero (click, hover, drag, etc.).
+
+---
+
+### Animation (componente)
+
+**Archivo fuente:** [Animation.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Animation.ts)
+
+Permite agregar animaciones SVG nativas (`<animate>` y `<animateTransform>`) a un nodo. Estas animaciones se ejecutan directamente en el navegador sin JavaScript.
+
+#### Constructor
+
+```typescript
+new Animation(animations: SvgAnimationDef[])
+```
+
+#### `SvgAnimationDef` (Union type)
+
+```typescript
+type SvgAnimationDef = SvgAnimateDef | SvgAnimateTransformDef;
+```
+
+#### `SvgAnimateDef`
+
+Genera un elemento `<animate>` que anima un atributo escalar.
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `'animate'` | — | Discriminante |
+| `attributeName` | `string` | — | Atributo SVG a animar (e.g., `'opacity'`, `'r'`, `'fill'`) |
+| `from` | `string` | `undefined` | Valor inicial |
+| `to` | `string` | `undefined` | Valor final |
+| `values` | `string` | `undefined` | Lista de valores separados por `;` (alternativa a from/to) |
+| `dur` | `string` | `undefined` | Duración (e.g., `'2s'`, `'500ms'`) |
+| `repeatCount` | `string` | `undefined` | Repeticiones: un número o `'indefinite'` |
+| `begin` | `string` | `undefined` | Cuándo empieza (e.g., `'0s'`, `'click'`) |
+| `fill` | `string` | `undefined` | Comportamiento al terminar: `'freeze'` o `'remove'` |
+| `keyTimes` | `string` | `undefined` | Tiempos clave separados por `;` (0–1) |
+| `keySplines` | `string` | `undefined` | Curvas Bézier para interpolación entre keyframes |
+| `calcMode` | `string` | `undefined` | Modo de cálculo: `'linear'`, `'discrete'`, `'paced'`, `'spline'` |
+
+#### `SvgAnimateTransformDef`
+
+Genera un elemento `<animateTransform>` que anima una transformación geométrica.
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `'animateTransform'` | — | Discriminante |
+| `transformType` | `string` | — | Tipo de transformación: `'translate'`, `'scale'`, `'rotate'`, `'skewX'`, `'skewY'` |
+| `from` | `string` | `undefined` | Valor inicial (e.g., `'0 50 50'` para rotación) |
+| `to` | `string` | `undefined` | Valor final |
+| `values` | `string` | `undefined` | Lista de valores separados por `;` |
+| `dur` | `string` | `undefined` | Duración |
+| `repeatCount` | `string` | `undefined` | Repeticiones |
+| `begin` | `string` | `undefined` | Cuándo empieza |
+| `fill` | `string` | `undefined` | `'freeze'` o `'remove'` |
+| `additive` | `string` | `undefined` | `'sum'` para acumular con la transformación base |
+
+#### Ejemplo
+
+```typescript
+const circle = new Node('pulse');
+circle.addComponent(createSphere(30));
+circle.addComponent(new Material({ fill: { r: 1, g: 0, b: 0 } }));
+circle.addComponent(new Animation([
+  // Pulsar opacidad
+  {
+    type: 'animate',
+    attributeName: 'opacity',
+    values: '1;0.3;1',
+    dur: '2s',
+    repeatCount: 'indefinite',
+  },
+  // Rotar continuamente
+  {
+    type: 'animateTransform',
+    transformType: 'rotate',
+    from: '0 50 50',
+    to: '360 50 50',
+    dur: '4s',
+    repeatCount: 'indefinite',
+  },
+]));
+scene.add(circle);
+```
+
+Genera:
+```xml
+<circle cx="0" cy="0" r="30" fill="rgb(255, 0, 0)">
+  <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+  <animateTransform attributeName="transform" type="rotate"
+    from="0 50 50" to="360 50 50" dur="4s" repeatCount="indefinite" />
+</circle>
+```
+
+> **Nota:** Las animaciones SVG nativas solo tienen efecto en el renderer SVG. El renderer Three.js las ignora.
+
+---
 
 #### Definición
 
@@ -936,7 +1161,8 @@ Convierte todo el scene graph a una cadena JSON formateada con indentación de 2
 | `Transform` | ✅ | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
 | `Geometry` | ✅ | `definition` completo (tipo + parámetros) |
 | `Material` | ✅ | `definition` completo (color, opacity, fill, stroke, etc.) |
-| `Camera` | ❌ | No implementado en deserialización |
+| `Camera` | ✅ | `definition` completo (type, fov/aspect/near/far para Perspective; left/right/top/bottom/near/far para Orthographic) |
+| `Animation` | ✅ | Array de `SvgAnimationDef` (animate y animateTransform) |
 
 #### `deserialize`
 
@@ -948,7 +1174,8 @@ Reconstruye una `Scene` funcional desde un string JSON.
 
 **Comportamiento:**
 - Los UUIDs de los nodos se **preservan** (mismo ID que el original).
-- Los componentes desconocidos se **ignoran silenciosamente** (e.g., Camera).
+- Los campos `cssClass` y `cssId` se serializan y restauran.
+- Todos los componentes (`Transform`, `Geometry`, `Material`, `Camera`, `Animation`) se serializan y deserializan correctamente.
 - El nodo raíz deserializado transfiere sus hijos al raíz de la nueva escena.
 
 #### Formato del JSON
@@ -1354,6 +1581,22 @@ graph TD
     subgraph "Camera types"
         CD["CameraDef (union)"]
         CD --> PCD["PerspectiveCameraDef"]
+        CD --> OCD["OrthographicCameraDef"]
+    end
+
+    subgraph "Animation types"
+        AD["SvgAnimationDef (union)"]
+        AD --> SAD["SvgAnimateDef"]
+        AD --> SATD["SvgAnimateTransformDef"]
+    end
+
+    subgraph "Filter types"
+        FD["SvgFilterDef"]
+        FD --> FE["SvgFilterEffect (union)"]
+        FE --> BL["SvgBlurEffect"]
+        FE --> DS["SvgDropShadowEffect"]
+        CPD["SvgClipPathDef"]
+        MKD["SvgMaskDef"]
     end
 
     subgraph "Enums"
@@ -1397,6 +1640,18 @@ graph TD
 | `CameraType` | enum | Components | `@oroya/core` |
 | `PerspectiveCameraDef` | interface | Types | `@oroya/core` |
 | `CameraDef` | type alias | Types | `@oroya/core` |
+| `OrthographicCameraDef` | interface | Types | `@oroya/core` |
+| `Interactive` | class | Components | `@oroya/core` |
+| `Animation` | class | Components | `@oroya/core` |
+| `SvgAnimateDef` | interface | Types | `@oroya/core` |
+| `SvgAnimateTransformDef` | interface | Types | `@oroya/core` |
+| `SvgAnimationDef` | type alias | Types | `@oroya/core` |
+| `SvgFilterDef` | interface | Types | `@oroya/core` |
+| `SvgFilterEffect` | type alias | Types | `@oroya/core` |
+| `SvgBlurEffect` | interface | Types | `@oroya/core` |
+| `SvgDropShadowEffect` | interface | Types | `@oroya/core` |
+| `SvgClipPathDef` | interface | Types | `@oroya/core` |
+| `SvgMaskDef` | interface | Types | `@oroya/core` |
 | `createBox` | function | Factory | `@oroya/core` |
 | `createSphere` | function | Factory | `@oroya/core` |
 | `createPath2D` | function | Factory | `@oroya/core` |

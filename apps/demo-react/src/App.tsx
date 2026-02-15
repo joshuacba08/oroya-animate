@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
+import { OroyaSvg } from './OroyaSvg';
 import { ControlPanel } from './components/ControlPanel';
 import { Sidebar, SIDEBAR_WIDTH } from './components/Sidebar';
 import { DEMO_SCENES } from './scenes';
@@ -135,12 +136,20 @@ function App() {
 
       {/* Main canvas area */}
       <div style={mainAreaStyles}>
-        {/* Canvas */}
-        <OroyaCanvas
-          key={`${activeId}-${buildKey}`}
-          scene={scene}
-          onAnimate={onAnimate}
-        />
+        {/* Renderer — Three.js canvas or SVG element */}
+        {activeDemo.renderer === 'svg' ? (
+          <OroyaSvg
+            key={`${activeId}-${buildKey}`}
+            scene={scene}
+            onAnimate={onAnimate}
+          />
+        ) : (
+          <OroyaCanvas
+            key={`${activeId}-${buildKey}`}
+            scene={scene}
+            onAnimate={onAnimate}
+          />
+        )}
 
         {/* Controls panel */}
         <ControlPanel

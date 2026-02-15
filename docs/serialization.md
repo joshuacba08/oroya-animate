@@ -76,7 +76,7 @@ renderer.render();
 flowchart LR
     STR["string JSON"] -->|"JSON.parse()"| OBJ["SerializableScene"]
     OBJ -->|"deserializeNode()"| RN["Reconstruir nodos\nrecursivamente"]
-    RN -->|"switch(type)"| COMP["Recrear componentes:\nTransform, Geometry, Material"]
+    RN -->|"switch(type)"| COMP["Recrear componentes:\nTransform, Geometry, Material,\nCamera, Animation"]
     COMP --> SCENE["new Scene()"]
     RN -->|"children"| SCENE
 ```
@@ -158,7 +158,7 @@ graph TD
 | Interface | Campos | Descripción |
 |-----------|--------|-------------|
 | `SerializableScene` | `root: SerializableNode` | Contenedor de nivel superior |
-| `SerializableNode` | `id`, `name`, `components[]`, `children[]` | Representación plana de un nodo |
+| `SerializableNode` | `id`, `name`, `cssClass?`, `cssId?`, `components[]`, `children[]` | Representación plana de un nodo |
 | `SerializableComponent` | `type: ComponentType`, `+ ...data` | Cada componente con su tipo y datos |
 
 ---
@@ -173,8 +173,9 @@ Todos los componentes se serializan usando spread (`{ ...component }`):
 |------------|-------------------|
 | `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
 | `Geometry` | `definition` completo (tipo + parámetros de geometría) |
-| `Material` | `definition` completo (color, opacity, fill, stroke, strokeWidth) |
-| `Camera` | `definition` completo (type, fov, aspect, near, far) |
+| `Material` | `definition` completo (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
+| `Camera` | `definition` completo (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
+| `Animation` | `animations[]` — array de `SvgAnimationDef` (animate / animateTransform) |
 
 ### En deserialización (`deserialize`)
 
@@ -183,9 +184,10 @@ Todos los componentes se serializan usando spread (`{ ...component }`):
 | `Transform` | ✅ | `Object.assign(new Transform(), data)` |
 | `Geometry` | ✅ | `new Geometry(data.definition)` |
 | `Material` | ✅ | `new Material(data.definition)` |
-| `Camera` | ❌ | No implementado — se ignora silenciosamente |
+| `Camera` | ✅ | `new Camera(data.definition)` |
+| `Animation` | ✅ | `new Animation(data.animations)` |
 
-> **⚠️ Nota:** Las cámaras se serializan pero no se deserializan en la versión actual. Si una escena necesita cámara después de deserializar, debe agregarse manualmente.
+> **Nota:** Todos los componentes se serializan y deserializan correctamente, incluyendo `Camera` y `Animation`.
 
 ### Preservación de datos
 
@@ -203,7 +205,11 @@ Todos los componentes se serializan usando spread (`{ ...component }`):
 | Color del material | ✅ |
 | Opacidad | ✅ |
 | Fill/Stroke (SVG) | ✅ |
-| Cámara | ⚠️ Solo serializa |
+| Gradientes (fill/stroke) | ✅ |
+| Filter / ClipPath / Mask | ✅ |
+| Cámara (Perspective + Orthographic) | ✅ |
+| Animaciones SVG | ✅ |
+| `cssClass` / `cssId` | ✅ |
 
 ---
 
@@ -303,7 +309,7 @@ Los diffs de Git muestran exactamente qué cambió:
 | Limitación | Impacto | Workaround |
 |------------|---------|------------|
 | UUIDs se preservan | Dos escenas del mismo JSON tendrán nodos con IDs idénticos | Regenerar IDs post-deserialización si se necesitan escenas independientes |
-| Camera no se deserializa | La escena pierde su cámara al restaurar | Agregar la cámara manualmente después de `deserialize()` |
+| Camera no se deserializa | ~~La escena pierde su cámara al restaurar~~ | ✅ **Resuelto** — Camera y Animation se deserializan correctamente |
 | Componentes desconocidos | Si se agrega un tipo custom y no se registra en el `switch`, se ignora | Extender `deserializeNode()` con nuevos tipos |
-| JSON verbose para escenas grandes | Archivos grandes para escenas con muchos nodos | Futuro: serialización binaria (MessagePack) |
+| xxxxxxxxxx const snapshot = new Map<string, Vec3>();​scene.traverse(node => {  const wm = node.transform.worldMatrix;  snapshot.set(node.id, {    x: wm[12], // posición X del mundo    y: wm[13], // posición Y del mundo    z: wm[14], // posición Z del mundo  });});typescript | Archivos grandes para escenas con muchos nodos | Futuro: serialización binaria (MessagePack) |
 | Sin referencia a `component.node` | La referencia circular `component → node` se pierde | Se reconstruye automáticamente por `addComponent()` |

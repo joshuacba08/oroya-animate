@@ -276,15 +276,15 @@ class GradientCollector {
 
     // Filters
     for (const [def, id] of this.filterMap) {
-      const filterEl = document.createElementNS(NS, 'filter') as SVGElement;
+      const filterEl = document.createElementNS(NS, 'filter');
       filterEl.setAttribute('id', id);
       for (const e of def.effects) {
         if (e.type === 'blur') {
-          const fe = document.createElementNS(NS, 'feGaussianBlur') as SVGElement;
+          const fe = document.createElementNS(NS, 'feGaussianBlur');
           fe.setAttribute('stdDeviation', String(e.stdDeviation));
           filterEl.appendChild(fe);
         } else {
-          const fe = document.createElementNS(NS, 'feDropShadow') as SVGElement;
+          const fe = document.createElementNS(NS, 'feDropShadow');
           fe.setAttribute('dx', String(e.dx));
           fe.setAttribute('dy', String(e.dy));
           fe.setAttribute('stdDeviation', String(e.stdDeviation));
@@ -298,7 +298,7 @@ class GradientCollector {
 
     // ClipPaths
     for (const [def, id] of this.clipPathMap) {
-      const clipEl = document.createElementNS(NS, 'clipPath') as SVGElement;
+      const clipEl = document.createElementNS(NS, 'clipPath');
       clipEl.setAttribute('id', id);
       const pathEl = document.createElementNS(NS, 'path') as SVGElement;
       pathEl.setAttribute('d', pathToD(def.path));
@@ -308,7 +308,7 @@ class GradientCollector {
 
     // Masks
     for (const [def, id] of this.maskMap) {
-      const maskEl = document.createElementNS(NS, 'mask') as SVGElement;
+      const maskEl = document.createElementNS(NS, 'mask');
       maskEl.setAttribute('id', id);
       const pathEl = document.createElementNS(NS, 'path') as SVGElement;
       pathEl.setAttribute('d', pathToD(def.path));
@@ -451,7 +451,7 @@ function attachAnimationDom(el: SVGElement, node: Node, NS: string): void {
   for (const a of anim.animations) {
     if (a.type === 'animate') {
       const d = a as SvgAnimateDef;
-      const animEl = document.createElementNS(NS, 'animate') as SVGElement;
+      const animEl = document.createElementNS(NS, 'animate');
       animEl.setAttribute('attributeName', d.attributeName);
       if (d.from !== undefined) animEl.setAttribute('from', d.from);
       if (d.to !== undefined) animEl.setAttribute('to', d.to);
@@ -466,7 +466,7 @@ function attachAnimationDom(el: SVGElement, node: Node, NS: string): void {
       el.appendChild(animEl);
     } else {
       const d = a as SvgAnimateTransformDef;
-      const animEl = document.createElementNS(NS, 'animateTransform') as SVGElement;
+      const animEl = document.createElementNS(NS, 'animateTransform');
       animEl.setAttribute('attributeName', 'transform');
       animEl.setAttribute('type', d.transformType);
       if (d.from !== undefined) animEl.setAttribute('from', d.from);

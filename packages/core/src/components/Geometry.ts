@@ -31,10 +31,10 @@ export interface SphereGeometryDef {
 }
 
 /**
- * A command for a 2D path.
+ * A command for a 2D path, using standard SVG path command letters.
  */
 export interface Path2DCommand {
-  command: 'moveTo' | 'lineTo' | 'closePath';
+  command: 'M' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A' | 'Z';
   args: number[];
 }
 

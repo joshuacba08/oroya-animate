@@ -236,8 +236,12 @@ flowchart TD
     PATH & RECT & CIRCLE & TEXT --> MAT{"¿Material?"}
     MAT -->|"fill/stroke"| STYLE["fill + stroke + opacity"]
     MAT -->|"fillGradient"| GRAD["url(#gradient-id) + defs"]
+    MAT -->|"filter/clip/mask"| FILT["url(#filter-id) + defs"]
     MAT -->|"Ninguno"| NONE["fill='none'"]
-    STYLE & GRAD & NONE --> TRANSFORM{"¿Transform ≠ identity?"}
+    STYLE & GRAD & FILT & NONE --> ANIM{"¿Animation?"}
+    ANIM -->|"Sí"| ANIMC["animate / animateTransform hijos"]
+    ANIM -->|"No"| NOANIM["Sin animación"]
+    ANIMC & NOANIM --> TRANSFORM{"¿Transform ≠ identity?"}
     TRANSFORM -->|"Sí"| MATRIX["g transform='matrix(a,b,c,d,e,f)'"]
     TRANSFORM -->|"No"| DIRECT["Elemento directo"]
     MATRIX & DIRECT --> CHILDREN{"¿Hijos?"}
@@ -264,6 +268,9 @@ flowchart TD
 | `opacity` | `number` | `opacity="N"` | Sin atributo (opaco) |
 | `fillGradient` | `GradientDef` | `fill="url(#id)"` + `<defs>` | Usa `fill` normal |
 | `strokeGradient` | `GradientDef` | `stroke="url(#id)"` + `<defs>` | Usa `stroke` normal |
+| `filter` | `SvgFilterDef` | `filter="url(#id)"` + `<filter>` en `<defs>` | Sin filtro |
+| `clipPath` | `SvgClipPathDef` | `clip-path="url(#id)"` + `<clipPath>` en `<defs>` | Sin recorte |
+| `mask` | `SvgMaskDef` | `mask="url(#id)"` + `<mask>` en `<defs>` | Sin máscara |
 
 ### Transforms y jerarquía
 
@@ -327,6 +334,182 @@ label.transform.position = { x: 200, y: 30, z: 0 };
 scene.add(label);
 ```
 
+### CSS Classes y IDs semánticos
+
+Cada nodo puede tener un `cssClass` y/o `cssId` que se emiten como atributos `class` e `id` en los elementos SVG generados.
+
+```typescript
+const node = new Node('highlight-box');
+node.addComponent(createBox(100, 60, 0));
+node.addComponent(new Material({ fill: { r: 1, g: 0.9, b: 0 } }));
+node.cssClass = 'highlight animated';
+node.cssId = 'main-callout';
+scene.add(node);
+```
+
+Genera:
+```xml
+<rect id="main-callout" class="highlight animated" x="-50" y="-30" width="100" height="60" fill="rgb(255, 230, 0)" />
+```
+
+Cuando el nodo tiene hijos o transform, el atributo se aplica al `<g>` contenedor:
+```xml
+<g id="main-callout" class="highlight animated" transform="matrix(1,0,0,1,50,25)">
+  <rect x="-50" y="-30" width="100" height="60" fill="rgb(255, 230, 0)" />
+</g>
+```
+
+> **Serialización:** `cssClass` y `cssId` se preservan en `serialize()` / `deserialize()`.
+
+### Cámara ortográfica y viewBox
+
+Si la escena contiene un nodo con `OrthographicCameraDef`, el renderer SVG calcula automáticamente el `viewBox` a partir del frustum de la cámara. Un `viewBox` explícito en las opciones tiene prioridad.
+
+```typescript
+const cam = new Node('ortho-cam');
+cam.addComponent(new Camera({
+  type: CameraType.Orthographic,
+  left: -400, right: 400,
+  top: -300, bottom: 300,
+  near: 0.1, far: 1000,
+}));
+scene.add(cam);
+
+// viewBox se calcula como "-400 -300 800 600"
+const svg = renderToSVG(scene, { width: 800, height: 600 });
+```
+
+La posición de la cámara se aplica como offset al viewBox:
+```typescript
+cam.transform.position = { x: 50, y: 25, z: 0 };
+// viewBox se calcula como "-350 -275 800 600"
+```
+
+### SVG Filters, Clip Paths y Masks
+
+El renderer soporta filtros SVG nativos, clip paths y máscaras a través de campos en `MaterialDef`.
+
+#### Blur
+
+```typescript
+const blurred = new Node('soft');
+blurred.addComponent(createSphere(40));
+blurred.addComponent(new Material({
+  fill: { r: 0.5, g: 0.8, b: 1 },
+  filter: { effects: [{ type: 'blur', stdDeviation: 3 }] },
+}));
+```
+
+Genera:
+```xml
+<defs>
+  <filter id="oroya-filter-0">
+    <feGaussianBlur stdDeviation="3" />
+  </filter>
+</defs>
+<circle cx="0" cy="0" r="40" fill="rgb(128, 204, 255)" filter="url(#oroya-filter-0)" />
+```
+
+#### Drop Shadow
+
+```typescript
+new Material({
+  fill: { r: 1, g: 0, b: 0 },
+  filter: {
+    effects: [{
+      type: 'dropShadow', dx: 4, dy: 4,
+      stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6,
+    }],
+  },
+});
+```
+
+#### Clip Path
+
+```typescript
+new Material({
+  fill: { r: 0, g: 1, b: 0 },
+  clipPath: {
+    path: [
+      { command: 'M', args: [0, 0] },
+      { command: 'L', args: [100, 0] },
+      { command: 'L', args: [50, 100] },
+      { command: 'Z', args: [] },
+    ],
+  },
+});
+```
+
+#### Mask
+
+```typescript
+new Material({
+  fill: { r: 0, g: 0, b: 1 },
+  mask: {
+    path: [
+      { command: 'M', args: [0, 0] },
+      { command: 'L', args: [80, 0] },
+      { command: 'L', args: [80, 80] },
+      { command: 'Z', args: [] },
+    ],
+    fill: 'white',
+    opacity: 0.8,
+  },
+});
+```
+
+### SVG Animaciones nativas
+
+El componente `Animation` permite agregar animaciones SVG declarativas (`<animate>` y `<animateTransform>`) que se ejecutan en el navegador sin JavaScript.
+
+```typescript
+import { Animation } from '@oroya/core';
+
+const circle = new Node('pulse');
+circle.addComponent(createSphere(30));
+circle.addComponent(new Material({ fill: { r: 1, g: 0, b: 0 } }));
+circle.addComponent(new Animation([
+  {
+    type: 'animate',
+    attributeName: 'opacity',
+    values: '1;0.3;1',
+    dur: '2s',
+    repeatCount: 'indefinite',
+  },
+]));
+```
+
+Genera:
+```xml
+<circle cx="0" cy="0" r="30" fill="rgb(255, 0, 0)">
+  <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+</circle>
+```
+
+Animaciones de transformación:
+```typescript
+new Animation([
+  {
+    type: 'animateTransform',
+    transformType: 'rotate',
+    from: '0 50 50',
+    to: '360 50 50',
+    dur: '4s',
+    repeatCount: 'indefinite',
+  },
+]);
+```
+
+Genera:
+```xml
+<animateTransform attributeName="transform" type="rotate"
+  from="0 50 50" to="360 50 50" dur="4s" repeatCount="indefinite" />
+```
+
+> **fill="freeze"** mantiene el valor final después de que la animación termina, en lugar de revertir.
+
+> **Nota:** Las animaciones nativas solo aplican al renderer SVG. El renderer Three.js las ignora.
+
 ### Ejemplo completo
 
 ```typescript
@@ -382,6 +565,9 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 | `strokeWidth` | ❌ | ✅ |
 | `fillGradient` | ❌ | ✅ |
 | `strokeGradient` | ❌ | ✅ |
+| `filter` | ❌ | ✅ |
+| `clipPath` | ❌ | ✅ |
+| `mask` | ❌ | ✅ |
 
 ### Soporte de transforms
 
@@ -391,6 +577,16 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 | Rotation | ✅ | ✅ `matrix()` |
 | Scale | ✅ | ✅ `matrix()` |
 | Jerarquía (`<g>`) | ✅ Groups | ✅ `<g>` |
+
+### Soporte de componentes especiales
+
+| Feature | Three.js | SVG |
+|---------|----------|-----|
+| `Camera` (Perspective) | ✅ | ❌ |
+| `Camera` (Orthographic) | ❌ | ✅ viewBox |
+| `Interactive` (eventos) | ✅ Raycaster | ✅ Event delegation |
+| `Animation` (SVG nativo) | ❌ | ✅ `<animate>` / `<animateTransform>` |
+| `cssClass` / `cssId` | ❌ | ✅ atributos `class` / `id` |
 
 ---
 
