@@ -1,61 +1,81 @@
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
 import { ThreeRenderer } from '@oroya/renderer-three';
+import { DEMO_SCENES } from './scenes';
 
-// 1. Setup Scene
-const scene = new Scene();
+// ── State ────────────────────────────────────────────────────────────
+let activeId = DEMO_SCENES[0].id;
+let renderer: ThreeRenderer | null = null;
+let animationFrameId = 0;
+let currentAnimate: ((time: number) => void) | null = null;
 
-// Create a camera
-const cameraNode = new Node('camera');
-cameraNode.addComponent(new Camera({
-  type: CameraType.Perspective,
-  fov: 75,
-  aspect: window.innerWidth / window.innerHeight,
-  near: 0.1,
-  far: 1000,
-}));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
-
-// Create a box
-const boxNode = new Node('rotating-box');
-boxNode.addComponent(createBox(1, 1, 1));
-boxNode.addComponent(new Material({ color: { r: 0.1, g: 0.4, b: 0.8 } }));
-scene.add(boxNode);
-
-
-// 2. Setup Renderer
+// ── DOM refs ─────────────────────────────────────────────────────────
 const canvas = document.getElementById('oroya-canvas') as HTMLCanvasElement;
-const renderer = new ThreeRenderer({
-  canvas,
-  width: window.innerWidth,
-  height: window.innerHeight,
+const nav = document.getElementById('nav')!;
+const infoTitle = document.getElementById('info-title')!;
+const infoDesc = document.getElementById('info-desc')!;
+
+// ── Build navigation buttons ─────────────────────────────────────────
+DEMO_SCENES.forEach((demo) => {
+  const btn = document.createElement('button');
+  btn.textContent = demo.label;
+  btn.className = 'nav-btn';
+  btn.dataset.id = demo.id;
+  btn.addEventListener('click', () => switchDemo(demo.id));
+  nav.appendChild(btn);
 });
 
-// 3. Mount scene to renderer
-renderer.mount(scene);
+// ── Core functions ───────────────────────────────────────────────────
 
-// 4. Animation loop
-function animate(time: number) {
-  time *= 0.001; // convert time to seconds
+function switchDemo(id: string) {
+  // Tear down previous
+  cancelAnimationFrame(animationFrameId);
+  renderer?.dispose();
+  renderer = null;
 
-  // Mutate the transform of the box node
-  const { transform } = boxNode;
-  const speed = 0.5;
-  transform.rotation.x = Math.sin(time * speed) * 2;
-  transform.rotation.y = Math.cos(time * speed) * 2;
-  transform.updateLocalMatrix(); // Mark the transform as dirty
+  activeId = id;
+  const demo = DEMO_SCENES.find((d) => d.id === id)!;
 
-  // Render the scene
-  renderer.render();
+  // Update info panel
+  infoTitle.textContent = demo.label;
+  infoDesc.textContent = demo.description;
 
-  requestAnimationFrame(animate);
+  // Update active button
+  nav.querySelectorAll('.nav-btn').forEach((btn) => {
+    const el = btn as HTMLElement;
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+
+  // Create new scene
+  const { scene, animate } = demo.factory();
+  currentAnimate = animate;
+
+  // Create renderer
+  renderer = new ThreeRenderer({
+    canvas,
+    width: canvas.clientWidth,
+    height: canvas.clientHeight,
+  });
+  renderer.mount(scene);
+
+  // Start animation loop
+  function loop(time: number) {
+    const t = time * 0.001;
+    currentAnimate?.(t);
+    renderer?.render();
+    animationFrameId = requestAnimationFrame(loop);
+  }
+  animationFrameId = requestAnimationFrame(loop);
 }
 
-requestAnimationFrame(animate);
-
-// Handle window resize
+// ── Resize handling ──────────────────────────────────────────────────
 window.addEventListener('resize', () => {
-  // A real app would have resize logic in the renderer
-  // For now, we'll just reload.
-  window.location.reload();
+  // Update camera aspect ratio for current scene
+  const demo = DEMO_SCENES.find((d) => d.id === activeId);
+  if (!demo) return;
+
+  // We can't access the scene from the renderer directly,
+  // so we just let the canvas CSS handle visual sizing.
+  // Camera aspect update would need scene reference — keep for future.
 });
+
+// ── Boot ─────────────────────────────────────────────────────────────
+switchDemo(activeId);

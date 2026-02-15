@@ -1,12 +1,38 @@
 # Renderers
 
-Oroya Animate uses a "compiler" pattern: renderers translate the engine-agnostic Scene Graph into technology-specific objects. This page documents the currently available renderers.
+Los renderers de Oroya Animate son **traductores** que convierten el scene graph agnóstico en salida visual. El core no conoce a los renderers — cada uno lee el scene graph y produce su propia representación.
+
+---
+
+## Visión general
+
+```mermaid
+graph TD
+    SG["Scene Graph\n(@oroya/core)"]
+    R3["ThreeRenderer\n(@oroya/renderer-three)"]
+    RS["renderToSVG\n(@oroya/renderer-svg)"]
+    WEBGL["WebGL Canvas (3D)"]
+    SVG["SVG String (2D)"]
+
+    SG -->|"mount + render"| R3
+    SG -->|"function call"| RS
+    R3 --> WEBGL
+    RS --> SVG
+```
+
+| Aspecto | `ThreeRenderer` | `renderToSVG` |
+|---------|----------------|---------------|
+| **Paradigma** | Instancia con estado (class) | Función pura (stateless) |
+| **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
+| **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
+| **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
+| **Vectorial** | ❌ Rasterizado | ✅ Infinitamente escalable |
 
 ---
 
 ## `@oroya/renderer-three` — Three.js (WebGL)
 
-The primary 3D renderer. It uses [Three.js](https://threejs.org/) under the hood to produce high-quality WebGL output.
+El renderer principal para visualización 3D interactiva.
 
 ### Setup
 
@@ -15,45 +41,83 @@ import { ThreeRenderer } from '@oroya/renderer-three';
 
 const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: 800,
-  height: 600,
-  dpr: window.devicePixelRatio, // optional
+  width: window.innerWidth,
+  height: window.innerHeight,
+  dpr: window.devicePixelRatio,  // opcional
 });
 ```
 
-### Options
+### Opciones del constructor
 
-| Option   | Type               | Default                  | Description                  |
-|----------|--------------------|--------------------------|------------------------------|
-| `canvas` | `HTMLCanvasElement` | —                        | **Required.** Target canvas. |
-| `width`  | `number`           | —                        | **Required.** Viewport width.|
-| `height` | `number`           | —                        | **Required.** Viewport height.|
-| `dpr`    | `number`           | `window.devicePixelRatio`| Device pixel ratio.          |
+| Opción | Tipo | Default | Descripción |
+|--------|------|---------|-------------|
+| `canvas` | `HTMLCanvasElement` | *(requerido)* | Elemento canvas destino |
+| `width` | `number` | *(requerido)* | Ancho del viewport |
+| `height` | `number` | *(requerido)* | Alto del viewport |
+| `dpr` | `number` | `window.devicePixelRatio` | Device pixel ratio (HiDPI) |
 
-### API
+### Métodos
 
-| Method             | Description                                                              |
-|--------------------|--------------------------------------------------------------------------|
-| `mount(scene)`     | Connects an Oroya `Scene` and builds the initial Three.js scene objects. |
-| `render()`         | Syncs Oroya transforms to Three.js objects and renders a frame.          |
-| `dispose()`        | Cleans up WebGL resources. Call when unmounting.                         |
+| Método | Descripción |
+|--------|-------------|
+| `mount(scene)` | Conecta una escena. Reconstruye la escena Three.js, detecta la cámara activa, agrega luces |
+| `render()` | Sincroniza transforms, propaga matrices y dibuja un frame |
+| `dispose()` | Libera recursos WebGL |
 
-### How it works
-1. **`mount()`** traverses the Oroya Scene Graph. For each node with a `Geometry` component, it creates the corresponding `THREE.Mesh`. Nodes with a `Camera` component become `THREE.PerspectiveCamera` instances. The first camera found becomes the **active camera**.
-2. **`render()`** calls `scene.updateWorldMatrices()`, then reads each node's `worldMatrix` and applies it to its Three.js counterpart via `matrix.fromArray()` + `decompose()`. Finally, it renders the frame with the active camera.
-3. If no camera node is found in the scene graph, a fallback `PerspectiveCamera` at `z = 5` is created automatically.
-4. Ambient and directional lighting are added by default.
+### Ciclo de vida
 
-### Supported Geometries
-- `Box` → `THREE.BoxGeometry`
-- `Sphere` → `THREE.SphereGeometry`
+```mermaid
+sequenceDiagram
+    participant U as User Code
+    participant TR as ThreeRenderer
+    participant TS as THREE.Scene
 
-### Supported Components
-- `Geometry` → `THREE.Mesh`
-- `Material` → `THREE.MeshStandardMaterial` (color, opacity, transparency)
-- `Camera` → `THREE.PerspectiveCamera` (Perspective type)
+    Note over U,TS: Montaje
+    U->>TR: mount(scene)
+    TR->>TS: clear + add lights
+    TR->>TR: traverse → create Mesh/Group/Camera per node
+    TR->>TR: Set first Camera as activeCamera
 
-### Example (Vanilla)
+    Note over U,TS: Render loop
+    loop requestAnimationFrame
+        U->>TR: render()
+        TR->>TR: updateWorldMatrices()
+        TR->>TS: sync worldMatrix → Three.js objects
+        TR->>TR: webglRenderer.render()
+    end
+```
+
+### Traducción de componentes
+
+| Nodo Oroya | Objeto Three.js |
+|------------|-----------------|
+| Node sin Geometry ni Camera | `THREE.Group` |
+| Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
+| Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
+| Node + `Geometry(Path2D)` | ❌ Ignorado |
+| Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
+| `Material` con `color` | `MeshStandardMaterial({ color })` |
+| `Material` con `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
+| Sin `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
+
+### Iluminación automática
+
+| Tipo | Config |
+|------|--------|
+| `AmbientLight` | Blanco, intensidad `0.5` |
+| `DirectionalLight` | Blanco, intensidad `1.5`, posición `(2, 5, 3)` |
+
+### Resolución de cámaras
+
+```mermaid
+flowchart TD
+    START["mount(scene)"] --> TRAVERSE["Traverse scene graph"]
+    TRAVERSE --> FOUND{"¿Encontró Camera?"}
+    FOUND -->|"Sí"| USE["Usar primera como activa"]
+    FOUND -->|"No"| FALLBACK["Fallback: PerspectiveCamera, FOV 75, z=5"]
+```
+
+### Ejemplo completo
 
 ```typescript
 import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
@@ -61,19 +125,14 @@ import { ThreeRenderer } from '@oroya/renderer-three';
 
 const scene = new Scene();
 
-// Camera
 const cam = new Node('cam');
 cam.addComponent(new Camera({
-  type: CameraType.Perspective,
-  fov: 75,
-  aspect: window.innerWidth / window.innerHeight,
-  near: 0.1,
-  far: 1000,
+  type: CameraType.Perspective, fov: 75,
+  aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000,
 }));
 cam.transform.position.z = 5;
 scene.add(cam);
 
-// Box
 const box = new Node('box');
 box.addComponent(createBox(1, 1, 1));
 box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
@@ -81,14 +140,12 @@ scene.add(box);
 
 const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: window.innerWidth, height: window.innerHeight,
 });
 renderer.mount(scene);
 
-function loop(time: number) {
-  time *= 0.001;
-  box.transform.rotation.y = time;
+function loop() {
+  box.transform.rotation.y = performance.now() * 0.001;
   box.transform.updateLocalMatrix();
   renderer.render();
   requestAnimationFrame(loop);
@@ -100,54 +157,57 @@ requestAnimationFrame(loop);
 
 ## `@oroya/renderer-svg` — SVG (2D)
 
-A lightweight renderer that outputs SVG markup from a 2D scene. Ideal for diagrams, icons, and server-side rendering.
+Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### Usage
+### API
 
 ```typescript
 import { renderToSVG } from '@oroya/renderer-svg';
 
-const svgString = renderToSVG(scene, {
-  width: 400,
-  height: 300,
-  viewBox: '0 0 400 300', // optional
-});
-
-document.getElementById('container')!.innerHTML = svgString;
+const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 ```
 
-### Options
+### Opciones
 
-| Option    | Type     | Default                    | Description             |
-|-----------|----------|----------------------------|-------------------------|
-| `width`   | `number` | —                          | **Required.** SVG width.|
-| `height`  | `number` | —                          | **Required.** SVG height.|
-| `viewBox` | `string` | `"0 0 {width} {height}"`  | SVG viewBox attribute.  |
+| Opción | Tipo | Default | Descripción |
+|--------|------|---------|-------------|
+| `width` | `number` | *(requerido)* | Ancho del SVG |
+| `height` | `number` | *(requerido)* | Alto del SVG |
+| `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox personalizado |
 
-### Supported Geometries
-- `Path2D` → `<path>` element
+### Pipeline
 
-### Material Properties (SVG-specific)
+```mermaid
+flowchart TD
+    START["renderToSVG(scene, opts)"] --> TRAVERSE["scene.traverse()"]
+    TRAVERSE --> CHECK{"¿Geometry(Path2D)?"}
+    CHECK -->|"No"| SKIP["Ignorar"]
+    CHECK -->|"Sí"| PATH["Generar path d='...'"]
+    PATH --> MAT{"¿Material?"}
+    MAT -->|"Sí"| STYLE["fill + stroke + stroke-width"]
+    MAT -->|"No"| NONE["fill='none'"]
+    STYLE --> COLLECT["→ array"]
+    NONE --> COLLECT
+    COLLECT -->|"Fin"| BUILD["Construir svg string"]
+```
 
-| Property      | Type       | Description                        |
-|---------------|------------|------------------------------------|
-| `fill`        | `ColorRGB` | Fill color of the SVG shape.       |
-| `stroke`      | `ColorRGB` | Stroke color of the SVG shape.     |
-| `strokeWidth` | `number`   | Width of the stroke.               |
+### Propiedades del material para SVG
 
-### Example
+| Campo | Tipo | Efecto SVG | Si ausente |
+|-------|------|-----------|------------|
+| `fill` | `ColorRGB` | `fill="rgb(R,G,B)"` | `fill="none"` |
+| `stroke` | `ColorRGB` | `stroke="rgb(R,G,B)"` | Sin stroke |
+| `strokeWidth` | `number` | `stroke-width="N"` | `1` |
+
+### Ejemplo
 
 ```typescript
-import { Scene, Node, createPath2D, Material } from '@oroya/core';
-import { renderToSVG } from '@oroya/renderer-svg';
-
-const scene = new Scene();
 const triangle = new Node('triangle');
 triangle.addComponent(createPath2D([
-  { command: 'moveTo', args: [200, 50] },
-  { command: 'lineTo', args: [350, 250] },
-  { command: 'lineTo', args: [50, 250] },
-  { command: 'closePath', args: [] },
+  { command: 'M', args: [200, 50] },
+  { command: 'L', args: [350, 250] },
+  { command: 'L', args: [50, 250] },
+  { command: 'Z', args: [] },
 ]));
 triangle.addComponent(new Material({
   fill: { r: 0.2, g: 0.8, b: 0.4 },
@@ -157,31 +217,95 @@ triangle.addComponent(new Material({
 scene.add(triangle);
 
 const svg = renderToSVG(scene, { width: 400, height: 300 });
-console.log(svg); // <svg>...</svg>
 ```
+
+### Casos de uso
+
+| Caso | Ventaja |
+|------|---------|
+| Exportar a .svg | Abrir en Figma, Illustrator, Inkscape |
+| Server-side rendering | Node.js sin DOM |
+| Arte generativo | Patrones procedurales como vectores |
+| Impresión | Escalable sin pérdida |
 
 ---
 
-## Adding a Custom Renderer
+## Comparación entre renderers
 
-Since `@oroya/core` is completely agnostic, you can build your own renderer. The pattern is:
+### Soporte de geometrías
 
-1. Accept an Oroya `Scene` in a `mount()` method.
-2. Use `scene.traverse()` to walk all nodes.
-3. Read `ComponentType.Geometry` and `ComponentType.Material` to build your engine's objects.
-4. On each `render()` call, sync transforms from Oroya nodes to your engine.
+| Geometría | Three.js | SVG |
+|-----------|----------|-----|
+| `Box` | ✅ | ❌ |
+| `Sphere` | ✅ | ❌ |
+| `Path2D` | ❌ | ✅ |
+
+### Soporte de material
+
+| Propiedad | Three.js | SVG |
+|-----------|----------|-----|
+| `color` | ✅ | ❌ |
+| `opacity` | ✅ | ❌ |
+| `fill` | ❌ | ✅ |
+| `stroke` | ❌ | ✅ |
+| `strokeWidth` | ❌ | ✅ |
+
+---
+
+## Crear un renderer personalizado
+
+El contrato es simple — implementar `mount`, `render` y `dispose`:
 
 ```typescript
-// Pseudocode for a Canvas2D renderer
+import { Scene, ComponentType, Geometry, Material, GeometryPrimitive } from '@oroya/core';
+
 export class Canvas2DRenderer {
-  mount(scene: Scene) {
-    scene.traverse((node) => {
-      // Build Canvas2D draw commands from node components
+  private ctx: CanvasRenderingContext2D;
+  private scene: Scene | null = null;
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.ctx = canvas.getContext('2d')!;
+  }
+
+  mount(scene: Scene): void { this.scene = scene; }
+
+  render(): void {
+    if (!this.scene) return;
+    this.scene.updateWorldMatrices();
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+    this.scene.traverse(node => {
+      const geo = node.getComponent<Geometry>(ComponentType.Geometry);
+      if (!geo) return;
+      const mat = node.getComponent<Material>(ComponentType.Material);
+      const wm = node.transform.worldMatrix;
+
+      this.ctx.save();
+      this.ctx.translate(wm[12], wm[13]);
+
+      if (geo.definition.type === GeometryPrimitive.Box) {
+        const { width, height } = geo.definition;
+        if (mat?.definition.color) {
+          const c = mat.definition.color;
+          this.ctx.fillStyle = `rgb(${c.r*255},${c.g*255},${c.b*255})`;
+        }
+        this.ctx.fillRect(-width/2, -height/2, width, height);
+      }
+      this.ctx.restore();
     });
   }
 
-  render() {
-    // Clear canvas, redraw based on current node transforms
-  }
+  dispose(): void { this.scene = null; }
 }
 ```
+
+### Checklist
+
+| Paso | Descripción |
+|------|-------------|
+| 1 | Crear paquete en `packages/renderer-xxx/` |
+| 2 | Agregar `@oroya/core` como dependencia |
+| 3 | Implementar `mount()` — recorrer árbol y crear objetos |
+| 4 | Implementar `render()` — sincronizar transforms y dibujar |
+| 5 | Implementar `dispose()` — liberar recursos |
+| 6 | Documentar geometrías y materiales soportados |
