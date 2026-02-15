@@ -1,0 +1,56 @@
+# Node dependencies
+node_modules/
+
+# pnpm store (local)
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+lib/
+**/dist/
+
+# Vite / bundler cache
+.vite/
+node_modules/.vite/
+.parcel-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Testing
+coverage/
+.vitest/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-workspace
+.history/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# Caches and temp
+.cache/
+.turbo/
+
+# Misc
+*.tgz
+*.local
+
+# Ensure package-lock (if present) isn't accidentally committed from other package managers
+package-lock.json

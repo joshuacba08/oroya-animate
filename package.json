@@ -7,11 +7,11 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "pnpm --filter "./packages/**" build",
+    "build": "pnpm --filter \"./packages/**\" build",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "dev:vanilla": "pnpm --filter "demo-vanilla" dev",
-    "dev:react": "pnpm --filter "demo-react" dev",
+    "dev:vanilla": "pnpm --filter \"demo-vanilla\" dev",
+    "dev:react": "pnpm --filter \"demo-react\" dev",
     "clean": "pnpm -r exec rm -rf dist .turbo",
     "typecheck": "pnpm -r typecheck"
   },

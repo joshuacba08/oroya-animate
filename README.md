@@ -35,6 +35,10 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 - [**Architecture Overview**](docs/architecture.md): Learn about the core engine-agnostic design.
 - [**Getting Started**](docs/getting-started.md): Your first scene in 5 minutes.
 - [**Scene Graph & Transformations**](docs/scene-graph.md): Deep dive into nodes and components.
+- [**API Reference**](docs/api-reference.md): Complete reference of classes, interfaces and functions.
+- [**Renderers**](docs/renderers.md): Three.js and SVG backends documentation.
+- [**Serialization**](docs/serialization.md): Save and load scenes as JSON.
+- [**Contributing & Development**](docs/contributing.md): Setup, scripts, and development workflow.
 ##  Getting Started
 
 ### Prerequisites

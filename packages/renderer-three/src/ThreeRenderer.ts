@@ -5,8 +5,11 @@ import {
   ComponentType,
   Geometry as OroyaGeometry,
   Material as OroyaMaterial,
+  Camera as OroyaCamera,
   GeometryPrimitive,
   BoxGeometryDef,
+  SphereGeometryDef,
+  PerspectiveCameraDef,
 } from '@oroya/core';
 
 interface ThreeRendererOptions {
@@ -19,7 +22,7 @@ interface ThreeRendererOptions {
 export class ThreeRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene: THREE.Scene;
-  private readonly camera: THREE.PerspectiveCamera;
+  private activeCamera: THREE.Camera | null = null;
   private oroyaScene: OroyaScene | null = null;
   private nodeMap: Map<string, THREE.Object3D> = new Map();
 
@@ -33,13 +36,6 @@ export class ThreeRenderer {
     this.renderer.setPixelRatio(options.dpr ?? window.devicePixelRatio);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      options.width / options.height,
-      0.1,
-      1000
-    );
-    this.camera.position.z = 5;
   }
 
   mount(oroyaScene: OroyaScene) {
@@ -48,31 +44,28 @@ export class ThreeRenderer {
   }
 
   render() {
-    if (!this.oroyaScene) return;
+    if (!this.oroyaScene || !this.activeCamera) return;
 
-    // This is the "compiler" step, run on each frame for dynamic updates
+    this.oroyaScene.updateWorldMatrices();
+
     this.oroyaScene.root.traverse((oroyaNode) => {
       const threeObject = this.nodeMap.get(oroyaNode.id);
       if (threeObject) {
-        // Apply transform updates
-        const { position, rotation, scale } = oroyaNode.transform;
-        threeObject.position.set(position.x, position.y, position.z);
-        threeObject.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-        threeObject.scale.set(scale.x, scale.y, scale.z);
+        threeObject.matrix.fromArray(oroyaNode.transform.worldMatrix);
+        threeObject.matrix.decompose(threeObject.position, threeObject.quaternion, threeObject.scale);
       }
     });
 
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.activeCamera);
   }
   
   private rebuildScene() {
     if (!this.oroyaScene) return;
 
-    // Clear previous objects
     this.scene.clear();
     this.nodeMap.clear();
+    this.activeCamera = null;
 
-    // Add some ambient light
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
     dirLight.position.set(2, 5, 3);
@@ -83,30 +76,42 @@ export class ThreeRenderer {
       if (threeObject) {
         this.nodeMap.set(oroyaNode.id, threeObject);
         
-        // Find parent in the map and attach
         const parentThreeObject = oroyaNode.parent ? this.nodeMap.get(oroyaNode.parent.id) : this.scene;
         parentThreeObject?.add(threeObject);
+
+        if (threeObject instanceof THREE.Camera && !this.activeCamera) {
+          this.activeCamera = threeObject;
+        }
       }
     });
+
+    if (!this.activeCamera) {
+      const defaultCamera = new THREE.PerspectiveCamera(75, this.renderer.domElement.width / this.renderer.domElement.height, 0.1, 1000);
+      defaultCamera.position.z = 5;
+      this.scene.add(defaultCamera);
+      this.activeCamera = defaultCamera;
+    }
   }
 
   private createThreeObject(oroyaNode: OroyaNode): THREE.Object3D | null {
-    const geoComponent = oroyaNode.getComponent<OroyaGeometry>(ComponentType.Geometry);
-    if (!geoComponent) {
-      // Create a group for nodes without geometry, so they can have children
-      return new THREE.Group();
-    }
+    let threeObject: THREE.Object3D | null = null;
 
-    const matComponent = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material);
-
-    const threeGeometry = this.createThreeGeometry(geoComponent);
-    const threeMaterial = this.createThreeMaterial(matComponent);
-    
-    if (threeGeometry && threeMaterial) {
-      return new THREE.Mesh(threeGeometry, threeMaterial);
+    if (oroyaNode.hasComponent(ComponentType.Geometry)) {
+      const geoComponent = oroyaNode.getComponent<OroyaGeometry>(ComponentType.Geometry)!;
+      const matComponent = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material);
+      const threeGeometry = this.createThreeGeometry(geoComponent);
+      const threeMaterial = this.createThreeMaterial(matComponent);
+      if (threeGeometry && threeMaterial) {
+        threeObject = new THREE.Mesh(threeGeometry, threeMaterial);
+      }
+    } else if (oroyaNode.hasComponent(ComponentType.Camera)) {
+      const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
+      threeObject = this.createThreeCamera(camComponent);
+    } else {
+      threeObject = new THREE.Group();
     }
     
-    return null;
+    return threeObject;
   }
 
   private createThreeGeometry(oroyaGeo: OroyaGeometry): THREE.BufferGeometry | null {
@@ -115,7 +120,9 @@ export class ThreeRenderer {
       case GeometryPrimitive.Box:
         const { width, height, depth } = definition as BoxGeometryDef;
         return new THREE.BoxGeometry(width, height, depth);
-      // Other cases would go here
+      case GeometryPrimitive.Sphere:
+        const { radius, widthSegments, heightSegments } = definition as SphereGeometryDef;
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
       default:
         return null;
     }
@@ -139,7 +146,19 @@ export class ThreeRenderer {
     return new THREE.MeshStandardMaterial(props);
   }
 
+  private createThreeCamera(oroyaCam: OroyaCamera): THREE.Camera | null {
+    const { definition } = oroyaCam;
+    switch(definition.type) {
+      case 'Perspective':
+        const { fov, aspect, near, far } = definition as PerspectiveCameraDef;
+        return new THREE.PerspectiveCamera(fov, aspect, near, far);
+      default:
+        return null;
+    }
+  }
+
   dispose() {
     this.renderer.dispose();
   }
 }
+

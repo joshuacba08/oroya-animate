@@ -1,4 +1,4 @@
-import { Scene, Node, createBox, Material } from '@oroya/core';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
 import { OroyaCanvas } from './OroyaCanvas';
 import { useMemo } from 'react';
 
@@ -21,10 +21,25 @@ function App() {
   // Create the scene only once
   const scene = useMemo(() => {
     const scene = new Scene();
+
+    // Add a camera
+    const cameraNode = new Node('camera-react');
+    cameraNode.addComponent(new Camera({
+      type: CameraType.Perspective,
+      fov: 75,
+      aspect: window.innerWidth / window.innerHeight,
+      near: 0.1,
+      far: 1000,
+    }));
+    cameraNode.transform.position.z = 5;
+    scene.add(cameraNode);
+
+    // Add a box
     const boxNode = new Node('rotating-box-react');
     boxNode.addComponent(createBox(1.5, 1.5, 1.5));
     boxNode.addComponent(new Material({ color: { r: 0.8, g: 0.1, b: 0.4 } }));
     scene.add(boxNode);
+
     return scene;
   }, []);
 

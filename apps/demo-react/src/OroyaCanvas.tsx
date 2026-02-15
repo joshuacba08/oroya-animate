@@ -29,10 +29,11 @@ export function OroyaCanvas({ scene }: OroyaCanvasProps) {
       const boxNode = scene.findNodeByName('rotating-box-react');
       
       if (boxNode) {
-        const { rotation } = boxNode.transform;
+        const { transform } = boxNode;
         const speed = 0.4;
-        rotation.x = Math.cos(time * speed);
-        rotation.y = Math.sin(time * speed);
+        transform.rotation.x = Math.cos(time * speed);
+        transform.rotation.y = Math.sin(time * speed);
+        transform.updateLocalMatrix(); // Mark the transform as dirty
       }
       
       renderer.render();
@@ -49,3 +50,4 @@ export function OroyaCanvas({ scene }: OroyaCanvasProps) {
 
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />;
 }
+
