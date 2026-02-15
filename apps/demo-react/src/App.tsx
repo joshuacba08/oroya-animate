@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
+import { ControlPanel } from './components/ControlPanel';
 import { DEMO_SCENES } from './scenes';
+import { getDefaultParams } from './types';
+import type { ParamValues } from './types';
 
-/* ------------------------------------------------------------------ */
-/*  Styles                                                             */
-/* ------------------------------------------------------------------ */
+/* ── Styles ───────────────────────────────────────────────────────────── */
 
 const containerStyles: React.CSSProperties = {
   width: '100%',
@@ -25,7 +26,7 @@ const headerStyles: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '16px 24px',
+  padding: '14px 20px',
   background: 'linear-gradient(to bottom, rgba(13,13,18,0.95) 0%, rgba(13,13,18,0) 100%)',
   pointerEvents: 'none',
 };
@@ -43,16 +44,16 @@ const logoAccentStyles: React.CSSProperties = {
 
 const navStyles: React.CSSProperties = {
   display: 'flex',
-  gap: '6px',
+  gap: '4px',
   pointerEvents: 'auto',
 };
 
-const navButtonBase: React.CSSProperties = {
-  padding: '8px 16px',
+const navBtnBase: React.CSSProperties = {
+  padding: '7px 14px',
   borderRadius: '8px',
   border: '1px solid transparent',
   cursor: 'pointer',
-  fontSize: '13px',
+  fontSize: '12.5px',
   fontWeight: 500,
   transition: 'all 0.2s ease',
   fontFamily: 'inherit',
@@ -60,43 +61,73 @@ const navButtonBase: React.CSSProperties = {
 
 const infoBoxStyles: React.CSSProperties = {
   position: 'absolute',
-  bottom: '24px',
-  left: '24px',
+  bottom: '20px',
+  left: '20px',
   zIndex: 10,
-  maxWidth: '420px',
-  padding: '16px 20px',
+  maxWidth: '380px',
+  padding: '14px 18px',
   borderRadius: '12px',
-  background: 'rgba(255,255,255,0.06)',
+  background: 'rgba(255,255,255,0.05)',
   backdropFilter: 'blur(12px)',
   border: '1px solid rgba(255,255,255,0.08)',
 };
 
 const infoTitleStyles: React.CSSProperties = {
-  fontSize: '16px',
+  fontSize: '15px',
   fontWeight: 600,
-  marginBottom: '6px',
+  marginBottom: '4px',
 };
 
 const infoDescStyles: React.CSSProperties = {
-  fontSize: '13px',
+  fontSize: '12.5px',
   lineHeight: 1.5,
-  color: 'rgba(255,255,255,0.6)',
+  color: 'rgba(255,255,255,0.55)',
 };
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
+/* ── Component ────────────────────────────────────────────────────────── */
 
 function App() {
   const [activeId, setActiveId] = useState(DEMO_SCENES[0].id);
+  const [params, setParams] = useState<ParamValues>(() =>
+    getDefaultParams(DEMO_SCENES[0].controls),
+  );
+  const [buildKey, setBuildKey] = useState(0);
 
   const activeDemo = DEMO_SCENES.find((d) => d.id === activeId)!;
 
-  // Recreate the scene only when the active demo changes
-  const { scene, animate } = useMemo(() => activeDemo.factory(), [activeDemo]);
+  // Keep a mutable ref so the animation loop always reads fresh values
+  const paramsRef = useRef(params);
+  paramsRef.current = params;
 
-  // Stable animate ref so OroyaCanvas doesn't re-mount on every render
-  const onAnimate = useCallback(animate, [animate]);
+  // Reset params when switching demos
+  useEffect(() => {
+    const defaults = getDefaultParams(activeDemo.controls);
+    setParams(defaults);
+    paramsRef.current = defaults;
+    setBuildKey((k) => k + 1);
+  }, [activeDemo]);
+
+  // Create scene — rebuilds only when buildKey changes
+  const { scene, animate } = useMemo(
+    () => activeDemo.factory(paramsRef.current),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeDemo, buildKey],
+  );
+
+  const onAnimate = useCallback(
+    (time: number) => animate(time, paramsRef.current),
+    [animate],
+  );
+
+  const handleParamChange = useCallback(
+    (key: string, value: number | string, rebuild: boolean) => {
+      setParams((prev) => ({ ...prev, [key]: value }));
+      if (rebuild) {
+        setBuildKey((k) => k + 1);
+      }
+    },
+    [],
+  );
 
   return (
     <div style={containerStyles}>
@@ -114,14 +145,14 @@ function App() {
                 key={demo.id}
                 onClick={() => setActiveId(demo.id)}
                 style={{
-                  ...navButtonBase,
+                  ...navBtnBase,
                   background: isActive
                     ? 'rgba(108,138,255,0.15)'
                     : 'rgba(255,255,255,0.04)',
                   borderColor: isActive
                     ? 'rgba(108,138,255,0.4)'
                     : 'rgba(255,255,255,0.08)',
-                  color: isActive ? '#a0b8ff' : 'rgba(255,255,255,0.55)',
+                  color: isActive ? '#a0b8ff' : 'rgba(255,255,255,0.5)',
                 }}
               >
                 {demo.label}
@@ -132,7 +163,18 @@ function App() {
       </div>
 
       {/* Canvas */}
-      <OroyaCanvas key={activeId} scene={scene} onAnimate={onAnimate} />
+      <OroyaCanvas
+        key={`${activeId}-${buildKey}`}
+        scene={scene}
+        onAnimate={onAnimate}
+      />
+
+      {/* Controls panel */}
+      <ControlPanel
+        controls={activeDemo.controls}
+        params={params}
+        onChange={handleParamChange}
+      />
 
       {/* Info panel */}
       <div style={infoBoxStyles}>

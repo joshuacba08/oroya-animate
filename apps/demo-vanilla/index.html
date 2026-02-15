@@ -23,21 +23,21 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* ── Canvas ─────────────────────────────────────── */
+      /* ── Canvas ─────────────────────────────── */
       #oroya-canvas {
         display: block;
         width: 100vw;
         height: 100vh;
       }
 
-      /* ── Header ─────────────────────────────────────── */
+      /* ── Header ─────────────────────────────── */
       .header {
         position: absolute;
         inset: 0 0 auto 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 24px;
+        padding: 14px 20px;
         background: linear-gradient(to bottom, rgba(13,13,18,.95), rgba(13,13,18,0));
         pointer-events: none;
         z-index: 10;
@@ -51,20 +51,20 @@
       }
       .logo-accent { color: #6c8aff; }
 
-      /* ── Navigation ─────────────────────────────────── */
+      /* ── Navigation ─────────────────────────── */
       .nav {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         pointer-events: auto;
       }
 
       .nav-btn {
-        padding: 8px 16px;
+        padding: 7px 14px;
         border-radius: 8px;
         border: 1px solid rgba(255,255,255,.08);
         background: rgba(255,255,255,.04);
-        color: rgba(255,255,255,.55);
-        font-size: 13px;
+        color: rgba(255,255,255,.5);
+        font-size: 12.5px;
         font-weight: 500;
         font-family: inherit;
         cursor: pointer;
@@ -80,28 +80,113 @@
         color: #a0b8ff;
       }
 
-      /* ── Info panel ─────────────────────────────────── */
+      /* ── Info panel ─────────────────────────── */
       .info-box {
         position: absolute;
-        bottom: 24px;
-        left: 24px;
+        bottom: 20px;
+        left: 20px;
         z-index: 10;
-        max-width: 420px;
-        padding: 16px 20px;
+        max-width: 380px;
+        padding: 14px 18px;
         border-radius: 12px;
-        background: rgba(255,255,255,.06);
+        background: rgba(255,255,255,.05);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255,255,255,.08);
       }
       .info-title {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
       }
       .info-desc {
-        font-size: 13px;
+        font-size: 12.5px;
         line-height: 1.5;
-        color: rgba(255,255,255,.6);
+        color: rgba(255,255,255,.55);
+      }
+
+      /* ── Controls panel ─────────────────────── */
+      .ctrl-panel {
+        position: absolute;
+        top: 64px;
+        right: 16px;
+        z-index: 10;
+        width: 260px;
+        padding: 16px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.05);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.08);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .ctrl-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: rgba(255,255,255,.4);
+      }
+
+      .ctrl-row {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .ctrl-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255,255,255,.75);
+      }
+
+      .ctrl-slider-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ctrl-slider {
+        flex: 1;
+        height: 4px;
+        accent-color: #6c8aff;
+        cursor: pointer;
+      }
+
+      .ctrl-value {
+        font-size: 12px;
+        font-family: monospace;
+        color: rgba(255,255,255,.5);
+        min-width: 36px;
+        text-align: right;
+      }
+
+      .ctrl-color {
+        width: 100%;
+        height: 32px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+        padding: 2px;
+      }
+
+      .ctrl-select {
+        width: 100%;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        color: #fff;
+        font-size: 13px;
+        font-family: inherit;
+        cursor: pointer;
+        outline: none;
+      }
+      .ctrl-select option {
+        background: #1a1a2e;
+        color: #fff;
       }
     </style>
   </head>
@@ -114,6 +199,9 @@
 
     <!-- Canvas -->
     <canvas id="oroya-canvas"></canvas>
+
+    <!-- Controls panel -->
+    <div id="controls" class="ctrl-panel"></div>
 
     <!-- Info panel -->
     <div class="info-box">

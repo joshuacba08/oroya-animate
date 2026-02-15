@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Component, ComponentType, Transform } from '../components';
 import { Matrix4, multiplyMatrices } from '../math/Matrix4';
+import { EventEmitter } from '../events/EventEmitter';
+import type { InteractionEvent, InteractionEventMap } from '../events/InteractionEvent';
 
 /**
  * A Node represents an element in a scene graph.
@@ -13,6 +15,9 @@ export class Node {
   parent: Node | null = null;
   readonly children: Node[] = [];
   readonly components: Map<ComponentType, Component> = new Map();
+
+  /** Event emitter for interaction events. */
+  readonly events = new EventEmitter<InteractionEventMap>();
 
   constructor(name: string, id: string = uuidv4()) {
     this.id = id;
@@ -147,6 +152,40 @@ export class Node {
       }
     }
     return undefined;
+  }
+
+  // ── Interaction Shortcuts ─────────────────────────────────
+
+  /**
+   * Register a handler for an interaction event type.
+   * Shortcut for `node.events.on(type, handler)`.
+   */
+  on<K extends keyof InteractionEventMap>(type: K, handler: (event: InteractionEventMap[K]) => void): void {
+    this.events.on(type, handler);
+  }
+
+  /**
+   * Remove a handler for an interaction event type.
+   * Shortcut for `node.events.off(type, handler)`.
+   */
+  off<K extends keyof InteractionEventMap>(type: K, handler: (event: InteractionEventMap[K]) => void): void {
+    this.events.off(type, handler);
+  }
+
+  /**
+   * Dispatch an interaction event on this node and propagate (bubble) up
+   * the scene graph hierarchy.
+   *
+   * Bubbling stops when `event.stopPropagation()` is called or the root
+   * node is reached.
+   */
+  dispatchInteraction(event: InteractionEvent): void {
+    event.currentTarget = this;
+    this.events.emit(event.type, event);
+
+    if (!event.propagationStopped && this.parent) {
+      this.parent.dispatchInteraction(event);
+    }
   }
 }
 

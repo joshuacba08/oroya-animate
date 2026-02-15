@@ -8,5 +8,9 @@ export * from './components/Camera';
 export * from './geometry/primitives';
 export * from './serialization/json';
 export * from './math/Matrix4';
+export * from './events/EventEmitter';
+export * from './events/InteractionEvent';
+export * from './components/Interactive';
+export * from './math/BoundingBox';
 
 

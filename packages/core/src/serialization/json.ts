@@ -1,6 +1,7 @@
 import { Scene } from '../scene/Scene';
 import { Node } from '../nodes/Node';
 import { Component, ComponentType, Geometry, Material, Transform } from '../components';
+import { Interactive } from '../components/Interactive';
 
 // A serializable representation of the scene graph
 interface SerializableComponent {
@@ -22,7 +23,9 @@ interface SerializableScene {
 function serializeNode(node: Node): SerializableNode {
   const components: SerializableComponent[] = [];
   for (const [, component] of node.components.entries()) {
-    components.push({ ...component });
+    // Destructure out the `node` back-reference to avoid circular JSON
+    const { node: _node, ...data } = component as any;
+    components.push(data);
   }
 
   return {
@@ -42,7 +45,7 @@ export function serialize(scene: Scene): string {
 
 function deserializeNode(sNode: SerializableNode): Node {
   const node = new Node(sNode.name, sNode.id);
-  
+
   // Clear default transform before adding deserialized ones
   node.components.clear();
 
@@ -60,9 +63,12 @@ function deserializeNode(sNode: SerializableNode): Node {
       case ComponentType.Material:
         component = new Material(sComp.definition);
         break;
+      case ComponentType.Interactive:
+        component = new Interactive(sComp.definition);
+        break;
     }
     if (component) {
-        node.addComponent(component);
+      node.addComponent(component);
     }
   }
 
@@ -77,7 +83,7 @@ export function deserialize(jsonString: string): Scene {
   const sScene: SerializableScene = JSON.parse(jsonString);
   const scene = new Scene();
   scene.root.children.length = 0; // Clear default root
-  
+
   const rootNode = deserializeNode(sScene.root);
   // The scene root itself is not added as a child, but its children are.
   rootNode.children.forEach(child => scene.add(child));

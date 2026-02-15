@@ -1,19 +1,24 @@
 import { ThreeRenderer } from '@oroya/renderer-three';
 import { DEMO_SCENES } from './scenes';
+import { getDefaultParams } from './types';
+import type { ParamValues } from './types';
+import { buildControlPanel } from './controls';
 
-// ── State ────────────────────────────────────────────────────────────
+/* ── State ────────────────────────────────────────────────────────────── */
 let activeId = DEMO_SCENES[0].id;
 let renderer: ThreeRenderer | null = null;
 let animationFrameId = 0;
-let currentAnimate: ((time: number) => void) | null = null;
+let currentAnimate: ((time: number, params: ParamValues) => void) | null = null;
+let params: ParamValues = {};
 
-// ── DOM refs ─────────────────────────────────────────────────────────
+/* ── DOM refs ─────────────────────────────────────────────────────────── */
 const canvas = document.getElementById('oroya-canvas') as HTMLCanvasElement;
 const nav = document.getElementById('nav')!;
 const infoTitle = document.getElementById('info-title')!;
 const infoDesc = document.getElementById('info-desc')!;
+const ctrlContainer = document.getElementById('controls')!;
 
-// ── Build navigation buttons ─────────────────────────────────────────
+/* ── Build navigation buttons ─────────────────────────────────────────── */
 DEMO_SCENES.forEach((demo) => {
   const btn = document.createElement('button');
   btn.textContent = demo.label;
@@ -23,32 +28,37 @@ DEMO_SCENES.forEach((demo) => {
   nav.appendChild(btn);
 });
 
-// ── Core functions ───────────────────────────────────────────────────
+/* ── Core ─────────────────────────────────────────────────────────────── */
 
 function switchDemo(id: string) {
-  // Tear down previous
-  cancelAnimationFrame(animationFrameId);
-  renderer?.dispose();
-  renderer = null;
-
+  teardown();
   activeId = id;
-  const demo = DEMO_SCENES.find((d) => d.id === id)!;
 
-  // Update info panel
+  const demo = DEMO_SCENES.find((d) => d.id === id)!;
+  params = getDefaultParams(demo.controls);
+
+  // Update info
   infoTitle.textContent = demo.label;
   infoDesc.textContent = demo.description;
 
-  // Update active button
+  // Update nav buttons
   nav.querySelectorAll('.nav-btn').forEach((btn) => {
-    const el = btn as HTMLElement;
-    el.classList.toggle('active', el.dataset.id === id);
+    (btn as HTMLElement).classList.toggle('active', (btn as HTMLElement).dataset.id === id);
   });
 
-  // Create new scene
-  const { scene, animate } = demo.factory();
+  // Build controls
+  buildControlPanel(ctrlContainer, demo.controls, params, handleParamChange);
+
+  // Boot scene
+  buildScene();
+}
+
+function buildScene() {
+  teardown();
+  const demo = DEMO_SCENES.find((d) => d.id === activeId)!;
+  const { scene, animate } = demo.factory(params);
   currentAnimate = animate;
 
-  // Create renderer
   renderer = new ThreeRenderer({
     canvas,
     width: canvas.clientWidth,
@@ -56,26 +66,28 @@ function switchDemo(id: string) {
   });
   renderer.mount(scene);
 
-  // Start animation loop
   function loop(time: number) {
     const t = time * 0.001;
-    currentAnimate?.(t);
+    currentAnimate?.(t, params);
     renderer?.render();
     animationFrameId = requestAnimationFrame(loop);
   }
   animationFrameId = requestAnimationFrame(loop);
 }
 
-// ── Resize handling ──────────────────────────────────────────────────
-window.addEventListener('resize', () => {
-  // Update camera aspect ratio for current scene
-  const demo = DEMO_SCENES.find((d) => d.id === activeId);
-  if (!demo) return;
+function teardown() {
+  cancelAnimationFrame(animationFrameId);
+  renderer?.dispose();
+  renderer = null;
+  currentAnimate = null;
+}
 
-  // We can't access the scene from the renderer directly,
-  // so we just let the canvas CSS handle visual sizing.
-  // Camera aspect update would need scene reference — keep for future.
-});
+function handleParamChange(key: string, value: number | string, rebuild: boolean) {
+  params = { ...params, [key]: value };
+  if (rebuild) {
+    buildScene();
+  }
+}
 
-// ── Boot ─────────────────────────────────────────────────────────────
+/* ── Boot ──────────────────────────────────────────────────────────────── */
 switchDemo(activeId);
