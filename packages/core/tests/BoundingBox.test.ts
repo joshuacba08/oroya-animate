@@ -34,10 +34,10 @@ describe('BoundingBox', () => {
             const aabb = computeLocalAABB({
                 type: GeometryPrimitive.Path2D,
                 path: [
-                    { command: 'M', args: [10, 20] },
-                    { command: 'L', args: [50, 80] },
-                    { command: 'L', args: [5, 60] },
-                    { command: 'Z', args: [] },
+                    { command: 'moveTo', args: [10, 20] },
+                    { command: 'lineTo', args: [50, 80] },
+                    { command: 'lineTo', args: [5, 60] },
+                    { command: 'closePath', args: [] },
                 ],
             });
 

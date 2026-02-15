@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { ControlPanel } from './components/ControlPanel';
 import { DEMO_SCENES } from './scenes';
-import { getDefaultParams } from './types';
+import { getDefaultParams, RENDERER_META } from './types';
 import type { ParamValues } from './types';
 
 /* ── Styles ───────────────────────────────────────────────────────────── */
@@ -84,6 +84,19 @@ const infoDescStyles: React.CSSProperties = {
   color: 'rgba(255,255,255,0.55)',
 };
 
+const rendererBadgeBase: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '1px 6px',
+  borderRadius: '4px',
+  fontSize: '10px',
+  fontWeight: 600,
+  letterSpacing: '0.03em',
+  lineHeight: '16px',
+  verticalAlign: 'middle',
+  marginLeft: '6px',
+  border: '1px solid',
+};
+
 /* ── Component ────────────────────────────────────────────────────────── */
 
 function App() {
@@ -142,6 +155,7 @@ function App() {
         <nav style={navStyles}>
           {DEMO_SCENES.map((demo) => {
             const isActive = demo.id === activeId;
+            const meta = RENDERER_META[demo.renderer];
             return (
               <button
                 key={demo.id}
@@ -158,6 +172,16 @@ function App() {
                 }}
               >
                 {demo.label}
+                <span
+                  style={{
+                    ...rendererBadgeBase,
+                    color: meta.color,
+                    borderColor: `${meta.color}44`,
+                    backgroundColor: `${meta.color}18`,
+                  }}
+                >
+                  {meta.label}
+                </span>
               </button>
             );
           })}
@@ -180,7 +204,19 @@ function App() {
 
       {/* Info panel */}
       <div style={infoBoxStyles}>
-        <div style={infoTitleStyles}>{activeDemo.label}</div>
+        <div style={infoTitleStyles}>
+          {activeDemo.label}
+          <span
+            style={{
+              ...rendererBadgeBase,
+              color: RENDERER_META[activeDemo.renderer].color,
+              borderColor: `${RENDERER_META[activeDemo.renderer].color}44`,
+              backgroundColor: `${RENDERER_META[activeDemo.renderer].color}18`,
+            }}
+          >
+            {RENDERER_META[activeDemo.renderer].label}
+          </span>
+        </div>
         <div style={infoDescStyles}>{activeDemo.description}</div>
       </div>
     </div>

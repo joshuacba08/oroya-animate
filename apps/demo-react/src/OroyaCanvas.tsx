@@ -48,6 +48,7 @@ export function OroyaCanvas({ scene, onAnimate }: OroyaCanvasProps) {
       height: canvas.clientHeight,
     });
     renderer.mount(scene);
+    renderer.enableInteraction();
     rendererRef.current = renderer;
 
     // Listen for window resize

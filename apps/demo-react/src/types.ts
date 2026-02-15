@@ -34,12 +34,23 @@ export type ControlDef = SliderControl | ColorControl | SelectControl;
 
 export type ParamValues = Record<string, number | string>;
 
+/* ── Renderer type ───────────────────────────────────────────────────── */
+
+export type RendererType = 'canvas' | 'svg' | 'three';
+
+export const RENDERER_META: Record<RendererType, { label: string; color: string }> = {
+  canvas: { label: 'Canvas 2D', color: '#f59e0b' },
+  svg:    { label: 'SVG',       color: '#10b981' },
+  three:  { label: 'Three.js',  color: '#6c8aff' },
+};
+
 /* ── Scene definition ────────────────────────────────────────────────── */
 
 export interface DemoSceneDef {
   id: string;
   label: string;
   description: string;
+  renderer: RendererType;
   controls: ControlDef[];
   factory: (params: ParamValues) => {
     scene: Scene;
