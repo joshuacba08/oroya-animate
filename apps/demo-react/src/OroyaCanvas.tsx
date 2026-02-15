@@ -51,6 +51,10 @@ export function OroyaCanvas({ scene, onAnimate }: OroyaCanvasProps) {
     renderer.enableInteraction();
     rendererRef.current = renderer;
 
+    // Fix camera aspect ratio on mount (scenes use window.innerWidth which
+    // doesn't account for the sidebar).
+    handleResize();
+
     // Listen for window resize
     window.addEventListener('resize', handleResize);
 

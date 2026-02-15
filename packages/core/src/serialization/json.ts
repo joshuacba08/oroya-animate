@@ -1,6 +1,6 @@
 import { Scene } from '../scene/Scene';
 import { Node } from '../nodes/Node';
-import { Component, ComponentType, Geometry, Material, Transform } from '../components';
+import { Camera, Component, ComponentType, Geometry, Material, Transform } from '../components';
 import { Interactive } from '../components/Interactive';
 
 // A serializable representation of the scene graph
@@ -65,6 +65,9 @@ function deserializeNode(sNode: SerializableNode): Node {
         break;
       case ComponentType.Interactive:
         component = new Interactive(sComp.definition);
+        break;
+      case ComponentType.Camera:
+        component = new Camera(sComp.definition);
         break;
     }
     if (component) {

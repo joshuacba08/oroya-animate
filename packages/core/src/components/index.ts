@@ -1,5 +1,5 @@
 export { Camera, CameraType } from './Camera';
-export type { CameraDef, PerspectiveCameraDef } from './Camera';
+export type { CameraDef, OrthographicCameraDef, PerspectiveCameraDef } from './Camera';
 export { Component, ComponentType } from './Component';
 export { Geometry, GeometryPrimitive } from './Geometry';
 export type { BoxGeometryDef, GeometryDef, Path2DCommand, Path2DGeometryDef, SphereGeometryDef, TextGeometryDef } from './Geometry';

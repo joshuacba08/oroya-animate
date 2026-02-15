@@ -1,37 +1,10 @@
-import {
-  Box,
-  Building2,
-  LayoutGrid,
-  MousePointerClick,
-  Palette,
-  RefreshCw,
-  Sparkles,
-  Sun,
-  Target,
-  Video,
-  type LucideIcon,
-} from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { ControlPanel } from './components/ControlPanel';
+import { Sidebar, SIDEBAR_WIDTH } from './components/Sidebar';
 import { DEMO_SCENES } from './scenes';
 import type { ParamValues } from './types';
 import { getDefaultParams, RENDERER_META } from './types';
-
-/* ── Icon mapping per scene id ─────────────────────────────────────────── */
-
-const SCENE_ICONS: Record<string, LucideIcon> = {
-  'interactive-demo': Sparkles,
-  'hover-showcase': Target,
-  'click-playground': MousePointerClick,
-  'wheel-bubbling': RefreshCw,
-  'hello-cube': Box,
-  'color-palette': Palette,
-  'solar-system': Sun,
-  'shape-grid': LayoutGrid,
-  'camera-viewpoints': Video,
-  'procedural-city': Building2,
-};
 
 /* ── Styles ───────────────────────────────────────────────────────────── */
 
@@ -41,63 +14,15 @@ const containerStyles: React.CSSProperties = {
   backgroundColor: '#0a0a10',
   color: 'white',
   fontFamily: "'JetBrains Mono', monospace",
-  position: 'relative',
+  display: 'flex',
   overflow: 'hidden',
 };
 
-const headerStyles: React.CSSProperties = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  zIndex: 10,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '16px 24px',
-  background:
-    'linear-gradient(180deg, rgba(10,10,16,0.97) 0%, rgba(10,10,16,0.7) 60%, transparent 100%)',
-  pointerEvents: 'none',
-};
-
-const logoStyles: React.CSSProperties = {
-  fontSize: '20px',
-  fontWeight: 800,
-  letterSpacing: '-0.01em',
-  pointerEvents: 'auto',
-  fontFamily: "'Zalando Sans Expanded', sans-serif",
-  display: 'flex',
-  alignItems: 'center',
-  gap: '3px',
-};
-
-const logoAccentStyles: React.CSSProperties = {
-  background: 'linear-gradient(135deg, #6c8aff 0%, #a78bfa 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-};
-
-const logoDimStyles: React.CSSProperties = {
-  color: 'rgba(255,255,255,0.6)',
-};
-
-const navStyles: React.CSSProperties = {
-  display: 'flex',
-  gap: '6px',
-  pointerEvents: 'auto',
-};
-
-const navBtnBase: React.CSSProperties = {
-  padding: '8px 14px',
-  borderRadius: '10px',
-  border: '1px solid transparent',
-  cursor: 'pointer',
-  fontSize: '11.5px',
-  fontWeight: 500,
-  fontFamily: "'JetBrains Mono', monospace",
-  letterSpacing: '-0.01em',
-  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+const mainAreaStyles: React.CSSProperties = {
+  flex: 1,
+  marginLeft: SIDEBAR_WIDTH,
+  position: 'relative',
+  overflow: 'hidden',
 };
 
 const infoBoxStyles: React.CSSProperties = {
@@ -113,7 +38,8 @@ const infoBoxStyles: React.CSSProperties = {
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
   border: '1px solid rgba(255,255,255,0.08)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
+  boxShadow:
+    '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
 };
 
 const infoTitleStyles: React.CSSProperties = {
@@ -122,6 +48,9 @@ const infoTitleStyles: React.CSSProperties = {
   marginBottom: '6px',
   fontFamily: "'Zalando Sans Expanded', sans-serif",
   letterSpacing: '-0.01em',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 };
 
 const infoDescStyles: React.CSSProperties = {
@@ -140,21 +69,9 @@ const rendererBadgeBase: React.CSSProperties = {
   letterSpacing: '0.04em',
   lineHeight: '16px',
   verticalAlign: 'middle',
-  marginLeft: '8px',
+  marginLeft: '4px',
   border: '1px solid',
   textTransform: 'uppercase',
-  fontFamily: "'JetBrains Mono', monospace",
-};
-
-const footerStyles: React.CSSProperties = {
-  position: 'absolute',
-  bottom: '24px',
-  right: '24px',
-  zIndex: 10,
-  fontSize: '10px',
-  fontWeight: 400,
-  color: 'rgba(255,255,255,0.2)',
-  letterSpacing: '0.04em',
   fontFamily: "'JetBrains Mono', monospace",
 };
 
@@ -205,95 +122,51 @@ function App() {
     [],
   );
 
+  const meta = RENDERER_META[activeDemo.renderer];
+
   return (
     <div style={containerStyles}>
-      {/* Header */}
-      <div style={headerStyles}>
-        <div style={logoStyles}>
-          <span style={logoAccentStyles}>Oroya</span>
-          <span style={logoDimStyles}>Animate</span>
-        </div>
-
-        <nav style={navStyles}>
-          {DEMO_SCENES.map((demo) => {
-            const isActive = demo.id === activeId;
-            const meta = RENDERER_META[demo.renderer];
-            const Icon = SCENE_ICONS[demo.id];
-            return (
-              <button
-                key={demo.id}
-                className="demo-nav-btn"
-                onClick={() => handleSwitchDemo(demo.id)}
-                style={{
-                  ...navBtnBase,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  background: isActive
-                    ? 'rgba(108,138,255,0.14)'
-                    : 'rgba(255,255,255,0.03)',
-                  borderColor: isActive
-                    ? 'rgba(108,138,255,0.35)'
-                    : 'rgba(255,255,255,0.06)',
-                  color: isActive ? '#a0b8ff' : 'rgba(255,255,255,0.45)',
-                  boxShadow: isActive
-                    ? '0 0 16px rgba(108,138,255,0.1), inset 0 1px 0 rgba(255,255,255,0.05)'
-                    : 'none',
-                }}
-              >
-                {Icon && <Icon size={18} strokeWidth={1.8} />}
-                {demo.label}
-                <span
-                  style={{
-                    ...rendererBadgeBase,
-                    color: meta.color,
-                    borderColor: `${meta.color}33`,
-                    backgroundColor: `${meta.color}12`,
-                  }}
-                >
-                  {meta.label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Canvas */}
-      <OroyaCanvas
-        key={`${activeId}-${buildKey}`}
-        scene={scene}
-        onAnimate={onAnimate}
+      {/* Sidebar */}
+      <Sidebar
+        scenes={DEMO_SCENES}
+        activeId={activeId}
+        onSelect={handleSwitchDemo}
       />
 
-      {/* Controls panel */}
-      <ControlPanel
-        controls={activeDemo.controls}
-        params={params}
-        onChange={handleParamChange}
-      />
+      {/* Main canvas area */}
+      <div style={mainAreaStyles}>
+        {/* Canvas */}
+        <OroyaCanvas
+          key={`${activeId}-${buildKey}`}
+          scene={scene}
+          onAnimate={onAnimate}
+        />
 
-      {/* Info panel */}
-      <div style={infoBoxStyles} className="glass-panel">
-        <div style={{ ...infoTitleStyles, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {(() => { const I = SCENE_ICONS[activeDemo.id]; return I ? <I size={18} strokeWidth={1.8} /> : null; })()}
-          {activeDemo.label}
-          <span
-            style={{
-              ...rendererBadgeBase,
-              color: RENDERER_META[activeDemo.renderer].color,
-              borderColor: `${RENDERER_META[activeDemo.renderer].color}33`,
-              backgroundColor: `${RENDERER_META[activeDemo.renderer].color}12`,
-            }}
-          >
-            {RENDERER_META[activeDemo.renderer].label}
-          </span>
+        {/* Controls panel */}
+        <ControlPanel
+          controls={activeDemo.controls}
+          params={params}
+          onChange={handleParamChange}
+        />
+
+        {/* Info panel */}
+        <div style={infoBoxStyles} className="glass-panel">
+          <div style={infoTitleStyles}>
+            {activeDemo.label}
+            <span
+              style={{
+                ...rendererBadgeBase,
+                color: meta.color,
+                borderColor: `${meta.color}33`,
+                backgroundColor: `${meta.color}12`,
+              }}
+            >
+              {meta.label}
+            </span>
+          </div>
+          <div style={infoDescStyles}>{activeDemo.description}</div>
         </div>
-        <div style={infoDescStyles}>{activeDemo.description}</div>
       </div>
-
-      {/* Watermark */}
-      <div style={footerStyles}>oroya-animate v0.1</div>
     </div>
   );
 }

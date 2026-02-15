@@ -4,7 +4,7 @@ import type { ControlDef, ParamValues } from '../types';
 
 const panelStyles: React.CSSProperties = {
   position: 'absolute',
-  top: '68px',
+  top: '20px',
   right: '20px',
   zIndex: 10,
   width: '270px',

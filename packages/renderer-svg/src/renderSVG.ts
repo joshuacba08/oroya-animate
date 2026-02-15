@@ -1,5 +1,7 @@
 import {
   BoxGeometryDef,
+  Camera,
+  CameraType,
   ColorRGB,
   ComponentType,
   createInteractionEvent,
@@ -12,6 +14,7 @@ import {
   Material,
   Matrix4,
   Node,
+  OrthographicCameraDef,
   Path2DGeometryDef,
   RadialGradientDef,
   Scene,
@@ -30,6 +33,36 @@ interface SvgRenderOptions {
 function toCssColor(color: ColorRGB | undefined, defaultColor: string): string {
   if (!color) return defaultColor;
   return `rgb(${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)})`;
+}
+
+/**
+ * Find the first node with a Camera component in the scene.
+ */
+function findCameraNode(scene: Scene): Node | null {
+  let result: Node | null = null;
+  scene.traverse((node) => {
+    if (!result && node.hasComponent(ComponentType.Camera)) {
+      result = node;
+    }
+  });
+  return result;
+}
+
+/**
+ * Compute a viewBox string from an orthographic camera.
+ * The camera's world-space position offsets the view.
+ */
+function orthoViewBox(cam: OrthographicCameraDef, camNode: Node): string {
+  const pos = camNode.transform.worldMatrix;
+  // Camera looks "down" the Z axis; X/Y translation shifts the view.
+  const tx = pos[12]; // worldMatrix column-major: e = m[12], f = m[13]
+  const ty = pos[13];
+
+  const minX = cam.left + tx;
+  const minY = cam.top + ty;  // SVG Y-down; top is the smaller Y value
+  const w = cam.right - cam.left;
+  const h = cam.bottom - cam.top;
+  return `${minX} ${minY} ${w} ${h}`;
 }
 
 /**
@@ -316,7 +349,18 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
   // Ensure all matrices are up-to-date before rendering.
   scene.updateWorldMatrices();
 
-  const viewBox = options.viewBox ?? `0 0 ${options.width} ${options.height}`;
+  // Compute viewBox: explicit option > orthographic camera > default
+  let viewBox = options.viewBox;
+  if (!viewBox) {
+    const camNode = findCameraNode(scene);
+    const cam = camNode?.getComponent<Camera>(ComponentType.Camera);
+    if (cam && cam.definition.type === CameraType.Orthographic) {
+      viewBox = orthoViewBox(cam.definition, camNode!);
+    } else {
+      viewBox = `0 0 ${options.width} ${options.height}`;
+    }
+  }
+
   const gradients = new GradientCollector();
   const childStrings: string[] = [];
 
@@ -505,7 +549,18 @@ export function renderToSVGElement(
   scene.updateWorldMatrices();
 
   const NS = 'http://www.w3.org/2000/svg';
-  const viewBox = options.viewBox ?? `0 0 ${options.width} ${options.height}`;
+
+  // Compute viewBox: explicit option > orthographic camera > default
+  let viewBox = options.viewBox;
+  if (!viewBox) {
+    const camNode = findCameraNode(scene);
+    const cam = camNode?.getComponent<Camera>(ComponentType.Camera);
+    if (cam && cam.definition.type === CameraType.Orthographic) {
+      viewBox = orthoViewBox(cam.definition, camNode!);
+    } else {
+      viewBox = `0 0 ${options.width} ${options.height}`;
+    }
+  }
 
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('width', String(options.width));
