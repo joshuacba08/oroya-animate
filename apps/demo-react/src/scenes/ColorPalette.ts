@@ -93,22 +93,69 @@ export function createColorPaletteScene(params: ParamValues) {
     nodes.push(node);
   });
 
+  // Quaternion from axis-angle (axis must be normalized)
+  function axisAngleToQuat(ax: number, ay: number, az: number, angle: number) {
+    const half = angle * 0.5;
+    const s = Math.sin(half);
+    return { x: ax * s, y: ay * s, z: az * s, w: Math.cos(half) };
+  }
+
+  // Multiply two quaternions: q1 * q2
+  function mulQuat(
+    a: { x: number; y: number; z: number; w: number },
+    b: { x: number; y: number; z: number; w: number },
+  ) {
+    return {
+      x: a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+      y: a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+      z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+      w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+    };
+  }
+
+  // Each shape gets a unique rotation style
+  const rotationAxes = [
+    { ax: 0, ay: 1, az: 0 },                                     // pure Y
+    { ax: 1, ay: 0, az: 0 },                                     // pure X
+    { ax: 0, ay: 0.7071, az: 0.7071 },                           // diagonal YZ
+    { ax: 0.5774, ay: 0.5774, az: 0.5774 },                      // (1,1,1) normalized
+    { ax: 0.7071, ay: 0.7071, az: 0 },                           // diagonal XY
+  ];
+
   function animate(time: number, p: ParamValues) {
     const speed = p.speed as number;
     const bobbing = p.bobbing as number;
 
     nodes.forEach((node, i) => {
-      const s = (0.5 + i * 0.3) * speed;
-      const angle = time * s;
+      const rate = (0.5 + i * 0.25) * speed;
 
-      node.transform.rotation = {
-        x: Math.sin(angle / 2) * 0.5,
-        y: Math.sin(angle / 2),
+      // Primary rotation around a unique axis
+      const { ax, ay, az } = rotationAxes[i % rotationAxes.length];
+      const primaryAngle = time * rate;
+      const qPrimary = axisAngleToQuat(ax, ay, az, primaryAngle);
+
+      // Gentle secondary tilt that oscillates
+      const tiltAngle = Math.sin(time * rate * 0.4 + i) * 0.3;
+      const qTilt = axisAngleToQuat(
+        i % 2 === 0 ? 1 : 0,
+        0,
+        i % 2 === 0 ? 0 : 1,
+        tiltAngle,
+      );
+
+      // Combine: tilt first, then primary spin
+      const qFinal = mulQuat(qPrimary, qTilt);
+      node.transform.rotation = qFinal;
+
+      // Smooth bobbing
+      const sp = params.spacing as number;
+      const totalW = (count - 1) * sp;
+      node.transform.position = {
+        x: i * sp - totalW / 2,
+        y: Math.sin(time * 1.5 * speed + i * 1.2) * bobbing,
         z: 0,
-        w: Math.cos(angle / 2),
       };
 
-      node.transform.position.y = Math.sin(time * 1.5 * speed + i * 1.2) * bobbing;
       node.transform.updateLocalMatrix();
     });
   }

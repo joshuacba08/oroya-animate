@@ -159,7 +159,9 @@ requestAnimationFrame(loop);
 
 Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### API
+### `renderToSVG` — String puro (server-safe)
+
+Función pura y stateless que retorna un string SVG. Funciona en Node.js sin DOM.
 
 ```typescript
 import { renderToSVG } from '@oroya/renderer-svg';
@@ -167,7 +169,7 @@ import { renderToSVG } from '@oroya/renderer-svg';
 const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 ```
 
-### Opciones
+#### Opciones (`SvgRenderOptions`)
 
 | Opción | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
@@ -175,21 +177,82 @@ const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 | `height` | `number` | *(requerido)* | Alto del SVG |
 | `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox personalizado |
 
+### `renderToSVGElement` — DOM interactivo
+
+Crea un `SVGSVGElement` real con event delegation. Los nodos con componente `Interactive` reciben listeners de pointer/click/wheel.
+
+```typescript
+import { renderToSVGElement } from '@oroya/renderer-svg';
+
+const { svg, dispose } = renderToSVGElement(scene, {
+  width: 800,
+  height: 600,
+  container: document.getElementById('app')!,
+});
+
+// Cuando ya no se necesite:
+dispose(); // Limpia listeners y remueve el SVG del DOM
+```
+
+#### Opciones (`SvgElementRenderOptions`)
+
+Extiende `SvgRenderOptions` con:
+
+| Opción | Tipo | Descripción |
+|--------|------|-------------|
+| `container` | `HTMLElement` | *(opcional)* Elemento padre donde se adjunta el SVG automáticamente |
+
+#### Retorno
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `svg` | `SVGSVGElement` | El elemento SVG creado |
+| `dispose` | `() => void` | Limpia event listeners y remueve el SVG del DOM |
+
+#### Eventos interactivos soportados
+
+| Evento DOM | `InteractionEventType` |
+|-----------|------------------------|
+| `click` | `Click` |
+| `pointerdown` | `PointerDown` |
+| `pointerup` | `PointerUp` |
+| `pointermove` | `PointerMove` |
+| `pointerenter` | `PointerEnter` |
+| `pointerleave` | `PointerLeave` |
+| `wheel` | `Wheel` |
+
 ### Pipeline
 
 ```mermaid
 flowchart TD
-    START["renderToSVG(scene, opts)"] --> TRAVERSE["scene.traverse()"]
-    TRAVERSE --> CHECK{"¿Geometry(Path2D)?"}
-    CHECK -->|"No"| SKIP["Ignorar"]
-    CHECK -->|"Sí"| PATH["Generar path d='...'"]
-    PATH --> MAT{"¿Material?"}
-    MAT -->|"Sí"| STYLE["fill + stroke + stroke-width"]
-    MAT -->|"No"| NONE["fill='none'"]
-    STYLE --> COLLECT["→ array"]
-    NONE --> COLLECT
-    COLLECT -->|"Fin"| BUILD["Construir svg string"]
+    START["renderToSVG / renderToSVGElement"] --> UPDATE["scene.updateWorldMatrices()"]
+    UPDATE --> WALK["Recorrer árbol recursivamente"]
+    WALK --> GEO{"¿Geometry?"}
+    GEO -->|"Path2D"| PATH["→ path"]
+    GEO -->|"Box"| RECT["→ rect"]
+    GEO -->|"Sphere"| CIRCLE["→ circle"]
+    GEO -->|"Text"| TEXT["→ text"]
+    GEO -->|"Ninguno"| GROUP["Solo g si tiene hijos"]
+    PATH & RECT & CIRCLE & TEXT --> MAT{"¿Material?"}
+    MAT -->|"fill/stroke"| STYLE["fill + stroke + opacity"]
+    MAT -->|"fillGradient"| GRAD["url(#gradient-id) + defs"]
+    MAT -->|"Ninguno"| NONE["fill='none'"]
+    STYLE & GRAD & NONE --> TRANSFORM{"¿Transform ≠ identity?"}
+    TRANSFORM -->|"Sí"| MATRIX["g transform='matrix(a,b,c,d,e,f)'"]
+    TRANSFORM -->|"No"| DIRECT["Elemento directo"]
+    MATRIX & DIRECT --> CHILDREN{"¿Hijos?"}
+    CHILDREN -->|"Sí"| NEST["Anidar en g"]
+    CHILDREN -->|"No"| LEAF["Nodo hoja"]
 ```
+
+### Soporte de geometrías
+
+| Geometría | Elemento SVG generado |
+|-----------|----------------------|
+| `Path2D` | `<path d="...">` |
+| `Box` | `<rect>` (width × height, depth ignorado) |
+| `Sphere` | `<circle>` (radio) |
+| `Text` | `<text>` con font-size, font-family, font-weight, text-anchor, dominant-baseline |
 
 ### Propiedades del material para SVG
 
@@ -198,8 +261,73 @@ flowchart TD
 | `fill` | `ColorRGB` | `fill="rgb(R,G,B)"` | `fill="none"` |
 | `stroke` | `ColorRGB` | `stroke="rgb(R,G,B)"` | Sin stroke |
 | `strokeWidth` | `number` | `stroke-width="N"` | `1` |
+| `opacity` | `number` | `opacity="N"` | Sin atributo (opaco) |
+| `fillGradient` | `GradientDef` | `fill="url(#id)"` + `<defs>` | Usa `fill` normal |
+| `strokeGradient` | `GradientDef` | `stroke="url(#id)"` + `<defs>` | Usa `stroke` normal |
 
-### Ejemplo
+### Transforms y jerarquía
+
+El renderer SVG aplica el `localMatrix` de cada nodo como atributo `transform="matrix(a,b,c,d,e,f)"` y genera `<g>` para representar la jerarquía padre-hijo del scene graph.
+
+```typescript
+const parent = new Node('group');
+parent.transform.position = { x: 100, y: 50, z: 0 };
+
+const child = new Node('square');
+child.addComponent(createBox(30, 30, 0));
+child.addComponent(new Material({ fill: { r: 1, g: 0, b: 0 } }));
+
+parent.add(child);
+scene.add(parent);
+```
+
+Genera:
+```xml
+<g transform="matrix(1,0,0,1,100,50)">
+  <rect x="-15" y="-15" width="30" height="30" fill="rgb(255, 0, 0)" />
+</g>
+```
+
+### Gradientes
+
+```typescript
+const circle = new Node('sun');
+circle.addComponent(createSphere(80));
+circle.addComponent(new Material({
+  fillGradient: {
+    type: 'radial',
+    cx: 0.5, cy: 0.5, r: 0.5,
+    stops: [
+      { offset: 0, color: { r: 1, g: 1, b: 0 } },
+      { offset: 1, color: { r: 1, g: 0.3, b: 0 }, opacity: 0.8 },
+    ],
+  },
+}));
+```
+
+Tipos de gradiente:
+
+| Tipo | Definición | Elemento SVG |
+|------|-----------|--------------|
+| `linear` | `LinearGradientDef` (x1, y1, x2, y2) | `<linearGradient>` |
+| `radial` | `RadialGradientDef` (cx, cy, r, fx, fy) | `<radialGradient>` |
+
+### Texto
+
+```typescript
+const label = new Node('title');
+label.addComponent(createText('Oroya Animate', {
+  fontSize: 24,
+  fontFamily: 'Inter',
+  fontWeight: 'bold',
+  textAnchor: 'middle',
+}));
+label.addComponent(new Material({ fill: { r: 0, g: 0, b: 0 } }));
+label.transform.position = { x: 200, y: 30, z: 0 };
+scene.add(label);
+```
+
+### Ejemplo completo
 
 ```typescript
 const triangle = new Node('triangle');
@@ -213,6 +341,7 @@ triangle.addComponent(new Material({
   fill: { r: 0.2, g: 0.8, b: 0.4 },
   stroke: { r: 0, g: 0, b: 0 },
   strokeWidth: 2,
+  opacity: 0.9,
 }));
 scene.add(triangle);
 
@@ -227,6 +356,7 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 | Server-side rendering | Node.js sin DOM |
 | Arte generativo | Patrones procedurales como vectores |
 | Impresión | Escalable sin pérdida |
+| Interactividad SVG | `renderToSVGElement` con event delegation |
 
 ---
 
@@ -236,19 +366,31 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 
 | Geometría | Three.js | SVG |
 |-----------|----------|-----|
-| `Box` | ✅ | ❌ |
-| `Sphere` | ✅ | ❌ |
-| `Path2D` | ❌ | ✅ |
+| `Box` | ✅ | ✅ `<rect>` |
+| `Sphere` | ✅ | ✅ `<circle>` |
+| `Path2D` | ❌ | ✅ `<path>` |
+| `Text` | ❌ | ✅ `<text>` |
 
 ### Soporte de material
 
 | Propiedad | Three.js | SVG |
 |-----------|----------|-----|
 | `color` | ✅ | ❌ |
-| `opacity` | ✅ | ❌ |
+| `opacity` | ✅ | ✅ |
 | `fill` | ❌ | ✅ |
 | `stroke` | ❌ | ✅ |
 | `strokeWidth` | ❌ | ✅ |
+| `fillGradient` | ❌ | ✅ |
+| `strokeGradient` | ❌ | ✅ |
+
+### Soporte de transforms
+
+| Feature | Three.js | SVG |
+|---------|----------|-----|
+| Position (translate) | ✅ | ✅ `matrix()` |
+| Rotation | ✅ | ✅ `matrix()` |
+| Scale | ✅ | ✅ `matrix()` |
+| Jerarquía (`<g>`) | ✅ Groups | ✅ `<g>` |
 
 ---
 

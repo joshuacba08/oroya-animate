@@ -1,6 +1,6 @@
-import type { Vec3 } from '../components/Transform';
 import type { GeometryDef } from '../components/Geometry';
 import { GeometryPrimitive } from '../components/Geometry';
+import type { Vec3 } from '../components/Transform';
 import type { Matrix4 } from './Matrix4';
 
 /**
@@ -67,6 +67,15 @@ export function computeLocalAABB(def: GeometryDef): AABB {
             return {
                 min: { x: minX, y: minY, z: 0 },
                 max: { x: maxX, y: maxY, z: 0 },
+            };
+        }
+
+        case GeometryPrimitive.Text: {
+            // Text AABB cannot be accurately computed without font metrics.
+            // Return a zero-size box at the origin as a placeholder.
+            return {
+                min: { x: 0, y: 0, z: 0 },
+                max: { x: 0, y: 0, z: 0 },
             };
         }
     }

@@ -1,18 +1,22 @@
 import {
-    BoxGeometryDef,
-    ColorRGB,
-    ComponentType,
-    createInteractionEvent,
-    Geometry,
-    GeometryPrimitive,
-    InteractionEventType,
-    Interactive,
-    Material,
-    Matrix4,
-    Node,
-    Path2DGeometryDef,
-    Scene,
-    SphereGeometryDef,
+  BoxGeometryDef,
+  ColorRGB,
+  ComponentType,
+  createInteractionEvent,
+  Geometry,
+  GeometryPrimitive,
+  GradientDef,
+  InteractionEventType,
+  Interactive,
+  LinearGradientDef,
+  Material,
+  Matrix4,
+  Node,
+  Path2DGeometryDef,
+  RadialGradientDef,
+  Scene,
+  SphereGeometryDef,
+  TextGeometryDef,
 } from '@oroya/core';
 
 // ─── Shared Helpers ─────────────────────────────────────────
@@ -54,38 +58,164 @@ function matrix4ToSvgTransform(m: Matrix4): string {
   return `matrix(${a},${b},${c},${d},${e},${f})`;
 }
 
+// ─── Gradient Helpers ───────────────────────────────────────
+
 /**
- * Build the fill/stroke style attributes string for a node's Material.
+ * A collector that accumulates gradient definitions during rendering and
+ * generates a `<defs>` block. Each gradient definition is deduplicated by
+ * reference identity—if the same GradientDef object is used on multiple
+ * nodes, it only generates one `<...Gradient>` element.
  */
-function buildStyleAttrs(mat: Material | undefined): string {
+class GradientCollector {
+  private counter = 0;
+  private map = new Map<GradientDef, string>(); // def → id
+
+  /** Register a gradient and return its SVG url reference (e.g. "url(#grad-0)"). */
+  register(def: GradientDef): string {
+    let id = this.map.get(def);
+    if (!id) {
+      id = `oroya-grad-${this.counter++}`;
+      this.map.set(def, id);
+    }
+    return `url(#${id})`;
+  }
+
+  /** Generate all `<stop>` elements for a gradient. */
+  private stopsToString(def: GradientDef): string {
+    return def.stops
+      .map(s => {
+        const color = toCssColor(s.color, 'black');
+        const opacity = s.opacity !== undefined ? ` stop-opacity="${s.opacity}"` : '';
+        return `<stop offset="${s.offset}" stop-color="${color}"${opacity} />`;
+      })
+      .join('');
+  }
+
+  /** Generate the `<defs>…</defs>` string. Returns empty string if no gradients. */
+  toDefsString(indent: string = '  '): string {
+    if (this.map.size === 0) return '';
+
+    const entries: string[] = [];
+    for (const [def, id] of this.map) {
+      if (def.type === 'linear') {
+        const g = def as LinearGradientDef;
+        entries.push(
+          `${indent}  <linearGradient id="${id}" x1="${g.x1 ?? 0}" y1="${g.y1 ?? 0}" x2="${g.x2 ?? 1}" y2="${g.y2 ?? 0}">${this.stopsToString(g)}</linearGradient>`,
+        );
+      } else {
+        const g = def as RadialGradientDef;
+        const fx = g.fx ?? g.cx ?? 0.5;
+        const fy = g.fy ?? g.cy ?? 0.5;
+        entries.push(
+          `${indent}  <radialGradient id="${id}" cx="${g.cx ?? 0.5}" cy="${g.cy ?? 0.5}" r="${g.r ?? 0.5}" fx="${fx}" fy="${fy}">${this.stopsToString(g)}</radialGradient>`,
+        );
+      }
+    }
+
+    return [`${indent}<defs>`, ...entries, `${indent}</defs>`].join('\n');
+  }
+
+  /** Build DOM `<defs>` element, returns null if no gradients. */
+  toDefsDom(NS: string): SVGDefsElement | null {
+    if (this.map.size === 0) return null;
+
+    const defs = document.createElementNS(NS, 'defs') as SVGDefsElement;
+
+    for (const [def, id] of this.map) {
+      if (def.type === 'linear') {
+        const g = def as LinearGradientDef;
+        const el = document.createElementNS(NS, 'linearGradient') as SVGElement;
+        el.setAttribute('id', id);
+        el.setAttribute('x1', String(g.x1 ?? 0));
+        el.setAttribute('y1', String(g.y1 ?? 0));
+        el.setAttribute('x2', String(g.x2 ?? 1));
+        el.setAttribute('y2', String(g.y2 ?? 0));
+        for (const s of g.stops) {
+          const stop = document.createElementNS(NS, 'stop') as SVGElement;
+          stop.setAttribute('offset', String(s.offset));
+          stop.setAttribute('stop-color', toCssColor(s.color, 'black'));
+          if (s.opacity !== undefined) stop.setAttribute('stop-opacity', String(s.opacity));
+          el.appendChild(stop);
+        }
+        defs.appendChild(el);
+      } else {
+        const g = def as RadialGradientDef;
+        const el = document.createElementNS(NS, 'radialGradient') as SVGElement;
+        el.setAttribute('id', id);
+        el.setAttribute('cx', String(g.cx ?? 0.5));
+        el.setAttribute('cy', String(g.cy ?? 0.5));
+        el.setAttribute('r', String(g.r ?? 0.5));
+        el.setAttribute('fx', String(g.fx ?? g.cx ?? 0.5));
+        el.setAttribute('fy', String(g.fy ?? g.cy ?? 0.5));
+        for (const s of g.stops) {
+          const stop = document.createElementNS(NS, 'stop') as SVGElement;
+          stop.setAttribute('offset', String(s.offset));
+          stop.setAttribute('stop-color', toCssColor(s.color, 'black'));
+          if (s.opacity !== undefined) stop.setAttribute('stop-opacity', String(s.opacity));
+          el.appendChild(stop);
+        }
+        defs.appendChild(el);
+      }
+    }
+
+    return defs;
+  }
+}
+
+/**
+ * Build the fill/stroke/opacity style attributes string for a node's Material.
+ * When fillGradient or strokeGradient is present, registers it with the collector
+ * and uses `url(#id)` as the value.
+ */
+function buildStyleAttrs(mat: Material | undefined, gradients?: GradientCollector): string {
   const attrs: string[] = [];
 
-  if (mat?.definition.fill) {
+  if (mat?.definition.fillGradient && gradients) {
+    attrs.push(`fill="${gradients.register(mat.definition.fillGradient)}"`);
+  } else if (mat?.definition.fill) {
     attrs.push(`fill="${toCssColor(mat.definition.fill, 'none')}"`);
   } else {
     attrs.push('fill="none"');
   }
 
-  if (mat?.definition.stroke) {
+  if (mat?.definition.strokeGradient && gradients) {
+    attrs.push(`stroke="${gradients.register(mat.definition.strokeGradient)}"`);
+    attrs.push(`stroke-width="${mat.definition.strokeWidth ?? 1}"`);
+  } else if (mat?.definition.stroke) {
     attrs.push(`stroke="${toCssColor(mat.definition.stroke, 'black')}"`);
     attrs.push(`stroke-width="${mat.definition.strokeWidth ?? 1}"`);
+  }
+
+  if (mat?.definition.opacity !== undefined && mat.definition.opacity < 1) {
+    attrs.push(`opacity="${mat.definition.opacity}"`);
   }
 
   return attrs.join(' ');
 }
 
 /**
- * Apply fill/stroke attributes from a Material to a DOM element.
+ * Apply fill/stroke/opacity attributes from a Material to a DOM element.
+ * When fillGradient or strokeGradient is present, registers it with the collector.
  */
-function applyStyleAttrsToElement(el: SVGElement, mat: Material | undefined): void {
-  if (mat?.definition.fill) {
+function applyStyleAttrsToElement(el: SVGElement, mat: Material | undefined, gradients?: GradientCollector): void {
+  if (mat?.definition.fillGradient && gradients) {
+    el.setAttribute('fill', gradients.register(mat.definition.fillGradient));
+  } else if (mat?.definition.fill) {
     el.setAttribute('fill', toCssColor(mat.definition.fill, 'none'));
   } else {
     el.setAttribute('fill', 'none');
   }
-  if (mat?.definition.stroke) {
+
+  if (mat?.definition.strokeGradient && gradients) {
+    el.setAttribute('stroke', gradients.register(mat.definition.strokeGradient));
+    el.setAttribute('stroke-width', String(mat.definition.strokeWidth ?? 1));
+  } else if (mat?.definition.stroke) {
     el.setAttribute('stroke', toCssColor(mat.definition.stroke, 'black'));
     el.setAttribute('stroke-width', String(mat.definition.strokeWidth ?? 1));
+  }
+
+  if (mat?.definition.opacity !== undefined && mat.definition.opacity < 1) {
+    el.setAttribute('opacity', String(mat.definition.opacity));
   }
 }
 
@@ -95,8 +225,8 @@ function applyStyleAttrsToElement(el: SVGElement, mat: Material | undefined): vo
  * Render a geometry definition to an SVG element string (without transform).
  * Returns `null` if the geometry type is not supported by SVG.
  */
-function geometryToSvgString(geo: Geometry, mat: Material | undefined): string | null {
-  const style = buildStyleAttrs(mat);
+function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients: GradientCollector): string | null {
+  const style = buildStyleAttrs(mat, gradients);
 
   switch (geo.definition.type) {
     case GeometryPrimitive.Path2D: {
@@ -120,6 +250,20 @@ function geometryToSvgString(geo: Geometry, mat: Material | undefined): string |
       return `<circle cx="0" cy="0" r="${sphereDef.radius}" ${style} />`;
     }
 
+    case GeometryPrimitive.Text: {
+      const textDef = geo.definition as TextGeometryDef;
+      const fontSize = textDef.fontSize ?? 16;
+      const fontFamily = textDef.fontFamily ?? 'sans-serif';
+      const fontWeight = textDef.fontWeight ?? 'normal';
+      const textAnchor = textDef.textAnchor ?? 'start';
+      const dominantBaseline = textDef.dominantBaseline ?? 'auto';
+      const escaped = textDef.text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<text font-size="${fontSize}" font-family="${fontFamily}" font-weight="${fontWeight}" text-anchor="${textAnchor}" dominant-baseline="${dominantBaseline}" ${style}>${escaped}</text>`;
+    }
+
     default:
       return null;
   }
@@ -130,11 +274,11 @@ function geometryToSvgString(geo: Geometry, mat: Material | undefined): string |
  * Uses the node's **localMatrix** for the transform so that `<g>` nesting
  * replicates the scene-graph hierarchy exactly.
  */
-function renderNodeToString(node: Node, indent: string): string {
+function renderNodeToString(node: Node, indent: string, gradients: GradientCollector): string {
   const geo = node.getComponent<Geometry>(ComponentType.Geometry);
   const mat = node.getComponent<Material>(ComponentType.Material);
   const hasChildren = node.children.length > 0;
-  const geoString = geo ? geometryToSvgString(geo, mat) : null;
+  const geoString = geo ? geometryToSvgString(geo, mat, gradients) : null;
   const transformStr = matrix4ToSvgTransform(node.transform.localMatrix);
   const transformAttr = transformStr ? ` transform="${transformStr}"` : '';
 
@@ -157,7 +301,7 @@ function renderNodeToString(node: Node, indent: string): string {
       lines.push(`${indent}  ${geoString}`);
     }
     for (const child of node.children) {
-      const childStr = renderNodeToString(child, indent + '  ');
+      const childStr = renderNodeToString(child, indent + '  ', gradients);
       if (childStr) lines.push(childStr);
     }
     lines.push(`${indent}</g>`);
@@ -173,15 +317,19 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
   scene.updateWorldMatrices();
 
   const viewBox = options.viewBox ?? `0 0 ${options.width} ${options.height}`;
+  const gradients = new GradientCollector();
   const childStrings: string[] = [];
 
   for (const child of scene.root.children) {
-    const str = renderNodeToString(child, '    ');
+    const str = renderNodeToString(child, '    ', gradients);
     if (str) childStrings.push(str);
   }
 
+  const defsStr = gradients.toDefsString('  ');
+
   return [
     `<svg width="${options.width}" height="${options.height}" viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">`,
+    ...(defsStr ? [defsStr] : []),
     ...childStrings,
     `</svg>`,
   ].join('\n');
@@ -226,6 +374,18 @@ function geometryToDomElement(geo: Geometry, NS: string): SVGElement | null {
       el.setAttribute('cx', '0');
       el.setAttribute('cy', '0');
       el.setAttribute('r', String(sphereDef.radius));
+      return el;
+    }
+
+    case GeometryPrimitive.Text: {
+      const textDef = geo.definition as TextGeometryDef;
+      const el = document.createElementNS(NS, 'text') as SVGElement;
+      el.setAttribute('font-size', String(textDef.fontSize ?? 16));
+      el.setAttribute('font-family', textDef.fontFamily ?? 'sans-serif');
+      el.setAttribute('font-weight', textDef.fontWeight ?? 'normal');
+      el.setAttribute('text-anchor', textDef.textAnchor ?? 'start');
+      el.setAttribute('dominant-baseline', textDef.dominantBaseline ?? 'auto');
+      el.textContent = textDef.text;
       return el;
     }
 
@@ -276,6 +436,7 @@ function renderNodeToDom(
   NS: string,
   nodeElementMap: Map<string, SVGElement>,
   signal: AbortSignal,
+  gradients: GradientCollector,
 ): void {
   const geo = node.getComponent<Geometry>(ComponentType.Geometry);
   const mat = node.getComponent<Material>(ComponentType.Material);
@@ -293,21 +454,21 @@ function renderNodeToDom(
 
     if (geoEl) {
       geoEl.setAttribute('data-oroya-id', node.id);
-      applyStyleAttrsToElement(geoEl, mat);
+      applyStyleAttrsToElement(geoEl, mat, gradients);
       attachInteractiveListeners(geoEl, node, signal);
       nodeElementMap.set(node.id, geoEl);
       g.appendChild(geoEl);
     }
 
     for (const child of node.children) {
-      renderNodeToDom(child, g, NS, nodeElementMap, signal);
+      renderNodeToDom(child, g, NS, nodeElementMap, signal, gradients);
     }
 
     parent.appendChild(g);
   } else if (geoEl) {
     // Leaf with geometry but no transform — append directly
     geoEl.setAttribute('data-oroya-id', node.id);
-    applyStyleAttrsToElement(geoEl, mat);
+    applyStyleAttrsToElement(geoEl, mat, gradients);
     attachInteractiveListeners(geoEl, node, signal);
     nodeElementMap.set(node.id, geoEl);
     parent.appendChild(geoEl);
@@ -326,6 +487,10 @@ function renderNodeToDom(
  * - **Path2D** → `<path>`
  * - **Box** → `<rect>` (width × height, depth ignored)
  * - **Sphere** → `<circle>` (radius)
+ * - **Text** → `<text>`
+ *
+ * Gradients defined in `MaterialDef.fillGradient` / `strokeGradient` are
+ * automatically collected and emitted as `<defs>` in the SVG.
  *
  * Interactive nodes (those with an `Interactive` component) receive pointer/click
  * event listeners that dispatch `InteractionEvent`s through the Oroya scene graph.
@@ -351,10 +516,17 @@ export function renderToSVGElement(
   const nodeElementMap = new Map<string, SVGElement>();
   const abortController = new AbortController();
   const { signal } = abortController;
+  const gradients = new GradientCollector();
 
   // Recursively build the DOM tree from the scene root's children.
   for (const child of scene.root.children) {
-    renderNodeToDom(child, svg, NS, nodeElementMap, signal);
+    renderNodeToDom(child, svg, NS, nodeElementMap, signal, gradients);
+  }
+
+  // Insert <defs> for gradients at the top of the SVG
+  const defsEl = gradients.toDefsDom(NS);
+  if (defsEl) {
+    svg.insertBefore(defsEl, svg.firstChild);
   }
 
   if (options.container) {

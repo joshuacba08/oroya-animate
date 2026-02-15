@@ -394,6 +394,7 @@ new Geometry(definition: GeometryDef)
 | `Box` | `'Box'` | Paralelepípedo (cubo, caja) |
 | `Sphere` | `'Sphere'` | Esfera UV |
 | `Path2D` | `'Path2D'` | Path vectorial 2D (para SVG) |
+| `Text` | `'Text'` | Texto SVG |
 
 #### `GeometryDef` (Union type)
 
@@ -402,6 +403,7 @@ graph TD
     GD["GeometryDef"] -->|"type = 'Box'"| Box["BoxGeometryDef"]
     GD -->|"type = 'Sphere'"| Sphere["SphereGeometryDef"]
     GD -->|"type = 'Path2D'"| Path["Path2DGeometryDef"]
+    GD -->|"type = 'Text'"| Text["TextGeometryDef"]
 ```
 
 #### `BoxGeometryDef`
@@ -449,13 +451,26 @@ graph TD
 | `A` | `[rx, ry, rotation, largeArc, sweep, x, y]` | Arc |
 | `Z` | `[]` | Close path — cerrar el camino |
 
+#### `TextGeometryDef`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `GeometryPrimitive.Text` | — | Discriminante |
+| `text` | `string` | — | Contenido del texto |
+| `fontSize` | `number` | `16` | Tamaño de fuente (px) |
+| `fontFamily` | `string` | `'sans-serif'` | Familia tipográfica |
+| `fontWeight` | `string` | `'normal'` | Peso: `'normal'`, `'bold'`, `'100'`–`'900'` |
+| `textAnchor` | `string` | `'start'` | Alineación horizontal: `'start'`, `'middle'`, `'end'` |
+| `dominantBaseline` | `string` | `'auto'` | Alineación vertical: `'auto'`, `'middle'`, `'hanging'` |
+
 #### Compatibilidad con renderers
 
 | GeometryDef | Three.js | SVG |
 |------------|----------|-----|
-| `BoxGeometryDef` | ✅ → `THREE.BoxGeometry` | ❌ ignorado |
-| `SphereGeometryDef` | ✅ → `THREE.SphereGeometry` | ❌ ignorado |
+| `BoxGeometryDef` | ✅ → `THREE.BoxGeometry` | ✅ → `<rect>` |
+| `SphereGeometryDef` | ✅ → `THREE.SphereGeometry` | ✅ → `<circle>` |
 | `Path2DGeometryDef` | ❌ ignorado | ✅ → `<path d="...">` |
+| `TextGeometryDef` | ❌ ignorado | ✅ → `<text>` |
 
 ---
 
@@ -486,10 +501,49 @@ new Material(definition?: MaterialDef)  // default: {}
 | Campo | Tipo | Default | Usado por | Descripción |
 |-------|------|---------|-----------|-------------|
 | `color` | `ColorRGB` | `undefined` | Three.js | Color de la superficie para renderizado 3D |
-| `opacity` | `number` | `undefined` | Three.js | Opacidad: 0 (transparente) a 1 (opaco). Activa transparencia automáticamente si < 1 |
+| `opacity` | `number` | `undefined` | Three.js, SVG | Opacidad: 0 (transparente) a 1 (opaco). Activa transparencia automáticamente si < 1 |
 | `fill` | `ColorRGB` | `undefined` | SVG | Color de relleno para paths 2D |
 | `stroke` | `ColorRGB` | `undefined` | SVG | Color del trazo para paths 2D |
 | `strokeWidth` | `number` | `undefined` | SVG | Ancho del trazo en píxeles |
+| `fillGradient` | `GradientDef` | `undefined` | SVG | Gradiente para relleno. Tiene prioridad sobre `fill` |
+| `strokeGradient` | `GradientDef` | `undefined` | SVG | Gradiente para trazo. Tiene prioridad sobre `stroke` |
+
+#### `GradientDef` (Union type)
+
+```typescript
+type GradientDef = LinearGradientDef | RadialGradientDef;
+```
+
+#### `LinearGradientDef`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `'linear'` | — | Discriminante |
+| `x1` | `number` | `0` | Coordenada X inicio (0–1) |
+| `y1` | `number` | `0` | Coordenada Y inicio (0–1) |
+| `x2` | `number` | `1` | Coordenada X fin (0–1) |
+| `y2` | `number` | `0` | Coordenada Y fin (0–1) |
+| `stops` | `GradientStop[]` | — | Paradas de color |
+
+#### `RadialGradientDef`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `type` | `'radial'` | — | Discriminante |
+| `cx` | `number` | `0.5` | Centro X (0–1) |
+| `cy` | `number` | `0.5` | Centro Y (0–1) |
+| `r` | `number` | `0.5` | Radio (0–1) |
+| `fx` | `number` | `undefined` | Foco X (0–1), opcional |
+| `fy` | `number` | `undefined` | Foco Y (0–1), opcional |
+| `stops` | `GradientStop[]` | — | Paradas de color |
+
+#### `GradientStop`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `offset` | `number` | Posición en el gradiente (0–1) |
+| `color` | `ColorRGB` | Color en esta parada |
+| `opacity` | `number` | *(opcional)* Opacidad de la parada (0–1) |
 
 #### Ejemplo: Material para ambos renderers
 
@@ -514,8 +568,9 @@ graph LR
     TH -->|"color"| M1
     TH -->|"opacity + transparent"| M1
     SV --> M2["style attributes"]
-    SV -->|"fill"| M2
-    SV -->|"stroke + stroke-width"| M2
+    SV -->|"fill / fillGradient"| M2
+    SV -->|"stroke / strokeGradient"| M2
+    SV -->|"opacity"| M2
 ```
 
 ---
@@ -835,6 +890,27 @@ const triangle = createPath2D([
   { command: 'L', args: [0, 100] },
   { command: 'Z', args: [] },
 ]);
+```
+
+#### `createText`
+
+```typescript
+function createText(text: string, options?: {
+  fontSize?: number;
+  fontFamily?: string;
+  fontWeight?: string;
+  textAnchor?: string;
+  dominantBaseline?: string;
+}): Geometry
+```
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `text` | `string` | Contenido del texto |
+| `options` | `object` | *(opcional)* Opciones tipográficas |
+
+```typescript
+const title = createText('Hello', { fontSize: 32, fontFamily: 'monospace', textAnchor: 'middle' });
 ```
 
 ---
@@ -1192,11 +1268,13 @@ dispose();
 
 #### Comportamiento
 
-1. Recorre toda la escena con `scene.traverse()`.
-2. Para cada nodo con un componente `Geometry` de tipo `Path2D`, genera un elemento `<path>`.
-3. Si el nodo tiene un `Material`, aplica `fill`, `stroke` y `stroke-width` como atributos.
-4. Los nodos sin `Path2D` se ignoran.
-5. Los colores se convierten de RGB normalizado (0-1) a `rgb(R, G, B)` con valores 0-255.
+1. Llama a `scene.updateWorldMatrices()` para sincronizar transforms.
+2. Recorre recursivamente el árbol de nodos generando `<g>` para la jerarquía.
+3. Geometrías soportadas: `Path2D` → `<path>`, `Box` → `<rect>`, `Sphere` → `<circle>`, `Text` → `<text>`.
+4. Si el nodo tiene un `Material`, aplica `fill`, `stroke`, `stroke-width`, `opacity`, `fillGradient` y `strokeGradient`.
+5. Los gradientes generan un bloque `<defs>` al inicio del SVG con `<linearGradient>` / `<radialGradient>`.
+6. El `localMatrix` de cada nodo se aplica como `transform="matrix(a,b,c,d,e,f)"`.
+7. Los colores se convierten de RGB normalizado (0–1) a `rgb(R, G, B)` con valores 0–255.
 
 #### Ejemplo
 
@@ -1330,4 +1408,11 @@ graph TD
 | `multiplyMatrices` | function | Math | `@oroya/core` |
 | `ThreeRenderer` | class | Rendering | `@oroya/renderer-three` |
 | `renderToSVG` | function | Rendering | `@oroya/renderer-svg` |
+| `renderToSVGElement` | function | Rendering | `@oroya/renderer-svg` |
+| `TextGeometryDef` | interface | Types | `@oroya/core` |
+| `GradientDef` | type alias | Types | `@oroya/core` |
+| `LinearGradientDef` | interface | Types | `@oroya/core` |
+| `RadialGradientDef` | interface | Types | `@oroya/core` |
+| `GradientStop` | interface | Types | `@oroya/core` |
+| `createText` | function | Factory | `@oroya/core` |
 | `loadGLTF` | async function | Loading | `@oroya/loader-gltf` |

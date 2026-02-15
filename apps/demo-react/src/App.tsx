@@ -1,14 +1,22 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
 import {
-  Sparkles, Target, MousePointerClick, RefreshCw,
-  Box, Palette, Sun, LayoutGrid, Video, Building2,
+  Box,
+  Building2,
+  LayoutGrid,
+  MousePointerClick,
+  Palette,
+  RefreshCw,
+  Sparkles,
+  Sun,
+  Target,
+  Video,
   type LucideIcon,
 } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { ControlPanel } from './components/ControlPanel';
 import { DEMO_SCENES } from './scenes';
-import { getDefaultParams, RENDERER_META } from './types';
 import type { ParamValues } from './types';
+import { getDefaultParams, RENDERER_META } from './types';
 
 /* ── Icon mapping per scene id ─────────────────────────────────────────── */
 
@@ -233,7 +241,7 @@ function App() {
                     : 'none',
                 }}
               >
-                {Icon && <Icon size={13} strokeWidth={2} />}
+                {Icon && <Icon size={18} strokeWidth={1.8} />}
                 {demo.label}
                 <span
                   style={{
@@ -268,7 +276,7 @@ function App() {
       {/* Info panel */}
       <div style={infoBoxStyles} className="glass-panel">
         <div style={{ ...infoTitleStyles, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {(() => { const I = SCENE_ICONS[activeDemo.id]; return I ? <I size={18} strokeWidth={2} /> : null; })()}
+          {(() => { const I = SCENE_ICONS[activeDemo.id]; return I ? <I size={18} strokeWidth={1.8} /> : null; })()}
           {activeDemo.label}
           <span
             style={{

@@ -1,4 +1,4 @@
-import { Geometry, BoxGeometryDef, GeometryPrimitive, Path2DGeometryDef, SphereGeometryDef } from '../components';
+import { BoxGeometryDef, Geometry, GeometryPrimitive, Path2DGeometryDef, SphereGeometryDef, TextGeometryDef } from '../components';
 
 /**
  * Creates a new box geometry component.
@@ -37,6 +37,20 @@ export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 
 export function createPath2D(path: Path2DGeometryDef['path']): Geometry {
     const def: Path2DGeometryDef = { type: GeometryPrimitive.Path2D, path };
     return new Geometry(def);
+}
+
+/**
+ * Creates a new text geometry component.
+ * @param text The text content to display.
+ * @param options Optional text styling (fontSize, fontFamily, fontWeight, textAnchor, dominantBaseline).
+ * @returns A new Geometry component with a text definition.
+ */
+export function createText(
+  text: string,
+  options: Omit<TextGeometryDef, 'type' | 'text'> = {},
+): Geometry {
+  const def: TextGeometryDef = { type: GeometryPrimitive.Text, text, ...options };
+  return new Geometry(def);
 }
 
 

@@ -7,6 +7,7 @@ import {
     Node,
     Scene,
 } from '../../core/src';
+import { createText } from '../../core/src/geometry/primitives';
 import { renderToSVG } from '../src/renderSVG';
 
 // ─── Helper ─────────────────────────────────────────────────
@@ -194,5 +195,242 @@ describe('renderToSVG', () => {
     const svg = renderToSVG(scene, { width: 300, height: 150 });
 
     expect(svg).toContain('viewBox="0 0 300 150"');
+  });
+
+  // ── Opacity ─────────────────────────────────────────────
+
+  it('applies opacity attribute when opacity < 1', () => {
+    const scene = new Scene();
+    const box = new Node('box');
+    box.addComponent(createBox(10, 10, 10));
+    box.addComponent(new Material({ fill: { r: 1, g: 0, b: 0 }, opacity: 0.5 }));
+    scene.add(box);
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).toContain('opacity="0.5"');
+  });
+
+  it('omits opacity attribute when opacity is 1', () => {
+    const scene = new Scene();
+    const box = new Node('box');
+    box.addComponent(createBox(10, 10, 10));
+    box.addComponent(new Material({ fill: { r: 1, g: 0, b: 0 }, opacity: 1 }));
+    scene.add(box);
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).not.toContain('opacity=');
+  });
+
+  it('omits opacity attribute when opacity is undefined', () => {
+    const scene = new Scene();
+    scene.add(triangle());
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).not.toContain('opacity=');
+  });
+
+  // ── Text ────────────────────────────────────────────────
+
+  it('renders Text geometry as <text>', () => {
+    const scene = new Scene();
+    const label = new Node('label');
+    label.addComponent(createText('Hello World'));
+    label.addComponent(new Material({ fill: { r: 0, g: 0, b: 0 } }));
+    scene.add(label);
+
+    const svg = renderToSVG(scene, { width: 400, height: 200 });
+
+    expect(svg).toContain('<text');
+    expect(svg).toContain('Hello World');
+    expect(svg).toContain('font-size="16"');
+    expect(svg).toContain('font-family="sans-serif"');
+  });
+
+  it('renders Text with custom font options', () => {
+    const scene = new Scene();
+    const label = new Node('label');
+    label.addComponent(createText('Bold Title', {
+      fontSize: 32,
+      fontFamily: 'Georgia',
+      fontWeight: 'bold',
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+    }));
+    label.addComponent(new Material({ fill: { r: 1, g: 1, b: 1 } }));
+    scene.add(label);
+
+    const svg = renderToSVG(scene, { width: 400, height: 200 });
+
+    expect(svg).toContain('font-size="32"');
+    expect(svg).toContain('font-family="Georgia"');
+    expect(svg).toContain('font-weight="bold"');
+    expect(svg).toContain('text-anchor="middle"');
+    expect(svg).toContain('dominant-baseline="middle"');
+    expect(svg).toContain('Bold Title');
+  });
+
+  it('escapes HTML entities in text content', () => {
+    const scene = new Scene();
+    const label = new Node('label');
+    label.addComponent(createText('a < b & c > d'));
+    label.addComponent(new Material({ fill: { r: 0, g: 0, b: 0 } }));
+    scene.add(label);
+
+    const svg = renderToSVG(scene, { width: 400, height: 200 });
+
+    expect(svg).toContain('a &lt; b &amp; c &gt; d');
+    expect(svg).not.toContain('a < b');
+  });
+
+  it('applies transform to text nodes', () => {
+    const scene = new Scene();
+    const label = new Node('label');
+    label.addComponent(createText('Moved'));
+    label.addComponent(new Material({ fill: { r: 0, g: 0, b: 0 } }));
+    label.transform.position = { x: 100, y: 50, z: 0 };
+    scene.add(label);
+
+    const svg = renderToSVG(scene, { width: 400, height: 200 });
+
+    expect(svg).toContain('transform="matrix(1,0,0,1,100,50)"');
+    expect(svg).toContain('<text');
+  });
+
+  // ── Gradients ───────────────────────────────────────────
+
+  it('renders linear gradient in <defs> and references it with url()', () => {
+    const scene = new Scene();
+    const box = new Node('box');
+    box.addComponent(createBox(100, 100, 0));
+    box.addComponent(new Material({
+      fillGradient: {
+        type: 'linear',
+        x1: 0, y1: 0, x2: 1, y2: 1,
+        stops: [
+          { offset: 0, color: { r: 1, g: 0, b: 0 } },
+          { offset: 1, color: { r: 0, g: 0, b: 1 } },
+        ],
+      },
+    }));
+    scene.add(box);
+
+    const svg = renderToSVG(scene, { width: 400, height: 400 });
+
+    expect(svg).toContain('<defs>');
+    expect(svg).toContain('<linearGradient');
+    expect(svg).toContain('x1="0"');
+    expect(svg).toContain('x2="1"');
+    expect(svg).toContain('y2="1"');
+    expect(svg).toContain('stop-color="rgb(255, 0, 0)"');
+    expect(svg).toContain('stop-color="rgb(0, 0, 255)"');
+    expect(svg).toContain('fill="url(#oroya-grad-0)"');
+    expect(svg).toContain('</defs>');
+  });
+
+  it('renders radial gradient in <defs>', () => {
+    const scene = new Scene();
+    const circle = new Node('circle');
+    circle.addComponent(createSphere(50));
+    circle.addComponent(new Material({
+      fillGradient: {
+        type: 'radial',
+        cx: 0.5, cy: 0.5, r: 0.5,
+        stops: [
+          { offset: 0, color: { r: 1, g: 1, b: 1 } },
+          { offset: 1, color: { r: 0, g: 0, b: 0 } },
+        ],
+      },
+    }));
+    scene.add(circle);
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).toContain('<radialGradient');
+    expect(svg).toContain('cx="0.5"');
+    expect(svg).toContain('r="0.5"');
+    expect(svg).toContain('fill="url(#oroya-grad-0)"');
+  });
+
+  it('supports stroke gradient', () => {
+    const scene = new Scene();
+    const box = new Node('box');
+    box.addComponent(createBox(100, 100, 0));
+    box.addComponent(new Material({
+      fill: { r: 1, g: 1, b: 1 },
+      strokeGradient: {
+        type: 'linear',
+        stops: [
+          { offset: 0, color: { r: 1, g: 0, b: 0 } },
+          { offset: 1, color: { r: 0, g: 1, b: 0 } },
+        ],
+      },
+      strokeWidth: 3,
+    }));
+    scene.add(box);
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).toContain('stroke="url(#oroya-grad-0)"');
+    expect(svg).toContain('stroke-width="3"');
+  });
+
+  it('supports gradient stop opacity', () => {
+    const scene = new Scene();
+    const box = new Node('box');
+    box.addComponent(createBox(50, 50, 0));
+    box.addComponent(new Material({
+      fillGradient: {
+        type: 'linear',
+        stops: [
+          { offset: 0, color: { r: 1, g: 0, b: 0 }, opacity: 1 },
+          { offset: 1, color: { r: 0, g: 0, b: 1 }, opacity: 0 },
+        ],
+      },
+    }));
+    scene.add(box);
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).toContain('stop-opacity="0"');
+  });
+
+  it('does not emit <defs> when no gradients are used', () => {
+    const scene = new Scene();
+    scene.add(triangle());
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    expect(svg).not.toContain('<defs>');
+  });
+
+  it('deduplicates the same gradient object used on multiple nodes', () => {
+    const sharedGrad = {
+      type: 'linear' as const,
+      stops: [
+        { offset: 0, color: { r: 1, g: 0, b: 0 } },
+        { offset: 1, color: { r: 0, g: 0, b: 1 } },
+      ],
+    };
+
+    const scene = new Scene();
+    for (let i = 0; i < 3; i++) {
+      const n = new Node(`box-${i}`);
+      n.addComponent(createBox(10, 10, 0));
+      n.addComponent(new Material({ fillGradient: sharedGrad }));
+      scene.add(n);
+    }
+
+    const svg = renderToSVG(scene, { width: 200, height: 200 });
+
+    // Should only have one linearGradient definition
+    const gradCount = (svg.match(/<linearGradient/g) || []).length;
+    expect(gradCount).toBe(1);
+
+    // All three rects reference the same gradient
+    const urlRefs = (svg.match(/url\(#oroya-grad-0\)/g) || []).length;
+    expect(urlRefs).toBe(3);
   });
 });

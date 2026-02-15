@@ -7,6 +7,7 @@ export enum GeometryPrimitive {
   Box = 'Box',
   Sphere = 'Sphere',
   Path2D = 'Path2D',
+  Text = 'Text',
 }
 
 /**
@@ -46,9 +47,28 @@ export interface Path2DGeometryDef {
 }
 
 /**
+ * The definition for a text geometry.
+ */
+export interface TextGeometryDef {
+  type: GeometryPrimitive.Text;
+  /** The text content to display. */
+  text: string;
+  /** Font size in SVG user units (pixels). Default: 16 */
+  fontSize?: number;
+  /** Font family name. Default: 'sans-serif' */
+  fontFamily?: string;
+  /** Font weight (e.g. 'normal', 'bold', '700'). Default: 'normal' */
+  fontWeight?: string;
+  /** Text anchor: 'start', 'middle', or 'end'. Default: 'start' */
+  textAnchor?: 'start' | 'middle' | 'end';
+  /** Dominant baseline: 'auto', 'middle', 'hanging', etc. Default: 'auto' */
+  dominantBaseline?: string;
+}
+
+/**
  * A union of all possible geometry definitions.
  */
-export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef;
+export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef;
 
 /**
  * A component that defines the geometry of a node.
