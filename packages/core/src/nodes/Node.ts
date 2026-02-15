@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Component, ComponentType, Transform } from '../components';
-import { Matrix4, multiplyMatrices } from '../math/Matrix4';
 import { EventEmitter } from '../events/EventEmitter';
 import type { InteractionEvent, InteractionEventMap } from '../events/InteractionEvent';
+import { Matrix4, multiplyMatrices } from '../math/Matrix4';
 
 /**
  * A Node represents an element in a scene graph.
@@ -15,6 +15,12 @@ export class Node {
   parent: Node | null = null;
   readonly children: Node[] = [];
   readonly components: Map<ComponentType, Component> = new Map();
+
+  /** Optional CSS class(es) for SVG output. */
+  cssClass?: string;
+
+  /** Optional semantic id for SVG output (distinct from internal UUID). */
+  cssId?: string;
 
   /** Event emitter for interaction events. */
   readonly events = new EventEmitter<InteractionEventMap>();

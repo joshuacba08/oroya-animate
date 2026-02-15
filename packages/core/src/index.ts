@@ -5,6 +5,7 @@ export * from './components/Transform';
 export * from './components/Geometry';
 export * from './components/Material';
 export * from './components/Camera';
+export * from './components/Animation';
 export * from './geometry/primitives';
 export * from './serialization/json';
 export * from './math/Matrix4';

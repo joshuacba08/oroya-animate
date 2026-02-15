@@ -9,6 +9,7 @@ export enum ComponentType {
   Material = 'Material',
   Camera = 'Camera',
   Interactive = 'Interactive',
+  Animation = 'Animation',
 }
 
 /**

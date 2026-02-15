@@ -1,4 +1,5 @@
 import {
+  Animation,
   BoxGeometryDef,
   Camera,
   CameraType,
@@ -19,6 +20,11 @@ import {
   RadialGradientDef,
   Scene,
   SphereGeometryDef,
+  SvgAnimateDef,
+  SvgAnimateTransformDef,
+  SvgClipPathDef,
+  SvgFilterDef,
+  SvgMaskDef,
   TextGeometryDef,
 } from '@oroya/core';
 
@@ -91,17 +97,26 @@ function matrix4ToSvgTransform(m: Matrix4): string {
   return `matrix(${a},${b},${c},${d},${e},${f})`;
 }
 
-// ─── Gradient Helpers ───────────────────────────────────────
+// ─── Defs Helpers (Gradients, Filters, ClipPaths, Masks) ────
 
 /**
- * A collector that accumulates gradient definitions during rendering and
- * generates a `<defs>` block. Each gradient definition is deduplicated by
- * reference identity—if the same GradientDef object is used on multiple
- * nodes, it only generates one `<...Gradient>` element.
+ * Helper to convert Path2DCommand[] to an SVG `d` attribute string.
+ */
+function pathToD(path: { command: string; args: number[] }[]): string {
+  return path.map(cmd => `${cmd.command} ${cmd.args.join(' ')}`).join(' ');
+}
+
+/**
+ * A collector that accumulates `<defs>` definitions (gradients, filters,
+ * clip-paths, masks) during rendering and generates a `<defs>` block.
+ * Each definition is deduplicated by reference identity.
  */
 class GradientCollector {
   private counter = 0;
-  private map = new Map<GradientDef, string>(); // def → id
+  private map = new Map<GradientDef, string>(); // gradient def → id
+  private filterMap = new Map<SvgFilterDef, string>();
+  private clipPathMap = new Map<SvgClipPathDef, string>();
+  private maskMap = new Map<SvgMaskDef, string>();
 
   /** Register a gradient and return its SVG url reference (e.g. "url(#grad-0)"). */
   register(def: GradientDef): string {
@@ -109,6 +124,36 @@ class GradientCollector {
     if (!id) {
       id = `oroya-grad-${this.counter++}`;
       this.map.set(def, id);
+    }
+    return `url(#${id})`;
+  }
+
+  /** Register a filter and return its SVG url reference. */
+  registerFilter(def: SvgFilterDef): string {
+    let id = this.filterMap.get(def);
+    if (!id) {
+      id = `oroya-filter-${this.counter++}`;
+      this.filterMap.set(def, id);
+    }
+    return `url(#${id})`;
+  }
+
+  /** Register a clip-path and return its SVG url reference. */
+  registerClipPath(def: SvgClipPathDef): string {
+    let id = this.clipPathMap.get(def);
+    if (!id) {
+      id = `oroya-clip-${this.counter++}`;
+      this.clipPathMap.set(def, id);
+    }
+    return `url(#${id})`;
+  }
+
+  /** Register a mask and return its SVG url reference. */
+  registerMask(def: SvgMaskDef): string {
+    let id = this.maskMap.get(def);
+    if (!id) {
+      id = `oroya-mask-${this.counter++}`;
+      this.maskMap.set(def, id);
     }
     return `url(#${id})`;
   }
@@ -124,11 +169,19 @@ class GradientCollector {
       .join('');
   }
 
-  /** Generate the `<defs>…</defs>` string. Returns empty string if no gradients. */
+  /** Whether any definitions have been registered. */
+  get isEmpty(): boolean {
+    return this.map.size === 0 && this.filterMap.size === 0 &&
+           this.clipPathMap.size === 0 && this.maskMap.size === 0;
+  }
+
+  /** Generate the `<defs>…</defs>` string. Returns empty string if no defs. */
   toDefsString(indent: string = '  '): string {
-    if (this.map.size === 0) return '';
+    if (this.isEmpty) return '';
 
     const entries: string[] = [];
+
+    // Gradients
     for (const [def, id] of this.map) {
       if (def.type === 'linear') {
         const g = def as LinearGradientDef;
@@ -145,15 +198,45 @@ class GradientCollector {
       }
     }
 
+    // Filters
+    for (const [def, id] of this.filterMap) {
+      const effects = def.effects.map(e => {
+        if (e.type === 'blur') {
+          return `<feGaussianBlur stdDeviation="${e.stdDeviation}" />`;
+        } else {
+          // dropShadow
+          const color = e.floodColor ? toCssColor(e.floodColor, 'black') : 'black';
+          const opacity = e.floodOpacity ?? 1;
+          return `<feDropShadow dx="${e.dx}" dy="${e.dy}" stdDeviation="${e.stdDeviation}" flood-color="${color}" flood-opacity="${opacity}" />`;
+        }
+      }).join('');
+      entries.push(`${indent}  <filter id="${id}">${effects}</filter>`);
+    }
+
+    // ClipPaths
+    for (const [def, id] of this.clipPathMap) {
+      const d = pathToD(def.path);
+      entries.push(`${indent}  <clipPath id="${id}"><path d="${d}" /></clipPath>`);
+    }
+
+    // Masks
+    for (const [def, id] of this.maskMap) {
+      const d = pathToD(def.path);
+      const fill = def.fill ? toCssColor(def.fill, 'white') : 'white';
+      const opacity = def.opacity !== undefined ? ` opacity="${def.opacity}"` : '';
+      entries.push(`${indent}  <mask id="${id}"><path d="${d}" fill="${fill}"${opacity} /></mask>`);
+    }
+
     return [`${indent}<defs>`, ...entries, `${indent}</defs>`].join('\n');
   }
 
-  /** Build DOM `<defs>` element, returns null if no gradients. */
+  /** Build DOM `<defs>` element, returns null if no definitions. */
   toDefsDom(NS: string): SVGDefsElement | null {
-    if (this.map.size === 0) return null;
+    if (this.isEmpty) return null;
 
     const defs = document.createElementNS(NS, 'defs') as SVGDefsElement;
 
+    // Gradients
     for (const [def, id] of this.map) {
       if (def.type === 'linear') {
         const g = def as LinearGradientDef;
@@ -191,6 +274,50 @@ class GradientCollector {
       }
     }
 
+    // Filters
+    for (const [def, id] of this.filterMap) {
+      const filterEl = document.createElementNS(NS, 'filter') as SVGElement;
+      filterEl.setAttribute('id', id);
+      for (const e of def.effects) {
+        if (e.type === 'blur') {
+          const fe = document.createElementNS(NS, 'feGaussianBlur') as SVGElement;
+          fe.setAttribute('stdDeviation', String(e.stdDeviation));
+          filterEl.appendChild(fe);
+        } else {
+          const fe = document.createElementNS(NS, 'feDropShadow') as SVGElement;
+          fe.setAttribute('dx', String(e.dx));
+          fe.setAttribute('dy', String(e.dy));
+          fe.setAttribute('stdDeviation', String(e.stdDeviation));
+          fe.setAttribute('flood-color', e.floodColor ? toCssColor(e.floodColor, 'black') : 'black');
+          fe.setAttribute('flood-opacity', String(e.floodOpacity ?? 1));
+          filterEl.appendChild(fe);
+        }
+      }
+      defs.appendChild(filterEl);
+    }
+
+    // ClipPaths
+    for (const [def, id] of this.clipPathMap) {
+      const clipEl = document.createElementNS(NS, 'clipPath') as SVGElement;
+      clipEl.setAttribute('id', id);
+      const pathEl = document.createElementNS(NS, 'path') as SVGElement;
+      pathEl.setAttribute('d', pathToD(def.path));
+      clipEl.appendChild(pathEl);
+      defs.appendChild(clipEl);
+    }
+
+    // Masks
+    for (const [def, id] of this.maskMap) {
+      const maskEl = document.createElementNS(NS, 'mask') as SVGElement;
+      maskEl.setAttribute('id', id);
+      const pathEl = document.createElementNS(NS, 'path') as SVGElement;
+      pathEl.setAttribute('d', pathToD(def.path));
+      pathEl.setAttribute('fill', def.fill ? toCssColor(def.fill, 'white') : 'white');
+      if (def.opacity !== undefined) pathEl.setAttribute('opacity', String(def.opacity));
+      maskEl.appendChild(pathEl);
+      defs.appendChild(maskEl);
+    }
+
     return defs;
   }
 }
@@ -223,11 +350,21 @@ function buildStyleAttrs(mat: Material | undefined, gradients?: GradientCollecto
     attrs.push(`opacity="${mat.definition.opacity}"`);
   }
 
+  if (mat?.definition.filter && gradients) {
+    attrs.push(`filter="${gradients.registerFilter(mat.definition.filter)}"`);
+  }
+  if (mat?.definition.clipPath && gradients) {
+    attrs.push(`clip-path="${gradients.registerClipPath(mat.definition.clipPath)}"`);
+  }
+  if (mat?.definition.mask && gradients) {
+    attrs.push(`mask="${gradients.registerMask(mat.definition.mask)}"`);
+  }
+
   return attrs.join(' ');
 }
 
 /**
- * Apply fill/stroke/opacity attributes from a Material to a DOM element.
+ * Apply fill/stroke/opacity/filter/clipPath/mask attributes from a Material to a DOM element.
  * When fillGradient or strokeGradient is present, registers it with the collector.
  */
 function applyStyleAttrsToElement(el: SVGElement, mat: Material | undefined, gradients?: GradientCollector): void {
@@ -250,16 +387,123 @@ function applyStyleAttrsToElement(el: SVGElement, mat: Material | undefined, gra
   if (mat?.definition.opacity !== undefined && mat.definition.opacity < 1) {
     el.setAttribute('opacity', String(mat.definition.opacity));
   }
+
+  if (mat?.definition.filter && gradients) {
+    el.setAttribute('filter', gradients.registerFilter(mat.definition.filter));
+  }
+  if (mat?.definition.clipPath && gradients) {
+    el.setAttribute('clip-path', gradients.registerClipPath(mat.definition.clipPath));
+  }
+  if (mat?.definition.mask && gradients) {
+    el.setAttribute('mask', gradients.registerMask(mat.definition.mask));
+  }
+}
+
+// ─── Animation Helpers ──────────────────────────────────────
+
+/**
+ * Build common animation attributes string.
+ */
+function animAttrs(a: SvgAnimateDef | SvgAnimateTransformDef): string {
+  const parts: string[] = [];
+  if (a.from !== undefined) parts.push(`from="${a.from}"`);
+  if (a.to !== undefined) parts.push(`to="${a.to}"`);
+  if (a.values !== undefined) parts.push(`values="${a.values}"`);
+  parts.push(`dur="${a.dur}"`);
+  if (a.repeatCount !== undefined) parts.push(`repeatCount="${a.repeatCount}"`);
+  if (a.begin !== undefined) parts.push(`begin="${a.begin}"`);
+  if (a.fill !== undefined) parts.push(`fill="${a.fill}"`);
+  return parts.join(' ');
+}
+
+/**
+ * Generate `<animate>` / `<animateTransform>` child strings for a node.
+ * Returns empty string if the node has no Animation component.
+ */
+function animationChildrenToString(node: Node): string {
+  const anim = node.getComponent<Animation>(ComponentType.Animation);
+  if (!anim || anim.animations.length === 0) return '';
+
+  return anim.animations.map(a => {
+    if (a.type === 'animate') {
+      const d = a as SvgAnimateDef;
+      const extra: string[] = [];
+      if (d.keyTimes !== undefined) extra.push(`keyTimes="${d.keyTimes}"`);
+      if (d.keySplines !== undefined) extra.push(`keySplines="${d.keySplines}"`);
+      if (d.calcMode !== undefined) extra.push(`calcMode="${d.calcMode}"`);
+      return `<animate attributeName="${d.attributeName}" ${animAttrs(d)}${extra.length ? ' ' + extra.join(' ') : ''} />`;
+    } else {
+      const d = a as SvgAnimateTransformDef;
+      const extra: string[] = [];
+      if (d.additive !== undefined) extra.push(`additive="${d.additive}"`);
+      return `<animateTransform attributeName="transform" type="${d.transformType}" ${animAttrs(d)}${extra.length ? ' ' + extra.join(' ') : ''} />`;
+    }
+  }).join('');
+}
+
+/**
+ * Attach `<animate>` / `<animateTransform>` DOM children to a geometry element.
+ */
+function attachAnimationDom(el: SVGElement, node: Node, NS: string): void {
+  const anim = node.getComponent<Animation>(ComponentType.Animation);
+  if (!anim || anim.animations.length === 0) return;
+
+  for (const a of anim.animations) {
+    if (a.type === 'animate') {
+      const d = a as SvgAnimateDef;
+      const animEl = document.createElementNS(NS, 'animate') as SVGElement;
+      animEl.setAttribute('attributeName', d.attributeName);
+      if (d.from !== undefined) animEl.setAttribute('from', d.from);
+      if (d.to !== undefined) animEl.setAttribute('to', d.to);
+      if (d.values !== undefined) animEl.setAttribute('values', d.values);
+      animEl.setAttribute('dur', d.dur);
+      if (d.repeatCount !== undefined) animEl.setAttribute('repeatCount', d.repeatCount);
+      if (d.begin !== undefined) animEl.setAttribute('begin', d.begin);
+      if (d.fill !== undefined) animEl.setAttribute('fill', d.fill);
+      if (d.keyTimes !== undefined) animEl.setAttribute('keyTimes', d.keyTimes);
+      if (d.keySplines !== undefined) animEl.setAttribute('keySplines', d.keySplines);
+      if (d.calcMode !== undefined) animEl.setAttribute('calcMode', d.calcMode);
+      el.appendChild(animEl);
+    } else {
+      const d = a as SvgAnimateTransformDef;
+      const animEl = document.createElementNS(NS, 'animateTransform') as SVGElement;
+      animEl.setAttribute('attributeName', 'transform');
+      animEl.setAttribute('type', d.transformType);
+      if (d.from !== undefined) animEl.setAttribute('from', d.from);
+      if (d.to !== undefined) animEl.setAttribute('to', d.to);
+      if (d.values !== undefined) animEl.setAttribute('values', d.values);
+      animEl.setAttribute('dur', d.dur);
+      if (d.repeatCount !== undefined) animEl.setAttribute('repeatCount', d.repeatCount);
+      if (d.begin !== undefined) animEl.setAttribute('begin', d.begin);
+      if (d.fill !== undefined) animEl.setAttribute('fill', d.fill);
+      if (d.additive !== undefined) animEl.setAttribute('additive', d.additive);
+      el.appendChild(animEl);
+    }
+  }
 }
 
 // ─── String-based SVG Renderer ──────────────────────────────
 
 /**
  * Render a geometry definition to an SVG element string (without transform).
+ * When the node has an Animation component, animation children are nested
+ * inside the element (making it non-self-closing).
  * Returns `null` if the geometry type is not supported by SVG.
  */
-function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients: GradientCollector): string | null {
+function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients: GradientCollector, node: Node): string | null {
   const style = buildStyleAttrs(mat, gradients);
+  const animStr = animationChildrenToString(node);
+
+  // Helper: wrap a self-closing tag to include animation children if needed
+  const wrapTag = (tag: string, attrs: string, selfClose: boolean, content?: string): string => {
+    if (animStr) {
+      return `<${tag} ${attrs}>${content ?? ''}${animStr}</${tag}>`;
+    }
+    if (content !== undefined) {
+      return `<${tag} ${attrs}>${content}</${tag}>`;
+    }
+    return selfClose ? `<${tag} ${attrs} />` : `<${tag} ${attrs}></${tag}>`;
+  };
 
   switch (geo.definition.type) {
     case GeometryPrimitive.Path2D: {
@@ -267,20 +511,19 @@ function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients
       const d = pathDef.path
         .map(cmd => `${cmd.command} ${cmd.args.join(' ')}`)
         .join(' ');
-      return `<path d="${d}" ${style} />`;
+      return wrapTag('path', `d="${d}" ${style}`, true);
     }
 
     case GeometryPrimitive.Box: {
       const boxDef = geo.definition as BoxGeometryDef;
-      // Center the rect at origin; the transform will position it.
       const x = -boxDef.width / 2;
       const y = -boxDef.height / 2;
-      return `<rect x="${x}" y="${y}" width="${boxDef.width}" height="${boxDef.height}" ${style} />`;
+      return wrapTag('rect', `x="${x}" y="${y}" width="${boxDef.width}" height="${boxDef.height}" ${style}`, true);
     }
 
     case GeometryPrimitive.Sphere: {
       const sphereDef = geo.definition as SphereGeometryDef;
-      return `<circle cx="0" cy="0" r="${sphereDef.radius}" ${style} />`;
+      return wrapTag('circle', `cx="0" cy="0" r="${sphereDef.radius}" ${style}`, true);
     }
 
     case GeometryPrimitive.Text: {
@@ -294,12 +537,30 @@ function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-      return `<text font-size="${fontSize}" font-family="${fontFamily}" font-weight="${fontWeight}" text-anchor="${textAnchor}" dominant-baseline="${dominantBaseline}" ${style}>${escaped}</text>`;
+      return wrapTag('text', `font-size="${fontSize}" font-family="${fontFamily}" font-weight="${fontWeight}" text-anchor="${textAnchor}" dominant-baseline="${dominantBaseline}" ${style}`, false, escaped);
     }
 
     default:
       return null;
   }
+}
+
+/**
+ * Build CSS class="" and id="" attribute string fragments for a node.
+ */
+function buildCssAttrs(node: Node): string {
+  const parts: string[] = [];
+  if (node.cssId) parts.push(`id="${node.cssId}"`);
+  if (node.cssClass) parts.push(`class="${node.cssClass}"`);
+  return parts.length ? ' ' + parts.join(' ') : '';
+}
+
+/**
+ * Apply cssClass and cssId attributes to a DOM element from a node.
+ */
+function applyCssAttrs(el: SVGElement, node: Node): void {
+  if (node.cssId) el.setAttribute('id', node.cssId);
+  if (node.cssClass) el.setAttribute('class', node.cssClass);
 }
 
 /**
@@ -311,17 +572,21 @@ function renderNodeToString(node: Node, indent: string, gradients: GradientColle
   const geo = node.getComponent<Geometry>(ComponentType.Geometry);
   const mat = node.getComponent<Material>(ComponentType.Material);
   const hasChildren = node.children.length > 0;
-  const geoString = geo ? geometryToSvgString(geo, mat, gradients) : null;
+  const geoString = geo ? geometryToSvgString(geo, mat, gradients, node) : null;
   const transformStr = matrix4ToSvgTransform(node.transform.localMatrix);
   const transformAttr = transformStr ? ` transform="${transformStr}"` : '';
-
-  // Skip empty subtrees (no geometry anywhere below) — but we can't know
-  // cheaply, so we always emit groups for simplicity and editor friendliness.
+  const cssAttrs = buildCssAttrs(node);
 
   // Leaf node with geometry, no children
   if (geoString && !hasChildren) {
     if (transformAttr) {
-      return `${indent}<g${transformAttr}>\n${indent}  ${geoString}\n${indent}</g>`;
+      return `${indent}<g${transformAttr}${cssAttrs}>\n${indent}  ${geoString}\n${indent}</g>`;
+    }
+    // Inject css attrs into the geometry tag itself
+    if (cssAttrs) {
+      // Insert before the closing /> or >
+      const injected = geoString.replace(/(\/?>)$/, `${cssAttrs} $1`);
+      return `${indent}${injected}`;
     }
     return `${indent}${geoString}`;
   }
@@ -329,7 +594,7 @@ function renderNodeToString(node: Node, indent: string, gradients: GradientColle
   // Node with children (may also have geometry)
   if (hasChildren) {
     const lines: string[] = [];
-    lines.push(`${indent}<g${transformAttr}>`);
+    lines.push(`${indent}<g${transformAttr}${cssAttrs}>`);
     if (geoString) {
       lines.push(`${indent}  ${geoString}`);
     }
@@ -495,10 +760,12 @@ function renderNodeToDom(
   if (needsGroup) {
     const g = document.createElementNS(NS, 'g') as SVGElement;
     if (transformStr) g.setAttribute('transform', transformStr);
+    applyCssAttrs(g, node);
 
     if (geoEl) {
       geoEl.setAttribute('data-oroya-id', node.id);
       applyStyleAttrsToElement(geoEl, mat, gradients);
+      attachAnimationDom(geoEl, node, NS);
       attachInteractiveListeners(geoEl, node, signal);
       nodeElementMap.set(node.id, geoEl);
       g.appendChild(geoEl);
@@ -512,7 +779,9 @@ function renderNodeToDom(
   } else if (geoEl) {
     // Leaf with geometry but no transform — append directly
     geoEl.setAttribute('data-oroya-id', node.id);
+    applyCssAttrs(geoEl, node);
     applyStyleAttrsToElement(geoEl, mat, gradients);
+    attachAnimationDom(geoEl, node, NS);
     attachInteractiveListeners(geoEl, node, signal);
     nodeElementMap.set(node.id, geoEl);
     parent.appendChild(geoEl);

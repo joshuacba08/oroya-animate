@@ -1,7 +1,8 @@
-import { Scene } from '../scene/Scene';
-import { Node } from '../nodes/Node';
 import { Camera, Component, ComponentType, Geometry, Material, Transform } from '../components';
+import { Animation } from '../components/Animation';
 import { Interactive } from '../components/Interactive';
+import { Node } from '../nodes/Node';
+import { Scene } from '../scene/Scene';
 
 // A serializable representation of the scene graph
 interface SerializableComponent {
@@ -12,6 +13,8 @@ interface SerializableComponent {
 interface SerializableNode {
   id: string;
   name: string;
+  cssClass?: string;
+  cssId?: string;
   components: SerializableComponent[];
   children: SerializableNode[];
 }
@@ -31,6 +34,8 @@ function serializeNode(node: Node): SerializableNode {
   return {
     id: node.id,
     name: node.name,
+    ...(node.cssClass ? { cssClass: node.cssClass } : {}),
+    ...(node.cssId ? { cssId: node.cssId } : {}),
     components: components,
     children: node.children.map(serializeNode),
   };
@@ -45,6 +50,8 @@ export function serialize(scene: Scene): string {
 
 function deserializeNode(sNode: SerializableNode): Node {
   const node = new Node(sNode.name, sNode.id);
+  if (sNode.cssClass) node.cssClass = sNode.cssClass;
+  if (sNode.cssId) node.cssId = sNode.cssId;
 
   // Clear default transform before adding deserialized ones
   node.components.clear();
@@ -68,6 +75,9 @@ function deserializeNode(sNode: SerializableNode): Node {
         break;
       case ComponentType.Camera:
         component = new Camera(sComp.definition);
+        break;
+      case ComponentType.Animation:
+        component = new Animation(sComp.animations ?? []);
         break;
     }
     if (component) {

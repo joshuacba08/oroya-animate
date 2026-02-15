@@ -62,6 +62,62 @@ export interface RadialGradientDef {
  */
 export type GradientDef = LinearGradientDef | RadialGradientDef;
 
+// ─── SVG Filter Effects ─────────────────────────────────────
+
+/** Gaussian blur effect. */
+export interface SvgBlurEffect {
+  type: 'blur';
+  /** Standard deviation of the blur. */
+  stdDeviation: number;
+}
+
+/** Drop-shadow effect. */
+export interface SvgDropShadowEffect {
+  type: 'dropShadow';
+  /** Horizontal offset. */
+  dx: number;
+  /** Vertical offset. */
+  dy: number;
+  /** Blur standard deviation. */
+  stdDeviation: number;
+  /** Shadow color. Default: black. */
+  floodColor?: ColorRGB;
+  /** Shadow opacity (0–1). Default: 1. */
+  floodOpacity?: number;
+}
+
+/** A union of all SVG filter effect types. */
+export type SvgFilterEffect = SvgBlurEffect | SvgDropShadowEffect;
+
+/** A filter definition containing one or more effects. */
+export interface SvgFilterDef {
+  effects: SvgFilterEffect[];
+}
+
+// ─── SVG Clip-path / Mask ───────────────────────────────────
+
+/**
+ * A clip-path definition using SVG path commands.
+ * The clipped region is defined by the path shape.
+ */
+export interface SvgClipPathDef {
+  /** Path commands defining the clip region. */
+  path: import('./Geometry').Path2DCommand[];
+}
+
+/**
+ * A mask definition using an SVG path with an optional fill opacity.
+ * White areas are visible, black areas are hidden.
+ */
+export interface SvgMaskDef {
+  /** Path commands defining the mask shape. */
+  path: import('./Geometry').Path2DCommand[];
+  /** Fill color for the mask shape (determines visibility). Default: white. */
+  fill?: ColorRGB;
+  /** Opacity of the mask shape (0–1). Default: 1. */
+  opacity?: number;
+}
+
 /**
  * The definition for a material.
  */
@@ -100,6 +156,24 @@ export interface MaterialDef {
    * The stroke width for 2D/SVG rendering.
    */
   strokeWidth?: number;
+
+  /**
+   * SVG filter effects (blur, drop-shadow, etc.).
+   * Generates a `<filter>` in `<defs>` and references it via `filter="url(#id)"`.
+   */
+  filter?: SvgFilterDef;
+
+  /**
+   * SVG clip-path defined by path commands.
+   * Generates a `<clipPath>` in `<defs>`.
+   */
+  clipPath?: SvgClipPathDef;
+
+  /**
+   * SVG mask defined by a path shape.
+   * Generates a `<mask>` in `<defs>`.
+   */
+  mask?: SvgMaskDef;
 
   // more properties like roughness, metalness, etc. can be added here
 }
