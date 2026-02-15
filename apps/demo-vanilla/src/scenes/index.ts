@@ -5,6 +5,9 @@ import { solarSystemControls, createSolarSystemScene } from './solar-system';
 import { shapeGridControls, createShapeGridScene } from './shape-grid';
 import { cameraViewpointsControls, createCameraViewpointsScene } from './camera-viewpoints';
 import { proceduralCityControls, createProceduralCityScene } from './procedural-city';
+import { gradientShowcaseControls, createGradientShowcaseScene } from './gradient-showcase';
+import { circleOverlayControls, createCircleOverlayScene } from './circle-overlay';
+import { generativeArtControls, createGenerativeArtScene } from './generative-art';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -48,5 +51,26 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     description: 'Ciudad generada algorítmicamente con edificios, parque central y torre destacada. Demuestra generación procedural y agrupación jerárquica.',
     controls: proceduralCityControls,
     factory: createProceduralCityScene,
+  },
+  {
+    id: 'gradient-showcase',
+    label: 'Gradient Showcase',
+    description: 'Muestra de gradientes lineales y radiales con múltiples color stops. Ideal para SVG con temas de atardecer, océano, neón y arcoíris.',
+    controls: gradientShowcaseControls,
+    factory: createGradientShowcaseScene,
+  },
+  {
+    id: 'circle-overlay',
+    label: 'Circle Overlay',
+    description: 'Círculos superpuestos con transparencia. Efecto de interferencia visual inspirado en arte generativo SVG.',
+    controls: circleOverlayControls,
+    factory: createCircleOverlayScene,
+  },
+  {
+    id: 'generative-art',
+    label: 'Generative Art',
+    description: 'Composiciones geométricas inspiradas en Albers, Mondrian y Bauhaus. Demuestra filtros SVG y capas de color.',
+    controls: generativeArtControls,
+    factory: createGenerativeArtScene,
   },
 ];

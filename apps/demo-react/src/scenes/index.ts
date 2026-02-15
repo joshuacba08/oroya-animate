@@ -12,6 +12,9 @@ import { wheelAndBubblingControls, createWheelAndBubblingScene } from './WheelAn
 import { svgShowcaseControls, createSvgShowcaseScene } from './SvgShowcase';
 import { svgAnimationsControls, createSvgAnimationsScene } from './SvgAnimations';
 import { svgInteractiveControls, createSvgInteractiveScene } from './SvgInteractive';
+import { gradientShowcaseControls, createGradientShowcaseScene } from './GradientShowcase';
+import { circleOverlayControls, createCircleOverlayScene } from './CircleOverlay';
+import { generativeArtControls, createGenerativeArtScene } from './GenerativeArt';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -117,6 +120,30 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'svg',
     controls: svgInteractiveControls,
     factory: createSvgInteractiveScene,
+  },
+  {
+    id: 'gradient-showcase',
+    label: 'Gradient Showcase',
+    description: 'Muestra de gradientes lineales y radiales con múltiples stops de color. Estilos: atardecer, océano, neón, arcoíris.',
+    renderer: 'svg',
+    controls: gradientShowcaseControls,
+    factory: createGradientShowcaseScene,
+  },
+  {
+    id: 'circle-overlay',
+    label: 'Circle Overlay',
+    description: 'Círculos semi-transparentes superpuestos creando patrones de interferencia. Demuestra opacidad y composición de formas.',
+    renderer: 'svg',
+    controls: circleOverlayControls,
+    factory: createCircleOverlayScene,
+  },
+  {
+    id: 'generative-art',
+    label: 'Generative Art',
+    description: 'Composiciones de color inspiradas en artistas famosos: Albers, Mondrian, Bauhaus. Demuestra paletas de color y filtros.',
+    renderer: 'svg',
+    controls: generativeArtControls,
+    factory: createGenerativeArtScene,
   },
 ];
 
