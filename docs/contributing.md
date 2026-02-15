@@ -111,7 +111,7 @@ oroya-animate/
 ## Build System
 
 Each package uses [tsup](https://tsup.egoist.dev/) for building:
-- Outputs both **ESM** (`.mjs`) and **CJS** (`.cjs`) formats.
+- Outputs both **ESM** (`.js`) and **CJS** (`.cjs`) formats.
 - Generates TypeScript declaration files (`.d.ts`).
 - Configuration is in `tsup.config.ts` inside each package.
 
