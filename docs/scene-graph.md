@@ -21,15 +21,32 @@ When a parent node moves, its children move with it. This is because transformat
 Every node has a `Transform` component, which includes:
 
 -   **Position:** `{ x, y, z }`
--   **Rotation:** A Quaternion `{ x, y, z, w }` (expressed via the Euler angles helper in the API soon).
+-   **Rotation:** A Quaternion `{ x, y, z, w }`.
 -   **Scale:** `{ x, y, z }`
+
+### Updating Transforms
+
+After modifying `position`, `rotation`, or `scale`, you must call `updateLocalMatrix()` to recompute the node's local transformation matrix:
+
+```typescript
+node.transform.position.x = 3;
+node.transform.rotation.y = 0.5;
+node.transform.updateLocalMatrix(); // Recalculates the 4x4 local matrix
+```
+
+The renderer then calls `scene.updateWorldMatrices()` to propagate local matrices through the hierarchy, computing the final `worldMatrix` for each node.
 
 ### Local vs World Space
 
 -   **Local Space:** The coordinates relative to the node's parent.
 -   **World Space:** The final coordinates in the 3D world after combining all parent transformations.
 
-Oroya handles the matrix calculations for you when you call `scene.updateWorldMatrices()` (or it's handled automatically by the renderers).
+Oroya computes `worldMatrix = parentWorldMatrix * localMatrix` for each node in the tree. The `ThreeRenderer` calls this automatically on every `render()` frame.
+
+You can also call it manually:
+```typescript
+scene.updateWorldMatrices();
+```
 
 ## 🧩 Components
 
@@ -51,7 +68,7 @@ const geo = node.getComponent<Geometry>(ComponentType.Geometry);
 ### Component Types
 Currently supported component types:
 -   `Transform` (Mandatory, added automatically)
--   `Geometry`
--   `Material`
--   `Camera` (Coming soon)
+-   `Geometry` — Defines shape (Box, Sphere, Path2D)
+-   `Material` — Defines appearance (color, opacity)
+-   `Camera` — Defines a viewpoint (Perspective; Orthographic planned)
 -   `Light` (Coming soon)

@@ -117,6 +117,31 @@ node.addComponent(new Material({
 
 ---
 
+### `Camera` (Component)
+
+Defines the viewpoint from which the scene is rendered. The `ThreeRenderer` automatically picks up the first `Camera` node.
+
+```typescript
+import { Camera, CameraType } from '@oroya/core';
+
+const cameraNode = new Node('main-cam');
+cameraNode.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 75,
+  aspect: 16 / 9,
+  near: 0.1,
+  far: 1000,
+}));
+cameraNode.transform.position.z = 5;
+scene.add(cameraNode);
+```
+
+| Property     | Type        | Description                               |
+|--------------|-------------|-------------------------------------------|
+| `definition` | `CameraDef` | The definition object for camera settings.|
+
+---
+
 ## Interfaces & Types
 
 ### `Vec3`
@@ -162,9 +187,48 @@ enum ComponentType {
   Transform = 'Transform',
   Geometry  = 'Geometry',
   Material  = 'Material',
-  Camera    = 'Camera',    // Reserved, not yet implemented
+  Camera    = 'Camera',
 }
 ```
+
+### `CameraType` (Enum)
+```typescript
+enum CameraType {
+  Perspective  = 'Perspective',
+  Orthographic = 'Orthographic',  // Planned
+}
+```
+
+### `CameraDef` (Union Type)
+```typescript
+type CameraDef = PerspectiveCameraDef; // | OrthographicCameraDef (planned)
+```
+
+### `PerspectiveCameraDef`
+```typescript
+interface PerspectiveCameraDef {
+  type: CameraType.Perspective;
+  fov: number;     // Field of view in degrees
+  aspect: number;  // Aspect ratio (width / height)
+  near: number;    // Near clipping plane
+  far: number;     // Far clipping plane
+}
+```
+
+### `Matrix4`
+```typescript
+// A 4x4 transformation matrix as a 16-element tuple
+type Matrix4 = [number, number, number, number,
+                number, number, number, number,
+                number, number, number, number,
+                number, number, number, number];
+```
+
+| Export              | Type         | Description                                   |
+|---------------------|--------------|-----------------------------------------------|
+| `Matrix4Identity`   | `Matrix4`    | The identity matrix constant.                 |
+| `composeMatrix()`   | `Matrix4`    | Builds a matrix from position, rotation, scale.|
+| `multiplyMatrices()`| `Matrix4`    | Multiplies two 4x4 matrices.                  |
 
 ---
 

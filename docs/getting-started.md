@@ -17,26 +17,29 @@ pnpm add @oroya/core @oroya/renderer-three
 First, let's create a Scene and a basic Node with a cube.
 
 ```typescript
-import { Scene, Node, createBox, Material } from '@oroya/core';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
 
 // Create the Scene
 const scene = new Scene();
 
-// Create a Node
+// Create a Camera node
+const cameraNode = new Node('main-camera');
+cameraNode.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 75,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 1000,
+}));
+cameraNode.transform.position.z = 5;
+scene.add(cameraNode);
+
+// Create a Cube node
 const cubeNode = new Node('my-cube');
-
-// Add a Box geometry (1x1x1)
 cubeNode.addComponent(createBox(1, 1, 1));
-
-// Add a red Material
 cubeNode.addComponent(new Material({ 
     color: { r: 1, g: 0.2, b: 0.2 } 
 }));
-
-// Position the cube
-cubeNode.transform.position = { x: 0, y: 0, z: 0 };
-
-// Add to scene structure
 scene.add(cubeNode);
 ```
 
@@ -59,17 +62,21 @@ const renderer = new ThreeRenderer({
 renderer.mount(scene);
 
 // Animation Loop
-function animate() {
+function animate(time: number) {
+    time *= 0.001; // convert to seconds
     requestAnimationFrame(animate);
     
     // Update logic: Rotate the cube
-    cubeNode.transform.rotation.y += 0.01;
+    const speed = 0.5;
+    cubeNode.transform.rotation.x = Math.sin(time * speed) * 2;
+    cubeNode.transform.rotation.y = Math.cos(time * speed) * 2;
+    cubeNode.transform.updateLocalMatrix(); // Recompute the local matrix
     
     // Sync Oroya scene with Three.js and render
     renderer.render();
 }
 
-animate();
+requestAnimationFrame(animate);
 ```
 
 ## 🧱 Key Concepts
@@ -79,9 +86,10 @@ Nodes are the building blocks of your world. They form a hierarchy where childre
 
 ### Components
 Components add behavior or data to nodes. 
--   **Transform:** Automatically added to every Node.
--   **Geometry:** Defines the shape (Box, Sphere, etc.).
--   **Material:** Defines the appearance (Color, opacity, textures).
+-   **Transform:** Automatically added to every Node. Call `updateLocalMatrix()` after mutating position/rotation/scale.
+-   **Geometry:** Defines the shape (Box, Sphere, Path2D).
+-   **Material:** Defines the appearance (Color, opacity).
+-   **Camera:** Defines a viewpoint in the scene (Perspective, Orthographic planned).
 
 ### Backends
 The renderer is chosen by you. If you want high-performance WebGL, use `@oroya/renderer-three`. If you need a scalable 2D graphic for documentation or static sites, use `@oroya/renderer-svg`.

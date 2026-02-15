@@ -26,6 +26,7 @@ graph TD
         Transform[Transform Component]
         Geometry[Geometry Component]
         Material[Material Component]
+        Camera[Camera Component]
     end
     
     subgraph ThreeJSBackend
@@ -42,9 +43,10 @@ graph TD
 ## 🌳 Scene Graph
 
 The Scene Graph is a hierarchical tree of `Node` objects. Each node:
--   Has a `Transform` (position, rotation, scale).
+-   Has a `Transform` (position, rotation, scale) with `localMatrix` and `worldMatrix`.
 -   Can have multiple children nodes.
--   Can have several `Component`s attached (Geometry, Material, etc.).
+-   Can have several `Component`s attached (Geometry, Material, Camera, etc.).
+-   Cameras are scene graph nodes too — they inherit parent transforms like any other node.
 
 ### Decoupling Logic
 The `@oroya/core` package does **not** depend on Three.js or any other rendering library. This allows it to:
@@ -54,11 +56,16 @@ The `@oroya/core` package does **not** depend on Three.js or any other rendering
 
 ## ⚙️ The Rendering Lifecycle
 
-1.  **Scene Preparation:** User builds the scene using `Node` and `Component`.
-2.  **Transformation Matrix Update:** The `scene.updateWorldMatrices()` method calculates world-space coordinates.
-3.  **Mounting:** The renderer (e.g., `ThreeRenderer`) is "mounted" to the Oroya scene. It performs an initial traversal to build the engine-specific objects.
-4.  **Render Loop:**
-    -   User updates Oroya nodes (e.g., rotates a cube).
+1.  **Scene Preparation:** User builds the scene using `Node` and `Component` (including a `Camera` node).
+2.  **Transform Updates:** Call `transform.updateLocalMatrix()` on modified nodes to recompute local matrices.
+3.  **World Matrix Propagation:** `renderer.render()` internally calls `scene.updateWorldMatrices()`, which walks the tree and computes each node's `worldMatrix` by multiplying with its parent.
+4.  **Mounting:** The renderer (e.g., `ThreeRenderer`) is "mounted" to the Oroya scene via `renderer.mount(scene)`. It traverses the graph, builds engine-specific objects, and locates the first `Camera` node to use as the active camera.
+5.  **Render Loop:**
+    -   User mutates Oroya node transforms (e.g., rotates a cube).
+    -   User calls `transform.updateLocalMatrix()` to mark the change.
     -   `renderer.render()` is called.
-    -   The renderer syncs the state from Oroya nodes to the backend objects.
-    -   The final frame is rendered to the screen.
+    -   The renderer reads each node's `worldMatrix`, applies it to the backend object via `matrix.fromArray()` + `decompose()`.
+    -   The final frame is rendered using the active camera.
+
+### Camera Resolution
+The `ThreeRenderer` searches the scene graph for the first node with a `Camera` component during `mount()`. If none is found, a default `PerspectiveCamera` at `z=5` is created as a fallback.

@@ -39,20 +39,41 @@ const renderer = new ThreeRenderer({
 | `dispose()`        | Cleans up WebGL resources. Call when unmounting.                         |
 
 ### How it works
-1. **`mount()`** traverses the Oroya Scene Graph. For each node with a `Geometry` component, it creates the corresponding `THREE.Mesh` (with `THREE.BoxGeometry`, etc.) and a `THREE.MeshStandardMaterial`.
-2. **`render()`** syncs `position`, `rotation` (quaternion), and `scale` from each Oroya node to its Three.js counterpart, then calls `renderer.render(scene, camera)`.
-3. A default `PerspectiveCamera` is created at `z = 5` with ambient and directional lighting.
+1. **`mount()`** traverses the Oroya Scene Graph. For each node with a `Geometry` component, it creates the corresponding `THREE.Mesh`. Nodes with a `Camera` component become `THREE.PerspectiveCamera` instances. The first camera found becomes the **active camera**.
+2. **`render()`** calls `scene.updateWorldMatrices()`, then reads each node's `worldMatrix` and applies it to its Three.js counterpart via `matrix.fromArray()` + `decompose()`. Finally, it renders the frame with the active camera.
+3. If no camera node is found in the scene graph, a fallback `PerspectiveCamera` at `z = 5` is created automatically.
+4. Ambient and directional lighting are added by default.
 
-### Supported Geometries (Current)
+### Supported Geometries
 - `Box` → `THREE.BoxGeometry`
+- `Sphere` → `THREE.SphereGeometry`
+
+### Supported Components
+- `Geometry` → `THREE.Mesh`
+- `Material` → `THREE.MeshStandardMaterial` (color, opacity, transparency)
+- `Camera` → `THREE.PerspectiveCamera` (Perspective type)
 
 ### Example (Vanilla)
 
 ```typescript
-import { Scene, Node, createBox, Material } from '@oroya/core';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
 import { ThreeRenderer } from '@oroya/renderer-three';
 
 const scene = new Scene();
+
+// Camera
+const cam = new Node('cam');
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 75,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 1000,
+}));
+cam.transform.position.z = 5;
+scene.add(cam);
+
+// Box
 const box = new Node('box');
 box.addComponent(createBox(1, 1, 1));
 box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
@@ -66,7 +87,9 @@ const renderer = new ThreeRenderer({
 renderer.mount(scene);
 
 function loop(time: number) {
-  box.transform.rotation.y = time * 0.001;
+  time *= 0.001;
+  box.transform.rotation.y = time;
+  box.transform.updateLocalMatrix();
   renderer.render();
   requestAnimationFrame(loop);
 }
