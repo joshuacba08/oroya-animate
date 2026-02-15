@@ -58,6 +58,7 @@ export function getDefaultParams(controls: ControlDef[]): ParamValues {
 }
 
 export function hexToRgb(hex: string) {
+  if (!hex || typeof hex !== 'string') return { r: 0.5, g: 0.5, b: 0.5 };
   const n = parseInt(hex.slice(1), 16);
   return {
     r: ((n >> 16) & 0xff) / 255,

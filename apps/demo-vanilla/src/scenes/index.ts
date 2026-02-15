@@ -3,6 +3,8 @@ import { helloCubeControls, createHelloCubeScene } from './hello-cube';
 import { colorPaletteControls, createColorPaletteScene } from './color-palette';
 import { solarSystemControls, createSolarSystemScene } from './solar-system';
 import { shapeGridControls, createShapeGridScene } from './shape-grid';
+import { cameraViewpointsControls, createCameraViewpointsScene } from './camera-viewpoints';
+import { proceduralCityControls, createProceduralCityScene } from './procedural-city';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -32,5 +34,19 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     description: 'Grilla procedural con ola sinusoidal y colores por posición. Demuestra generación procedural y animación masiva.',
     controls: shapeGridControls,
     factory: createShapeGridScene,
+  },
+  {
+    id: 'camera-viewpoints',
+    label: 'Camera Viewpoints',
+    description: 'Múltiples puntos de vista (orbital, frontal, cenital, lateral) sobre una escena con pilares y esferas. Demuestra posicionamiento y animación de cámaras.',
+    controls: cameraViewpointsControls,
+    factory: createCameraViewpointsScene,
+  },
+  {
+    id: 'procedural-city',
+    label: 'Procedural City',
+    description: 'Ciudad generada algorítmicamente con edificios, parque central y torre destacada. Demuestra generación procedural y agrupación jerárquica.',
+    controls: proceduralCityControls,
+    factory: createProceduralCityScene,
   },
 ];

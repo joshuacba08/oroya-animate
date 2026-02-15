@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { ControlPanel } from './components/ControlPanel';
 import { DEMO_SCENES } from './scenes';
@@ -99,13 +99,15 @@ function App() {
   const paramsRef = useRef(params);
   paramsRef.current = params;
 
-  // Reset params when switching demos
-  useEffect(() => {
-    const defaults = getDefaultParams(activeDemo.controls);
+  // Switch demo: reset params synchronously so useMemo gets correct values
+  const handleSwitchDemo = useCallback((id: string) => {
+    const demo = DEMO_SCENES.find((d) => d.id === id)!;
+    const defaults = getDefaultParams(demo.controls);
+    setActiveId(id);
     setParams(defaults);
     paramsRef.current = defaults;
     setBuildKey((k) => k + 1);
-  }, [activeDemo]);
+  }, []);
 
   // Create scene — rebuilds only when buildKey changes
   const { scene, animate } = useMemo(
@@ -143,7 +145,7 @@ function App() {
             return (
               <button
                 key={demo.id}
-                onClick={() => setActiveId(demo.id)}
+                onClick={() => handleSwitchDemo(demo.id)}
                 style={{
                   ...navBtnBase,
                   background: isActive
