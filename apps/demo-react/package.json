@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@oroya/core": "workspace:*",
+    "@oroya/renderer-svg": "workspace:*",
     "@oroya/renderer-three": "workspace:*",
     "lucide-react": "^0.564.0",
     "react": "^18.3.1",

@@ -23,6 +23,9 @@ importers:
       '@oroya/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@oroya/renderer-svg':
+        specifier: workspace:*
+        version: link:../../packages/renderer-svg
       '@oroya/renderer-three':
         specifier: workspace:*
         version: link:../../packages/renderer-three

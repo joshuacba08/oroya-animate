@@ -2,6 +2,7 @@ import {
   Scene, Node, Material, Camera, CameraType,
   createBox, createSphere, createPath2D, createText,
 } from '@oroya/core';
+import type { Path2DCommand } from '@oroya/core';
 import type { ControlDef, ParamValues } from '../types';
 import { hexToRgb } from '../types';
 
@@ -124,7 +125,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
     filter: {
       effects: [{
         type: 'dropShadow', dx, dy,
-        stdDeviation: 3, floodColor: '#000', floodOpacity: 0.5,
+        stdDeviation: 3, floodColor: { r: 0, g: 0, b: 0 }, floodOpacity: 0.5,
       }],
     },
   }));
@@ -183,19 +184,19 @@ export function createSvgShowcaseScene(params: ParamValues) {
     },
     mask: {
       path: [
-        { command: 'M', args: [-75, -60] },
-        { command: 'L', args: [75, -60] },
-        { command: 'L', args: [75, 60] },
-        { command: 'L', args: [-75, 60] },
-        { command: 'Z', args: [] },
+        { command: 'M' as const, args: [-75, -60] },
+        { command: 'L' as const, args: [75, -60] },
+        { command: 'L' as const, args: [75, 60] },
+        { command: 'L' as const, args: [-75, 60] },
+        { command: 'Z' as const, args: [] },
         // Inner diamond cutout
-        { command: 'M', args: [0, -40] },
-        { command: 'L', args: [40, 0] },
-        { command: 'L', args: [0, 40] },
-        { command: 'L', args: [-40, 0] },
-        { command: 'Z', args: [] },
+        { command: 'M' as const, args: [0, -40] },
+        { command: 'L' as const, args: [40, 0] },
+        { command: 'L' as const, args: [0, 40] },
+        { command: 'L' as const, args: [-40, 0] },
+        { command: 'Z' as const, args: [] },
       ],
-      fill: 'white',
+      fill: { r: 1, g: 1, b: 1 },
       opacity: 0.9,
     },
   }));
@@ -279,8 +280,8 @@ export function createSvgShowcaseScene(params: ParamValues) {
 function createStarCommands(
   cx: number, cy: number,
   points: number, outerR: number, innerR: number,
-) {
-  const commands: { command: string; args: number[] }[] = [];
+): Path2DCommand[] {
+  const commands: Path2DCommand[] = [];
   for (let i = 0; i < points * 2; i++) {
     const angle = (i * Math.PI) / points - Math.PI / 2;
     const r = i % 2 === 0 ? outerR : innerR;

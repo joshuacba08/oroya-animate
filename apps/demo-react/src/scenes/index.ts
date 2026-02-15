@@ -9,6 +9,9 @@ import { interactiveDemoControls, createInteractiveDemoScene } from './Interacti
 import { hoverShowcaseControls, createHoverShowcaseScene } from './HoverShowcase';
 import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
 import { wheelAndBubblingControls, createWheelAndBubblingScene } from './WheelAndBubbling';
+import { svgShowcaseControls, createSvgShowcaseScene } from './SvgShowcase';
+import { svgAnimationsControls, createSvgAnimationsScene } from './SvgAnimations';
+import { svgInteractiveControls, createSvgInteractiveScene } from './SvgInteractive';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -90,6 +93,30 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'three',
     controls: proceduralCityControls,
     factory: createProceduralCityScene,
+  },
+  {
+    id: 'svg-showcase',
+    label: 'SVG Showcase',
+    description: 'Catálogo visual de capacidades SVG: gradientes lineales/radiales, filtros (blur, drop-shadow), clip-path, mask, paths Bézier, texto y stroke gradient.',
+    renderer: 'svg',
+    controls: svgShowcaseControls,
+    factory: createSvgShowcaseScene,
+  },
+  {
+    id: 'svg-animations',
+    label: 'SVG Animations',
+    description: 'Animaciones SVG nativas declarativas sin JavaScript: pulse (opacity), rotate, scale, color cycle, bounce (translate) y combinadas. Usa <animate> y <animateTransform>.',
+    renderer: 'svg',
+    controls: svgAnimationsControls,
+    factory: createSvgAnimationsScene,
+  },
+  {
+    id: 'svg-interactive',
+    label: 'SVG Interactive',
+    description: 'Grilla de figuras SVG interactivas con eventos click y hover. Usa renderToSVGElement con el componente Interactive para event delegation.',
+    renderer: 'svg',
+    controls: svgInteractiveControls,
+    factory: createSvgInteractiveScene,
   },
 ];
 
