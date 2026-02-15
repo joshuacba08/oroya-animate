@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { Animation } from '../src/components/Animation';
+import { Camera, CameraType } from '../src/components/Camera';
 import { Node } from '../src/nodes/Node';
 import { Scene } from '../src/scene/Scene';
 import { deserialize, serialize } from '../src/serialization/json';
-import { Camera, CameraType } from '../src/components/Camera';
-import { Animation } from '../src/components/Animation';
 
 describe('Node', () => {
   it('should create a node with a name and default transform', () => {
