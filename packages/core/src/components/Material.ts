@@ -22,7 +22,22 @@ export interface MaterialDef {
    * The opacity of the material, from 0 (transparent) to 1 (opaque).
    */
   opacity?: number;
-  
+
+  /**
+   * The fill color for 2D/SVG rendering.
+   */
+  fill?: ColorRGB;
+
+  /**
+   * The stroke color for 2D/SVG rendering.
+   */
+  stroke?: ColorRGB;
+
+  /**
+   * The stroke width for 2D/SVG rendering.
+   */
+  strokeWidth?: number;
+
   // more properties like roughness, metalness, etc. can be added here
 }
 

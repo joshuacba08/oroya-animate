@@ -17,7 +17,91 @@ pnpm add @oroya/core @oroya/renderer-three
 First, let's create a Scene and a basic Node with a cube.
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
+C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.C:\devfiles\personal-projects\oroya-animate\packages\loader-gltf:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @oroya/loader-gltf@0.1.0 build: `tsup`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
 
 // Create the Scene
 const scene = new Scene();

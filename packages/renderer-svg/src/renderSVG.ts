@@ -38,20 +38,20 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
 
     const style: Record<string, string | number> = {};
     if (mat?.definition.fill) {
-        style['fill'] = toCssColor(mat.definition.fill, 'none');
+      style['fill'] = toCssColor(mat.definition.fill, 'none');
     } else {
-        style['fill'] = 'none';
+      style['fill'] = 'none';
     }
-    
+
     if (mat?.definition.stroke) {
-        style['stroke'] = toCssColor(mat.definition.stroke, 'black');
-        style['stroke-width'] = mat.definition.strokeWidth ?? 1;
+      style['stroke'] = toCssColor(mat.definition.stroke, 'black');
+      style['stroke-width'] = mat.definition.strokeWidth ?? 1;
     }
 
     const styleString = Object.entries(style)
-        .map(([key, value]) => `${key}="${value}"`)
-        .join(' ');
-    
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(' ');
+
     paths.push(`<path d="${d}" ${styleString} />`);
   });
 
@@ -59,8 +59,7 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
 
   return `
     <svg width="${options.width}" height="${options.height}" viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">
-      ${paths.join('
-      ')}
+      ${paths.join('\n      ')}
     </svg>
   `.trim();
 }

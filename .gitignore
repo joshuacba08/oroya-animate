@@ -3,7 +3,7 @@ node_modules/
 .pnpm-store/
 
 # Build Artifacts
-/dist
+dist/
 /build
 /.turbo
 

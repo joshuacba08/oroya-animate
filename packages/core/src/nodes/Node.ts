@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Component, ComponentType, Transform } from '../components';
-import { Matrix4, Matrix4Identity, multiplyMatrices } from '../math/Matrix4';
+import { Matrix4, multiplyMatrices } from '../math/Matrix4';
 
 /**
  * A Node represents an element in a scene graph.
@@ -101,7 +101,7 @@ export class Node {
       child.updateWorldMatrix(this.transform.worldMatrix);
     }
   }
-  
+
   /**
    * Traverses the node and its children recursively.
    * @param callback The function to execute for each node.
