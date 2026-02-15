@@ -1,0 +1,24 @@
+{
+  "name": "oroya-animate-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monorepo for Oroya Animate, a 2D/3D web graphics library",
+  "author": "Oroya AI Collaborator",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter "./packages/**" build",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "dev:vanilla": "pnpm --filter "demo-vanilla" dev",
+    "dev:react": "pnpm --filter "demo-react" dev",
+    "clean": "pnpm -r exec rm -rf dist .turbo",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "packageManager": "pnpm@9.1.0"
+}

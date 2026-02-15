@@ -1,0 +1,32 @@
+{
+  "name": "@oroya/loader-gltf",
+  "version": "0.1.0",
+  "description": "glTF loader for Oroya Animate.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@oroya/core": "workspace:*",
+    "three": "^0.165.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
+  }
+}

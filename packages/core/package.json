@@ -1,0 +1,32 @@
+{
+  "name": "@oroya/core",
+  "version": "0.1.0",
+  "description": "Core package for Oroya Animate scene graph and components.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.8",
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  }
+}
