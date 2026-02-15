@@ -1,6 +1,6 @@
 {
   "name": "@oroya/renderer-svg",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "SVG renderer for Oroya Animate.",
   "type": "module",
   "main": "./dist/index.cjs",

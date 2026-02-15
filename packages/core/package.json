@@ -1,6 +1,6 @@
 {
   "name": "@oroya/core",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Core package for Oroya Animate scene graph and components.",
   "type": "module",
   "main": "./dist/index.cjs",

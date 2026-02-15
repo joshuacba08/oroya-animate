@@ -29,6 +29,7 @@ This project is managed as a monorepo using `pnpm` workspaces:
 ### Apps
 - [`demo-react`](apps/demo-react): Showcase of Oroya Animate working with React and Three.js.
 - [`demo-vanilla`](apps/demo-vanilla): Minimal examples using vanilla JavaScript.
+
 ## 📚 Documentation
 
 Detailed documentation is available in the [`docs/`](docs/) folder:
@@ -40,6 +41,9 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 - [**Renderers**](docs/renderers.md): Three.js and SVG backends documentation.
 - [**Serialization**](docs/serialization.md): Save and load scenes as JSON.
 - [**Contributing & Development**](docs/contributing.md): Setup, scripts, and development workflow.
+- [**Programming Principles**](docs/programming-principles.md): Coding conventions and architectural rules for the project.
+- [**Build Errors Postmortem**](docs/troubleshooting/build-errors-postmortem.md): Analysis of common build mistakes and how to prevent them.
+
 ##  Getting Started
 
 ### Prerequisites
@@ -51,6 +55,14 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 ```bash
 pnpm install
 ```
+
+### Build (required before running demos)
+
+```bash
+pnpm build
+```
+
+> ⚠️ The workspace packages must be built before running any demo app, since they resolve through their `dist/` output.
 
 ### Basic Usage (Core)
 
@@ -109,7 +121,19 @@ renderer.render();
 - [x] TSDoc on all public API surfaces.
 - [x] Comprehensive documentation (see [`docs/`](docs/)).
 
-### v0.3.0 — Model Loading & Animation (Next)
+### v0.3.0 — Build Stabilization & Project Hardening ✅
+- [x] Fixed build pipeline: all 4 packages compile successfully (CJS + ESM + DTS).
+- [x] Correct `package.json` exports (file extensions, `types`-first condition order).
+- [x] TypeScript `composite: false` override for tsup DTS compatibility.
+- [x] Barrel files (`index.ts`) for all module directories.
+- [x] Extended `MaterialDef` with SVG-specific properties (`fill`, `stroke`, `strokeWidth`).
+- [x] Missing `@types/three` added to `@oroya/loader-gltf`.
+- [x] Eliminated dead code (unused imports).
+- [x] Fixed syntax errors in renderer-svg template literals.
+- [x] New documentation: [Programming Principles](docs/programming-principles.md).
+- [x] New documentation: [Build Errors Postmortem](docs/troubleshooting/build-errors-postmortem.md).
+
+### v0.4.0 — Model Loading & Animation (Next)
 - [ ] Full glTF/GLB loader (geometry + materials from Blender).
 - [ ] Animation system (keyframes, timelines).
 - [ ] Orthographic camera support.
