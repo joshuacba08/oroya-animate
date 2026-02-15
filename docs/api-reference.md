@@ -1,241 +1,1045 @@
-# API Reference — `@oroya/core`
+# API Reference
 
-Complete reference of the classes, interfaces, and functions exported by the core package.
+Complete reference for all packages in the Oroya Animate ecosystem.
 
 ---
 
-## Classes
+## Tabla de contenidos
+
+- [Visión general de la arquitectura](#visión-general-de-la-arquitectura)
+- [`@oroya/core`](#oroyacore)
+  - [Scene](#scene)
+  - [Node](#node)
+  - [Component (base)](#component-base-abstracta)
+  - [Transform](#transform-componente)
+  - [Geometry](#geometry-componente)
+  - [Material](#material-componente)
+  - [Camera](#camera-componente)
+  - [Factory Functions](#factory-functions)
+  - [Serialization](#serialización)
+  - [Math — Matrix4](#math--matrix4)
+- [`@oroya/renderer-three`](#oroyarenderer-three)
+  - [ThreeRenderer](#threerenderer)
+- [`@oroya/renderer-svg`](#oroyarenderer-svg)
+  - [renderToSVG](#rendertosvg)
+- [`@oroya/loader-gltf`](#oroyaloader-gltf)
+  - [loadGLTF](#loadgltf)
+- [Mapa completo de tipos](#mapa-completo-de-tipos)
+
+---
+
+## Visión general de la arquitectura
+
+```mermaid
+graph TD
+    subgraph "@oroya/core"
+        Scene --> Node
+        Node --> Transform
+        Node --> Geometry
+        Node --> Material
+        Node --> Camera
+        Node -->|"children[]"| Node
+        
+        Geometry -.->|"uses"| GeometryDef["GeometryDef (union)"]
+        Material -.->|"uses"| MaterialDef
+        Camera -.->|"uses"| CameraDef["CameraDef (union)"]
+        Transform -.->|"uses"| Matrix4
+    end
+
+    subgraph "@oroya/renderer-three"
+        ThreeRenderer -->|"reads"| Scene
+        ThreeRenderer -->|"produces"| WebGL["WebGL Canvas"]
+    end
+
+    subgraph "@oroya/renderer-svg"
+        renderToSVG -->|"reads"| Scene
+        renderToSVG -->|"produces"| SVGStr["SVG String"]
+    end
+
+    subgraph "@oroya/loader-gltf"
+        loadGLTF -->|"produces"| Scene
+    end
+```
+
+### Flujo de datos
+
+```mermaid
+sequenceDiagram
+    participant User as User Code
+    participant Scene as Scene Graph
+    participant Node as Node + Components
+    participant Renderer as Renderer
+
+    User->>Scene: new Scene()
+    User->>Node: new Node('box')
+    User->>Node: addComponent(createBox(...))
+    User->>Node: addComponent(new Material(...))
+    User->>Scene: scene.add(node)
+    User->>Renderer: renderer.mount(scene)
+    
+    loop Animation Frame
+        User->>Node: transform.rotation = {...}
+        User->>Node: transform.updateLocalMatrix()
+        User->>Renderer: renderer.render()
+        Renderer->>Scene: scene.updateWorldMatrices()
+        Scene->>Node: node.updateWorldMatrix(parentMatrix)
+        Renderer->>Renderer: Draw frame
+    end
+```
+
+---
+
+## `@oroya/core`
+
+### Exports completos
+
+```typescript
+// Scene
+export { Scene } from './scene/Scene';
+
+// Nodes
+export { Node } from './nodes/Node';
+
+// Components
+export { Component, ComponentType } from './components/Component';
+export { Transform } from './components/Transform';
+export type { Vec3, Quat } from './components/Transform';
+export { Geometry, GeometryPrimitive } from './components/Geometry';
+export type { BoxGeometryDef, SphereGeometryDef, Path2DGeometryDef, Path2DCommand, GeometryDef } from './components/Geometry';
+export { Material } from './components/Material';
+export type { ColorRGB, MaterialDef } from './components/Material';
+export { Camera, CameraType } from './components/Camera';
+export type { PerspectiveCameraDef, CameraDef } from './components/Camera';
+
+// Primitives
+export { createBox, createSphere, createPath2D } from './geometry/primitives';
+
+// Serialization
+export { serialize, deserialize } from './serialization/json';
+
+// Math
+export { Matrix4Identity, composeMatrix, multiplyMatrices } from './math/Matrix4';
+export type { Matrix4 } from './math/Matrix4';
+```
+
+---
 
 ### `Scene`
 
-The top-level container for the entire scene graph.
+El contenedor de nivel superior del scene graph.
+
+**Archivo fuente:** [Scene.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/scene/Scene.ts)
 
 ```typescript
 import { Scene } from '@oroya/core';
 const scene = new Scene();
 ```
 
-| Property | Type   | Description                           |
-|----------|--------|---------------------------------------|
-| `root`   | `Node` | The root node of the scene hierarchy. |
+#### Constructor
 
-| Method                  | Returns          | Description                                      |
-|-------------------------|------------------|--------------------------------------------------|
-| `add(node, parent?)`    | `void`           | Adds a node. Defaults to root as parent.         |
-| `remove(node)`          | `void`           | Removes a node from its parent.                  |
-| `findNodeById(id)`      | `Node \| undefined` | Searches recursively by unique ID.           |
-| `findNodeByName(name)`  | `Node \| undefined` | Searches recursively by name.                |
-| `traverse(callback)`    | `void`           | Iterates over every node in the tree.            |
-| `updateWorldMatrices()` | `void`           | Recalculates all world-space transformation matrices. |
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| *(ninguno)* | — | Crea una escena con un nodo raíz llamado `'root'` |
+
+#### Propiedades
+
+| Propiedad | Tipo | Acceso | Descripción |
+|-----------|------|--------|-------------|
+| `root` | `Node` | `readonly` | El nodo raíz del árbol de escena |
+
+#### Métodos
+
+| Método | Firma | Retorno | Descripción |
+|--------|-------|---------|-------------|
+| `add` | `add(node: Node, parent?: Node)` | `void` | Agrega un nodo. Si no se especifica `parent`, se agrega como hijo del `root` |
+| `remove` | `remove(node: Node)` | `void` | Remueve un nodo de su padre |
+| `findNodeById` | `findNodeById(id: string)` | `Node \| undefined` | Busca recursivamente un nodo por su UUID |
+| `findNodeByName` | `findNodeByName(name: string)` | `Node \| undefined` | Busca recursivamente un nodo por su nombre |
+| `traverse` | `traverse(callback: (node: Node) => void)` | `void` | Recorre todos los nodos del árbol en profundidad (DFS pre-order) |
+| `updateWorldMatrices` | `updateWorldMatrices()` | `void` | Recalcula las matrices del mundo de todos los nodos. Se llama internamente por los renderers |
+
+#### Ejemplo
+
+```typescript
+const scene = new Scene();
+
+const parent = new Node('group');
+const child = new Node('child');
+
+scene.add(parent);
+scene.add(child, parent); // child es hijo de parent, no del root
+
+scene.traverse(node => console.log(node.name));
+// → 'root', 'group', 'child'
+
+const found = scene.findNodeByName('child');
+console.log(found?.parent?.name); // → 'group'
+```
 
 ---
 
 ### `Node`
 
-A single element in the scene graph. Supports parent-child hierarchy and an ECS-style component system.
+Un elemento del scene graph. Soporta jerarquía padre-hijo y un sistema de componentes ECS.
+
+**Archivo fuente:** [Node.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/nodes/Node.ts)
+
+```mermaid
+classDiagram
+    class Node {
+        +readonly id: string
+        +name: string
+        +parent: Node | null
+        +readonly children: Node[]
+        +readonly components: Map~ComponentType, Component~
+        +get transform(): Transform
+        +constructor(name: string, id?: string)
+        +addComponent(component: Component): void
+        +getComponent~T~(type: ComponentType): T | undefined
+        +hasComponent(type: ComponentType): boolean
+        +add(node: Node): void
+        +remove(node: Node): void
+        +updateWorldMatrix(parentMatrix?: Matrix4): void
+        +traverse(callback: Function): void
+        +findNodeById(id: string): Node | undefined
+        +findNodeByName(name: string): Node | undefined
+    }
+```
+
+#### Constructor
+
+| Parámetro | Tipo | Default | Descripción |
+|-----------|------|---------|-------------|
+| `name` | `string` | *(requerido)* | Nombre legible del nodo |
+| `id` | `string` | `uuidv4()` | Identificador único. Se auto-genera si no se provee |
+
+> **Nota:** Cada nodo recibe automáticamente un componente `Transform` al crearse.
+
+#### Propiedades
+
+| Propiedad | Tipo | Acceso | Descripción |
+|-----------|------|--------|-------------|
+| `id` | `string` | `readonly` | UUID único generado automáticamente |
+| `name` | `string` | read/write | Etiqueta legible para humanos |
+| `parent` | `Node \| null` | read/write | Referencia al nodo padre |
+| `children` | `Node[]` | `readonly` | Array de nodos hijos |
+| `components` | `Map<ComponentType, Component>` | `readonly` | Mapa de componentes. Máximo uno por tipo |
+| `transform` | `Transform` | getter | Acceso directo al componente Transform |
+
+#### Métodos
+
+| Método | Firma | Retorno | Descripción |
+|--------|-------|---------|-------------|
+| `addComponent` | `addComponent(component: Component)` | `void` | Adjunta un componente. Si ya existe uno del mismo tipo, lo reemplaza. Establece `component.node = this` |
+| `getComponent<T>` | `getComponent<T>(type: ComponentType)` | `T \| undefined` | Obtiene un componente por tipo, casteado al tipo genérico |
+| `hasComponent` | `hasComponent(type: ComponentType)` | `boolean` | Verifica si existe un componente de ese tipo |
+| `add` | `add(node: Node)` | `void` | Agrega un hijo. Si el nodo ya tiene padre, lo remueve primero (re-parenting) |
+| `remove` | `remove(node: Node)` | `void` | Remueve un hijo. Establece `node.parent = null` |
+| `updateWorldMatrix` | `updateWorldMatrix(parentMatrix?: Matrix4)` | `void` | Recalcula la world matrix y propaga a los hijos recursivamente |
+| `traverse` | `traverse(callback: (node: Node) => void)` | `void` | DFS pre-order sobre este nodo y todos los descendientes |
+| `findNodeById` | `findNodeById(id: string)` | `Node \| undefined` | Búsqueda recursiva por UUID |
+| `findNodeByName` | `findNodeByName(name: string)` | `Node \| undefined` | Búsqueda recursiva por nombre. Retorna el primero encontrado |
+
+#### Ejemplo completo
 
 ```typescript
-import { Node } from '@oroya/core';
 const player = new Node('player');
+player.addComponent(createBox(0.5, 1, 0.5));
+player.addComponent(new Material({ color: { r: 0.3, g: 0.8, b: 0.5 } }));
+
+// Composición jerárquica
+const weapon = new Node('weapon');
+weapon.addComponent(createBox(0.1, 0.1, 0.8));
+weapon.transform.position = { x: 0.3, y: 0.5, z: 0 };
+player.add(weapon); // weapon es hijo de player
+
+// Consultar componentes
+const geo = player.getComponent<Geometry>(ComponentType.Geometry);
+console.log(geo?.definition); // { type: 'Box', width: 0.5, ... }
+console.log(player.hasComponent(ComponentType.Camera)); // false
+
+// Re-parenting: mover weapon a otro nodo
+const chest = new Node('chest');
+chest.add(weapon); // se remueve automáticamente de player
+console.log(weapon.parent?.name); // 'chest'
 ```
 
-| Property     | Type                            | Description                             |
-|--------------|---------------------------------|-----------------------------------------|
-| `id`         | `string` (readonly)             | Unique identifier (UUID v4 by default). |
-| `name`       | `string`                        | Human-readable label.                   |
-| `parent`     | `Node \| null`                  | Reference to the parent node.           |
-| `children`   | `Node[]` (readonly)             | Array of child nodes.                   |
-| `components` | `Map<ComponentType, Component>` | Attached components.                    |
-| `transform`  | `Transform`                     | Shortcut to the Transform component.    |
-
-| Method                        | Returns              | Description                                   |
-|-------------------------------|----------------------|-----------------------------------------------|
-| `addComponent(component)`     | `void`               | Attaches a component to this node.            |
-| `getComponent<T>(type)`       | `T \| undefined`     | Retrieves a component by its `ComponentType`. |
-| `hasComponent(type)`          | `boolean`            | Checks if a component of that type exists.    |
-| `add(node)`                   | `void`               | Adds a child node.                            |
-| `remove(node)`                | `void`               | Removes a child node.                         |
-| `traverse(callback)`          | `void`               | Iterates over this node and all descendants.  |
-| `findNodeById(id)`            | `Node \| undefined`  | Recursive search by ID.                       |
-| `findNodeByName(name)`        | `Node \| undefined`  | Recursive search by name.                     |
-| `updateWorldMatrix(parent?)`  | `void`               | Recalculates world matrix from local + parent.|
-
 ---
 
-### `Transform` (Component)
+### `Component` (base abstracta)
 
-Defines the spatial properties of a node. **Automatically added** to every `Node`.
+Clase base para todos los componentes del sistema ECS.
 
-| Property      | Type      | Default               | Description                              |
-|---------------|-----------|-----------------------|------------------------------------------|
-| `position`    | `Vec3`    | `{ x: 0, y: 0, z: 0 }` | Translation in local space.            |
-| `rotation`    | `Quat`    | `{ x: 0, y: 0, z: 0, w: 1 }` | Rotation as a quaternion.       |
-| `scale`       | `Vec3`    | `{ x: 1, y: 1, z: 1 }` | Scale in local space.                  |
-| `localMatrix` | `Matrix4` | Identity               | The local transformation matrix.        |
-| `worldMatrix` | `Matrix4` | Identity               | The computed world transformation matrix.|
-| `isDirty`     | `boolean` | `true`                 | Flag for matrix recalculation.          |
+**Archivo fuente:** [Component.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Component.ts)
 
-| Method               | Description                                  |
-|----------------------|----------------------------------------------|
-| `updateLocalMatrix()`| Recomputes `localMatrix` from position/rotation/scale. |
-
----
-
-### `Geometry` (Component)
-
-Defines the shape of a node.
-
-```typescript
-import { createBox, createSphere, createPath2D } from '@oroya/core';
-
-node.addComponent(createBox(2, 2, 2));
-node.addComponent(createSphere(1, 32, 32));
+```mermaid
+classDiagram
+    class Component {
+        <<abstract>>
+        +abstract readonly type: ComponentType
+        +node: Node | null
+    }
+    class Transform {
+        +type = ComponentType.Transform
+        +position: Vec3
+        +rotation: Quat
+        +scale: Vec3
+        +localMatrix: Matrix4
+        +worldMatrix: Matrix4
+        +isDirty: boolean
+        +updateLocalMatrix(): void
+    }
+    class Geometry {
+        +type = ComponentType.Geometry
+        +definition: GeometryDef
+    }
+    class Material {
+        +type = ComponentType.Material
+        +definition: MaterialDef
+    }
+    class Camera {
+        +type = ComponentType.Camera
+        +definition: CameraDef
+    }
+    Component <|-- Transform
+    Component <|-- Geometry
+    Component <|-- Material
+    Component <|-- Camera
 ```
 
-| Property     | Type          | Description                                     |
-|--------------|---------------|-------------------------------------------------|
-| `definition` | `GeometryDef` | The definition object describing the geometry.  |
+#### `ComponentType` (Enum)
+
+| Valor | String | Usado por |
+|-------|--------|-----------|
+| `Transform` | `'Transform'` | `Transform` — automático en cada `Node` |
+| `Geometry` | `'Geometry'` | `Geometry` — define la forma |
+| `Material` | `'Material'` | `Material` — define la apariencia |
+| `Camera` | `'Camera'` | `Camera` — define el punto de vista |
+
+> **Regla ECS:** Cada nodo puede tener **máximo un componente** de cada tipo. Agregar un segundo componente del mismo tipo reemplaza al anterior.
 
 ---
 
-### `Material` (Component)
+### `Transform` (Componente)
 
-Defines the visual appearance of a node.
+Define la posición, rotación y escala de un nodo en espacio 3D. Se crea **automáticamente** con cada `Node`.
+
+**Archivo fuente:** [Transform.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Transform.ts)
+
+#### Propiedades
+
+| Propiedad | Tipo | Default | Descripción |
+|-----------|------|---------|-------------|
+| `position` | `Vec3` | `{ x: 0, y: 0, z: 0 }` | Traslación en espacio local |
+| `rotation` | `Quat` | `{ x: 0, y: 0, z: 0, w: 1 }` | Rotación como quaternion (identidad = sin rotación) |
+| `scale` | `Vec3` | `{ x: 1, y: 1, z: 1 }` | Escala en espacio local |
+| `localMatrix` | `Matrix4` | Identidad | Matriz de transformación local (calculada) |
+| `worldMatrix` | `Matrix4` | Identidad | Matriz de transformación en espacio mundo (calculada) |
+| `isDirty` | `boolean` | `true` | Indica si la matriz necesita recalcularse |
+
+#### Métodos
+
+| Método | Descripción |
+|--------|-------------|
+| `updateLocalMatrix()` | Recalcula `localMatrix` a partir de `position`, `rotation` y `scale`. Marca `isDirty = true` |
+
+#### Pipeline de transformación
+
+```mermaid
+graph LR
+    A["position + rotation + scale"] -->|"updateLocalMatrix()"| B["localMatrix"]
+    B -->|"× parent.worldMatrix"| C["worldMatrix"]
+    C -->|"renderer reads"| D["Posición final en pantalla"]
+```
+
+#### Guía rápida de quaterniones
+
+Los quaterniones `{ x, y, z, w }` representan rotaciones 3D sin gimbal lock.
+
+| Rotación deseada | Quaternion |
+|-----------------|------------|
+| Sin rotación | `{ x: 0, y: 0, z: 0, w: 1 }` |
+| 90° en eje Y | `{ x: 0, y: 0.707, z: 0, w: 0.707 }` |
+| 180° en eje Y | `{ x: 0, y: 1, z: 0, w: 0 }` |
+| θ grados en eje Y | `{ x: 0, y: sin(θ/2), z: 0, w: cos(θ/2) }` |
+| θ grados en eje X | `{ x: sin(θ/2), y: 0, z: 0, w: cos(θ/2) }` |
+| θ grados en eje Z | `{ x: 0, y: 0, z: sin(θ/2), w: cos(θ/2) }` |
+
+> **Fórmula:** Para rotar `θ` radianes alrededor del eje unitario `(ax, ay, az)`:
+> `{ x: ax * sin(θ/2), y: ay * sin(θ/2), z: az * sin(θ/2), w: cos(θ/2) }`
+
+---
+
+### `Geometry` (Componente)
+
+Define la forma geométrica de un nodo.
+
+**Archivo fuente:** [Geometry.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Geometry.ts)
+
+#### Constructor
 
 ```typescript
-import { Material } from '@oroya/core';
+new Geometry(definition: GeometryDef)
+```
 
-node.addComponent(new Material({
-  color: { r: 0.5, g: 0.8, b: 1.0 },
+#### `GeometryPrimitive` (Enum)
+
+| Valor | String | Descripción |
+|-------|--------|-------------|
+| `Box` | `'Box'` | Paralelepípedo (cubo, caja) |
+| `Sphere` | `'Sphere'` | Esfera UV |
+| `Path2D` | `'Path2D'` | Path vectorial 2D (para SVG) |
+
+#### `GeometryDef` (Union type)
+
+```mermaid
+graph TD
+    GD["GeometryDef"] -->|"type = 'Box'"| Box["BoxGeometryDef"]
+    GD -->|"type = 'Sphere'"| Sphere["SphereGeometryDef"]
+    GD -->|"type = 'Path2D'"| Path["Path2DGeometryDef"]
+```
+
+#### `BoxGeometryDef`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `type` | `GeometryPrimitive.Box` | Discriminante |
+| `width` | `number` | Ancho (eje X) |
+| `height` | `number` | Alto (eje Y) |
+| `depth` | `number` | Profundidad (eje Z) |
+
+#### `SphereGeometryDef`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `type` | `GeometryPrimitive.Sphere` | Discriminante |
+| `radius` | `number` | Radio de la esfera |
+| `widthSegments` | `number` | Segmentos horizontales (meridianos) |
+| `heightSegments` | `number` | Segmentos verticales (paralelos) |
+
+> **Tip:** Más segmentos = esfera más suave. Valores comunes: 16 (baja calidad), 32 (estándar), 64 (alta calidad).
+
+#### `Path2DGeometryDef`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `type` | `GeometryPrimitive.Path2D` | Discriminante |
+| `path` | `Path2DCommand[]` | Array de comandos SVG-like |
+
+#### `Path2DCommand`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `command` | `string` | Comando SVG: `'M'`, `'L'`, `'C'`, `'Q'`, `'Z'`, etc. |
+| `args` | `number[]` | Argumentos numéricos del comando |
+
+**Comandos SVG soportados:**
+
+| Comando | Argumentos | Descripción |
+|---------|-----------|-------------|
+| `M` | `[x, y]` | Move to — mover sin dibujar |
+| `L` | `[x, y]` | Line to — línea recta |
+| `C` | `[cx1, cy1, cx2, cy2, x, y]` | Cubic Bézier |
+| `Q` | `[cx, cy, x, y]` | Quadratic Bézier |
+| `A` | `[rx, ry, rotation, largeArc, sweep, x, y]` | Arc |
+| `Z` | `[]` | Close path — cerrar el camino |
+
+#### Compatibilidad con renderers
+
+| GeometryDef | Three.js | SVG |
+|------------|----------|-----|
+| `BoxGeometryDef` | ✅ → `THREE.BoxGeometry` | ❌ ignorado |
+| `SphereGeometryDef` | ✅ → `THREE.SphereGeometry` | ❌ ignorado |
+| `Path2DGeometryDef` | ❌ ignorado | ✅ → `<path d="...">` |
+
+---
+
+### `Material` (Componente)
+
+Define la apariencia visual de un nodo.
+
+**Archivo fuente:** [Material.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Material.ts)
+
+#### Constructor
+
+```typescript
+new Material(definition?: MaterialDef)  // default: {}
+```
+
+#### `ColorRGB`
+
+| Campo | Tipo | Rango | Descripción |
+|-------|------|-------|-------------|
+| `r` | `number` | 0.0 – 1.0 | Componente rojo |
+| `g` | `number` | 0.0 – 1.0 | Componente verde |
+| `b` | `number` | 0.0 – 1.0 | Componente azul |
+
+> **Conversión:** Para convertir de hex `#3399ff` a RGB normalizado: `{ r: 0x33/255, g: 0x99/255, b: 0xff/255 }` → `{ r: 0.2, g: 0.6, b: 1.0 }`
+
+#### `MaterialDef`
+
+| Campo | Tipo | Default | Usado por | Descripción |
+|-------|------|---------|-----------|-------------|
+| `color` | `ColorRGB` | `undefined` | Three.js | Color de la superficie para renderizado 3D |
+| `opacity` | `number` | `undefined` | Three.js | Opacidad: 0 (transparente) a 1 (opaco). Activa transparencia automáticamente si < 1 |
+| `fill` | `ColorRGB` | `undefined` | SVG | Color de relleno para paths 2D |
+| `stroke` | `ColorRGB` | `undefined` | SVG | Color del trazo para paths 2D |
+| `strokeWidth` | `number` | `undefined` | SVG | Ancho del trazo en píxeles |
+
+#### Ejemplo: Material para ambos renderers
+
+```typescript
+// Material que funciona en 3D y SVG
+const material = new Material({
+  color: { r: 0.2, g: 0.6, b: 1.0 },    // Three.js lo usa como diffuse color
+  fill: { r: 0.2, g: 0.6, b: 1.0 },      // SVG lo usa como fill
+  stroke: { r: 0.1, g: 0.3, b: 0.8 },    // SVG lo usa como stroke
+  strokeWidth: 2,
   opacity: 0.9,
-}));
+});
 ```
 
-| Property     | Type          | Description                                  |
-|--------------|---------------|----------------------------------------------|
-| `definition` | `MaterialDef` | The definition object for visual properties. |
+#### Cómo lo interpretan los renderers
+
+```mermaid
+graph LR
+    MD["MaterialDef"] --> TH{"Three.js Renderer"}
+    MD --> SV{"SVG Renderer"}
+    TH --> M1["MeshStandardMaterial"]
+    TH -->|"color"| M1
+    TH -->|"opacity + transparent"| M1
+    SV --> M2["style attributes"]
+    SV -->|"fill"| M2
+    SV -->|"stroke + stroke-width"| M2
+```
 
 ---
 
-### `Camera` (Component)
+### `Camera` (Componente)
 
-Defines the viewpoint from which the scene is rendered. The `ThreeRenderer` automatically picks up the first `Camera` node.
+Define un punto de vista para renderizar la escena. El `ThreeRenderer` busca automáticamente el primer nodo con `Camera` al montar la escena.
+
+**Archivo fuente:** [Camera.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Camera.ts)
+
+#### Constructor
 
 ```typescript
-import { Camera, CameraType } from '@oroya/core';
+new Camera(definition: CameraDef)
+```
 
-const cameraNode = new Node('main-cam');
-cameraNode.addComponent(new Camera({
+#### `CameraType` (Enum)
+
+| Valor | String | Estado |
+|-------|--------|--------|
+| `Perspective` | `'Perspective'` | ✅ Implementado |
+| `Orthographic` | `'Orthographic'` | 🔜 Planificado |
+
+#### `PerspectiveCameraDef`
+
+| Campo | Tipo | Descripción | Valor típico |
+|-------|------|-------------|--------------|
+| `type` | `CameraType.Perspective` | Discriminante | — |
+| `fov` | `number` | Campo de visión en grados | 45 – 90 |
+| `aspect` | `number` | Relación de aspecto (ancho / alto) | `window.innerWidth / window.innerHeight` |
+| `near` | `number` | Plano de corte cercano | 0.1 |
+| `far` | `number` | Plano de corte lejano | 1000 |
+
+#### Diagrama de frustum (perspectiva)
+
+```
+              far plane
+          ┌─────────────────┐
+         /                   \
+        /     Visible         \
+       /      Volume           \
+      /      (frustum)          \
+     /                           \
+    └─────────────────────────────┘
+     ├── near plane ──┤
+              △
+           Camera
+          position
+```
+
+#### Ejemplo de uso
+
+```typescript
+const cam = new Node('main-camera');
+cam.addComponent(new Camera({
   type: CameraType.Perspective,
   fov: 75,
   aspect: 16 / 9,
   near: 0.1,
   far: 1000,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+cam.transform.position = { x: 0, y: 5, z: 10 };
+scene.add(cam);
 ```
 
-| Property     | Type        | Description                               |
-|--------------|-------------|-------------------------------------------|
-| `definition` | `CameraDef` | The definition object for camera settings.|
+> **Nota:** Si no se agrega ninguna cámara, `ThreeRenderer` crea un fallback en `(0, 0, 5)` con FOV 75.
 
 ---
 
-## Interfaces & Types
+### Factory Functions
 
-### `Vec3`
+Funciones helper para crear componentes `Geometry` de forma concisa.
+
+**Archivo fuente:** [primitives.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/geometry/primitives.ts)
+
+#### `createBox`
+
 ```typescript
-interface Vec3 { x: number; y: number; z: number; }
+function createBox(width?: number, height?: number, depth?: number): Geometry
 ```
 
-### `Quat`
+| Parámetro | Tipo | Default | Descripción |
+|-----------|------|---------|-------------|
+| `width` | `number` | `1` | Ancho (eje X) |
+| `height` | `number` | `1` | Alto (eje Y) |
+| `depth` | `number` | `1` | Profundidad (eje Z) |
+
 ```typescript
-interface Quat { x: number; y: number; z: number; w: number; }
+const cube = createBox();          // Cubo 1×1×1
+const plank = createBox(5, 0.2, 1); // Tabla plana
 ```
 
-### `ColorRGB`
+#### `createSphere`
+
 ```typescript
-interface ColorRGB { r: number; g: number; b: number; }
+function createSphere(radius?: number, widthSegments?: number, heightSegments?: number): Geometry
 ```
 
-### `MaterialDef`
+| Parámetro | Tipo | Default | Descripción |
+|-----------|------|---------|-------------|
+| `radius` | `number` | `0.5` | Radio de la esfera |
+| `widthSegments` | `number` | `16` | Segmentos horizontales |
+| `heightSegments` | `number` | `16` | Segmentos verticales |
+
 ```typescript
-interface MaterialDef {
-  color?: ColorRGB;
-  opacity?: number;
-  fill?: ColorRGB;       // Used by SVG renderer
-  stroke?: ColorRGB;     // Used by SVG renderer
-  strokeWidth?: number;  // Used by SVG renderer
-}
+const ball = createSphere(1, 32, 32); // Esfera suave
+const lowpoly = createSphere(1, 8, 6); // Esfera facetada
 ```
 
-### `GeometryDef` (Union Type)
+#### `createPath2D`
+
 ```typescript
-type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef;
+function createPath2D(path: Path2DCommand[]): Geometry
 ```
 
-| Variant             | Properties                                        |
-|---------------------|---------------------------------------------------|
-| `BoxGeometryDef`    | `type: 'Box'`, `width`, `height`, `depth`         |
-| `SphereGeometryDef` | `type: 'Sphere'`, `radius`, `widthSegments`, `heightSegments` |
-| `Path2DGeometryDef` | `type: 'Path2D'`, `path: Path2DCommand[]`         |
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `path` | `Path2DCommand[]` | Array de comandos SVG |
 
-### `ComponentType` (Enum)
 ```typescript
-enum ComponentType {
-  Transform = 'Transform',
-  Geometry  = 'Geometry',
-  Material  = 'Material',
-  Camera    = 'Camera',
-}
+const triangle = createPath2D([
+  { command: 'M', args: [50, 0] },
+  { command: 'L', args: [100, 100] },
+  { command: 'L', args: [0, 100] },
+  { command: 'Z', args: [] },
+]);
 ```
-
-### `CameraType` (Enum)
-```typescript
-enum CameraType {
-  Perspective  = 'Perspective',
-  Orthographic = 'Orthographic',  // Planned
-}
-```
-
-### `CameraDef` (Union Type)
-```typescript
-type CameraDef = PerspectiveCameraDef; // | OrthographicCameraDef (planned)
-```
-
-### `PerspectiveCameraDef`
-```typescript
-interface PerspectiveCameraDef {
-  type: CameraType.Perspective;
-  fov: number;     // Field of view in degrees
-  aspect: number;  // Aspect ratio (width / height)
-  near: number;    // Near clipping plane
-  far: number;     // Far clipping plane
-}
-```
-
-### `Matrix4`
-```typescript
-// A 4x4 transformation matrix as a 16-element tuple
-type Matrix4 = [number, number, number, number,
-                number, number, number, number,
-                number, number, number, number,
-                number, number, number, number];
-```
-
-| Export              | Type         | Description                                   |
-|---------------------|--------------|-----------------------------------------------|
-| `Matrix4Identity`   | `Matrix4`    | The identity matrix constant.                 |
-| `composeMatrix()`   | `Matrix4`    | Builds a matrix from position, rotation, scale.|
-| `multiplyMatrices()`| `Matrix4`    | Multiplies two 4x4 matrices.                  |
 
 ---
 
-## Factory Functions
+### Serialización
 
-| Function                              | Returns    | Description                      |
-|---------------------------------------|------------|----------------------------------|
-| `createBox(width, height, depth)`     | `Geometry` | Creates a box geometry component.|
-| `createSphere(radius, wSeg, hSeg)`   | `Geometry` | Creates a sphere geometry.       |
-| `createPath2D(path)`                  | `Geometry` | Creates a 2D path (for SVG).    |
+Funciones para convertir escenas a JSON y reconstruirlas.
+
+**Archivo fuente:** [json.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/serialization/json.ts)
+
+#### `serialize`
+
+```typescript
+function serialize(scene: Scene): string
+```
+
+Convierte todo el scene graph a una cadena JSON formateada con indentación de 2 espacios.
+
+**Componentes soportados en serialización:**
+
+| Componente | ¿Se serializa? | Datos incluidos |
+|------------|----------------|-----------------|
+| `Transform` | ✅ | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
+| `Geometry` | ✅ | `definition` completo (tipo + parámetros) |
+| `Material` | ✅ | `definition` completo (color, opacity, fill, stroke, etc.) |
+| `Camera` | ❌ | No implementado en deserialización |
+
+#### `deserialize`
+
+```typescript
+function deserialize(jsonString: string): Scene
+```
+
+Reconstruye una `Scene` funcional desde un string JSON.
+
+**Comportamiento:**
+- Los UUIDs de los nodos se **preservan** (mismo ID que el original).
+- Los componentes desconocidos se **ignoran silenciosamente** (e.g., Camera).
+- El nodo raíz deserializado transfiere sus hijos al raíz de la nueva escena.
+
+#### Formato del JSON
+
+```mermaid
+graph TD
+    Root["SerializableScene"] -->|"root"| RN["SerializableNode"]
+    RN -->|"id"| ID["string (UUID)"]
+    RN -->|"name"| Name["string"]
+    RN -->|"components"| Comps["SerializableComponent[]"]
+    RN -->|"children"| Children["SerializableNode[]"]
+    Comps --> SC["{ type: ComponentType, ...data }"]
+```
+
+```json
+{
+  "root": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "root",
+    "components": [
+      {
+        "type": "Transform",
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "rotation": { "x": 0, "y": 0, "z": 0, "w": 1 },
+        "scale": { "x": 1, "y": 1, "z": 1 }
+      }
+    ],
+    "children": [
+      {
+        "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+        "name": "my-box",
+        "components": [
+          { "type": "Transform", "..." : "..." },
+          { "type": "Geometry", "definition": { "type": "Box", "width": 2, "height": 2, "depth": 2 } },
+          { "type": "Material", "definition": { "color": { "r": 1, "g": 0.5, "b": 0 } } }
+        ],
+        "children": []
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Math — Matrix4
+
+Utilidades matemáticas para transformaciones 3D con matrices 4×4.
+
+**Archivo fuente:** [Matrix4.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/Matrix4.ts)
+
+#### `Matrix4` (Type)
+
+Tupla de 16 números en **column-major order** (compatible con WebGL/Three.js):
+
+```typescript
+type Matrix4 = [
+  number, number, number, number,  // Columna 0 (Right)
+  number, number, number, number,  // Columna 1 (Up)
+  number, number, number, number,  // Columna 2 (Forward)
+  number, number, number, number   // Columna 3 (Position)
+];
+```
+
+**Layout de la matriz:**
+
+```
+Índice:  [ 0]  [ 4]  [ 8]  [12]
+         [ 1]  [ 5]  [ 9]  [13]
+         [ 2]  [ 6]  [10]  [14]
+         [ 3]  [ 7]  [11]  [15]
+
+Significado:
+         [Rx]  [Ux]  [Fx]  [Tx]     R = Right (eje X)
+         [Ry]  [Uy]  [Fy]  [Ty]     U = Up (eje Y)
+         [Rz]  [Uz]  [Fz]  [Tz]     F = Forward (eje Z)
+         [ 0]  [ 0]  [ 0]  [ 1]     T = Translation
+```
+
+#### `Matrix4Identity`
+
+```typescript
+const Matrix4Identity: Readonly<Matrix4> = [
+  1, 0, 0, 0,
+  0, 1, 0, 0,
+  0, 0, 1, 0,
+  0, 0, 0, 1
+];
+```
+
+#### `composeMatrix`
+
+```typescript
+function composeMatrix(position: Vec3, quaternion: Quat, scale: Vec3): Matrix4
+```
+
+Construye una matriz de transformación a partir de posición, rotación (quaternion) y escala. Esta es la función usada internamente por `Transform.updateLocalMatrix()`.
+
+#### `multiplyMatrices`
+
+```typescript
+function multiplyMatrices(a: Matrix4, b: Matrix4): Matrix4
+```
+
+Multiplica dos matrices 4×4. El orden es importante: `result = A × B` (A se aplica después de B).
+
+Usada internamente por `Node.updateWorldMatrix()`:
+
+```typescript
+worldMatrix = multiplyMatrices(parent.worldMatrix, this.localMatrix)
+```
+
+---
+
+## `@oroya/renderer-three`
+
+### `ThreeRenderer`
+
+Renderer WebGL basado en Three.js.
+
+**Archivo fuente:** [ThreeRenderer.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-three/src/ThreeRenderer.ts)
+
+```mermaid
+classDiagram
+    class ThreeRenderer {
+        -renderer: THREE.WebGLRenderer
+        -scene: THREE.Scene
+        -activeCamera: THREE.Camera | null
+        -oroyaScene: OroyaScene | null
+        -nodeMap: Map~string, THREE.Object3D~
+        +constructor(options: ThreeRendererOptions)
+        +mount(scene: OroyaScene): void
+        +render(): void
+        +dispose(): void
+    }
+
+    class ThreeRendererOptions {
+        +canvas: HTMLCanvasElement
+        +width: number
+        +height: number
+        +dpr?: number
+    }
+```
+
+#### `ThreeRendererOptions`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `canvas` | `HTMLCanvasElement` | *(requerido)* | El elemento canvas donde se renderiza |
+| `width` | `number` | *(requerido)* | Ancho del viewport en píxeles |
+| `height` | `number` | *(requerido)* | Alto del viewport en píxeles |
+| `dpr` | `number` | `window.devicePixelRatio` | Device pixel ratio para HiDPI |
+
+#### Métodos
+
+| Método | Descripción |
+|--------|-------------|
+| `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js, busca la primera cámara, y agrega luces ambientales. Puede llamarse múltiples veces |
+| `render()` | Actualiza las matrices del mundo, sincroniza las posiciones de los objetos Three.js con el scene graph de Oroya, y dibuja el frame. Debe llamarse en un `requestAnimationFrame` loop |
+| `dispose()` | Libera los recursos del WebGLRenderer |
+
+#### Traducción de componentes
+
+| Oroya Component | Three.js Object |
+|----------------|-----------------|
+| `Node` sin geometría ni cámara | `THREE.Group` |
+| `Node` con `Geometry` (Box) | `THREE.Mesh` + `THREE.BoxGeometry` |
+| `Node` con `Geometry` (Sphere) | `THREE.Mesh` + `THREE.SphereGeometry` |
+| `Node` con `Camera` (Perspective) | `THREE.PerspectiveCamera` |
+| `Material` con `color` | `THREE.MeshStandardMaterial` |
+| `Material` con `opacity < 1` | `THREE.MeshStandardMaterial({ transparent: true })` |
+| Sin `Material` | `THREE.MeshStandardMaterial({ color: 0xcccccc })` (gris por defecto) |
+
+#### Iluminación automática
+
+Al montar una escena, el renderer agrega automáticamente:
+
+| Luz | Configuración |
+|-----|---------------|
+| `AmbientLight` | Color: blanco, Intensidad: 0.5 |
+| `DirectionalLight` | Color: blanco, Intensidad: 1.5, Posición: `(2, 5, 3)` |
+
+#### Ejemplo
+
+```typescript
+const renderer = new ThreeRenderer({
+  canvas: document.getElementById('canvas') as HTMLCanvasElement,
+  width: window.innerWidth,
+  height: window.innerHeight,
+  dpr: 2, // Retina display
+});
+
+renderer.mount(scene);
+
+function animate() {
+  // ... mutate scene ...
+  renderer.render();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Cleanup
+renderer.dispose();
+```
+
+---
+
+## `@oroya/renderer-svg`
+
+### `renderToSVG`
+
+Función pura que genera un string SVG a partir de una escena.
+
+**Archivo fuente:** [renderSVG.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-svg/src/renderSVG.ts)
+
+```typescript
+function renderToSVG(scene: Scene, options: SvgRenderOptions): string
+```
+
+#### `SvgRenderOptions`
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `width` | `number` | *(requerido)* | Ancho del SVG en píxeles |
+| `height` | `number` | *(requerido)* | Alto del SVG en píxeles |
+| `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox SVG personalizado |
+
+#### Comportamiento
+
+1. Recorre toda la escena con `scene.traverse()`.
+2. Para cada nodo con un componente `Geometry` de tipo `Path2D`, genera un elemento `<path>`.
+3. Si el nodo tiene un `Material`, aplica `fill`, `stroke` y `stroke-width` como atributos.
+4. Los nodos sin `Path2D` se ignoran.
+5. Los colores se convierten de RGB normalizado (0-1) a `rgb(R, G, B)` con valores 0-255.
+
+#### Ejemplo
+
+```typescript
+import { renderToSVG } from '@oroya/renderer-svg';
+
+const svg = renderToSVG(scene, {
+  width: 800,
+  height: 600,
+  viewBox: '0 0 800 600',
+});
+
+// Insertar en el DOM
+document.body.innerHTML = svg;
+
+// O guardar como archivo en Node.js
+import { writeFileSync } from 'fs';
+writeFileSync('output.svg', svg);
+```
+
+> **Ventaja clave:** Esta función es **pura** y no requiere DOM. Funciona en Node.js para server-side rendering.
+
+---
+
+## `@oroya/loader-gltf`
+
+### `loadGLTF`
+
+Carga un archivo glTF/GLB y lo traduce al scene graph de Oroya.
+
+**Archivo fuente:** [loadGLTF.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/loader-gltf/src/loadGLTF.ts)
+
+```typescript
+async function loadGLTF(url: string): Promise<Scene>
+```
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `url` | `string` | URL del archivo .gltf o .glb |
+
+#### Traducción (simplificada — v0.3)
+
+| glTF Element | Oroya Node |
+|-------------|------------|
+| `THREE.Object3D` (cualquiera) | `Node` con posición/rotación/escala del objeto |
+| `THREE.Mesh` | `Node` + `createBox(1,1,1)` (placeholder) + `Material` con color si disponible |
+| Hijos del objeto | Nodos hijos recursivos |
+
+> **⚠️ Limitaciones actuales:** La geometría real del glTF no se traduce — se usa un box placeholder. Los materiales solo extraen el color base. Las animaciones no se importan. Esto se mejorará en v0.4.
+
+---
+
+## Mapa completo de tipos
+
+```mermaid
+graph TD
+    subgraph "Tipos base"
+        Vec3["Vec3 {x, y, z}"]
+        Quat["Quat {x, y, z, w}"]
+        ColorRGB["ColorRGB {r, g, b}"]
+        M4["Matrix4 (16-tuple)"]
+    end
+
+    subgraph "Geometry types"
+        GD["GeometryDef (union)"]
+        GD --> BGD["BoxGeometryDef"]
+        GD --> SGD["SphereGeometryDef"]
+        GD --> PGD["Path2DGeometryDef"]
+        PGD --> P2DC["Path2DCommand"]
+    end
+
+    subgraph "Material types"
+        MatD["MaterialDef"]
+        MatD -.-> ColorRGB
+    end
+
+    subgraph "Camera types"
+        CD["CameraDef (union)"]
+        CD --> PCD["PerspectiveCameraDef"]
+    end
+
+    subgraph "Enums"
+        CT["ComponentType"]
+        GP["GeometryPrimitive"]
+        CamT["CameraType"]
+    end
+
+    subgraph "Serialization"
+        SScene["SerializableScene"]
+        SNode["SerializableNode"]
+        SComp["SerializableComponent"]
+        SScene --> SNode
+        SNode --> SComp
+        SNode -->|"children"| SNode
+    end
+```
+
+### Tabla resumen de todos los exports
+
+| Export | Tipo | Categoría | Paquete |
+|--------|------|-----------|---------|
+| `Scene` | class | Scene graph | `@oroya/core` |
+| `Node` | class | Scene graph | `@oroya/core` |
+| `Component` | abstract class | ECS | `@oroya/core` |
+| `ComponentType` | enum | ECS | `@oroya/core` |
+| `Transform` | class | Components | `@oroya/core` |
+| `Vec3` | interface | Types | `@oroya/core` |
+| `Quat` | interface | Types | `@oroya/core` |
+| `Geometry` | class | Components | `@oroya/core` |
+| `GeometryPrimitive` | enum | Components | `@oroya/core` |
+| `BoxGeometryDef` | interface | Types | `@oroya/core` |
+| `SphereGeometryDef` | interface | Types | `@oroya/core` |
+| `Path2DGeometryDef` | interface | Types | `@oroya/core` |
+| `Path2DCommand` | interface | Types | `@oroya/core` |
+| `GeometryDef` | type alias | Types | `@oroya/core` |
+| `Material` | class | Components | `@oroya/core` |
+| `ColorRGB` | interface | Types | `@oroya/core` |
+| `MaterialDef` | interface | Types | `@oroya/core` |
+| `Camera` | class | Components | `@oroya/core` |
+| `CameraType` | enum | Components | `@oroya/core` |
+| `PerspectiveCameraDef` | interface | Types | `@oroya/core` |
+| `CameraDef` | type alias | Types | `@oroya/core` |
+| `createBox` | function | Factory | `@oroya/core` |
+| `createSphere` | function | Factory | `@oroya/core` |
+| `createPath2D` | function | Factory | `@oroya/core` |
+| `serialize` | function | Serialization | `@oroya/core` |
+| `deserialize` | function | Serialization | `@oroya/core` |
+| `Matrix4` | type alias | Math | `@oroya/core` |
+| `Matrix4Identity` | constant | Math | `@oroya/core` |
+| `composeMatrix` | function | Math | `@oroya/core` |
+| `multiplyMatrices` | function | Math | `@oroya/core` |
+| `ThreeRenderer` | class | Rendering | `@oroya/renderer-three` |
+| `renderToSVG` | function | Rendering | `@oroya/renderer-svg` |
+| `loadGLTF` | async function | Loading | `@oroya/loader-gltf` |

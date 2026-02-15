@@ -43,6 +43,7 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 - [**Contributing & Development**](docs/contributing.md): Setup, scripts, and development workflow.
 - [**Programming Principles**](docs/programming-principles.md): Coding conventions and architectural rules for the project.
 - [**Build Errors Postmortem**](docs/troubleshooting/build-errors-postmortem.md): Analysis of common build mistakes and how to prevent them.
+- [**Tutorials**](docs/tutorials/README.md): Step-by-step guides from beginner to advanced.
 
 ##  Getting Started
 
