@@ -69,6 +69,23 @@ export class ThreeRenderer {
       if (threeObject) {
         threeObject.matrix.fromArray(oroyaNode.transform.worldMatrix);
         threeObject.matrix.decompose(threeObject.position, threeObject.quaternion, threeObject.scale);
+
+        // Sync material properties (color, opacity) every frame
+        if (threeObject instanceof THREE.Mesh && oroyaNode.hasComponent(ComponentType.Material)) {
+          const oroyaMat = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material)!;
+          const threeMat = threeObject.material as THREE.MeshStandardMaterial;
+          if (oroyaMat.definition.color) {
+            threeMat.color.setRGB(
+              oroyaMat.definition.color.r,
+              oroyaMat.definition.color.g,
+              oroyaMat.definition.color.b,
+            );
+          }
+          if (oroyaMat.definition.opacity !== undefined) {
+            threeMat.opacity = oroyaMat.definition.opacity;
+            threeMat.transparent = oroyaMat.definition.opacity < 1.0;
+          }
+        }
       }
     });
 

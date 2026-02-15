@@ -6,6 +6,9 @@ import { shapeGridControls, createShapeGridScene } from './ShapeGrid';
 import { cameraViewpointsControls, createCameraViewpointsScene } from './CameraViewpoints';
 import { proceduralCityControls, createProceduralCityScene } from './ProceduralCity';
 import { interactiveDemoControls, createInteractiveDemoScene } from './InteractiveDemo';
+import { hoverShowcaseControls, createHoverShowcaseScene } from './HoverShowcase';
+import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
+import { wheelAndBubblingControls, createWheelAndBubblingScene } from './WheelAndBubbling';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -15,6 +18,30 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'three',
     controls: interactiveDemoControls,
     factory: createInteractiveDemoScene,
+  },
+  {
+    id: 'hover-showcase',
+    label: '🎯 Hover Showcase',
+    description: '5 efectos hover distintos: levitar, girar, crecer, cambio de color y pulsar. Cada objeto usa un cursor CSS diferente (pointer, grab, zoom-in, crosshair, cell).',
+    renderer: 'three',
+    controls: hoverShowcaseControls,
+    factory: createHoverShowcaseScene,
+  },
+  {
+    id: 'click-playground',
+    label: '🖱️ Click Playground',
+    description: 'Click counter, toggle on/off, efecto de presión (pointerdown/up), ciclo de colores y explosión/reagrupación. Demuestra click, pointerdown y pointerup.',
+    renderer: 'three',
+    controls: clickPlaygroundControls,
+    factory: createClickPlaygroundScene,
+  },
+  {
+    id: 'wheel-bubbling',
+    label: '🔄 Wheel & Bubbling',
+    description: 'Rueda del mouse para escalar objetos, event bubbling padre→hijo con stopPropagation(), y pointer tracking con pointermove. Demuestra wheel, bubbling y pointermove.',
+    renderer: 'three',
+    controls: wheelAndBubblingControls,
+    factory: createWheelAndBubblingScene,
   },
   {
     id: 'hello-cube',
