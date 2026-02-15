@@ -26,6 +26,7 @@ Complete reference for all packages in the Oroya Animate ecosystem.
   - [ThreeRenderer](#threerenderer)
 - [`@oroya/renderer-svg`](#oroyarenderer-svg)
   - [renderToSVG](#rendertosvg)
+  - [renderToSVGElement](#rendertosvgelement)
 - [`@oroya/loader-gltf`](#oroyaloader-gltf)
   - [loadGLTF](#loadgltf)
 - [Mapa completo de tipos](#mapa-completo-de-tipos)
@@ -584,7 +585,200 @@ scene.add(cam);
 
 ---
 
+### Interactive (componente)
+
+**Archivo fuente:** [Interactive.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Interactive.ts)
+
+Marca un nodo como interactivo, permitiendo que responda a eventos de puntero (click, hover, drag, etc.).
+
+#### Definición
+
+```typescript
+interface InteractiveDef {
+  enabled: boolean;
+  cursor: string;
+  blocksRaycast: boolean;
+}
+```
+
+| Campo | Tipo | Default | Descripción |
+|-------|------|---------|-------------|
+| `enabled` | `boolean` | `true` | Si el nodo responde a eventos |
+| `cursor` | `string` | `'pointer'` | CSS cursor al hacer hover (e.g., `'pointer'`, `'grab'`, `'move'`) |
+| `blocksRaycast` | `boolean` | `true` | Si bloquea raycasts a objetos detrás |
+
+#### Uso
+
+```typescript
+import { Node, Interactive, createBox } from '@oroya/core';
+
+const button = new Node('button');
+button.addComponent(createBox(2, 1, 0.2));
+button.addComponent(new Interactive({ cursor: 'pointer' }));
+
+// Registrar event handlers
+button.on('click', (e) => {
+  console.log('Clicked!', e.target.name);
+});
+
+button.on('pointerenter', (e) => {
+  console.log('Hover started');
+});
+
+button.on('pointerleave', (e) => {
+  console.log('Hover ended');
+});
+```
+
+#### Integración con renderers
+
+- **ThreeRenderer:** Requiere llamar `renderer.enableInteraction()` después de `mount()`. Usa `THREE.Raycaster` para hit-testing 3D.
+- **SVG Renderer:** Usa `renderToSVGElement()` (no `renderToSVG()`) para obtener un DOM element con event listeners.
+
+---
+
+### EventEmitter
+
+**Archivo fuente:** [EventEmitter.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/events/EventEmitter.ts)
+
+Sistema de eventos genérico con tipado fuerte. Cada `Node` tiene un `EventEmitter` interno para manejar `InteractionEvent`s.
+
+#### API
+
+```typescript
+class EventEmitter<EventMap extends Record<string, any>> {
+  on<K extends keyof EventMap>(
+    eventType: K,
+    handler: (payload: EventMap[K]) => void
+  ): void;
+
+  off<K extends keyof EventMap>(
+    eventType: K,
+    handler: (payload: EventMap[K]) => void
+  ): void;
+
+  emit<K extends keyof EventMap>(
+    eventType: K,
+    payload: EventMap[K]
+  ): void;
+
+  removeAllListeners(eventType?: keyof EventMap): void;
+
+  hasListeners(eventType: keyof EventMap): boolean;
+}
+```
+
+#### Ejemplo de uso directo
+
+```typescript
+import { EventEmitter } from '@oroya/core';
+
+type MyEvents = {
+  'data-loaded': { id: string; data: any };
+  'error': { message: string };
+};
+
+const emitter = new EventEmitter<MyEvents>();
+
+emitter.on('data-loaded', (payload) => {
+  console.log('Data:', payload.data);
+});
+
+emitter.emit('data-loaded', { id: '123', data: { foo: 'bar' } });
+```
+
+#### Uso en Node
+
+Los nodos exponen shortcuts `on()` y `off()` que delegan al `EventEmitter` interno:
+
+```typescript
+const node = new Node('my-node');
+
+node.on('click', (e: InteractionEvent) => {
+  console.log('Clicked at', e.screenPosition);
+});
+```
+
+---
+
+### InteractionEvent
+
+**Archivo fuente:** [InteractionEvent.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/events/InteractionEvent.ts)
+
+Eventos de interacción que se disparan cuando el usuario interactúa con nodos marcados como `Interactive`.
+
+#### Tipos de eventos
+
+```typescript
+enum InteractionEventType {
+  Click = 'click',
+  PointerDown = 'pointerdown',
+  PointerUp = 'pointerup',
+  PointerMove = 'pointermove',
+  PointerEnter = 'pointerenter',
+  PointerLeave = 'pointerleave',
+  PointerCancel = 'pointercancel',
+  Wheel = 'wheel',
+  DragStart = 'dragstart',
+  DragEnd = 'dragend',
+}
+```
+
+#### Interfaz
+
+```typescript
+interface InteractionEvent {
+  type: InteractionEventType;
+  target: Node;                    // Nodo que recibió el evento originalmente
+  currentTarget: Node;             // Nodo actual durante bubbling
+  point?: { x: number; y: number; z: number };  // Posición 3D en world space
+  localPoint?: { x: number; y: number; z: number };  // Posición en local space del nodo
+  screenPosition: { x: number; y: number };  // Posición en pantalla (clientX/Y)
+  nativeEvent: unknown;            // Evento DOM original (PointerEvent, MouseEvent, etc.)
+  propagationStopped: boolean;
+  stopPropagation(): void;
+}
+```
+
+#### Event Bubbling
+
+Los eventos se propagan hacia arriba en el scene graph (de hijo a padre), similar al DOM:
+
+```typescript
+const parent = new Node('parent');
+const child = new Node('child');
+parent.add(child);
+
+parent.on('click', (e) => {
+  console.log('Parent clicked, target:', e.target.name);  // "child"
+  console.log('Current target:', e.currentTarget.name);   // "parent"
+});
+
+child.on('click', (e) => {
+  console.log('Child clicked');
+  e.stopPropagation();  // Detiene el bubbling
+});
+```
+
+#### Factory
+
+```typescript
+function createInteractionEvent(
+  type: InteractionEventType,
+  target: Node,
+  nativeEvent: unknown,
+  screenPosition: { x: number; y: number },
+  options?: {
+    point?: { x: number; y: number; z: number };
+    localPoint?: { x: number; y: number; z: number };
+  }
+): InteractionEvent;
+```
+
+---
+
 ### Factory Functions
+
 
 Funciones helper para crear componentes `Geometry` de forma concisa.
 
@@ -793,6 +987,52 @@ worldMatrix = multiplyMatrices(parent.worldMatrix, this.localMatrix)
 
 ---
 
+### Math — BoundingBox
+
+**Archivo fuente:** [BoundingBox.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/BoundingBox.ts)
+
+Utilidades para calcular y manipular Axis-Aligned Bounding Boxes (AABB).
+
+#### Tipos
+
+```typescript
+interface AABB {
+  min: { x: number; y: number; z: number };
+  max: { x: number; y: number; z: number };
+}
+```
+
+#### Funciones
+
+##### `computeLocalAABB`
+
+Calcula el AABB local basado en la definición de la geometría.
+
+```typescript
+function computeLocalAABB(def: GeometryDef): AABB
+```
+
+- Soporta `Box`, `Sphere` y `Path2D`.
+- Para `Path2D`, calcula el bounding box exacto de los puntos de control.
+
+##### `transformAABB`
+
+Transforma un AABB local al espacio de mundo usando una matriz de transformación.
+
+```typescript
+function transformAABB(localAABB: AABB, matrix: Matrix4): AABB
+```
+
+##### `pointInAABB`
+
+Verifica si un punto está dentro de un AABB.
+
+```typescript
+function pointInAABB(point: { x: number; y: number; z: number }, aabb: AABB): boolean
+```
+
+---
+
 ## `@oroya/renderer-three`
 
 ### `ThreeRenderer`
@@ -812,6 +1052,8 @@ classDiagram
         +constructor(options: ThreeRendererOptions)
         +mount(scene: OroyaScene): void
         +render(): void
+        +enableInteraction(): void
+        +disableInteraction(): void
         +dispose(): void
     }
 
@@ -838,7 +1080,9 @@ classDiagram
 |--------|-------------|
 | `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js, busca la primera cámara, y agrega luces ambientales. Puede llamarse múltiples veces |
 | `render()` | Actualiza las matrices del mundo, sincroniza las posiciones de los objetos Three.js con el scene graph de Oroya, y dibuja el frame. Debe llamarse en un `requestAnimationFrame` loop |
-| `dispose()` | Libera los recursos del WebGLRenderer |
+| `enableInteraction()` | Activa el sistema de interactividad (raycasting, listeners DOM). Debe llamarse después de `mount()`. |
+| `disableInteraction()` | Desactiva el sistema de interactividad y remueve listeners. |
+| `dispose()` | Libera los recursos del WebGLRenderer y limpia listeners de interacción. |
 
 #### Traducción de componentes
 
@@ -905,6 +1149,46 @@ function renderToSVG(scene: Scene, options: SvgRenderOptions): string
 | `width` | `number` | *(requerido)* | Ancho del SVG en píxeles |
 | `height` | `number` | *(requerido)* | Alto del SVG en píxeles |
 | `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox SVG personalizado |
+
+### `renderToSVGElement`
+
+Genera un elemento SVG del DOM (`SVGSVGElement`) con event listeners para interactividad.
+
+**Archivo fuente:** [renderSVG.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-svg/src/renderSVG.ts)
+
+```typescript
+function renderToSVGElement(
+  scene: Scene,
+  options: SvgElementRenderOptions
+): { svg: SVGSVGElement; dispose: () => void }
+```
+
+#### `SvgElementRenderOptions`
+
+Extiende `SvgRenderOptions` con:
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `container` | `HTMLElement` | *(opcional)* Elemento padre donde se adjuntará el SVG automáticamente |
+
+#### Retorno
+
+Retorna un objeto con:
+- `svg`: El elemento DOM SVG creado.
+- `dispose()`: Función para limpiar event listeners y remover el elemento del DOM.
+
+#### Ejemplo
+
+```typescript
+const { dispose } = renderToSVGElement(scene, {
+  width: 800,
+  height: 600,
+  container: document.body
+});
+
+// Más tarde...
+dispose();
+```
 
 #### Comportamiento
 

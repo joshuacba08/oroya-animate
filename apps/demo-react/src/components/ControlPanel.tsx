@@ -4,82 +4,96 @@ import type { ControlDef, ParamValues } from '../types';
 
 const panelStyles: React.CSSProperties = {
   position: 'absolute',
-  top: '64px',
-  right: '16px',
+  top: '68px',
+  right: '20px',
   zIndex: 10,
-  width: '260px',
-  padding: '16px',
-  borderRadius: '14px',
-  background: 'rgba(255,255,255,0.05)',
-  backdropFilter: 'blur(14px)',
+  width: '270px',
+  padding: '18px',
+  borderRadius: '16px',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
   border: '1px solid rgba(255,255,255,0.08)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
   display: 'flex',
   flexDirection: 'column',
-  gap: '14px',
+  gap: '16px',
 };
 
 const titleStyles: React.CSSProperties = {
-  fontSize: '12px',
-  fontWeight: 600,
+  fontSize: '10px',
+  fontWeight: 700,
   textTransform: 'uppercase',
-  letterSpacing: '0.08em',
-  color: 'rgba(255,255,255,0.4)',
+  letterSpacing: '0.12em',
+  color: 'rgba(255,255,255,0.3)',
+  fontFamily: "'Zalando Sans Expanded', sans-serif",
+  paddingBottom: '4px',
+  borderBottom: '1px solid rgba(255,255,255,0.06)',
 };
 
 const rowStyles: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: '5px',
+  gap: '6px',
 };
 
 const labelStyles: React.CSSProperties = {
-  fontSize: '13px',
+  fontSize: '11.5px',
   fontWeight: 500,
-  color: 'rgba(255,255,255,0.75)',
+  color: 'rgba(255,255,255,0.6)',
+  letterSpacing: '0.02em',
+  fontFamily: "'JetBrains Mono', monospace",
 };
 
 const sliderRowStyles: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '10px',
 };
 
 const sliderStyles: React.CSSProperties = {
   flex: 1,
   height: '4px',
-  accentColor: '#6c8aff',
   cursor: 'pointer',
 };
 
 const valueStyles: React.CSSProperties = {
-  fontSize: '12px',
-  fontFamily: 'monospace',
-  color: 'rgba(255,255,255,0.5)',
-  minWidth: '36px',
+  fontSize: '11px',
+  fontFamily: "'JetBrains Mono', monospace",
+  color: 'rgba(108,138,255,0.7)',
+  minWidth: '40px',
   textAlign: 'right',
+  fontWeight: 500,
+  background: 'rgba(108,138,255,0.08)',
+  padding: '2px 6px',
+  borderRadius: '4px',
 };
 
 const colorInputStyles: React.CSSProperties = {
   width: '100%',
-  height: '32px',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: '6px',
-  background: 'transparent',
+  height: '34px',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '8px',
+  background: 'rgba(255,255,255,0.03)',
   cursor: 'pointer',
-  padding: '2px',
+  padding: '3px',
+  transition: 'border-color 0.2s ease',
 };
 
 const selectStyles: React.CSSProperties = {
   width: '100%',
-  padding: '6px 10px',
-  borderRadius: '6px',
-  border: '1px solid rgba(255,255,255,0.12)',
-  background: 'rgba(255,255,255,0.06)',
-  color: '#fff',
-  fontSize: '13px',
-  fontFamily: 'inherit',
+  padding: '7px 10px',
+  borderRadius: '8px',
+  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'rgba(255,255,255,0.04)',
+  color: 'rgba(255,255,255,0.8)',
+  fontSize: '12px',
+  fontFamily: "'JetBrains Mono', monospace",
   cursor: 'pointer',
   outline: 'none',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  colorScheme: 'dark',
 };
 
 /* ── Component ────────────────────────────────────────────────────────── */
@@ -94,7 +108,7 @@ export function ControlPanel({ controls, params, onChange }: ControlPanelProps) 
   if (controls.length === 0) return null;
 
   return (
-    <div style={panelStyles}>
+    <div style={panelStyles} className="glass-panel">
       <div style={titleStyles}>Controles</div>
       {controls.map((ctrl) => (
         <div key={ctrl.key} style={rowStyles}>
@@ -143,6 +157,7 @@ function renderControl(
     case 'select':
       return (
         <select
+          className="demo-select"
           value={params[ctrl.key] as string}
           onChange={(e) => onChange(ctrl.key, e.target.value, !!ctrl.rebuild)}
           style={selectStyles}

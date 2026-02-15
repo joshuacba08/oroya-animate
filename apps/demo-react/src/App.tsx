@@ -10,9 +10,9 @@ import type { ParamValues } from './types';
 const containerStyles: React.CSSProperties = {
   width: '100%',
   height: '100%',
-  backgroundColor: '#0d0d12',
+  backgroundColor: '#0a0a10',
   color: 'white',
-  fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+  fontFamily: "'JetBrains Mono', monospace",
   position: 'relative',
   overflow: 'hidden',
 };
@@ -26,75 +26,108 @@ const headerStyles: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '14px 20px',
-  background: 'linear-gradient(to bottom, rgba(13,13,18,0.95) 0%, rgba(13,13,18,0) 100%)',
+  padding: '16px 24px',
+  background:
+    'linear-gradient(180deg, rgba(10,10,16,0.97) 0%, rgba(10,10,16,0.7) 60%, transparent 100%)',
   pointerEvents: 'none',
 };
 
 const logoStyles: React.CSSProperties = {
-  fontSize: '18px',
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
+  fontSize: '20px',
+  fontWeight: 800,
+  letterSpacing: '-0.01em',
   pointerEvents: 'auto',
+  fontFamily: "'Zalando Sans Expanded', sans-serif",
+  display: 'flex',
+  alignItems: 'center',
+  gap: '3px',
 };
 
 const logoAccentStyles: React.CSSProperties = {
-  color: '#6c8aff',
+  background: 'linear-gradient(135deg, #6c8aff 0%, #a78bfa 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
+const logoDimStyles: React.CSSProperties = {
+  color: 'rgba(255,255,255,0.6)',
 };
 
 const navStyles: React.CSSProperties = {
   display: 'flex',
-  gap: '4px',
+  gap: '6px',
   pointerEvents: 'auto',
 };
 
 const navBtnBase: React.CSSProperties = {
-  padding: '7px 14px',
-  borderRadius: '8px',
+  padding: '8px 14px',
+  borderRadius: '10px',
   border: '1px solid transparent',
   cursor: 'pointer',
-  fontSize: '12.5px',
+  fontSize: '11.5px',
   fontWeight: 500,
-  transition: 'all 0.2s ease',
-  fontFamily: 'inherit',
+  fontFamily: "'JetBrains Mono', monospace",
+  letterSpacing: '-0.01em',
+  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
 const infoBoxStyles: React.CSSProperties = {
   position: 'absolute',
-  bottom: '20px',
-  left: '20px',
+  bottom: '24px',
+  left: '24px',
   zIndex: 10,
-  maxWidth: '380px',
-  padding: '14px 18px',
-  borderRadius: '12px',
-  background: 'rgba(255,255,255,0.05)',
-  backdropFilter: 'blur(12px)',
+  maxWidth: '400px',
+  padding: '18px 22px',
+  borderRadius: '16px',
+  background:
+    'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
   border: '1px solid rgba(255,255,255,0.08)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
 };
 
 const infoTitleStyles: React.CSSProperties = {
-  fontSize: '15px',
-  fontWeight: 600,
-  marginBottom: '4px',
+  fontSize: '16px',
+  fontWeight: 700,
+  marginBottom: '6px',
+  fontFamily: "'Zalando Sans Expanded', sans-serif",
+  letterSpacing: '-0.01em',
 };
 
 const infoDescStyles: React.CSSProperties = {
-  fontSize: '12.5px',
-  lineHeight: 1.5,
-  color: 'rgba(255,255,255,0.55)',
+  fontSize: '12px',
+  lineHeight: 1.6,
+  color: 'rgba(255,255,255,0.45)',
+  letterSpacing: '0.01em',
 };
 
 const rendererBadgeBase: React.CSSProperties = {
   display: 'inline-block',
-  padding: '1px 6px',
-  borderRadius: '4px',
-  fontSize: '10px',
+  padding: '2px 7px',
+  borderRadius: '6px',
+  fontSize: '9px',
   fontWeight: 600,
-  letterSpacing: '0.03em',
+  letterSpacing: '0.04em',
   lineHeight: '16px',
   verticalAlign: 'middle',
-  marginLeft: '6px',
+  marginLeft: '8px',
   border: '1px solid',
+  textTransform: 'uppercase',
+  fontFamily: "'JetBrains Mono', monospace",
+};
+
+const footerStyles: React.CSSProperties = {
+  position: 'absolute',
+  bottom: '24px',
+  right: '24px',
+  zIndex: 10,
+  fontSize: '10px',
+  fontWeight: 400,
+  color: 'rgba(255,255,255,0.2)',
+  letterSpacing: '0.04em',
+  fontFamily: "'JetBrains Mono', monospace",
 };
 
 /* ── Component ────────────────────────────────────────────────────────── */
@@ -149,7 +182,8 @@ function App() {
       {/* Header */}
       <div style={headerStyles}>
         <div style={logoStyles}>
-          <span style={logoAccentStyles}>Oroya</span> Animate
+          <span style={logoAccentStyles}>Oroya</span>
+          <span style={logoDimStyles}>Animate</span>
         </div>
 
         <nav style={navStyles}>
@@ -159,16 +193,20 @@ function App() {
             return (
               <button
                 key={demo.id}
+                className="demo-nav-btn"
                 onClick={() => handleSwitchDemo(demo.id)}
                 style={{
                   ...navBtnBase,
                   background: isActive
-                    ? 'rgba(108,138,255,0.15)'
-                    : 'rgba(255,255,255,0.04)',
+                    ? 'rgba(108,138,255,0.14)'
+                    : 'rgba(255,255,255,0.03)',
                   borderColor: isActive
-                    ? 'rgba(108,138,255,0.4)'
-                    : 'rgba(255,255,255,0.08)',
-                  color: isActive ? '#a0b8ff' : 'rgba(255,255,255,0.5)',
+                    ? 'rgba(108,138,255,0.35)'
+                    : 'rgba(255,255,255,0.06)',
+                  color: isActive ? '#a0b8ff' : 'rgba(255,255,255,0.45)',
+                  boxShadow: isActive
+                    ? '0 0 16px rgba(108,138,255,0.1), inset 0 1px 0 rgba(255,255,255,0.05)'
+                    : 'none',
                 }}
               >
                 {demo.label}
@@ -176,8 +214,8 @@ function App() {
                   style={{
                     ...rendererBadgeBase,
                     color: meta.color,
-                    borderColor: `${meta.color}44`,
-                    backgroundColor: `${meta.color}18`,
+                    borderColor: `${meta.color}33`,
+                    backgroundColor: `${meta.color}12`,
                   }}
                 >
                   {meta.label}
@@ -203,15 +241,15 @@ function App() {
       />
 
       {/* Info panel */}
-      <div style={infoBoxStyles}>
+      <div style={infoBoxStyles} className="glass-panel">
         <div style={infoTitleStyles}>
           {activeDemo.label}
           <span
             style={{
               ...rendererBadgeBase,
               color: RENDERER_META[activeDemo.renderer].color,
-              borderColor: `${RENDERER_META[activeDemo.renderer].color}44`,
-              backgroundColor: `${RENDERER_META[activeDemo.renderer].color}18`,
+              borderColor: `${RENDERER_META[activeDemo.renderer].color}33`,
+              backgroundColor: `${RENDERER_META[activeDemo.renderer].color}12`,
             }}
           >
             {RENDERER_META[activeDemo.renderer].label}
@@ -219,6 +257,9 @@ function App() {
         </div>
         <div style={infoDescStyles}>{activeDemo.description}</div>
       </div>
+
+      {/* Watermark */}
+      <div style={footerStyles}>oroya-animate v0.1</div>
     </div>
   );
 }

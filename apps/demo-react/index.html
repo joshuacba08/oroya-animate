@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Zalando+Sans+Expanded:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -16,9 +16,119 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #0d0d12;
+        background: #0a0a10;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Selection */
+      ::selection {
+        background: rgba(108, 138, 255, 0.35);
+        color: #fff;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+
+      /* Nav buttons hover/active */
+      .demo-nav-btn {
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+      .demo-nav-btn:hover {
+        background: rgba(108, 138, 255, 0.1) !important;
+        border-color: rgba(108, 138, 255, 0.25) !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        transform: translateY(-1px);
+      }
+      .demo-nav-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* Custom range input */
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #6c8aff;
+        border: 2px solid #0a0a10;
+        margin-top: -5px;
+        box-shadow: 0 0 8px rgba(108, 138, 255, 0.4);
+        transition: box-shadow 0.2s ease, transform 0.15s ease;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        box-shadow: 0 0 14px rgba(108, 138, 255, 0.6);
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-track {
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.08);
+        border: none;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #6c8aff;
+        border: 2px solid #0a0a10;
+        box-shadow: 0 0 8px rgba(108, 138, 255, 0.4);
+      }
+
+      /* Select dropdown styling */
+      .demo-select {
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        color-scheme: dark;
+      }
+      .demo-select:hover {
+        border-color: rgba(108, 138, 255, 0.3) !important;
+      }
+      .demo-select:focus {
+        border-color: rgba(108, 138, 255, 0.5) !important;
+        box-shadow: 0 0 0 2px rgba(108, 138, 255, 0.12);
+      }
+      .demo-select option {
+        background: #1a1a24;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 6px 10px;
+      }
+      .demo-select option:checked {
+        background: rgba(108, 138, 255, 0.25);
+        color: #a0b8ff;
+      }
+
+      /* Glass panel hover effect */
+      .glass-panel {
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .glass-panel:hover {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Subtle pulse for logo accent */
+      @keyframes logoPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
       }
     </style>
   </head>
