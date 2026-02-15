@@ -1,9 +1,29 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
+import {
+  Sparkles, Target, MousePointerClick, RefreshCw,
+  Box, Palette, Sun, LayoutGrid, Video, Building2,
+  type LucideIcon,
+} from 'lucide-react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { ControlPanel } from './components/ControlPanel';
 import { DEMO_SCENES } from './scenes';
 import { getDefaultParams, RENDERER_META } from './types';
 import type { ParamValues } from './types';
+
+/* ── Icon mapping per scene id ─────────────────────────────────────────── */
+
+const SCENE_ICONS: Record<string, LucideIcon> = {
+  'interactive-demo': Sparkles,
+  'hover-showcase': Target,
+  'click-playground': MousePointerClick,
+  'wheel-bubbling': RefreshCw,
+  'hello-cube': Box,
+  'color-palette': Palette,
+  'solar-system': Sun,
+  'shape-grid': LayoutGrid,
+  'camera-viewpoints': Video,
+  'procedural-city': Building2,
+};
 
 /* ── Styles ───────────────────────────────────────────────────────────── */
 
@@ -190,6 +210,7 @@ function App() {
           {DEMO_SCENES.map((demo) => {
             const isActive = demo.id === activeId;
             const meta = RENDERER_META[demo.renderer];
+            const Icon = SCENE_ICONS[demo.id];
             return (
               <button
                 key={demo.id}
@@ -197,6 +218,9 @@ function App() {
                 onClick={() => handleSwitchDemo(demo.id)}
                 style={{
                   ...navBtnBase,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
                   background: isActive
                     ? 'rgba(108,138,255,0.14)'
                     : 'rgba(255,255,255,0.03)',
@@ -209,6 +233,7 @@ function App() {
                     : 'none',
                 }}
               >
+                {Icon && <Icon size={13} strokeWidth={2} />}
                 {demo.label}
                 <span
                   style={{
@@ -242,7 +267,8 @@ function App() {
 
       {/* Info panel */}
       <div style={infoBoxStyles} className="glass-panel">
-        <div style={infoTitleStyles}>
+        <div style={{ ...infoTitleStyles, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {(() => { const I = SCENE_ICONS[activeDemo.id]; return I ? <I size={18} strokeWidth={2} /> : null; })()}
           {activeDemo.label}
           <span
             style={{

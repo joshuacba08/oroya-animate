@@ -13,7 +13,7 @@ import { wheelAndBubblingControls, createWheelAndBubblingScene } from './WheelAn
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
     id: 'interactive-demo',
-    label: '✨ Interactive Demo',
+    label: 'Interactive Demo',
     description: 'Objetos interactivos con click, hover, cambio de color y animación. Demuestra el sistema de eventos e Interactive component.',
     renderer: 'three',
     controls: interactiveDemoControls,
@@ -21,7 +21,7 @@ export const DEMO_SCENES: DemoSceneDef[] = [
   },
   {
     id: 'hover-showcase',
-    label: '🎯 Hover Showcase',
+    label: 'Hover Showcase',
     description: '5 efectos hover distintos: levitar, girar, crecer, cambio de color y pulsar. Cada objeto usa un cursor CSS diferente (pointer, grab, zoom-in, crosshair, cell).',
     renderer: 'three',
     controls: hoverShowcaseControls,
@@ -29,7 +29,7 @@ export const DEMO_SCENES: DemoSceneDef[] = [
   },
   {
     id: 'click-playground',
-    label: '🖱️ Click Playground',
+    label: 'Click Playground',
     description: 'Click counter, toggle on/off, efecto de presión (pointerdown/up), ciclo de colores y explosión/reagrupación. Demuestra click, pointerdown y pointerup.',
     renderer: 'three',
     controls: clickPlaygroundControls,
@@ -37,7 +37,7 @@ export const DEMO_SCENES: DemoSceneDef[] = [
   },
   {
     id: 'wheel-bubbling',
-    label: '🔄 Wheel & Bubbling',
+    label: 'Wheel & Bubbling',
     description: 'Rueda del mouse para escalar objetos, event bubbling padre→hijo con stopPropagation(), y pointer tracking con pointermove. Demuestra wheel, bubbling y pointermove.',
     renderer: 'three',
     controls: wheelAndBubblingControls,

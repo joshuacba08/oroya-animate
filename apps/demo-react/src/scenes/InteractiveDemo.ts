@@ -85,7 +85,7 @@ export function createInteractiveDemoScene(_params: ParamValues) {
         // ── Event handlers ─────────────────────────────────────
 
         node.on('click', (e) => {
-            console.log(`🖱️ Click on "${e.target.name}" at screen (${e.screenPosition.x}, ${e.screenPosition.y})`);
+            console.log(`[Click] "${e.target.name}" at screen (${e.screenPosition.x}, ${e.screenPosition.y})`);
         });
 
         node.on('pointerenter', () => {

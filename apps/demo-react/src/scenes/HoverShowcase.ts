@@ -96,12 +96,12 @@ export function createHoverShowcaseScene(_params: ParamValues) {
         // ── Events ──────────────────────────────────────
         node.on('pointerenter', () => {
             entry.isHovered = true;
-            console.log(`🎯 Hover ENTER: "${node.name}" (cursor: ${cfg.cursor})`);
+            console.log(`[Hover] ENTER: "${node.name}" (cursor: ${cfg.cursor})`);
         });
 
         node.on('pointerleave', () => {
             entry.isHovered = false;
-            console.log(`🎯 Hover LEAVE: "${node.name}"`);
+            console.log(`[Hover] LEAVE: "${node.name}"`);
         });
     }
 

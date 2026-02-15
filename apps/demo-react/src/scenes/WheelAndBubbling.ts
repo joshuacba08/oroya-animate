@@ -85,7 +85,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
             const nativeEvent = e.nativeEvent as WheelEvent;
             const delta = -nativeEvent.deltaY * 0.003;
             entry.targetScale = Math.max(0.3, Math.min(3, entry.targetScale + delta));
-            console.log(`🔄 Wheel en "${node.name}": escala → ${entry.targetScale.toFixed(2)}`);
+            console.log(`[Wheel] "${node.name}": scale -> ${entry.targetScale.toFixed(2)}`);
         });
 
         // Hover highlight
@@ -128,8 +128,8 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
     parentNode.on('click', (e) => {
         parentState.flashTimer = 1;
         parentState.color = { r: 0.2, g: 0.6, b: 1.0 };
-        console.log(`📦 PARENT recibió click (target: "${e.target.name}", currentTarget: "${e.currentTarget.name}")`);
-        console.log(`   → El evento hizo BUBBLING desde "${e.target.name}" hasta "bubbling-parent"`);
+        console.log(`[Bubbling] PARENT received click (target: "${e.target.name}", currentTarget: "${e.currentTarget.name}")`);
+        console.log(`   -> Event BUBBLED from "${e.target.name}" to "bubbling-parent"`);
     });
 
     // Child A – click bubbles up to parent
@@ -146,7 +146,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
 
     childA.on('click', (e) => {
         childAState.flashTimer = 1;
-        console.log(`🟠 Child A clicked – evento BURBUJEA al padre`);
+        console.log(`[Bubbling] Child A clicked - event BUBBLES to parent`);
         console.log(`   target: "${e.target.name}", currentTarget: "${e.currentTarget.name}"`);
     });
 
@@ -165,7 +165,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
     childB.on('click', (e) => {
         e.stopPropagation();
         childBState.flashTimer = 1;
-        console.log(`🟣 Child B clicked – stopPropagation() llamado, NO burbujea`);
+        console.log(`[Bubbling] Child B clicked - stopPropagation() called, does NOT bubble`);
     });
 
     // Child C – lower, also bubbles
@@ -182,7 +182,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
 
     childC.on('click', (e) => {
         childCState.flashTimer = 1;
-        console.log(`🟢 Child C clicked – evento BURBUJEA al padre`);
+        console.log(`[Bubbling] Child C clicked - event BUBBLES to parent`);
         console.log(`   target: "${e.target.name}", currentTarget: "${e.currentTarget.name}"`);
     });
 

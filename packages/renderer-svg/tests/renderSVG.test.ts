@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  Scene,
-  Node,
-  createPath2D,
-  createBox,
-  createSphere,
-  Material,
+    createBox,
+    createPath2D,
+    createSphere,
+    Material,
+    Node,
+    Scene,
 } from '../../core/src';
 import { renderToSVG } from '../src/renderSVG';
 

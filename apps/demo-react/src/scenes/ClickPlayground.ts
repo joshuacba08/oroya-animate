@@ -62,7 +62,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     counterNode.on('click', (e) => {
         counterState.clicks++;
         counterState.targetScale = 1 + counterState.clicks * 0.15;
-        console.log(`🔢 Counter: ${counterState.clicks} clicks (scale → ${counterState.targetScale.toFixed(2)})`);
+        console.log(`[Counter] ${counterState.clicks} clicks (scale -> ${counterState.targetScale.toFixed(2)})`);
         console.log(`   Screen pos: (${e.screenPosition.x}, ${e.screenPosition.y})`);
     });
 
@@ -85,7 +85,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     toggleNode.on('click', () => {
         toggleState.on = !toggleState.on;
         toggleState.targetY = toggleState.on ? 1.5 : 0;
-        console.log(`🔘 Toggle: ${toggleState.on ? 'ON' : 'OFF'}`);
+        console.log(`[Toggle] ${toggleState.on ? 'ON' : 'OFF'}`);
     });
 
     // ══════════════════════════════════════════════════
@@ -103,12 +103,12 @@ export function createClickPlaygroundScene(_params: ParamValues) {
 
     pressNode.on('pointerdown', () => {
         pressState.pressed = true;
-        console.log('⬇️ PointerDown – presionando...');
+        console.log('[PointerDown] pressing...');
     });
 
     pressNode.on('pointerup', () => {
         pressState.pressed = false;
-        console.log('⬆️ PointerUp – soltando');
+        console.log('[PointerUp] released');
     });
 
     pressNode.on('pointerleave', () => {
@@ -131,7 +131,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     cyclerNode.on('click', () => {
         cyclerState.colorIndex = (cyclerState.colorIndex + 1) % CYCLE_COLORS.length;
         cyclerState.targetColor = { ...CYCLE_COLORS[cyclerState.colorIndex] };
-        console.log(`🎨 Color cycler → índice ${cyclerState.colorIndex}`);
+        console.log(`[ColorCycler] index ${cyclerState.colorIndex}`);
     });
 
     // ══════════════════════════════════════════════════
@@ -178,7 +178,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
 
     hub.on('click', () => {
         explodeState.exploded = !explodeState.exploded;
-        console.log(`💥 Explode: ${explodeState.exploded ? 'DISPERSAR' : 'REAGRUPAR'}`);
+        console.log(`[Explode] ${explodeState.exploded ? 'DISPERSAR' : 'REAGRUPAR'}`);
     });
 
     // ── Floor ─────────────────────────────────────────
