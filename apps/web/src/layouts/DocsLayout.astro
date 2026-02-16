@@ -1,0 +1,104 @@
+---
+import "../assets/app.css";
+import Navbar from "../components/Navbar.astro";
+import DocsSidebar from "../components/DocsSidebar.astro";
+import Footer from "../components/Footer.astro";
+import MermaidInit from "../components/MermaidInit.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const fullTitle = `${title} — Oroya Animate Docs`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description || `${title} - Oroya Animate documentation`} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{fullTitle}</title>
+  </head>
+  <body class="min-h-screen bg-base-100 font-sans text-base-content">
+    <!-- Subtle background -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+      <div class="absolute top-0 left-[10%] w-[500px] h-[500px] rounded-full bg-purple-600/5 blur-[128px]"></div>
+      <div class="absolute bottom-0 right-[10%] w-[400px] h-[400px] rounded-full bg-blue-600/5 blur-[128px]"></div>
+    </div>
+
+    <Navbar />
+
+    <div class="pt-20 px-4 lg:px-8">
+      <div class="container mx-auto max-w-7xl flex gap-8">
+        <!-- Sidebar -->
+        <DocsSidebar />
+
+        <!-- Main content -->
+        <main class="flex-1 min-w-0 py-8">
+          <!-- Mobile sidebar toggle -->
+          <div class="lg:hidden mb-6">
+            <label for="mobile-sidebar" class="btn btn-outline btn-sm gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" x2="20" y1="12" y2="12"/>
+                <line x1="4" x2="20" y1="6" y2="6"/>
+                <line x1="4" x2="20" y1="18" y2="18"/>
+              </svg>
+              Navigation
+            </label>
+          </div>
+
+          <!-- Article content -->
+          <article class="prose prose-invert max-w-none
+            prose-headings:font-display prose-headings:tracking-tight
+            prose-h1:text-3xl prose-h1:md:text-4xl prose-h1:mb-4 prose-h1:text-gradient
+            prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-b prose-h2:border-base-300/30 prose-h2:pb-3
+            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+            prose-p:text-base-content/80 prose-p:leading-relaxed
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-base-content
+            prose-code:text-primary/90 prose-code:font-mono prose-code:text-sm
+            prose-code:bg-base-300/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
+            prose-code:before:content-none prose-code:after:content-none
+            prose-pre:bg-base-300/40 prose-pre:backdrop-blur-md prose-pre:border prose-pre:border-base-300/50 prose-pre:rounded-xl
+            prose-pre:font-mono prose-pre:text-sm
+            prose-table:text-sm
+            prose-th:text-base-content/80 prose-th:font-display prose-th:font-semibold
+            prose-th:border-base-300/50 prose-td:border-base-300/30
+            prose-blockquote:border-primary/50 prose-blockquote:text-base-content/60
+            prose-li:text-base-content/80
+            prose-hr:border-base-300/30
+            prose-img:rounded-xl
+          ">
+            <slot />
+          </article>
+
+          <!-- Page navigation (prev/next) -->
+          <div class="mt-16 pt-8 border-t border-base-300/30">
+            <slot name="pagination" />
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <Footer />
+
+    <!-- Mermaid diagram rendering -->
+    <MermaidInit />
+  </body>
+</html>

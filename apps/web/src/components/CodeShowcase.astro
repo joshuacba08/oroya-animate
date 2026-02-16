@@ -1,4 +1,6 @@
 ---
+import { Code } from "astro:components";
+
 const codeExample = `import { Scene, Node, createBox, Material,
          Camera, CameraType } from '@oroya/core'
 import { ThreeRenderer } from '@oroya/renderer-three'
@@ -75,16 +77,18 @@ const highlights = [
       </div>
 
       <!-- Right: code block -->
-      <div class="glass-card rounded-2xl overflow-hidden">
+      <div class="code-card rounded-2xl overflow-hidden">
         <!-- Code header -->
-        <div class="flex items-center gap-2 px-4 py-3 border-b border-base-300/50">
-          <div class="w-3 h-3 rounded-full bg-error/60"></div>
-          <div class="w-3 h-3 rounded-full bg-warning/60"></div>
-          <div class="w-3 h-3 rounded-full bg-success/60"></div>
-          <span class="text-xs text-base-content/40 ml-2 font-mono">scene.ts</span>
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+          <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+          <span class="text-xs text-white/40 ml-2 font-mono">scene.ts</span>
         </div>
         <!-- Code content -->
-        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><code class="font-mono text-base-content/80">{codeExample}</code></pre>
+        <div class="code-highlight-wrapper">
+          <Code code={codeExample} lang="typescript" theme="night-owl" />
+        </div>
       </div>
     </div>
   </div>

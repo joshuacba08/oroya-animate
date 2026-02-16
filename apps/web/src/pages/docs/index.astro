@@ -1,0 +1,53 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getCollection } from "astro:content";
+
+const docs = await getCollection("docs");
+const sortedDocs = docs.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+const categories = [
+  { key: "guide", title: "Getting Started", icon: "🚀", color: "badge-primary" },
+  { key: "concepts", title: "Core Concepts", icon: "📐", color: "badge-secondary" },
+  { key: "reference", title: "Reference", icon: "📖", color: "badge-accent" },
+  { key: "development", title: "Development", icon: "🛠️", color: "badge-info" },
+];
+---
+
+<DocsLayout title="Documentation" description="Complete documentation for Oroya Animate">
+  <h1>Documentation</h1>
+  <p class="text-lg text-base-content/60 mb-12">
+    Learn how to build 2D and 3D graphics applications with Oroya Animate's
+    engine-agnostic scene graph.
+  </p>
+
+  {categories.map((cat) => {
+    const catDocs = sortedDocs.filter((d) => d.data.category === cat.key);
+    if (catDocs.length === 0) return null;
+    return (
+      <section class="mb-10">
+        <h2 class="flex items-center gap-2 not-prose">
+          <span>{cat.icon}</span>
+          {cat.title}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-4">
+          {catDocs.map((doc) => (
+            <a
+              href={`/docs/${doc.id}`}
+              class="glass-card rounded-xl p-5 group block no-underline"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-display font-semibold text-base-content group-hover:text-primary transition-colors">
+                  {doc.data.title}
+                </h3>
+                <span class={`badge ${cat.color} badge-xs`}>{cat.key}</span>
+              </div>
+              <p class="text-sm text-base-content/50 leading-relaxed">
+                {doc.data.description}
+              </p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+</DocsLayout>

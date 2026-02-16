@@ -1,4 +1,19 @@
 ---
+import { Code } from "astro:components";
+
+const sceneCode = `import { Scene, Node, createBox, Material } from '@oroya/core'
+import { ThreeRenderer } from '@oroya/renderer-three'
+
+const scene = new Scene()
+
+const cube = new Node('cube')
+cube.addComponent(createBox(1, 1, 1))
+cube.addComponent(new Material({ color: { r: 0.4, g: 0.5, b: 1 } }))
+scene.add(cube)
+
+const renderer = new ThreeRenderer({ canvas, width: 800, height: 600 })
+renderer.mount(scene)
+renderer.render()`;
 ---
 
 <section id="start" class="py-24 px-6">
@@ -25,7 +40,7 @@
             <span class="w-7 h-7 rounded-full bg-primary/20 text-primary text-sm font-bold flex items-center justify-center font-mono">1</span>
             <span class="font-display font-semibold text-sm">Install packages</span>
           </div>
-          <div class="mockup-code bg-base-300/40 backdrop-blur-md border border-base-300/50">
+          <div class="mockup-code bg-base-200 border border-base-300 shadow-sm">
             <pre data-prefix="$" class="text-sm"><code class="font-mono">pnpm add @oroya/core @oroya/renderer-three three</code></pre>
           </div>
         </div>
@@ -36,26 +51,16 @@
             <span class="w-7 h-7 rounded-full bg-primary/20 text-primary text-sm font-bold flex items-center justify-center font-mono">2</span>
             <span class="font-display font-semibold text-sm">Create a scene</span>
           </div>
-          <div class="glass-card rounded-xl overflow-hidden">
-            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-base-300/50">
-              <div class="w-2.5 h-2.5 rounded-full bg-error/50"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-warning/50"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-success/50"></div>
-              <span class="text-xs text-base-content/30 ml-2 font-mono">main.ts</span>
+          <div class="code-card rounded-xl overflow-hidden">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/10">
+              <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></div>
+              <span class="text-xs text-white/30 ml-2 font-mono">main.ts</span>
             </div>
-            <pre class="p-4 text-sm leading-relaxed overflow-x-auto"><code class="font-mono text-base-content/80">import { Scene, Node, createBox, Material } from '@oroya/core'
-import { ThreeRenderer } from '@oroya/renderer-three'
-
-const scene = new Scene()
-
-const cube = new Node('cube')
-cube.addComponent(createBox(1, 1, 1))
-cube.addComponent(new Material({ color: { r: 0.4, g: 0.5, b: 1 } }))
-scene.add(cube)
-
-const renderer = new ThreeRenderer({ canvas, width: 800, height: 600 })
-renderer.mount(scene)
-renderer.render()</code></pre>
+            <div class="code-highlight-wrapper">
+              <Code code={sceneCode} lang="typescript" theme="night-owl" />
+            </div>
           </div>
         </div>
 

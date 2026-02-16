@@ -1,0 +1,80 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getCollection } from "astro:content";
+
+const tutorials = await getCollection("tutorials");
+const sorted = tutorials.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+const levels = [
+  {
+    key: "beginner" as const,
+    title: "Beginner",
+    emoji: "🟢",
+    badge: "badge-success",
+    description: "Start here if you're new to Oroya Animate.",
+  },
+  {
+    key: "intermediate" as const,
+    title: "Intermediate",
+    emoji: "🟡",
+    badge: "badge-warning",
+    description: "Build on the basics with more complex scenes and renderers.",
+  },
+  {
+    key: "advanced" as const,
+    title: "Advanced",
+    emoji: "🔴",
+    badge: "badge-error",
+    description: "Push the boundaries with procedural generation and multi-renderer patterns.",
+  },
+];
+---
+
+<DocsLayout title="Tutorials" description="Step-by-step tutorials for learning Oroya Animate">
+  <h1>Tutorials</h1>
+  <p class="text-lg text-base-content/60 mb-12">
+    Learn Oroya Animate step by step, from your first 3D scene to advanced
+    generative art and multi-renderer techniques.
+  </p>
+
+  {levels.map((level) => {
+    const levelTutorials = sorted.filter((t) => t.data.level === level.key);
+    if (levelTutorials.length === 0) return null;
+    return (
+      <section class="mb-10">
+        <h2 class="flex items-center gap-2 not-prose">
+          <span>{level.emoji}</span>
+          {level.title}
+        </h2>
+        <p class="text-sm text-base-content/50 mb-4 not-prose">{level.description}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
+          {levelTutorials.map((tutorial, i) => (
+            <a
+              href={`/tutorials/${tutorial.id}`}
+              class="glass-card rounded-xl p-5 group block no-underline"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-display font-semibold text-base-content group-hover:text-primary transition-colors">
+                  {tutorial.data.title}
+                </h3>
+                <div class="flex items-center gap-2 shrink-0">
+                  {tutorial.data.duration && (
+                    <span class="text-xs text-base-content/40 font-mono">
+                      {tutorial.data.duration}
+                    </span>
+                  )}
+                  <span class={`badge ${level.badge} badge-xs`}>
+                    {level.key}
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-base-content/50 leading-relaxed">
+                {tutorial.data.description}
+              </p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+</DocsLayout>

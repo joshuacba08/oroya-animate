@@ -1,0 +1,174 @@
+---
+interface SidebarLink {
+  slug: string;
+  label: string;
+}
+
+interface SidebarSection {
+  title: string;
+  items: SidebarLink[];
+  basePath?: string;
+}
+
+const currentPath = Astro.url.pathname;
+
+const docsSections: SidebarSection[] = [
+  {
+    title: "Getting Started",
+    items: [
+      { slug: "getting-started", label: "Introduction" },
+    ],
+  },
+  {
+    title: "Core Concepts",
+    items: [
+      { slug: "architecture", label: "Architecture" },
+      { slug: "scene-graph", label: "Scene Graph" },
+      { slug: "renderers", label: "Renderers" },
+      { slug: "serialization", label: "Serialization" },
+    ],
+  },
+  {
+    title: "Reference",
+    items: [
+      { slug: "api-reference", label: "API Reference" },
+    ],
+  },
+  {
+    title: "Development",
+    items: [
+      { slug: "contributing", label: "Contributing" },
+      { slug: "programming-principles", label: "Principles" },
+    ],
+  },
+];
+
+const tutorialSections: SidebarSection[] = [
+  {
+    title: "Beginner",
+    basePath: "/tutorials",
+    items: [
+      { slug: "01-hello-cube", label: "Hello Cube" },
+      { slug: "02-color-palette", label: "Color Palette" },
+      { slug: "03-save-load-scenes", label: "Save & Load Scenes" },
+    ],
+  },
+  {
+    title: "Intermediate",
+    basePath: "/tutorials",
+    items: [
+      { slug: "04-solar-system", label: "Solar System" },
+      { slug: "05-svg-generative-art", label: "SVG Generative Art" },
+      { slug: "06-cameras-viewpoints", label: "Cameras & Viewpoints" },
+      { slug: "09-svg-gradients-filters", label: "SVG Gradients & Filters" },
+      { slug: "10-svg-animations", label: "SVG Animations" },
+    ],
+  },
+  {
+    title: "Advanced",
+    basePath: "/tutorials",
+    items: [
+      { slug: "07-procedural-city", label: "Procedural City" },
+      { slug: "08-multi-renderer", label: "Multi-Renderer" },
+      { slug: "11-svg-interactive", label: "SVG Interactive" },
+    ],
+  },
+];
+
+function isActive(slug: string, basePath?: string): boolean {
+  const prefix = basePath || "/docs";
+  return currentPath === `${prefix}/${slug}` || currentPath === `${prefix}/${slug}/`;
+}
+
+function renderSections(sections: SidebarSection[], defaultBasePath: string) {
+  return sections;
+}
+---
+
+<aside class="w-72 shrink-0 hidden lg:block">
+  <nav class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-4 pb-8 space-y-6">
+    <!-- Docs sections -->
+    <div>
+      <a
+        href="/docs"
+        class:list={[
+          "text-xs font-display font-bold uppercase tracking-wider mb-4 block",
+          currentPath === "/docs" || currentPath === "/docs/"
+            ? "text-primary"
+            : "text-base-content/40 hover:text-base-content/70 transition-colors",
+        ]}
+      >
+        Documentation
+      </a>
+      {docsSections.map((section) => (
+        <div class="mb-5">
+          <h4 class="text-xs font-display font-semibold uppercase tracking-wider text-base-content/40 mb-2 pl-3">
+            {section.title}
+          </h4>
+          <ul class="space-y-0.5">
+            {section.items.map((item) => (
+              <li>
+                <a
+                  href={`/docs/${item.slug}`}
+                  class:list={[
+                    "block text-sm py-1.5 px-3 rounded-lg transition-all duration-200",
+                    isActive(item.slug)
+                      ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+                      : "text-base-content/60 hover:text-base-content hover:bg-base-200/50",
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-base-300/30 my-4"></div>
+
+    <!-- Tutorials sections -->
+    <div>
+      <a
+        href="/tutorials"
+        class:list={[
+          "text-xs font-display font-bold uppercase tracking-wider mb-4 block",
+          currentPath === "/tutorials" || currentPath === "/tutorials/"
+            ? "text-primary"
+            : "text-base-content/40 hover:text-base-content/70 transition-colors",
+        ]}
+      >
+        Tutorials
+      </a>
+      {tutorialSections.map((section) => (
+        <div class="mb-5">
+          <h4 class="text-xs font-display font-semibold uppercase tracking-wider text-base-content/40 mb-2 pl-3 flex items-center gap-2">
+            {section.title}
+            {section.title === "Beginner" && <span class="badge badge-success badge-xs">Easy</span>}
+            {section.title === "Intermediate" && <span class="badge badge-warning badge-xs">Mid</span>}
+            {section.title === "Advanced" && <span class="badge badge-error badge-xs">Hard</span>}
+          </h4>
+          <ul class="space-y-0.5">
+            {section.items.map((item) => (
+              <li>
+                <a
+                  href={`/tutorials/${item.slug}`}
+                  class:list={[
+                    "block text-sm py-1.5 px-3 rounded-lg transition-all duration-200",
+                    isActive(item.slug, "/tutorials")
+                      ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+                      : "text-base-content/60 hover:text-base-content hover:bg-base-200/50",
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </nav>
+</aside>
