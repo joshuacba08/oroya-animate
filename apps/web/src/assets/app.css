@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Zalando Sans Expanded", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Background gradient blobs */
+.bg-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(128px);
+  pointer-events: none;
+}
+
+/* Glass card effect */
+.glass-card {
+  background: oklch(0.2 0.03 265 / 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid oklch(0.3 0.03 265 / 0.5);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: oklch(0.6 0.15 265 / 0.4);
+  box-shadow: 0 0 30px oklch(0.5 0.15 265 / 0.1);
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(oklch(0.3 0.02 265 / 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.3 0.02 265 / 0.15) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

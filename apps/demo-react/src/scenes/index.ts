@@ -15,6 +15,7 @@ import { createSvgAnimationsScene, svgAnimationsControls } from './SvgAnimations
 import { createSvgInteractiveScene, svgInteractiveControls } from './SvgInteractive';
 import { createSvgShowcaseScene, svgShowcaseControls } from './SvgShowcase';
 import { createWheelAndBubblingScene, wheelAndBubblingControls } from './WheelAndBubbling';
+import { SvJsGenerativeDemo } from './SvJsGenerativeDemo';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -145,5 +146,6 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     controls: generativeArtControls,
     factory: createGenerativeArtScene,
   },
+  SvJsGenerativeDemo,
 ];
 

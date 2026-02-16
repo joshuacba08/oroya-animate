@@ -1,0 +1,66 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-base-300/50 py-12 px-6 mt-12">
+  <div class="container mx-auto max-w-6xl">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <!-- Brand -->
+      <div class="md:col-span-1">
+        <a href="/" class="flex items-center gap-2 text-lg font-display font-bold mb-3">
+          <div class="w-7 h-7 rounded-md bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+            O
+          </div>
+          Oroya Animate
+        </a>
+        <p class="text-sm text-base-content/50 leading-relaxed">
+          Engine-agnostic 2D/3D graphics library for the modern web.
+        </p>
+      </div>
+
+      <!-- Docs -->
+      <div>
+        <h4 class="font-display font-semibold text-sm mb-3">Documentation</h4>
+        <ul class="space-y-2 text-sm text-base-content/50">
+          <li><a href="/docs/getting-started" class="hover:text-base-content transition-colors">Getting Started</a></li>
+          <li><a href="/docs/architecture" class="hover:text-base-content transition-colors">Architecture</a></li>
+          <li><a href="/docs/api-reference" class="hover:text-base-content transition-colors">API Reference</a></li>
+          <li><a href="/docs/tutorials" class="hover:text-base-content transition-colors">Tutorials</a></li>
+        </ul>
+      </div>
+
+      <!-- Packages -->
+      <div>
+        <h4 class="font-display font-semibold text-sm mb-3">Packages</h4>
+        <ul class="space-y-2 text-sm text-base-content/50">
+          <li><a href="https://www.npmjs.com/package/@oroya/core" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/core</a></li>
+          <li><a href="https://www.npmjs.com/package/@oroya/renderer-three" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/renderer-three</a></li>
+          <li><a href="https://www.npmjs.com/package/@oroya/renderer-svg" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/renderer-svg</a></li>
+          <li><a href="https://www.npmjs.com/package/@oroya/loader-gltf" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/loader-gltf</a></li>
+        </ul>
+      </div>
+
+      <!-- Community -->
+      <div>
+        <h4 class="font-display font-semibold text-sm mb-3">Community</h4>
+        <ul class="space-y-2 text-sm text-base-content/50">
+          <li><a href="https://github.com/andersonur/oroya-animate" target="_blank" rel="noopener" class="hover:text-base-content transition-colors">GitHub</a></li>
+          <li><a href="https://github.com/andersonur/oroya-animate/issues" target="_blank" rel="noopener" class="hover:text-base-content transition-colors">Issues</a></li>
+          <li><a href="/docs/contributing" class="hover:text-base-content transition-colors">Contributing</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-base-300/30 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-xs text-base-content/40">
+        &copy; {currentYear} Oroya Animate. MIT License.
+      </p>
+      <p class="text-xs text-base-content/30">
+        Built with <a href="https://astro.build" target="_blank" rel="noopener" class="hover:text-base-content/60 transition-colors">Astro</a>,
+        <a href="https://tailwindcss.com" target="_blank" rel="noopener" class="hover:text-base-content/60 transition-colors">Tailwind CSS</a>
+        & <a href="https://daisyui.com" target="_blank" rel="noopener" class="hover:text-base-content/60 transition-colors">daisyUI</a>
+      </p>
+    </div>
+  </div>
+</footer>

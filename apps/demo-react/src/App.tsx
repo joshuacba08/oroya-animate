@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { OroyaCanvas } from './OroyaCanvas';
 import { OroyaSvg } from './OroyaSvg';
+import { OroyaSvJs } from './OroyaSvJs';
 import { ControlPanel } from './components/ControlPanel';
 import { Sidebar, SIDEBAR_WIDTH } from './components/Sidebar';
 import { DEMO_SCENES } from './scenes';
@@ -139,6 +140,12 @@ function App() {
         {/* Renderer — Three.js canvas or SVG element */}
         {activeDemo.renderer === 'svg' ? (
           <OroyaSvg
+            key={`${activeId}-${buildKey}`}
+            scene={scene}
+            onAnimate={onAnimate}
+          />
+        ) : activeDemo.renderer === 'svjs' ? (
+          <OroyaSvJs
             key={`${activeId}-${buildKey}`}
             scene={scene}
             onAnimate={onAnimate}
