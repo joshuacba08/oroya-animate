@@ -1,0 +1,195 @@
+{
+  "scenes": {
+    "interactive-demo": {
+      "label": "Demo Interactiva",
+      "description": "Objetos interactivos con click, hover, cambio de color y animación. Demuestra el sistema de eventos e Interactive component."
+    },
+    "hover-showcase": {
+      "label": "Hover Showcase",
+      "description": "5 efectos hover distintos: levitar, girar, crecer, cambio de color y pulsar. Cada objeto usa un cursor CSS diferente (pointer, grab, zoom-in, crosshair, cell)."
+    },
+    "click-playground": {
+      "label": "Click Playground",
+      "description": "Click counter, toggle on/off, efecto de presión (pointerdown/up), ciclo de colores y explosión/reagrupación. Demuestra click, pointerdown y pointerup."
+    },
+    "wheel-bubbling": {
+      "label": "Wheel & Bubbling",
+      "description": "Rueda del mouse para escalar objetos, event bubbling padre→hijo con stopPropagation(), y pointer tracking con pointermove. Demuestra wheel, bubbling y pointermove."
+    },
+    "hello-cube": {
+      "label": "Hola Cubo",
+      "description": "Un cubo 3D con rotación quaternion suave. Demuestra la configuración básica de escena, cámara y geometría."
+    },
+    "color-palette": {
+      "label": "Paleta de Colores",
+      "description": "Figuras geométricas con diferentes formas, colores y velocidades. Muestra createBox, createSphere y temas de color."
+    },
+    "solar-system": {
+      "label": "Sistema Solar",
+      "description": "Sistema planetario con órbitas jerárquicas usando nodos pivot padre-hijo. Demuestra transforms anidados."
+    },
+    "shape-grid": {
+      "label": "Grilla de Formas",
+      "description": "Grilla procedural con ola sinusoidal y colores por posición. Demuestra generación procedural y animación masiva."
+    },
+    "camera-viewpoints": {
+      "label": "Puntos de Vista",
+      "description": "Múltiples puntos de vista (orbital, frontal, cenital, lateral) sobre una escena con pilares y esferas. Demuestra posicionamiento y animación de cámaras."
+    },
+    "procedural-city": {
+      "label": "Ciudad Procedural",
+      "description": "Ciudad generada algorítmicamente con edificios, parque central y torre destacada. Demuestra generación procedural y agrupación jerárquica."
+    },
+    "svg-showcase": {
+      "label": "SVG Showcase",
+      "description": "Catálogo visual de capacidades SVG: gradientes lineales/radiales, filtros (blur, drop-shadow), clip-path, mask, paths Bézier, texto y stroke gradient."
+    },
+    "svg-animations": {
+      "label": "Animaciones SVG",
+      "description": "Animaciones SVG nativas declarativas sin JavaScript: pulse (opacity), rotate, scale, color cycle, bounce (translate) y combinadas. Usa <animate> y <animateTransform>."
+    },
+    "svg-interactive": {
+      "label": "SVG Interactivo",
+      "description": "Grilla de figuras SVG interactivas con eventos click y hover. Usa renderToSVGElement con el componente Interactive para event delegation."
+    },
+    "colour-spiral": {
+      "label": "Espiral de Colores",
+      "description": "Espiral de puntos coloridos generados proceduralmente. Demuestra createSphere, fill con paleta de colores y posicionamiento polar."
+    },
+    "gradient-gallery": {
+      "label": "Galería de Gradientes",
+      "description": "Barras con gradientes lineales verticales y círculos con gradientes radiales. Demuestra fillGradient lineal y radial."
+    },
+    "circle-overlay": {
+      "label": "Círculos Superpuestos",
+      "description": "Círculos translúcidos superpuestos creando profundidad. Demuestra opacity, strokeGradient y composición visual."
+    },
+    "porto-pareto": {
+      "label": "Porto Pareto",
+      "description": "Paisaje urbano generativo usando distribución de Pareto para alturas de edificios. Demuestra Gen.pareto y constrains."
+    },
+    "gaussian-dist": {
+      "label": "Distribución Gaussiana",
+      "description": "Visualización de distribución normal (campana de Gauss). Demuestra Gen.gaussian y mapeo de colores."
+    },
+    "colourful-grids": {
+      "label": "Grillas Coloridas",
+      "description": "Grilla con patrones recortados usando clipPath y decisiones probabilísticas con Gen.chance."
+    },
+    "interactive-galaxy": {
+      "label": "Galaxia Interactiva",
+      "description": "Sistema de partículas con efecto de paralaje que sigue al mouse. Demuestra trackCursor y reactividad."
+    },
+    "svjs-generative": {
+      "label": "Generativo Nativo",
+      "description": "Arte generativo usando el nuevo wrapper nativo SvJs."
+    }
+  },
+  "controls": {
+    "speed": "Velocidad",
+    "hoverSpeed": "Velocidad efecto",
+    "animSpeed": "Velocidad animación",
+    "sensitivity": "Sensibilidad wheel",
+    "tilt": "Inclinación",
+    "size": "Tamaño",
+    "cubeColor": "Color cubo",
+    "bobbing": "Flotación",
+    "spacing": "Espaciado",
+    "theme": "Tema",
+    "orbitalSpeed": "Velocidad orbital",
+    "planetScale": "Escala planetas",
+    "cameraHeight": "Altura cámara",
+    "cameraDistance": "Distancia cámara",
+    "gridSize": "Tamaño grilla",
+    "waveSpeed": "Velocidad ola",
+    "waveHeight": "Altura ola",
+    "gap": "Separación",
+    "shape": "Forma",
+    "viewpoint": "Punto de vista",
+    "fov": "Campo de visión",
+    "citySize": "Tamaño ciudad",
+    "maxHeight": "Altura máxima",
+    "density": "Densidad",
+    "cameraSpeed": "Velocidad cámara",
+    "style": "Estilo",
+    "accentColor": "Color acento",
+    "blur": "Blur (px)",
+    "shadowDx": "Sombra dx",
+    "shadowDy": "Sombra dy",
+    "gradient": "Gradiente",
+    "globalSpeed": "Velocidad global",
+    "columns": "Columnas",
+    "rows": "Filas",
+    "dots": "Puntos",
+    "turns": "Vueltas",
+    "maxSize": "Tamaño máx",
+    "bars": "Barras",
+    "circles": "Círculos",
+    "rings": "Anillos",
+    "opacity": "Opacidad",
+    "buildings": "Edificios",
+    "minHeight": "Altura mínima",
+    "particles": "Partículas",
+    "spread": "Dispersión (SD)",
+    "gridSizePx": "Tamaño grilla",
+    "fillChance": "Prob. relleno %",
+    "starCount": "Cantidad estrellas",
+    "iterations": "Iteraciones",
+    "baseHue": "Tono base",
+    "rotation": "Rotación"
+  },
+  "options": {
+    "gems": "Gemas",
+    "warm": "Cálido",
+    "cool": "Frío",
+    "neon": "Neón",
+    "cubes": "Cubos",
+    "spheres": "Esferas",
+    "orbital": "Orbital",
+    "front": "Frontal",
+    "topDown": "Cenital",
+    "side": "Lateral",
+    "cinematic": "Cinemático",
+    "modern": "Moderno",
+    "sunset": "Atardecer",
+    "linear": "Lineal",
+    "radial": "Radial",
+    "slow": "Lenta (4s)",
+    "normal": "Normal (2s)",
+    "fast": "Rápida (0.8s)"
+  },
+  "hoverEffects": {
+    "float": "Levitar",
+    "spin": "Girar",
+    "grow": "Crecer",
+    "color": "Color",
+    "pulse": "Pulsar"
+  },
+  "svgLabels": {
+    "svgShowcase": "SVG Showcase",
+    "gradient": "Gradiente",
+    "blur": "Blur ({{value}}px)",
+    "dropShadow": "Drop Shadow ({{dx}}, {{dy}})",
+    "clipPath": "Clip Path",
+    "mask": "Máscara",
+    "bezierPath": "Curva Bézier",
+    "strokeGradient": "Gradiente de trazo",
+    "svgAnimations": "Animaciones SVG",
+    "pulseOpacity": "Pulso (opacity)",
+    "rotateTransform": "Rotación (transform)",
+    "scaleTransform": "Escala (transform)",
+    "colorCycleFill": "Ciclo de color (fill)",
+    "bounceTranslate": "Rebote (translate)",
+    "combinedRotateOpacity": "Combinado (rotate+opacity)",
+    "nativeAnimationsFooter": "Animaciones SVG nativas — sin JavaScript en el render",
+    "interactiveSvg": "SVG Interactivo",
+    "interactiveSvgSubtitle": "Haz click en las figuras — los eventos se procesan via renderToSVGElement",
+    "clickOnShape": "Haz click en una figura..."
+  },
+  "renderers": {
+    "three": "Three.js",
+    "canvas": "Canvas 2D",
+    "svg": "SVG",
+    "svjs": "SvJs"
+  }
+}

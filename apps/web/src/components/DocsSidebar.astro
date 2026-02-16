@@ -1,4 +1,6 @@
 ---
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from '../i18n';
+
 interface SidebarLink {
   slug: string;
   label: string;
@@ -10,42 +12,44 @@ interface SidebarSection {
   basePath?: string;
 }
 
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 const currentPath = Astro.url.pathname;
 
 const docsSections: SidebarSection[] = [
   {
-    title: "Getting Started",
+    title: t('docs.gettingStarted'),
     items: [
-      { slug: "getting-started", label: "Introduction" },
+      { slug: "getting-started", label: t('docs.sidebar.introduction') },
     ],
   },
   {
-    title: "Core Concepts",
+    title: t('docs.coreConcepts'),
     items: [
-      { slug: "architecture", label: "Architecture" },
-      { slug: "scene-graph", label: "Scene Graph" },
-      { slug: "renderers", label: "Renderers" },
-      { slug: "serialization", label: "Serialization" },
+      { slug: "architecture", label: t('docs.sidebar.architecture') },
+      { slug: "scene-graph", label: t('docs.sidebar.sceneGraph') },
+      { slug: "renderers", label: t('docs.sidebar.renderers') },
+      { slug: "serialization", label: t('docs.sidebar.serialization') },
     ],
   },
   {
-    title: "Reference",
+    title: t('docs.reference'),
     items: [
-      { slug: "api-reference", label: "API Reference" },
+      { slug: "api-reference", label: t('docs.sidebar.apiReference') },
     ],
   },
   {
-    title: "Development",
+    title: t('docs.development'),
     items: [
-      { slug: "contributing", label: "Contributing" },
-      { slug: "programming-principles", label: "Principles" },
+      { slug: "contributing", label: t('docs.sidebar.contributing') },
+      { slug: "programming-principles", label: t('docs.sidebar.principles') },
     ],
   },
 ];
 
 const tutorialSections: SidebarSection[] = [
   {
-    title: "Beginner",
+    title: t('tutorials.beginner'),
     basePath: "/tutorials",
     items: [
       { slug: "01-hello-cube", label: "Hello Cube" },
@@ -54,7 +58,7 @@ const tutorialSections: SidebarSection[] = [
     ],
   },
   {
-    title: "Intermediate",
+    title: t('tutorials.intermediate'),
     basePath: "/tutorials",
     items: [
       { slug: "04-solar-system", label: "Solar System" },
@@ -65,7 +69,7 @@ const tutorialSections: SidebarSection[] = [
     ],
   },
   {
-    title: "Advanced",
+    title: t('tutorials.advanced'),
     basePath: "/tutorials",
     items: [
       { slug: "07-procedural-city", label: "Procedural City" },
@@ -77,7 +81,8 @@ const tutorialSections: SidebarSection[] = [
 
 function isActive(slug: string, basePath?: string): boolean {
   const prefix = basePath || "/docs";
-  return currentPath === `${prefix}/${slug}` || currentPath === `${prefix}/${slug}/`;
+  const localizedPrefix = getLocalizedPath(prefix, locale);
+  return currentPath === `${localizedPrefix}/${slug}` || currentPath === `${localizedPrefix}/${slug}/`;
 }
 
 function renderSections(sections: SidebarSection[], defaultBasePath: string) {
@@ -85,20 +90,20 @@ function renderSections(sections: SidebarSection[], defaultBasePath: string) {
 }
 ---
 
-<aside class="w-72 shrink-0 hidden lg:block">
-  <nav class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-4 pb-8 space-y-6">
+<aside class="w-72 shrink-0 min-h-full bg-base-100 lg:bg-transparent lg:fixed lg:top-20 lg:bottom-0 lg:left-0 lg:w-72">
+  <nav class="max-h-[calc(100vh-6rem)] overflow-y-auto px-4 pb-8 pt-4 lg:pt-0 space-y-6" aria-label={t('docs.navigation')}>
     <!-- Docs sections -->
     <div>
       <a
-        href="/docs"
+        href={getLocalizedPath("/docs", locale)}
         class:list={[
           "text-xs font-display font-bold uppercase tracking-wider mb-4 block",
-          currentPath === "/docs" || currentPath === "/docs/"
+          currentPath === getLocalizedPath("/docs", locale) || currentPath === `${getLocalizedPath("/docs", locale)}/`
             ? "text-primary"
             : "text-base-content/40 hover:text-base-content/70 transition-colors",
         ]}
       >
-        Documentation
+        {t('docs.sidebar.documentation')}
       </a>
       {docsSections.map((section) => (
         <div class="mb-5">
@@ -109,7 +114,7 @@ function renderSections(sections: SidebarSection[], defaultBasePath: string) {
             {section.items.map((item) => (
               <li>
                 <a
-                  href={`/docs/${item.slug}`}
+                  href={getLocalizedPath(`/docs/${item.slug}`, locale)}
                   class:list={[
                     "block text-sm py-1.5 px-3 rounded-lg transition-all duration-200",
                     isActive(item.slug)
@@ -132,29 +137,29 @@ function renderSections(sections: SidebarSection[], defaultBasePath: string) {
     <!-- Tutorials sections -->
     <div>
       <a
-        href="/tutorials"
+        href={getLocalizedPath("/tutorials", locale)}
         class:list={[
           "text-xs font-display font-bold uppercase tracking-wider mb-4 block",
-          currentPath === "/tutorials" || currentPath === "/tutorials/"
+          currentPath === getLocalizedPath("/tutorials", locale) || currentPath === `${getLocalizedPath("/tutorials", locale)}/`
             ? "text-primary"
             : "text-base-content/40 hover:text-base-content/70 transition-colors",
         ]}
       >
-        Tutorials
+        {t('docs.sidebar.tutorials')}
       </a>
       {tutorialSections.map((section) => (
         <div class="mb-5">
           <h4 class="text-xs font-display font-semibold uppercase tracking-wider text-base-content/40 mb-2 pl-3 flex items-center gap-2">
             {section.title}
-            {section.title === "Beginner" && <span class="badge badge-success badge-xs">Easy</span>}
-            {section.title === "Intermediate" && <span class="badge badge-warning badge-xs">Mid</span>}
-            {section.title === "Advanced" && <span class="badge badge-error badge-xs">Hard</span>}
+            {section.title === t('tutorials.beginner') && <span class="badge badge-success badge-xs">Easy</span>}
+            {section.title === t('tutorials.intermediate') && <span class="badge badge-warning badge-xs">Mid</span>}
+            {section.title === t('tutorials.advanced') && <span class="badge badge-error badge-xs">Hard</span>}
           </h4>
           <ul class="space-y-0.5">
             {section.items.map((item) => (
               <li>
                 <a
-                  href={`/tutorials/${item.slug}`}
+                  href={getLocalizedPath(`/tutorials/${item.slug}`, locale)}
                   class:list={[
                     "block text-sm py-1.5 px-3 rounded-lg transition-all duration-200",
                     isActive(item.slug, "/tutorials")

@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "docs": "ドキュメント",
+    "examples": "サンプル",
+    "tutorials": "チュートリアル"
+  },
+  "hero": {
+    "badge": "v0.3.0 — SVGインタラクティブ＆ジェネラティブアート",
+    "heading1": "エンジン非依存",
+    "heading2": "2D/3Dグラフィックス",
+    "heading3": "Web向け",
+    "subtitle": "グラフィックスロジックをレンダリングエンジンから分離するTypeScriptファーストのシーングラフライブラリ。一度構築すれば、どこでもレンダリング。",
+    "cta": "はじめる",
+    "github": "GitHub"
+  },
+  "features": {
+    "sectionTitle": "<span>モダングラフィックス</span>のために構築",
+    "sectionSubtitle": "レンダリングエンジンを自由に選択できる柔軟性を備えた、美しい2D・3Dグラフィックスアプリケーション構築に必要なすべて。",
+    "engineAgnostic": "エンジン非依存",
+    "engineAgnosticDesc": "1つのシーングラフ、複数のレンダラー。グラフィックスロジックをレンダリングエンジンから分離し、バックエンド間を自由に切り替え。",
+    "typescriptFirst": "TypeScriptファースト",
+    "typescriptFirstDesc": "完全な型定義、インテリジェントな自動補完、完全な型安全性。TypeScriptでゼロから構築。",
+    "sceneGraph": "シーングラフ",
+    "sceneGraphDesc": "ジオメトリ、マテリアル、カメラ、トランスフォームなどのアタッチ可能なコンポーネントを持つ階層的ノードベースアーキテクチャ。",
+    "threeRenderer": "Three.jsレンダラー",
+    "threeRendererDesc": "Three.jsによる完全なWebGL 3Dレンダリング。カメラ、ライティング、マテリアル、glTFモデル読み込みをサポート。",
+    "svgRenderer": "SVGレンダラー",
+    "svgRendererDesc": "ジェネラティブアート、データビジュアライゼーション、インタラクティブダイアグラムに最適な軽量2Dベクターグラフィックス。",
+    "serialization": "シリアライゼーション",
+    "serializationDesc": "JSON形式でシーン全体を保存・読み込み。エディター、永続化、シーン構成の共有に最適。"
+  },
+  "renderers": {
+    "sectionTitle": "1つのシーングラフ、<span>複数のレンダラー</span>",
+    "sectionSubtitle": "シーンロジックを一度だけ記述。Three.jsで没入型3D WebGL体験、またはSVGで軽量でスケーラブルな2Dベクターグラフィックスをレンダリング。",
+    "threeTitle": "Three.jsレンダラー",
+    "threeDesc": "Three.jsとWebGLによる完全な3Dレンダリング。透視投影・正投影カメラ、PBRマテリアル、glTFモデル読み込み、リアルタイムインタラクションイベントをサポート。",
+    "svgTitle": "SVGレンダラー",
+    "svgDesc": "軽量ベクターグラフィックスレンダリング。ジェネラティブアート、データビジュアライゼーション、インタラクティブダイアグラム、CSSスタイリング対応の解像度非依存グラフィックスに最適。",
+    "swapNote": "同じシーングラフ — レンダラーを交換するだけ"
+  },
+  "code": {
+    "sectionTitle": "シンプルで<span>パワフル</span>なAPI",
+    "sectionSubtitle": "直感的なTypeScriptファーストAPIでシーンを作成。ノードを追加し、コンポーネントをアタッチし、お好みのエンジンでレンダリング — すべて数行のコードで。",
+    "highlight1": "ノードベースアーキテクチャによる階層的シーングラフ",
+    "highlight2": "アタッチ可能なコンポーネント：ジオメトリ、マテリアル、カメラ",
+    "highlight3": "シーンロジックを変更せずにレンダラーを交換",
+    "highlight4": "組み込みプリミティブ：box、sphere、cylinder、plane"
+  },
+  "getStarted": {
+    "sectionTitle": "<span>始める</span>準備はできましたか？",
+    "sectionSubtitle": "コアパッケージとお好みのレンダラーをインストール。1分以内に最初のシーンをレンダリングできます。",
+    "step1": "パッケージをインストール",
+    "step2": "シーンを作成",
+    "step3": "ドキュメントを探索",
+    "readDocs": "ドキュメントを読む"
+  },
+  "footer": {
+    "tagline": "モダンWeb向けエンジン非依存2D/3Dグラフィックスライブラリ。",
+    "documentation": "ドキュメント",
+    "gettingStarted": "はじめに",
+    "architecture": "アーキテクチャ",
+    "apiReference": "APIリファレンス",
+    "tutorials": "チュートリアル",
+    "packages": "パッケージ",
+    "community": "コミュニティ",
+    "issues": "イシュー",
+    "contributing": "コントリビュート"
+  },
+  "docs": {
+    "title": "ドキュメント",
+    "subtitle": "Oroya Animateのエンジン非依存シーングラフで2D・3Dグラフィックスアプリケーションを構築する方法を学びましょう。",
+    "gettingStarted": "はじめに",
+    "coreConcepts": "コアコンセプト",
+    "reference": "リファレンス",
+    "development": "開発",
+    "previous": "前へ",
+    "next": "次へ",
+    "navigation": "ナビゲーション",
+    "sidebar": {
+      "documentation": "ドキュメント",
+      "tutorials": "チュートリアル",
+      "introduction": "イントロダクション",
+      "architecture": "アーキテクチャ",
+      "sceneGraph": "シーングラフ",
+      "renderers": "レンダラー",
+      "serialization": "シリアライゼーション",
+      "apiReference": "APIリファレンス",
+      "contributing": "コントリビュート",
+      "principles": "原則"
+    }
+  },
+  "tutorials": {
+    "title": "チュートリアル",
+    "subtitle": "最初の3Dシーンから高度なジェネラティブアート、マルチレンダラーテクニックまで、Oroya Animateをステップバイステップで学びましょう。",
+    "beginner": "初級",
+    "beginnerDesc": "Oroya Animateが初めての方はここから。",
+    "intermediate": "中級",
+    "intermediateDesc": "より複雑なシーンとレンダラーで基礎を発展させましょう。",
+    "advanced": "上級",
+    "advancedDesc": "プロシージャル生成とマルチレンダラーパターンで限界に挑戦。",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "examples": {
+    "badge": "ライブデモ",
+    "title": "インタラクティブ<span>サンプル</span>",
+    "subtitle": "Oroya Animateの機能を実演するインタラクティブなサンプルを探索。各デモはブラウザ内でリアルタイムに実行されます。",
+    "ctaText": "もっとサンプルを見たい、または自分で作りたいですか？",
+    "getStarted": "はじめる",
+    "viewOnGitHub": "GitHubで見る"
+  },
+  "i18n": {
+    "translationPending": "このコンテンツはまだお使いの言語では利用できません。英語版を表示しています。",
+    "switchLanguage": "言語を切り替え"
+  }
+}

@@ -151,6 +151,25 @@
   color: oklch(0.75 0.12 265);
 }
 
+/* Skip to content link (a11y) */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary, oklch(0.6 0.2 265));
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0 0 0.5rem 0;
+  text-decoration: none;
+}
+
+.skip-to-content:focus {
+  left: 0;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

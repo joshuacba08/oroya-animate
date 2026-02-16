@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { ControlDef, ParamValues } from '../types';
 
 /* ── Styles ───────────────────────────────────────────────────────────── */
@@ -105,15 +106,18 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ controls, params, onChange }: ControlPanelProps) {
+  const { t } = useTranslation();
   if (controls.length === 0) return null;
 
   return (
     <div style={panelStyles} className="glass-panel">
-      <div style={titleStyles}>Controles</div>
+      <div style={titleStyles}>{t('common:controls.title')}</div>
       {controls.map((ctrl) => (
         <div key={ctrl.key} style={rowStyles}>
-          <label style={labelStyles}>{ctrl.label}</label>
-          {renderControl(ctrl, params, onChange)}
+          <label style={labelStyles}>
+            {t(`demo:controls.${ctrl.key}`, { defaultValue: ctrl.label })}
+          </label>
+          {renderControl(ctrl, params, onChange, t)}
         </div>
       ))}
     </div>
@@ -124,6 +128,7 @@ function renderControl(
   ctrl: ControlDef,
   params: ParamValues,
   onChange: ControlPanelProps['onChange'],
+  t: (key: string, opts?: Record<string, unknown>) => string,
 ) {
   switch (ctrl.type) {
     case 'slider':
@@ -164,7 +169,7 @@ function renderControl(
         >
           {ctrl.options.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {t(`demo:options.${opt.value}`, { defaultValue: opt.label })}
             </option>
           ))}
         </select>

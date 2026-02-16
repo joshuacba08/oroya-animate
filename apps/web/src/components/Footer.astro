@@ -1,4 +1,8 @@
 ---
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from '../i18n';
+
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 const currentYear = new Date().getFullYear();
 ---
 
@@ -7,31 +11,31 @@ const currentYear = new Date().getFullYear();
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
       <!-- Brand -->
       <div class="md:col-span-1">
-        <a href="/" class="flex items-center gap-2 text-lg font-display font-bold mb-3">
+        <a href={getLocalizedPath("/", locale)} class="flex items-center gap-2 text-lg font-display font-bold mb-3">
           <div class="w-7 h-7 rounded-md bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
             O
           </div>
           Oroya Animate
         </a>
         <p class="text-sm text-base-content/50 leading-relaxed">
-          Engine-agnostic 2D/3D graphics library for the modern web.
+          {t('footer.tagline')}
         </p>
       </div>
 
       <!-- Docs -->
       <div>
-        <h4 class="font-display font-semibold text-sm mb-3">Documentation</h4>
+        <h4 class="font-display font-semibold text-sm mb-3">{t('footer.documentation')}</h4>
         <ul class="space-y-2 text-sm text-base-content/50">
-          <li><a href="/docs/getting-started" class="hover:text-base-content transition-colors">Getting Started</a></li>
-          <li><a href="/docs/architecture" class="hover:text-base-content transition-colors">Architecture</a></li>
-          <li><a href="/docs/api-reference" class="hover:text-base-content transition-colors">API Reference</a></li>
-          <li><a href="/docs/tutorials" class="hover:text-base-content transition-colors">Tutorials</a></li>
+          <li><a href={getLocalizedPath("/docs/getting-started", locale)} class="hover:text-base-content transition-colors">{t('footer.gettingStarted')}</a></li>
+          <li><a href={getLocalizedPath("/docs/architecture", locale)} class="hover:text-base-content transition-colors">{t('footer.architecture')}</a></li>
+          <li><a href={getLocalizedPath("/docs/api-reference", locale)} class="hover:text-base-content transition-colors">{t('footer.apiReference')}</a></li>
+          <li><a href={getLocalizedPath("/docs/tutorials", locale)} class="hover:text-base-content transition-colors">{t('footer.tutorials')}</a></li>
         </ul>
       </div>
 
       <!-- Packages -->
       <div>
-        <h4 class="font-display font-semibold text-sm mb-3">Packages</h4>
+        <h4 class="font-display font-semibold text-sm mb-3">{t('footer.packages')}</h4>
         <ul class="space-y-2 text-sm text-base-content/50">
           <li><a href="https://www.npmjs.com/package/@oroya/core" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/core</a></li>
           <li><a href="https://www.npmjs.com/package/@oroya/renderer-three" target="_blank" rel="noopener" class="hover:text-base-content transition-colors font-mono">@oroya/renderer-three</a></li>
@@ -42,11 +46,11 @@ const currentYear = new Date().getFullYear();
 
       <!-- Community -->
       <div>
-        <h4 class="font-display font-semibold text-sm mb-3">Community</h4>
+        <h4 class="font-display font-semibold text-sm mb-3">{t('footer.community')}</h4>
         <ul class="space-y-2 text-sm text-base-content/50">
           <li><a href="https://github.com/andersonur/oroya-animate" target="_blank" rel="noopener" class="hover:text-base-content transition-colors">GitHub</a></li>
-          <li><a href="https://github.com/andersonur/oroya-animate/issues" target="_blank" rel="noopener" class="hover:text-base-content transition-colors">Issues</a></li>
-          <li><a href="/docs/contributing" class="hover:text-base-content transition-colors">Contributing</a></li>
+          <li><a href="https://github.com/andersonur/oroya-animate/issues" target="_blank" rel="noopener" class="hover:text-base-content transition-colors">{t('footer.issues')}</a></li>
+          <li><a href={getLocalizedPath("/docs/contributing", locale)} class="hover:text-base-content transition-colors">{t('footer.contributing')}</a></li>
         </ul>
       </div>
     </div>

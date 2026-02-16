@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.0.0",
+    "@astrojs/sitemap": "^3.7.0",
     "@oroya/core": "workspace:*",
     "@oroya/renderer-svg": "workspace:^",
     "@oroya/renderer-three": "workspace:*",

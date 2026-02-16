@@ -1,0 +1,93 @@
+---
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import { getCollection } from "astro:content";
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../../i18n";
+
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
+
+const tutorials = await getCollection("tutorials");
+const sorted = tutorials.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+
+const levels = [
+  {
+    key: "beginner" as const,
+    title: t('tutorials.beginner'),
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
+    iconColor: "text-success",
+    badge: "badge-success",
+    description: t('tutorials.beginnerDesc'),
+  },
+  {
+    key: "intermediate" as const,
+    title: t('tutorials.intermediate'),
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',
+    iconColor: "text-warning",
+    badge: "badge-warning",
+    description: t('tutorials.intermediateDesc'),
+  },
+  {
+    key: "advanced" as const,
+    title: t('tutorials.advanced'),
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    iconColor: "text-error",
+    badge: "badge-error",
+    description: t('tutorials.advancedDesc'),
+  },
+];
+---
+
+<DocsLayout title={t('tutorials.title')} description={t('tutorials.subtitle')}>
+  {locale !== 'en' && (
+    <div class="alert alert-info mb-8">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>{t('i18n.translationPending')}</span>
+    </div>
+  )}
+
+  <h1>{t('tutorials.title')}</h1>
+  <p class="text-lg text-base-content/60 mb-12">
+    {t('tutorials.subtitle')}
+  </p>
+
+  {levels.map((level) => {
+    const levelTutorials = sorted.filter((t) => t.data.level === level.key);
+    if (levelTutorials.length === 0) return null;
+    return (
+      <section class="mb-10">
+        <h2 class="flex items-center gap-2 not-prose">
+          <span class:list={[level.iconColor, "shrink-0"]} set:html={level.icon} />
+          {level.title}
+        </h2>
+        <p class="text-sm text-base-content/50 mb-4 not-prose">{level.description}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
+          {levelTutorials.map((tutorial, i) => (
+            <a
+              href={getLocalizedPath(`/tutorials/${tutorial.id}`, locale)}
+              class="glass-card rounded-xl p-5 group block no-underline"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-display font-semibold text-base-content group-hover:text-primary transition-colors">
+                  {tutorial.data.title}
+                </h3>
+                <div class="flex items-center gap-2 shrink-0">
+                  {tutorial.data.duration && (
+                    <span class="text-xs text-base-content/40 font-mono">
+                      {tutorial.data.duration}
+                    </span>
+                  )}
+                  <span class={`badge ${level.badge} badge-xs`}>
+                    {level.key}
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-base-content/50 leading-relaxed">
+                {tutorial.data.description}
+              </p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+</DocsLayout>

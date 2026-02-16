@@ -5,7 +5,7 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
     id: 'svjs-generative',
     label: 'Generative Native',
     description: 'Generative art using the new SvJs native wrapper.',
-    renderer: 'svjs',
+    renderer: 'svg',
     controls: [
         { type: 'slider', key: 'iterations', label: 'Iterations', min: 10, max: 200, step: 1, defaultValue: 50, rebuild: true },
         { type: 'slider', key: 'hue', label: 'Base Hue', min: 0, max: 360, step: 1, defaultValue: 180, rebuild: true },

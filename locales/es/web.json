@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "docs": "Documentación",
+    "examples": "Ejemplos",
+    "tutorials": "Tutoriales"
+  },
+  "hero": {
+    "badge": "v0.3.0 — SVG Interactivo y Arte Generativo",
+    "heading1": "Agnóstico de Motor",
+    "heading2": "Gráficos 2D/3D",
+    "heading3": "para la Web",
+    "subtitle": "Una librería de grafos de escena TypeScript-first que desacopla tu lógica gráfica del motor de renderizado. Construye una vez, renderiza en cualquier lugar.",
+    "cta": "Comenzar",
+    "github": "GitHub"
+  },
+  "features": {
+    "sectionTitle": "Construido para <span>Gráficos Modernos</span>",
+    "sectionSubtitle": "Todo lo que necesitas para crear impresionantes aplicaciones gráficas 2D y 3D, con la flexibilidad de elegir tu motor de renderizado.",
+    "engineAgnostic": "Agnóstico de Motor",
+    "engineAgnosticDesc": "Un grafo de escena, múltiples renderers. Desacopla tu lógica gráfica del motor de renderizado y cambia libremente entre backends.",
+    "typescriptFirst": "TypeScript-First",
+    "typescriptFirstDesc": "Definiciones de tipos completas, autocompletado inteligente y seguridad de tipos total. Escrito en TypeScript desde cero.",
+    "sceneGraph": "Grafo de Escena",
+    "sceneGraphDesc": "Arquitectura jerárquica basada en nodos con componentes acoplables: geometría, materiales, cámaras, transformaciones y más.",
+    "threeRenderer": "Renderer Three.js",
+    "threeRendererDesc": "Renderizado WebGL 3D completo con Three.js. Soporte para cámaras, iluminación, materiales y carga de modelos glTF.",
+    "svgRenderer": "Renderer SVG",
+    "svgRendererDesc": "Gráficos vectoriales 2D ligeros, perfectos para arte generativo, visualización de datos y diagramas interactivos.",
+    "serialization": "Serialización",
+    "serializationDesc": "Guarda y carga escenas completas en formato JSON. Perfecto para editores, persistencia y compartir configuraciones."
+  },
+  "renderers": {
+    "sectionTitle": "Un Grafo de Escena, <span>Múltiples Renderers</span>",
+    "sectionSubtitle": "Escribe tu lógica de escena una vez. Renderiza con Three.js para experiencias 3D WebGL inmersivas, o SVG para gráficos vectoriales 2D ligeros y escalables.",
+    "threeTitle": "Renderer Three.js",
+    "threeDesc": "Renderizado 3D completo con Three.js y WebGL. Soporte para cámaras perspectiva y ortográficas, materiales PBR, carga de modelos glTF y eventos de interacción en tiempo real.",
+    "svgTitle": "Renderer SVG",
+    "svgDesc": "Renderizado de gráficos vectoriales ligeros. Perfecto para arte generativo, visualización de datos, diagramas interactivos y gráficos independientes de resolución con soporte CSS.",
+    "swapNote": "Mismo grafo de escena — solo cambia el renderer"
+  },
+  "code": {
+    "sectionTitle": "API Simple y <span>Potente</span>",
+    "sectionSubtitle": "Crea escenas con una API intuitiva TypeScript-first. Agrega nodos, acopla componentes y renderiza con el motor de tu elección — todo en pocas líneas de código.",
+    "highlight1": "Grafo de escena jerárquico con arquitectura basada en nodos",
+    "highlight2": "Componentes acoplables: geometría, materiales, cámaras",
+    "highlight3": "Cambia renderers sin modificar la lógica de escena",
+    "highlight4": "Primitivas integradas: box, sphere, cylinder, plane"
+  },
+  "getStarted": {
+    "sectionTitle": "¿Listo para <span>Comenzar</span>?",
+    "sectionSubtitle": "Instala el paquete core y tu renderer preferido. Estarás renderizando tu primera escena en menos de un minuto.",
+    "step1": "Instalar paquetes",
+    "step2": "Crear una escena",
+    "step3": "Explorar la documentación",
+    "readDocs": "Leer la Documentación"
+  },
+  "footer": {
+    "tagline": "Librería de gráficos 2D/3D agnóstica de motor para la web moderna.",
+    "documentation": "Documentación",
+    "gettingStarted": "Primeros Pasos",
+    "architecture": "Arquitectura",
+    "apiReference": "Referencia API",
+    "tutorials": "Tutoriales",
+    "packages": "Paquetes",
+    "community": "Comunidad",
+    "issues": "Issues",
+    "contributing": "Contribuir"
+  },
+  "docs": {
+    "title": "Documentación",
+    "subtitle": "Aprende a construir aplicaciones gráficas 2D y 3D con el grafo de escena agnóstico de Oroya Animate.",
+    "gettingStarted": "Primeros Pasos",
+    "coreConcepts": "Conceptos Fundamentales",
+    "reference": "Referencia",
+    "development": "Desarrollo",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "navigation": "Navegación",
+    "sidebar": {
+      "documentation": "Documentación",
+      "tutorials": "Tutoriales",
+      "introduction": "Introducción",
+      "architecture": "Arquitectura",
+      "sceneGraph": "Grafo de Escena",
+      "renderers": "Renderers",
+      "serialization": "Serialización",
+      "apiReference": "Referencia API",
+      "contributing": "Contribuir",
+      "principles": "Principios"
+    }
+  },
+  "tutorials": {
+    "title": "Tutoriales",
+    "subtitle": "Aprende Oroya Animate paso a paso, desde tu primera escena 3D hasta arte generativo avanzado y técnicas multi-renderer.",
+    "beginner": "Principiante",
+    "beginnerDesc": "Empieza aquí si eres nuevo en Oroya Animate.",
+    "intermediate": "Intermedio",
+    "intermediateDesc": "Amplía los conceptos básicos con escenas y renderers más complejos.",
+    "advanced": "Avanzado",
+    "advancedDesc": "Lleva al límite con generación procedural y patrones multi-renderer.",
+    "previous": "Anterior",
+    "next": "Siguiente"
+  },
+  "examples": {
+    "badge": "Demos en Vivo",
+    "title": "Ejemplos <span>Interactivos</span>",
+    "subtitle": "Explora ejemplos interactivos que demuestran las capacidades de Oroya Animate. Cada demo se ejecuta en tiempo real directamente en tu navegador.",
+    "ctaText": "¿Quieres ver más ejemplos o crear el tuyo propio?",
+    "getStarted": "Comenzar",
+    "viewOnGitHub": "Ver en GitHub"
+  },
+  "i18n": {
+    "translationPending": "Este contenido aún no está disponible en tu idioma. Mostrando la versión en inglés.",
+    "switchLanguage": "Cambiar idioma"
+  }
+}

@@ -1,6 +1,9 @@
 ---
 import DocsLayout from "../../layouts/DocsLayout.astro";
 import { getCollection, render } from "astro:content";
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../i18n";
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 
 export async function getStaticPaths() {
   const docs = await getCollection("docs");
@@ -28,10 +31,10 @@ const nextDoc = currentIndex < sortedDocs.length - 1 ? sortedDocs[currentIndex +
   <div slot="pagination" class="flex justify-between gap-4">
     {prevDoc ? (
       <a
-        href={`/docs/${prevDoc.id}`}
+        href={getLocalizedPath(`/docs/${prevDoc.id}`, locale)}
         class="glass-card rounded-xl p-4 flex-1 group no-underline max-w-[50%]"
       >
-        <span class="text-xs text-base-content/40 font-display">Previous</span>
+        <span class="text-xs text-base-content/40 font-display">{t('docs.previous')}</span>
         <p class="text-sm font-display font-semibold text-base-content/80 group-hover:text-primary transition-colors mt-1">
           ← {prevDoc.data.title}
         </p>
@@ -40,10 +43,10 @@ const nextDoc = currentIndex < sortedDocs.length - 1 ? sortedDocs[currentIndex +
 
     {nextDoc ? (
       <a
-        href={`/docs/${nextDoc.id}`}
+        href={getLocalizedPath(`/docs/${nextDoc.id}`, locale)}
         class="glass-card rounded-xl p-4 flex-1 group no-underline text-right max-w-[50%]"
       >
-        <span class="text-xs text-base-content/40 font-display">Next</span>
+        <span class="text-xs text-base-content/40 font-display">{t('docs.next')}</span>
         <p class="text-sm font-display font-semibold text-base-content/80 group-hover:text-primary transition-colors mt-1">
           {nextDoc.data.title} →
         </p>

@@ -1,0 +1,195 @@
+{
+  "scenes": {
+    "interactive-demo": {
+      "label": "Interactive Demo",
+      "description": "Interactive objects with click, hover, color change and animation. Demonstrates the event system and Interactive component."
+    },
+    "hover-showcase": {
+      "label": "Hover Showcase",
+      "description": "5 different hover effects: float, spin, grow, color change and pulse. Each object uses a different CSS cursor (pointer, grab, zoom-in, crosshair, cell)."
+    },
+    "click-playground": {
+      "label": "Click Playground",
+      "description": "Click counter, toggle on/off, press effect (pointerdown/up), color cycling and explode/regroup. Demonstrates click, pointerdown and pointerup."
+    },
+    "wheel-bubbling": {
+      "label": "Wheel & Bubbling",
+      "description": "Mouse wheel to scale objects, event bubbling parent→child with stopPropagation(), and pointer tracking with pointermove. Demonstrates wheel, bubbling and pointermove."
+    },
+    "hello-cube": {
+      "label": "Hello Cube",
+      "description": "A 3D cube with smooth quaternion rotation. Demonstrates basic scene, camera and geometry setup."
+    },
+    "color-palette": {
+      "label": "Color Palette",
+      "description": "Geometric shapes with different forms, colors and speeds. Shows createBox, createSphere and color themes."
+    },
+    "solar-system": {
+      "label": "Solar System",
+      "description": "Planetary system with hierarchical orbits using parent-child pivot nodes. Demonstrates nested transforms."
+    },
+    "shape-grid": {
+      "label": "Shape Grid",
+      "description": "Procedural grid with sinusoidal wave and position-based colors. Demonstrates procedural generation and massive animation."
+    },
+    "camera-viewpoints": {
+      "label": "Camera Viewpoints",
+      "description": "Multiple viewpoints (orbital, front, top-down, side) over a scene with pillars and spheres. Demonstrates camera positioning and animation."
+    },
+    "procedural-city": {
+      "label": "Procedural City",
+      "description": "Algorithmically generated city with buildings, central park and landmark tower. Demonstrates procedural generation and hierarchical grouping."
+    },
+    "svg-showcase": {
+      "label": "SVG Showcase",
+      "description": "Visual catalog of SVG capabilities: linear/radial gradients, filters (blur, drop-shadow), clip-path, mask, Bézier paths, text and stroke gradient."
+    },
+    "svg-animations": {
+      "label": "SVG Animations",
+      "description": "Declarative native SVG animations without JavaScript: pulse (opacity), rotate, scale, color cycle, bounce (translate) and combined. Uses <animate> and <animateTransform>."
+    },
+    "svg-interactive": {
+      "label": "SVG Interactive",
+      "description": "Grid of interactive SVG shapes with click and hover events. Uses renderToSVGElement with the Interactive component for event delegation."
+    },
+    "colour-spiral": {
+      "label": "Colour Spiral",
+      "description": "Procedurally generated colorful dot spiral. Demonstrates createSphere, fill with color palette and polar positioning."
+    },
+    "gradient-gallery": {
+      "label": "Gradient Gallery",
+      "description": "Bars with vertical linear gradients and circles with radial gradients. Demonstrates linear and radial fillGradient."
+    },
+    "circle-overlay": {
+      "label": "Circle Overlay",
+      "description": "Translucent overlapping circles creating depth. Demonstrates opacity, strokeGradient and visual composition."
+    },
+    "porto-pareto": {
+      "label": "Porto Pareto",
+      "description": "Generative cityscape using Pareto distribution for building heights. Demonstrates Gen.pareto and constraints."
+    },
+    "gaussian-dist": {
+      "label": "Gaussian Distribution",
+      "description": "Normal distribution (bell curve) visualization. Demonstrates Gen.gaussian and color mapping."
+    },
+    "colourful-grids": {
+      "label": "Colourful Grids",
+      "description": "Grid with clipped patterns using clipPath and probabilistic decisions with Gen.chance."
+    },
+    "interactive-galaxy": {
+      "label": "Interactive Galaxy",
+      "description": "Particle system with parallax effect following the mouse. Demonstrates trackCursor and reactivity."
+    },
+    "svjs-generative": {
+      "label": "Generative Native",
+      "description": "Generative art using the new SvJs native wrapper."
+    }
+  },
+  "controls": {
+    "speed": "Speed",
+    "hoverSpeed": "Effect speed",
+    "animSpeed": "Animation speed",
+    "sensitivity": "Wheel sensitivity",
+    "tilt": "Tilt",
+    "size": "Size",
+    "cubeColor": "Cube color",
+    "bobbing": "Bobbing",
+    "spacing": "Spacing",
+    "theme": "Theme",
+    "orbitalSpeed": "Orbital speed",
+    "planetScale": "Planet scale",
+    "cameraHeight": "Camera height",
+    "cameraDistance": "Camera distance",
+    "gridSize": "Grid size",
+    "waveSpeed": "Wave speed",
+    "waveHeight": "Wave height",
+    "gap": "Gap",
+    "shape": "Shape",
+    "viewpoint": "Viewpoint",
+    "fov": "Field of view",
+    "citySize": "City size",
+    "maxHeight": "Max height",
+    "density": "Density",
+    "cameraSpeed": "Camera speed",
+    "style": "Style",
+    "accentColor": "Accent color",
+    "blur": "Blur (px)",
+    "shadowDx": "Shadow dx",
+    "shadowDy": "Shadow dy",
+    "gradient": "Gradient",
+    "globalSpeed": "Global speed",
+    "columns": "Columns",
+    "rows": "Rows",
+    "dots": "Dots",
+    "turns": "Turns",
+    "maxSize": "Max size",
+    "bars": "Bars",
+    "circles": "Circles",
+    "rings": "Rings",
+    "opacity": "Opacity",
+    "buildings": "Buildings",
+    "minHeight": "Min Height",
+    "particles": "Particles",
+    "spread": "Spread (SD)",
+    "gridSizePx": "Grid Size",
+    "fillChance": "Fill Chance %",
+    "starCount": "Star Count",
+    "iterations": "Iterations",
+    "baseHue": "Base Hue",
+    "rotation": "Rotation"
+  },
+  "options": {
+    "gems": "Gems",
+    "warm": "Warm",
+    "cool": "Cool",
+    "neon": "Neon",
+    "cubes": "Cubes",
+    "spheres": "Spheres",
+    "orbital": "Orbital",
+    "front": "Front",
+    "topDown": "Top-down",
+    "side": "Side",
+    "cinematic": "Cinematic",
+    "modern": "Modern",
+    "sunset": "Sunset",
+    "linear": "Linear",
+    "radial": "Radial",
+    "slow": "Slow (4s)",
+    "normal": "Normal (2s)",
+    "fast": "Fast (0.8s)"
+  },
+  "hoverEffects": {
+    "float": "Float",
+    "spin": "Spin",
+    "grow": "Grow",
+    "color": "Color",
+    "pulse": "Pulse"
+  },
+  "svgLabels": {
+    "svgShowcase": "SVG Showcase",
+    "gradient": "Gradient",
+    "blur": "Blur ({{value}}px)",
+    "dropShadow": "Drop Shadow ({{dx}}, {{dy}})",
+    "clipPath": "Clip Path",
+    "mask": "Mask",
+    "bezierPath": "Bézier Path",
+    "strokeGradient": "Stroke Gradient",
+    "svgAnimations": "SVG Animations",
+    "pulseOpacity": "Pulse (opacity)",
+    "rotateTransform": "Rotate (transform)",
+    "scaleTransform": "Scale (transform)",
+    "colorCycleFill": "Color cycle (fill)",
+    "bounceTranslate": "Bounce (translate)",
+    "combinedRotateOpacity": "Combined (rotate+opacity)",
+    "nativeAnimationsFooter": "Native SVG animations — no JavaScript in the render",
+    "interactiveSvg": "Interactive SVG",
+    "interactiveSvgSubtitle": "Click on the shapes — events are processed via renderToSVGElement",
+    "clickOnShape": "Click on a shape..."
+  },
+  "renderers": {
+    "three": "Three.js",
+    "canvas": "Canvas 2D",
+    "svg": "SVG",
+    "svjs": "SvJs"
+  }
+}

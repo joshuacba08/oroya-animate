@@ -1,20 +1,28 @@
 ---
 import "../assets/app.css";
 import CopyCodeInit from "../components/CopyCodeInit.astro";
+import { getLocaleFromUrl, supportedLocales, getLocalizedPath } from "../i18n";
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
 
 const {
   title = "Oroya Animate — Engine-Agnostic 2D/3D Graphics for the Web",
   description = "A TypeScript-first scene graph library that decouples your graphics logic from the rendering engine. Build once, render anywhere.",
+  image = "/og-image.png",
 } = Astro.props;
+
+const locale = getLocaleFromUrl(Astro.url);
+const siteUrl = import.meta.env.SITE || "https://oroya-animate.vercel.app";
+const canonicalURL = new URL(Astro.url.pathname, siteUrl);
+const ogImageURL = new URL(image, siteUrl);
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang={locale} data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,25 +42,55 @@ const {
       })();
     </script>
 
-    <!-- Fonts -->
+    <!-- Fonts: non-blocking load with media swap trick -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Alternate language links (hreflang) -->
+    {supportedLocales.map((loc) => (
+      <link
+        rel="alternate"
+        hreflang={loc}
+        href={new URL(getLocalizedPath(Astro.url.pathname, loc), siteUrl)}
+      />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={new URL(getLocalizedPath(Astro.url.pathname, 'en'), siteUrl)} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
 
     <title>{title}</title>
   </head>
   <body class="min-h-screen bg-base-100 font-sans text-base-content bg-grid">
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
     <!-- Global background gradient blobs -->
     <div class="fixed inset-0 -z-10 overflow-hidden">
       <div class="bg-blob w-[600px] h-[600px] bg-primary/10 top-[-10%] left-[15%]"></div>

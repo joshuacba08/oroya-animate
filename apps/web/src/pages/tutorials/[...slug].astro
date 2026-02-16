@@ -1,6 +1,9 @@
 ---
 import DocsLayout from "../../layouts/DocsLayout.astro";
 import { getCollection, render } from "astro:content";
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../i18n";
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 
 export async function getStaticPaths() {
   const tutorials = await getCollection("tutorials");
@@ -21,9 +24,9 @@ const prevTutorial = currentIndex > 0 ? sorted[currentIndex - 1] : null;
 const nextTutorial = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : null;
 
 const levelBadge = {
-  beginner: { class: "badge-success", label: "Beginner" },
-  intermediate: { class: "badge-warning", label: "Intermediate" },
-  advanced: { class: "badge-error", label: "Advanced" },
+  beginner: { class: "badge-success", label: t('tutorials.beginner') },
+  intermediate: { class: "badge-warning", label: t('tutorials.intermediate') },
+  advanced: { class: "badge-error", label: t('tutorials.advanced') },
 };
 const badge = levelBadge[entry.data.level ?? "beginner"];
 ---
@@ -49,10 +52,10 @@ const badge = levelBadge[entry.data.level ?? "beginner"];
   <div slot="pagination" class="flex justify-between gap-4">
     {prevTutorial ? (
       <a
-        href={`/tutorials/${prevTutorial.id}`}
+        href={getLocalizedPath(`/tutorials/${prevTutorial.id}`, locale)}
         class="glass-card rounded-xl p-4 flex-1 group no-underline max-w-[50%]"
       >
-        <span class="text-xs text-base-content/40 font-display">Previous</span>
+        <span class="text-xs text-base-content/40 font-display">{t('tutorials.previous')}</span>
         <p class="text-sm font-display font-semibold text-base-content/80 group-hover:text-primary transition-colors mt-1">
           ← {prevTutorial.data.title}
         </p>
@@ -61,10 +64,10 @@ const badge = levelBadge[entry.data.level ?? "beginner"];
 
     {nextTutorial ? (
       <a
-        href={`/tutorials/${nextTutorial.id}`}
+        href={getLocalizedPath(`/tutorials/${nextTutorial.id}`, locale)}
         class="glass-card rounded-xl p-4 flex-1 group no-underline text-right max-w-[50%]"
       >
-        <span class="text-xs text-base-content/40 font-display">Next</span>
+        <span class="text-xs text-base-content/40 font-display">{t('tutorials.next')}</span>
         <p class="text-sm font-display font-semibold text-base-content/80 group-hover:text-primary transition-colors mt-1">
           {nextTutorial.data.title} →
         </p>

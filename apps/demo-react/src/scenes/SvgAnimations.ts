@@ -3,6 +3,7 @@ import {
   createBox, createSphere, createPath2D, createText,
 } from '@oroya/core';
 import type { Path2DCommand } from '@oroya/core';
+import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 
 /* ── Controls ─────────────────────────────────────────────────────────── */
@@ -35,9 +36,11 @@ export function createSvgAnimationsScene(params: ParamValues) {
   }));
   scene.add(cam);
 
+  const t = i18next.t.bind(i18next);
+
   // ── Title ──────────────────────────────────────────────────────────
   const title = new Node('title');
-  title.addComponent(createText('SVG Animations', {
+  title.addComponent(createText(t('demo:svgLabels.svgAnimations'), {
     fontSize: 30, fontFamily: 'system-ui, sans-serif',
     fontWeight: 'bold', textAnchor: 'middle',
   }));
@@ -71,7 +74,7 @@ export function createSvgAnimationsScene(params: ParamValues) {
   pulse.transform.updateLocalMatrix();
   scene.add(pulse);
 
-  addLabel(scene, 'Pulse (opacity)', 130, 230);
+  addLabel(scene, t('demo:svgLabels.pulseOpacity'), 130, 230);
 
   // ── 2. Rotating square ─────────────────────────────────────────────
   const spinner = new Node('spinner');
@@ -95,7 +98,7 @@ export function createSvgAnimationsScene(params: ParamValues) {
   spinner.transform.updateLocalMatrix();
   scene.add(spinner);
 
-  addLabel(scene, 'Rotate (transform)', 400, 230);
+  addLabel(scene, t('demo:svgLabels.rotateTransform'), 400, 230);
 
   // ── 3. Scaling diamond ─────────────────────────────────────────────
   const diamond = new Node('diamond');
@@ -124,7 +127,7 @@ export function createSvgAnimationsScene(params: ParamValues) {
   diamond.transform.updateLocalMatrix();
   scene.add(diamond);
 
-  addLabel(scene, 'Scale (transform)', 670, 230);
+  addLabel(scene, t('demo:svgLabels.scaleTransform'), 670, 230);
 
   // ── 4. Color cycling rectangle ─────────────────────────────────────
   const colorBox = new Node('color-cycle');
@@ -145,7 +148,7 @@ export function createSvgAnimationsScene(params: ParamValues) {
   colorBox.transform.updateLocalMatrix();
   scene.add(colorBox);
 
-  addLabel(scene, 'Color cycle (fill)', 130, 445);
+  addLabel(scene, t('demo:svgLabels.colorCycleFill'), 130, 445);
 
   // ── 5. Translate bouncing circle ───────────────────────────────────
   const bouncer = new Node('bouncer');
@@ -169,7 +172,7 @@ export function createSvgAnimationsScene(params: ParamValues) {
   bouncer.transform.updateLocalMatrix();
   scene.add(bouncer);
 
-  addLabel(scene, 'Bounce (translate)', 400, 445);
+  addLabel(scene, t('demo:svgLabels.bounceTranslate'), 400, 445);
 
   // ── 6. Combined: rotate + opacity ──────────────────────────────────
   const starPath = createStarCommands(0, 0, 6, 45, 20);
@@ -205,11 +208,11 @@ export function createSvgAnimationsScene(params: ParamValues) {
   combinedStar.transform.updateLocalMatrix();
   scene.add(combinedStar);
 
-  addLabel(scene, 'Combined (rotate+opacity)', 670, 445);
+  addLabel(scene, t('demo:svgLabels.combinedRotateOpacity'), 670, 445);
 
   // ── Footer note ────────────────────────────────────────────────────
   const footer = new Node('footer');
-  footer.addComponent(createText('Animaciones SVG nativas — sin JavaScript en el render', {
+  footer.addComponent(createText(t('demo:svgLabels.nativeAnimationsFooter'), {
     fontSize: 13, fontFamily: 'system-ui, sans-serif',
     textAnchor: 'middle', fontWeight: 'normal',
   }));

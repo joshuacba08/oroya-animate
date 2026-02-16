@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "docs": "Docs",
+    "examples": "Examples",
+    "tutorials": "Tutorials"
+  },
+  "hero": {
+    "badge": "v0.3.0 — SVG Interactive & Generative Art",
+    "heading1": "Engine-Agnostic",
+    "heading2": "2D/3D Graphics",
+    "heading3": "for the Web",
+    "subtitle": "A TypeScript-first scene graph library that decouples your graphics logic from the rendering engine. Build once, render anywhere.",
+    "cta": "Get Started",
+    "github": "GitHub"
+  },
+  "features": {
+    "sectionTitle": "Built for <span>Modern Graphics</span>",
+    "sectionSubtitle": "Everything you need to build stunning 2D and 3D graphics applications, with the flexibility to choose your rendering engine.",
+    "engineAgnostic": "Engine-Agnostic",
+    "engineAgnosticDesc": "One scene graph, multiple renderers. Decouple your graphics logic from the rendering engine and switch freely between backends.",
+    "typescriptFirst": "TypeScript-First",
+    "typescriptFirstDesc": "Complete type definitions, intelligent autocompletion, and full type safety. Written in TypeScript from the ground up.",
+    "sceneGraph": "Scene Graph",
+    "sceneGraphDesc": "Hierarchical node-based architecture with attachable components: geometry, materials, cameras, transforms, and more.",
+    "threeRenderer": "Three.js Renderer",
+    "threeRendererDesc": "Full WebGL 3D rendering powered by Three.js. Support for cameras, lighting, materials, and glTF model loading.",
+    "svgRenderer": "SVG Renderer",
+    "svgRendererDesc": "Lightweight 2D vector graphics, perfect for generative art, data visualization, and interactive diagrams.",
+    "serialization": "Serialization",
+    "serializationDesc": "Save and load complete scenes in JSON format. Perfect for editors, persistence, and sharing scene configurations."
+  },
+  "renderers": {
+    "sectionTitle": "One Scene Graph, <span>Multiple Renderers</span>",
+    "sectionSubtitle": "Write your scene logic once. Render with Three.js for immersive 3D WebGL experiences, or SVG for lightweight, scalable 2D vector graphics.",
+    "threeTitle": "Three.js Renderer",
+    "threeDesc": "Full 3D rendering powered by Three.js and WebGL. Support for perspective and orthographic cameras, PBR materials, glTF model loading, and real-time interaction events.",
+    "svgTitle": "SVG Renderer",
+    "svgDesc": "Lightweight vector graphics rendering. Perfect for generative art, data visualization, interactive diagrams, and resolution-independent graphics with CSS styling support.",
+    "swapNote": "Same scene graph — just swap the renderer"
+  },
+  "code": {
+    "sectionTitle": "Simple, <span>Powerful</span> API",
+    "sectionSubtitle": "Create scenes with an intuitive, TypeScript-first API. Add nodes, attach components, and render with your engine of choice — all in a few lines of code.",
+    "highlight1": "Hierarchical scene graph with node-based architecture",
+    "highlight2": "Attachable components: geometry, materials, cameras",
+    "highlight3": "Swap renderers without changing scene logic",
+    "highlight4": "Built-in primitives: box, sphere, cylinder, plane"
+  },
+  "getStarted": {
+    "sectionTitle": "Ready to <span>Get Started</span>?",
+    "sectionSubtitle": "Install the core package and your preferred renderer. You'll be rendering your first scene in under a minute.",
+    "step1": "Install packages",
+    "step2": "Create a scene",
+    "step3": "Explore the docs",
+    "readDocs": "Read the Documentation"
+  },
+  "footer": {
+    "tagline": "Engine-agnostic 2D/3D graphics library for the modern web.",
+    "documentation": "Documentation",
+    "gettingStarted": "Getting Started",
+    "architecture": "Architecture",
+    "apiReference": "API Reference",
+    "tutorials": "Tutorials",
+    "packages": "Packages",
+    "community": "Community",
+    "issues": "Issues",
+    "contributing": "Contributing"
+  },
+  "docs": {
+    "title": "Documentation",
+    "subtitle": "Learn how to build 2D and 3D graphics applications with Oroya Animate's engine-agnostic scene graph.",
+    "gettingStarted": "Getting Started",
+    "coreConcepts": "Core Concepts",
+    "reference": "Reference",
+    "development": "Development",
+    "previous": "Previous",
+    "next": "Next",
+    "navigation": "Navigation",
+    "sidebar": {
+      "documentation": "Documentation",
+      "tutorials": "Tutorials",
+      "introduction": "Introduction",
+      "architecture": "Architecture",
+      "sceneGraph": "Scene Graph",
+      "renderers": "Renderers",
+      "serialization": "Serialization",
+      "apiReference": "API Reference",
+      "contributing": "Contributing",
+      "principles": "Principles"
+    }
+  },
+  "tutorials": {
+    "title": "Tutorials",
+    "subtitle": "Learn Oroya Animate step by step, from your first 3D scene to advanced generative art and multi-renderer techniques.",
+    "beginner": "Beginner",
+    "beginnerDesc": "Start here if you're new to Oroya Animate.",
+    "intermediate": "Intermediate",
+    "intermediateDesc": "Build on the basics with more complex scenes and renderers.",
+    "advanced": "Advanced",
+    "advancedDesc": "Push the boundaries with procedural generation and multi-renderer patterns.",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "examples": {
+    "badge": "Live Demos",
+    "title": "Interactive <span>Examples</span>",
+    "subtitle": "Explore interactive examples that demonstrate the capabilities of Oroya Animate. Each demo runs in real-time directly in your browser.",
+    "ctaText": "Want to see more examples or create your own?",
+    "getStarted": "Get Started",
+    "viewOnGitHub": "View on GitHub"
+  },
+  "i18n": {
+    "translationPending": "This content is not yet available in your language. Showing the English version.",
+    "switchLanguage": "Switch language"
+  }
+}

@@ -1,0 +1,43 @@
+---
+import {
+  getLocaleFromUrl,
+  getLocalizedPath,
+  supportedLocales,
+  languageMeta,
+} from '../i18n';
+
+const currentLocale = getLocaleFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+---
+
+<div class="dropdown dropdown-end">
+  <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-1.5 text-xs font-mono">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+      <path d="M2 12h20"/>
+    </svg>
+    {currentLocale.toUpperCase()}
+  </div>
+  <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-50 w-40 p-2 shadow-lg mt-2">
+    {supportedLocales.map((locale) => (
+      <li>
+        <a
+          href={getLocalizedPath(currentPath, locale)}
+          class:list={[
+            'flex items-center gap-2 text-sm',
+            { 'font-semibold text-primary': locale === currentLocale },
+          ]}
+        >
+          <span>{languageMeta[locale].flag}</span>
+          <span>{languageMeta[locale].label}</span>
+          {locale === currentLocale && (
+            <svg class="w-4 h-4 ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

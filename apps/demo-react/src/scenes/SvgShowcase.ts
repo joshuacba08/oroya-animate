@@ -3,6 +3,7 @@ import {
   createBox, createSphere, createPath2D, createText,
 } from '@oroya/core';
 import type { Path2DCommand } from '@oroya/core';
+import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 import { hexToRgb } from '../types';
 
@@ -42,9 +43,11 @@ export function createSvgShowcaseScene(params: ParamValues) {
   }));
   scene.add(cam);
 
+  const t = i18next.t.bind(i18next);
+
   // ── Title ──────────────────────────────────────────────────────────
   const title = new Node('title');
-  title.addComponent(createText('SVG Showcase', {
+  title.addComponent(createText(t('demo:svgLabels.svgShowcase'), {
     fontSize: 32,
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 'bold',
@@ -89,7 +92,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(gradRect);
 
   const gradLabel = new Node('gradient-label');
-  gradLabel.addComponent(createText('Gradiente', {
+  gradLabel.addComponent(createText(t('demo:svgLabels.gradient'), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   gradLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -109,7 +112,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(blurCircle);
 
   const blurLabel = new Node('blur-label');
-  blurLabel.addComponent(createText(`Blur (${blurVal}px)`, {
+  blurLabel.addComponent(createText(t('demo:svgLabels.blur', { value: blurVal }), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   blurLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -134,7 +137,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(shadowBox);
 
   const shadowLabel = new Node('shadow-label');
-  shadowLabel.addComponent(createText(`Drop Shadow (${dx}, ${dy})`, {
+  shadowLabel.addComponent(createText(t('demo:svgLabels.dropShadow', { dx, dy }), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   shadowLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -162,7 +165,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(clippedCircle);
 
   const clipLabel = new Node('clip-label');
-  clipLabel.addComponent(createText('Clip Path', {
+  clipLabel.addComponent(createText(t('demo:svgLabels.clipPath'), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   clipLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -205,7 +208,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(maskedRect);
 
   const maskLabel = new Node('mask-label');
-  maskLabel.addComponent(createText('Mask', {
+  maskLabel.addComponent(createText(t('demo:svgLabels.mask'), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   maskLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -228,7 +231,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(bezier);
 
   const bezierLabel = new Node('bezier-label');
-  bezierLabel.addComponent(createText('Bézier Path', {
+  bezierLabel.addComponent(createText(t('demo:svgLabels.bezierPath'), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   bezierLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
@@ -259,7 +262,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   scene.add(gradLine);
 
   const lineLabel = new Node('line-label');
-  lineLabel.addComponent(createText('Stroke Gradient', {
+  lineLabel.addComponent(createText(t('demo:svgLabels.strokeGradient'), {
     fontSize: 14, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   lineLabel.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));

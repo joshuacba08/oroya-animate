@@ -1,0 +1,195 @@
+{
+  "scenes": {
+    "interactive-demo": {
+      "label": "インタラクティブデモ",
+      "description": "クリック、ホバー、色変更、アニメーションを備えたインタラクティブオブジェクト。イベントシステムとInteractiveコンポーネントのデモ。"
+    },
+    "hover-showcase": {
+      "label": "ホバーショーケース",
+      "description": "5種類のホバーエフェクト：浮遊、回転、拡大、色変更、パルス。各オブジェクトは異なるCSSカーソルを使用。"
+    },
+    "click-playground": {
+      "label": "クリックプレイグラウンド",
+      "description": "クリックカウンター、トグル、プレスエフェクト、カラーサイクル、爆発/集合。click、pointerdown、pointerupのデモ。"
+    },
+    "wheel-bubbling": {
+      "label": "ホイール＆バブリング",
+      "description": "マウスホイールでオブジェクトをスケール、stopPropagation()によるイベントバブリング、pointermoveによるポインタートラッキング。"
+    },
+    "hello-cube": {
+      "label": "ハローキューブ",
+      "description": "滑らかなクォータニオン回転の3Dキューブ。シーン、カメラ、ジオメトリの基本設定デモ。"
+    },
+    "color-palette": {
+      "label": "カラーパレット",
+      "description": "様々な形状、色、速度の幾何学図形。createBox、createSphere、カラーテーマのデモ。"
+    },
+    "solar-system": {
+      "label": "太陽系",
+      "description": "親子ピボットノードを使用した階層的軌道の惑星系。ネストされたトランスフォームのデモ。"
+    },
+    "shape-grid": {
+      "label": "シェイプグリッド",
+      "description": "正弦波と位置ベースの色によるプロシージャルグリッド。プロシージャル生成と大規模アニメーションのデモ。"
+    },
+    "camera-viewpoints": {
+      "label": "カメラビューポイント",
+      "description": "柱と球体のシーンに対する複数の視点（軌道、正面、俯瞰、側面）。カメラの配置とアニメーションのデモ。"
+    },
+    "procedural-city": {
+      "label": "プロシージャルシティ",
+      "description": "ビル、中央公園、ランドマークタワーを持つアルゴリズム生成都市。プロシージャル生成と階層的グルーピングのデモ。"
+    },
+    "svg-showcase": {
+      "label": "SVGショーケース",
+      "description": "SVG機能のビジュアルカタログ：線形/放射グラデーション、フィルター（ブラー、ドロップシャドウ）、クリップパス、マスク、ベジェパス、ストロークグラデーション。"
+    },
+    "svg-animations": {
+      "label": "SVGアニメーション",
+      "description": "JavaScriptなしの宣言的なネイティブSVGアニメーション：パルス、回転、スケール、カラーサイクル、バウンス、複合。"
+    },
+    "svg-interactive": {
+      "label": "SVGインタラクティブ",
+      "description": "クリックとホバーイベントを持つインタラクティブSVG図形のグリッド。イベント委譲のデモ。"
+    },
+    "colour-spiral": {
+      "label": "カラースパイラル",
+      "description": "プロシージャルに生成されたカラフルなドットスパイラル。createSphere、カラーパレットによるfill、極座標配置のデモ。"
+    },
+    "gradient-gallery": {
+      "label": "グラデーションギャラリー",
+      "description": "縦方向の線形グラデーションバーと放射グラデーション円。線形・放射fillGradientのデモ。"
+    },
+    "circle-overlay": {
+      "label": "サークルオーバーレイ",
+      "description": "深みを生む半透明の重なり合う円。opacity、strokeGradient、ビジュアルコンポジションのデモ。"
+    },
+    "porto-pareto": {
+      "label": "ポルトパレート",
+      "description": "パレート分布を使用したビルの高さによるジェネラティブ都市景観。Gen.paretoと制約のデモ。"
+    },
+    "gaussian-dist": {
+      "label": "ガウス分布",
+      "description": "正規分布（ベルカーブ）の視覚化。Gen.gaussianとカラーマッピングのデモ。"
+    },
+    "colourful-grids": {
+      "label": "カラフルグリッド",
+      "description": "clipPathを使用したクリップパターンとGen.chanceによる確率的決定のグリッド。"
+    },
+    "interactive-galaxy": {
+      "label": "インタラクティブギャラクシー",
+      "description": "マウスに追従するパララックスエフェクトのパーティクルシステム。trackCursorとリアクティビティのデモ。"
+    },
+    "svjs-generative": {
+      "label": "ネイティブジェネラティブ",
+      "description": "新しいSvJsネイティブラッパーを使用したジェネラティブアート。"
+    }
+  },
+  "controls": {
+    "speed": "速度",
+    "hoverSpeed": "エフェクト速度",
+    "animSpeed": "アニメーション速度",
+    "sensitivity": "ホイール感度",
+    "tilt": "傾き",
+    "size": "サイズ",
+    "cubeColor": "キューブの色",
+    "bobbing": "浮遊",
+    "spacing": "間隔",
+    "theme": "テーマ",
+    "orbitalSpeed": "軌道速度",
+    "planetScale": "惑星スケール",
+    "cameraHeight": "カメラ高さ",
+    "cameraDistance": "カメラ距離",
+    "gridSize": "グリッドサイズ",
+    "waveSpeed": "波速度",
+    "waveHeight": "波の高さ",
+    "gap": "隙間",
+    "shape": "形状",
+    "viewpoint": "視点",
+    "fov": "視野角",
+    "citySize": "都市サイズ",
+    "maxHeight": "最大高さ",
+    "density": "密度",
+    "cameraSpeed": "カメラ速度",
+    "style": "スタイル",
+    "accentColor": "アクセントカラー",
+    "blur": "ブラー (px)",
+    "shadowDx": "影 dx",
+    "shadowDy": "影 dy",
+    "gradient": "グラデーション",
+    "globalSpeed": "全体速度",
+    "columns": "列",
+    "rows": "行",
+    "dots": "ドット",
+    "turns": "回転数",
+    "maxSize": "最大サイズ",
+    "bars": "バー",
+    "circles": "サークル",
+    "rings": "リング",
+    "opacity": "不透明度",
+    "buildings": "ビル数",
+    "minHeight": "最小高さ",
+    "particles": "パーティクル",
+    "spread": "広がり (SD)",
+    "gridSizePx": "グリッドサイズ",
+    "fillChance": "塗りつぶし確率 %",
+    "starCount": "星の数",
+    "iterations": "イテレーション",
+    "baseHue": "ベース色相",
+    "rotation": "回転"
+  },
+  "options": {
+    "gems": "宝石",
+    "warm": "暖色",
+    "cool": "寒色",
+    "neon": "ネオン",
+    "cubes": "キューブ",
+    "spheres": "スフィア",
+    "orbital": "軌道",
+    "front": "正面",
+    "topDown": "俯瞰",
+    "side": "側面",
+    "cinematic": "シネマティック",
+    "modern": "モダン",
+    "sunset": "サンセット",
+    "linear": "リニア",
+    "radial": "ラジアル",
+    "slow": "遅い (4s)",
+    "normal": "通常 (2s)",
+    "fast": "速い (0.8s)"
+  },
+  "hoverEffects": {
+    "float": "浮遊",
+    "spin": "回転",
+    "grow": "拡大",
+    "color": "カラー",
+    "pulse": "パルス"
+  },
+  "svgLabels": {
+    "svgShowcase": "SVGショーケース",
+    "gradient": "グラデーション",
+    "blur": "ブラー ({{value}}px)",
+    "dropShadow": "ドロップシャドウ ({{dx}}, {{dy}})",
+    "clipPath": "クリップパス",
+    "mask": "マスク",
+    "bezierPath": "ベジェパス",
+    "strokeGradient": "ストロークグラデーション",
+    "svgAnimations": "SVGアニメーション",
+    "pulseOpacity": "パルス (opacity)",
+    "rotateTransform": "回転 (transform)",
+    "scaleTransform": "スケール (transform)",
+    "colorCycleFill": "カラーサイクル (fill)",
+    "bounceTranslate": "バウンス (translate)",
+    "combinedRotateOpacity": "複合 (rotate+opacity)",
+    "nativeAnimationsFooter": "ネイティブSVGアニメーション — レンダリングにJavaScript不要",
+    "interactiveSvg": "インタラクティブSVG",
+    "interactiveSvgSubtitle": "図形をクリック — イベントはrenderToSVGElementで処理されます",
+    "clickOnShape": "図形をクリック..."
+  },
+  "renderers": {
+    "three": "Three.js",
+    "canvas": "Canvas 2D",
+    "svg": "SVG",
+    "svjs": "SvJs"
+  }
+}

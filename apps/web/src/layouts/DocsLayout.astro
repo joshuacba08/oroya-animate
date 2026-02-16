@@ -5,22 +5,30 @@ import DocsSidebar from "../components/DocsSidebar.astro";
 import Footer from "../components/Footer.astro";
 import MermaidInit from "../components/MermaidInit.astro";
 import CopyCodeInit from "../components/CopyCodeInit.astro";
+import { getLocaleFromUrl, supportedLocales, getLocalizedPath } from "../i18n";
 
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image = "/og-image.png" } = Astro.props;
 const fullTitle = `${title} — Oroya Animate Docs`;
+const fullDescription = description || `${title} - Oroya Animate documentation`;
+
+const locale = getLocaleFromUrl(Astro.url);
+const siteUrl = import.meta.env.SITE || "https://oroya-animate.vercel.app";
+const canonicalURL = new URL(Astro.url.pathname, siteUrl);
+const ogImageURL = new URL(image, siteUrl);
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang={locale} data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description || `${title} - Oroya Animate documentation`} />
+    <meta name="description" content={fullDescription} />
     <meta name="generator" content={Astro.generator} />
 
     <!-- Theme detection (before paint to avoid flash) -->
@@ -36,20 +44,57 @@ const fullTitle = `${title} — Oroya Animate Docs`;
       })();
     </script>
 
-    <!-- Fonts -->
+    <!-- Fonts: non-blocking load with media swap trick -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Zalando+Sans+Expanded:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    <!-- Preconnect to CDN used by Mermaid diagrams -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Alternate language links (hreflang) -->
+    {supportedLocales.map((loc) => (
+      <link
+        rel="alternate"
+        hreflang={loc}
+        href={new URL(getLocalizedPath(Astro.url.pathname, loc), siteUrl)}
+      />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={new URL(getLocalizedPath(Astro.url.pathname, 'en'), siteUrl)} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={fullDescription} />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={fullDescription} />
+    <meta name="twitter:image" content={ogImageURL} />
+
     <title>{fullTitle}</title>
   </head>
   <body class="min-h-screen bg-base-100 font-sans text-base-content">
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
     <!-- Subtle background -->
     <div class="fixed inset-0 -z-10 overflow-hidden">
       <div class="absolute top-0 left-[10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[128px]"></div>
@@ -58,54 +103,61 @@ const fullTitle = `${title} — Oroya Animate Docs`;
 
     <Navbar />
 
-    <div class="pt-20 px-4 lg:px-8">
-      <div class="container mx-auto max-w-7xl flex gap-8">
-        <!-- Sidebar -->
+    <div class="drawer lg:drawer-open pt-20">
+      <input id="mobile-sidebar" type="checkbox" class="drawer-toggle" />
+
+      <!-- Main content (drawer-content) -->
+      <div class="drawer-content px-4 lg:px-8">
+        <div class="container mx-auto max-w-7xl lg:pl-80">
+          <main id="main-content" class="py-8">
+            <!-- Mobile sidebar toggle -->
+            <div class="lg:hidden mb-6">
+              <label for="mobile-sidebar" class="btn btn-outline btn-sm gap-2 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="4" x2="20" y1="12" y2="12"/>
+                  <line x1="4" x2="20" y1="6" y2="6"/>
+                  <line x1="4" x2="20" y1="18" y2="18"/>
+                </svg>
+                Navigation
+              </label>
+            </div>
+
+            <!-- Article content -->
+            <article class="prose max-w-none docs-prose
+              prose-headings:font-display prose-headings:tracking-tight prose-headings:text-base-content
+              prose-h1:text-3xl prose-h1:md:text-4xl prose-h1:mb-4 prose-h1:text-gradient
+              prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-b prose-h2:border-base-300/30 prose-h2:pb-3
+              prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+              prose-p:text-base-content/80 prose-p:leading-relaxed
+              prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-base-content
+              prose-code:text-primary/90 prose-code:font-mono prose-code:text-sm
+              prose-code:bg-base-300/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
+              prose-code:before:content-none prose-code:after:content-none
+              prose-pre:rounded-xl prose-pre:font-mono prose-pre:text-sm
+              prose-table:text-sm
+              prose-th:text-base-content/80 prose-th:font-display prose-th:font-semibold
+              prose-th:border-base-300/50 prose-td:border-base-300/30
+              prose-blockquote:border-primary/50 prose-blockquote:text-base-content/60
+              prose-li:text-base-content/80
+              prose-hr:border-base-300/30
+              prose-img:rounded-xl
+            ">
+              <slot />
+            </article>
+
+            <!-- Page navigation (prev/next) -->
+            <div class="mt-16 pt-8 border-t border-base-300/30">
+              <slot name="pagination" />
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <!-- Sidebar (drawer-side) -->
+      <div class="drawer-side z-40">
+        <label for="mobile-sidebar" aria-label="Close navigation" class="drawer-overlay"></label>
         <DocsSidebar />
-
-        <!-- Main content -->
-        <main class="flex-1 min-w-0 py-8">
-          <!-- Mobile sidebar toggle -->
-          <div class="lg:hidden mb-6">
-            <label for="mobile-sidebar" class="btn btn-outline btn-sm gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" x2="20" y1="12" y2="12"/>
-                <line x1="4" x2="20" y1="6" y2="6"/>
-                <line x1="4" x2="20" y1="18" y2="18"/>
-              </svg>
-              Navigation
-            </label>
-          </div>
-
-          <!-- Article content -->
-          <article class="prose max-w-none docs-prose
-            prose-headings:font-display prose-headings:tracking-tight prose-headings:text-base-content
-            prose-h1:text-3xl prose-h1:md:text-4xl prose-h1:mb-4 prose-h1:text-gradient
-            prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-b prose-h2:border-base-300/30 prose-h2:pb-3
-            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-            prose-p:text-base-content/80 prose-p:leading-relaxed
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-base-content
-            prose-code:text-primary/90 prose-code:font-mono prose-code:text-sm
-            prose-code:bg-base-300/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
-            prose-code:before:content-none prose-code:after:content-none
-            prose-pre:rounded-xl prose-pre:font-mono prose-pre:text-sm
-            prose-table:text-sm
-            prose-th:text-base-content/80 prose-th:font-display prose-th:font-semibold
-            prose-th:border-base-300/50 prose-td:border-base-300/30
-            prose-blockquote:border-primary/50 prose-blockquote:text-base-content/60
-            prose-li:text-base-content/80
-            prose-hr:border-base-300/30
-            prose-img:rounded-xl
-          ">
-            <slot />
-          </article>
-
-          <!-- Page navigation (prev/next) -->
-          <div class="mt-16 pt-8 border-t border-base-300/30">
-            <slot name="pagination" />
-          </div>
-        </main>
       </div>
     </div>
 

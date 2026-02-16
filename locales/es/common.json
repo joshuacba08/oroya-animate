@@ -1,0 +1,15 @@
+{
+  "sidebar": {
+    "subtitle": "Motor de Grafos de Escena",
+    "comingSoon": "Próximamente",
+    "version": "oroya-animate v0.1"
+  },
+  "controls": {
+    "title": "Controles"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español",
+    "ja": "日本語"
+  }
+}

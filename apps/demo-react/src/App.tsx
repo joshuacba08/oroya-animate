@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OroyaCanvas } from './OroyaCanvas';
 import { OroyaSvg } from './OroyaSvg';
 import { OroyaSvJs } from './OroyaSvJs';
@@ -80,6 +81,7 @@ const rendererBadgeBase: React.CSSProperties = {
 /* ── Component ────────────────────────────────────────────────────────── */
 
 function App() {
+  const { t } = useTranslation();
   const [activeId, setActiveId] = useState(DEMO_SCENES[0].id);
   const [params, setParams] = useState<ParamValues>(() =>
     getDefaultParams(DEMO_SCENES[0].controls),
@@ -168,7 +170,7 @@ function App() {
         {/* Info panel */}
         <div style={infoBoxStyles} className="glass-panel">
           <div style={infoTitleStyles}>
-            {activeDemo.label}
+            {t(`demo:scenes.${activeDemo.id}.label`, { defaultValue: activeDemo.label })}
             <span
               style={{
                 ...rendererBadgeBase,
@@ -177,10 +179,12 @@ function App() {
                 backgroundColor: `${meta.color}12`,
               }}
             >
-              {meta.label}
+              {t(`demo:renderers.${activeDemo.renderer}`, { defaultValue: meta.label })}
             </span>
           </div>
-          <div style={infoDescStyles}>{activeDemo.description}</div>
+          <div style={infoDescStyles}>
+            {t(`demo:scenes.${activeDemo.id}.description`, { defaultValue: activeDemo.description })}
+          </div>
         </div>
       </div>
     </div>

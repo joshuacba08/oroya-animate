@@ -1,0 +1,15 @@
+{
+  "sidebar": {
+    "subtitle": "シーングラフエンジン",
+    "comingSoon": "近日公開",
+    "version": "oroya-animate v0.1"
+  },
+  "controls": {
+    "title": "コントロール"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Español",
+    "ja": "日本語"
+  }
+}

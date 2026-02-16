@@ -1,31 +1,17 @@
-import { Scene, Node, createBox, Material } from '@oroya/core';
-import { renderToSVGElement, SvJs, Gen } from '@oroya/renderer-svg';
+import { SvJs, Gen } from '@oroya/renderer-svg';
+import type { ControlDef, ParamValues } from '../types';
 
-export const portoParetoControls = {
-    buildingCount: { value: 60, min: 10, max: 200, step: 1, label: 'Buildings' },
-    minHeight: { value: 20, min: 10, max: 100, step: 1, label: 'Min Height' },
-};
+export const portoParetoControls: ControlDef[] = [
+    { type: 'slider', key: 'buildingCount', label: 'Buildings', min: 10, max: 200, step: 1, defaultValue: 60, rebuild: true },
+    { type: 'slider', key: 'minHeight', label: 'Min Height', min: 10, max: 100, step: 1, defaultValue: 20, rebuild: true },
+];
 
-export function createPortoParetoScene(
-    container: HTMLElement,
-    config: typeof portoParetoControls
-) {
-    // We use a "dummy" scene structure just to fit the factory pattern,
-    // but we primarily use SvJs directly for this generative canvas.
-    const scene = new Scene();
-
-    // Create wrapper for cleanup
-    const wrapper = document.createElement('div');
-    wrapper.style.width = '100%';
-    wrapper.style.height = '100%';
-    container.appendChild(wrapper);
-
+export function createPortoParetoScene(params: ParamValues) {
     const svgSize = 1000;
 
     // Initialize SvJs
     const svg = new SvJs();
     svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
-    svg.addTo(wrapper);
 
     // Background
     const skyGradientId = 'sky-gradient';
@@ -40,8 +26,8 @@ export function createPortoParetoScene(
     const city = svg.g();
 
     // Generate buildings
-    const count = config.buildingCount.value;
-    const minH = config.minHeight.value;
+    const count = Number(params.buildingCount);
+    const minH = Number(params.minHeight);
     const spacing = 1000 / count;
 
     for (let i = 0; i < count; i++) {
@@ -69,10 +55,7 @@ export function createPortoParetoScene(
         .set({ filter: 'blur(4px)' });
 
     return {
-        scene,
-        update: () => { },
-        dispose: () => {
-            wrapper.remove();
-        }
+        scene: svg as any,
+        animate: () => { }
     };
 }

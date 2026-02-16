@@ -1,25 +1,15 @@
-import { Scene } from '@oroya/core';
 import { SvJs, Gen } from '@oroya/renderer-svg';
+import type { ControlDef, ParamValues } from '../types';
 
-export const gaussianDistControls = {
-    count: { value: 2000, min: 100, max: 10000, step: 100, label: 'Particles' },
-    spread: { value: 120, min: 20, max: 300, step: 10, label: 'Spread (SD)' },
-};
+export const gaussianDistControls: ControlDef[] = [
+    { type: 'slider', key: 'count', label: 'Particles', min: 100, max: 10000, step: 100, defaultValue: 2000, rebuild: true },
+    { type: 'slider', key: 'spread', label: 'Spread (SD)', min: 20, max: 300, step: 10, defaultValue: 120, rebuild: true },
+];
 
-export function createGaussianDistScene(
-    container: HTMLElement,
-    config: typeof gaussianDistControls
-) {
-    const scene = new Scene();
-    const wrapper = document.createElement('div');
-    wrapper.style.width = '100%';
-    wrapper.style.height = '100%';
-    container.appendChild(wrapper);
-
+export function createGaussianDistScene(params: ParamValues) {
     const svgSize = 1000;
     const svg = new SvJs();
     svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
-    svg.addTo(wrapper);
 
     // Background
     svg.rect(svgSize, svgSize).fill('#111');
@@ -27,8 +17,8 @@ export function createGaussianDistScene(
     const particles = svg.g();
     const centerX = svgSize / 2;
     const centerY = svgSize / 2;
-    const count = config.count.value;
-    const sd = config.spread.value;
+    const count = Number(params.count);
+    const sd = Number(params.spread);
 
     for (let i = 0; i < count; i++) {
         // Gaussian distribution centered at 500
@@ -48,10 +38,7 @@ export function createGaussianDistScene(
     graphGroup.line(0, centerY, 1000, centerY).stroke('#fff', 1, 0.2);
 
     return {
-        scene,
-        update: () => { },
-        dispose: () => {
-            wrapper.remove();
-        }
+        scene: svg as any,
+        animate: () => { }
     };
 }

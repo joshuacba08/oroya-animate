@@ -15,8 +15,10 @@ import {
   Video,
   type LucideIcon,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { DemoSceneDef, RendererType } from '../types';
 import { RENDERER_META } from '../types';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 /* ── Icon mapping ─────────────────────────────────────────────────────── */
 
@@ -175,6 +177,8 @@ interface SidebarProps {
 const RENDERER_ORDER: RendererType[] = ['three', 'canvas', 'svg'];
 
 export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
+  const { t } = useTranslation();
+
   // Group scenes by renderer
   const grouped = RENDERER_ORDER.map((renderer) => ({
     renderer,
@@ -191,7 +195,7 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
           <span style={logoAccentStyles}>Oroya</span>
           <span style={logoDimStyles}>Animate</span>
         </div>
-        <div style={logoSubStyles}>Scene Graph Engine</div>
+        <div style={logoSubStyles}>{t('common:sidebar.subtitle')}</div>
       </div>
 
       {/* Scene list */}
@@ -206,7 +210,7 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
                 style={{ color: meta.color, opacity: 0.7 }}
               />
               <span style={{ ...sectionLabelStyles, color: meta.color }}>
-                {meta.label}
+                {t(`demo:renderers.${renderer}`, { defaultValue: meta.label })}
               </span>
               <span style={sectionCountStyles}>
                 {group.length > 0 ? group.length : ''}
@@ -215,7 +219,7 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
 
             {/* Items */}
             {group.length === 0 ? (
-              <div style={emptyStyles}>Próximamente</div>
+              <div style={emptyStyles}>{t('common:sidebar.comingSoon')}</div>
             ) : (
               group.map((demo) => {
                 const isActive = demo.id === activeId;
@@ -249,7 +253,7 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
                     }}>
-                      {demo.label}
+                      {t(`demo:scenes.${demo.id}.label`, { defaultValue: demo.label })}
                     </span>
                   </button>
                 );
@@ -259,8 +263,11 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
         ))}
       </div>
 
+      {/* Language switcher */}
+      <LanguageSwitcher />
+
       {/* Version */}
-      <div style={versionStyles}>oroya-animate v0.1</div>
+      <div style={versionStyles}>{t('common:sidebar.version')}</div>
     </div>
   );
 }

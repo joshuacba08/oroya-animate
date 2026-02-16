@@ -1,32 +1,23 @@
-import { Scene } from '@oroya/core';
 import { SvJs, Gen } from '@oroya/renderer-svg';
+import type { ControlDef, ParamValues } from '../types';
 
-export const colourfulGridsControls = {
-    gridSize: { value: 600, min: 400, max: 800, step: 50, label: 'Grid Size' },
-    rows: { value: 10, min: 2, max: 20, step: 1, label: 'Rows' },
-    chance: { value: 60, min: 0, max: 100, step: 5, label: 'Fill Chance %' }
-};
+export const colourfulGridsControls: ControlDef[] = [
+    { type: 'slider', key: 'gridSize', label: 'Grid Size', min: 400, max: 800, step: 50, defaultValue: 600, rebuild: true },
+    { type: 'slider', key: 'rows', label: 'Rows', min: 2, max: 20, step: 1, defaultValue: 10, rebuild: true },
+    { type: 'slider', key: 'chance', label: 'Fill Chance %', min: 0, max: 100, step: 5, defaultValue: 60, rebuild: true }
+];
 
-export function createColourfulGridsScene(
-    container: HTMLElement,
-    config: typeof colourfulGridsControls
-) {
-    const scene = new Scene();
-    const wrapper = document.createElement('div');
-    wrapper.style.width = '100%';
-    wrapper.style.height = '100%';
-    container.appendChild(wrapper);
-
+export function createColourfulGridsScene(params: ParamValues) {
     const svgSize = 1000;
     const svg = new SvJs();
     svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
-    svg.addTo(wrapper);
 
     // Background
     svg.rect(svgSize, svgSize).fill('#f0f0f0');
 
-    const gSize = config.gridSize.value;
-    const rows = config.rows.value;
+    const gSize = Number(params.gridSize);
+    const rows = Number(params.rows);
+    const chance = Number(params.chance);
     const spacing = 10;
 
     const increment = gSize / rows;
@@ -48,7 +39,7 @@ export function createColourfulGridsScene(
         for (let x = 0; x < gSize; x += increment) {
 
             // Chance to skip cell
-            if (!Gen.chance(config.chance.value)) continue;
+            if (!Gen.chance(chance)) continue;
 
             const cellId = `cell-${x}-${y}`;
 
@@ -89,8 +80,7 @@ export function createColourfulGridsScene(
     function clipId(base: string) { return `clip-${base}-${Math.floor(Math.random() * 10000)}`; }
 
     return {
-        scene,
-        update: () => { },
-        dispose: () => { wrapper.remove(); }
+        scene: svg as any,
+        animate: () => { }
     };
 }

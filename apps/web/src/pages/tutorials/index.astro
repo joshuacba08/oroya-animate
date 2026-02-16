@@ -1,6 +1,9 @@
 ---
 import DocsLayout from "../../layouts/DocsLayout.astro";
 import { getCollection } from "astro:content";
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../i18n";
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 
 const tutorials = await getCollection("tutorials");
 const sorted = tutorials.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
@@ -8,36 +11,35 @@ const sorted = tutorials.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 
 const levels = [
   {
     key: "beginner" as const,
-    title: "Beginner",
+    title: t('tutorials.beginner'),
     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
     iconColor: "text-success",
     badge: "badge-success",
-    description: "Start here if you're new to Oroya Animate.",
+    description: t('tutorials.beginnerDesc'),
   },
   {
     key: "intermediate" as const,
-    title: "Intermediate",
+    title: t('tutorials.intermediate'),
     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',
     iconColor: "text-warning",
     badge: "badge-warning",
-    description: "Build on the basics with more complex scenes and renderers.",
+    description: t('tutorials.intermediateDesc'),
   },
   {
     key: "advanced" as const,
-    title: "Advanced",
+    title: t('tutorials.advanced'),
     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
     iconColor: "text-error",
     badge: "badge-error",
-    description: "Push the boundaries with procedural generation and multi-renderer patterns.",
+    description: t('tutorials.advancedDesc'),
   },
 ];
 ---
 
-<DocsLayout title="Tutorials" description="Step-by-step tutorials for learning Oroya Animate">
-  <h1>Tutorials</h1>
+<DocsLayout title={t('tutorials.title')} description="Step-by-step tutorials for learning Oroya Animate">
+  <h1>{t('tutorials.title')}</h1>
   <p class="text-lg text-base-content/60 mb-12">
-    Learn Oroya Animate step by step, from your first 3D scene to advanced
-    generative art and multi-renderer techniques.
+    {t('tutorials.subtitle')}
   </p>
 
   {levels.map((level) => {
@@ -53,7 +55,7 @@ const levels = [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           {levelTutorials.map((tutorial, i) => (
             <a
-              href={`/tutorials/${tutorial.id}`}
+              href={getLocalizedPath(`/tutorials/${tutorial.id}`, locale)}
               class="glass-card rounded-xl p-5 group block no-underline"
             >
               <div class="flex items-start justify-between mb-2">

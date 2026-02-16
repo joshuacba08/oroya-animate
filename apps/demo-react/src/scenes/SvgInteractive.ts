@@ -3,6 +3,7 @@ import {
   createBox, createSphere, createPath2D, createText,
 } from '@oroya/core';
 import type { Path2DCommand } from '@oroya/core';
+import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 
 /* ── Controls ─────────────────────────────────────────────────────────── */
@@ -42,9 +43,11 @@ export function createSvgInteractiveScene(params: ParamValues) {
   }));
   scene.add(cam);
 
+  const t = i18next.t.bind(i18next);
+
   // ── Title ──────────────────────────────────────────────────────────
   const title = new Node('title');
-  title.addComponent(createText('Interactive SVG', {
+  title.addComponent(createText(t('demo:svgLabels.interactiveSvg'), {
     fontSize: 28, fontFamily: 'system-ui, sans-serif',
     fontWeight: 'bold', textAnchor: 'middle',
   }));
@@ -54,7 +57,7 @@ export function createSvgInteractiveScene(params: ParamValues) {
   scene.add(title);
 
   const subtitle = new Node('subtitle');
-  subtitle.addComponent(createText('Haz click en las figuras — los eventos se procesan via renderToSVGElement', {
+  subtitle.addComponent(createText(t('demo:svgLabels.interactiveSvgSubtitle'), {
     fontSize: 12, fontFamily: 'system-ui, sans-serif', textAnchor: 'middle',
   }));
   subtitle.addComponent(new Material({ fill: { r: 0.45, g: 0.45, b: 0.55 } }));
@@ -64,7 +67,7 @@ export function createSvgInteractiveScene(params: ParamValues) {
 
   // ── Status text (updates on interaction) ───────────────────────────
   const statusText = new Node('status');
-  statusText.addComponent(createText('Click on a shape...', {
+  statusText.addComponent(createText(t('demo:svgLabels.clickOnShape'), {
     fontSize: 16, fontFamily: 'system-ui, sans-serif',
     textAnchor: 'middle', fontWeight: 'bold',
   }));
