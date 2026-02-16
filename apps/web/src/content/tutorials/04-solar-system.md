@@ -5,7 +5,7 @@ order: 4
 level: "intermediate"
 duration: "20 min"
 ---
-# Tutorial 4: Sistema Solar 🟡
+# Tutorial 4: Sistema Solar
 
 > **Nivel:** Intermedio  
 > **Tiempo estimado:** 20 minutos  
@@ -173,4 +173,4 @@ worldMatrix(luna) = local(luna) × local(moonPivot) × local(earth) × local(ear
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md) — renderer SVG y Path2D.
+→ [Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md) — renderer SVG y Path2D.

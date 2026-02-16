@@ -1,7 +1,35 @@
 {
   "name": "@oroya/core",
   "version": "0.3.0",
-  "description": "Core package for Oroya Animate scene graph and components.",
+  "description": "Core scene graph and component system for Oroya Animate - an engine-agnostic 2D/3D graphics library",
+  "keywords": [
+    "oroya",
+    "scene-graph",
+    "component-system",
+    "3d",
+    "2d",
+    "graphics",
+    "webgl",
+    "svg",
+    "typescript",
+    "node-system",
+    "transform",
+    "engine-agnostic"
+  ],
+  "author": {
+    "name": "Oroya AI Collaborator",
+    "url": "https://github.com/joshuacba08"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuacba08/oroya-animate.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://oroya-animate.vercel.app",
+  "bugs": {
+    "url": "https://github.com/joshuacba08/oroya-animate/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

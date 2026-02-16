@@ -5,7 +5,7 @@ order: 5
 level: "intermediate"
 duration: "20 min"
 ---
-# Tutorial 5: Arte Generativo SVG 🟡
+# Tutorial 5: Arte Generativo SVG
 
 > **Nivel:** Intermedio  
 > **Tiempo estimado:** 20 minutos  
@@ -209,10 +209,10 @@ downloadSVG(svg, 'generative-mosaic.svg');
 
 ## Resultado
 
-Un mosaico de colores con cuadrados, diamantes y triángulos generados proceduralmente. El archivo SVG exportado se puede abrir en cualquier editor de vectores (Figma, Illustrator, Inkscape). 🎨
+Un mosaico de colores con cuadrados, diamantes y triángulos generados proceduralmente. El archivo SVG exportado se puede abrir en cualquier editor de vectores (Figma, Illustrator, Inkscape).
 
 ---
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 6: Cámaras y Puntos de Vista](./06-cameras-viewpoints.md) — posicionando cámaras.
+→ [Tutorial 6: Cámaras y Puntos de Vista](./06-cameras-viewpoints.md) — posicionando cámaras.

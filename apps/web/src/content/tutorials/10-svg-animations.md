@@ -5,7 +5,7 @@ order: 10
 level: "intermediate"
 duration: "20 min"
 ---
-# Tutorial 10: Animaciones SVG Nativas 🟡
+# Tutorial 10: Animaciones SVG Nativas
 
 > **Nivel:** Intermedio  
 > **Tiempo estimado:** 20 minutos  
@@ -334,4 +334,4 @@ Explora todas estas animaciones en la demo **"SVG Animations"** del demo-react.
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 11: SVG Interactivo](./11-svg-interactive.md) — event delegation con `renderToSVGElement`.
+→ [Tutorial 11: SVG Interactivo](./11-svg-interactive.md) — event delegation con `renderToSVGElement`.

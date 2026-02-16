@@ -5,7 +5,7 @@ order: 3
 level: "beginner"
 duration: "10 min"
 ---
-# Tutorial 3: Guardar y Cargar Escenas 🟢
+# Tutorial 3: Guardar y Cargar Escenas
 
 > **Nivel:** Principiante  
 > **Tiempo estimado:** 10 minutos  
@@ -135,10 +135,10 @@ downloadScene(scene, 'my-scene.json');
 
 ## Resultado
 
-Una escena que puede ser guardada, compartida y restaurada sin perder ningún dato. La serialización es la base para editores visuales, colaboración en tiempo real y versionado de escenas en Git. 💾
+Una escena que puede ser guardada, compartida y restaurada sin perder ningún dato. La serialización es la base para editores visuales, colaboración en tiempo real y versionado de escenas en Git.
 
 ---
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 4: Sistema Solar](./04-solar-system.md) — transforms jerárquicos y animación.
+→ [Tutorial 4: Sistema Solar](./04-solar-system.md) — transforms jerárquicos y animación.

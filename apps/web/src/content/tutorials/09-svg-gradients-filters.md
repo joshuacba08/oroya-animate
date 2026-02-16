@@ -5,7 +5,7 @@ order: 9
 level: "intermediate"
 duration: "25 min"
 ---
-# Tutorial 9: Gradientes, Filtros y Efectos SVG 🟡
+# Tutorial 9: Gradientes, Filtros y Efectos SVG
 
 > **Nivel:** Intermedio  
 > **Tiempo estimado:** 25 minutos  
@@ -338,4 +338,4 @@ Puedes explorar todos estos efectos en la demo **"SVG Showcase"** del demo-react
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 10: Animaciones SVG Nativas](./10-svg-animations.md) — animaciones declarativas sin JavaScript.
+→ [Tutorial 10: Animaciones SVG Nativas](./10-svg-animations.md) — animaciones declarativas sin JavaScript.

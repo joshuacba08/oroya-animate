@@ -1,5 +1,17 @@
 ﻿# Oroya Animate 
 
+<div align="center">
+
+[![NPM Version](https://img.shields.io/npm/v/@oroya/core?style=flat-square&logo=npm&label=@oroya/core)](https://www.npmjs.com/package/@oroya/core)
+[![License](https://img.shields.io/github/license/joshuacba08/oroya-animate?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/joshuacba08/oroya-animate/ci.yml?branch=main&style=flat-square&logo=github&label=CI)](https://github.com/joshuacba08/oroya-animate/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-9+-orange?style=flat-square&logo=pnpm)](https://pnpm.io/)
+
+**[Documentation](https://oroya-animate.vercel.app)** • **[NPM](https://www.npmjs.com/org/oroya)** • **[CDN](https://unpkg.com/@oroya/core)** • **[GitHub](https://github.com/joshuacba08/oroya-animate)**
+
+</div>
+
 A professional, engine-agnostic 2D/3D graphics library for the web. Built with TypeScript, designed for scalability and performance.
 
 ##  Vision
@@ -34,32 +46,72 @@ This project is managed as a monorepo using `pnpm` workspaces:
 
 Detailed documentation is available in the [`docs/`](docs/) folder:
 
+### Core Documentation
 - [**Architecture Overview**](docs/architecture.md): Learn about the core engine-agnostic design.
 - [**Getting Started**](docs/getting-started.md): Your first scene in 5 minutes.
 - [**Scene Graph & Transformations**](docs/scene-graph.md): Deep dive into nodes and components.
 - [**API Reference**](docs/api-reference.md): Complete reference of classes, interfaces and functions.
 - [**Renderers**](docs/renderers.md): Three.js and SVG backends documentation.
 - [**Serialization**](docs/serialization.md): Save and load scenes as JSON.
+
+### Deployment & Publishing
+- [**NPM Publishing**](docs/deployment/npm-publishing.md): Publish packages to NPM registry.
+- [**CDN Setup**](docs/deployment/cdn-setup.md): Use packages directly from CDN.
+- [**Vercel Deployment**](docs/deployment/vercel-deployment.md): Deploy documentation website.
+
+### Development
 - [**Contributing & Development**](docs/contributing.md): Setup, scripts, and development workflow.
-- [**Programming Principles**](docs/programming-principles.md): Coding conventions and architectural rules for the project.
-- [**Build Errors Postmortem**](docs/troubleshooting/build-errors-postmortem.md): Analysis of common build mistakes and how to prevent them.
+- [**Programming Principles**](docs/programming-principles.md): Coding conventions and architectural rules.
+- [**Build Errors Postmortem**](docs/troubleshooting/build-errors-postmortem.md): Analysis of common build mistakes.
+
+### Tutorials
 - [**Tutorials**](docs/tutorials/README.md): Step-by-step guides from beginner to advanced.
 
 ##  Getting Started
 
-### Prerequisites
+### Installation
+
+#### NPM/PNPM (Recommended)
+
+```bash
+# Using npm
+npm install @oroya/core @oroya/renderer-three
+
+# Using pnpm
+pnpm add @oroya/core @oroya/renderer-three
+
+# Using yarn
+yarn add @oroya/core @oroya/renderer-three
+```
+
+#### CDN (No Build Step)
+
+```html
+<script type="module">
+  import { Scene, Node } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js';
+  
+  // Your code here
+</script>
+```
+
+### For Development
+
+If you want to contribute or develop locally:
+
+**Prerequisites:**
 - [Node.js](https://nodejs.org/) (v18+)
 - [pnpm](https://pnpm.io/) (v9+)
 
-### Installation
-
 ```bash
+# Clone repository
+git clone https://github.com/joshuacba08/oroya-animate.git
+cd oroya-animate
+
+# Install dependencies
 pnpm install
-```
 
-### Build (required before running demos)
-
-```bash
+# Build packages
 pnpm build
 ```
 
@@ -139,9 +191,48 @@ renderer.render();
 - [ ] Animation system (keyframes, timelines).
 - [ ] Orthographic camera support.
 - [ ] Orbital camera controls.
-- [ ] Renderer resize handling.
+- [🚀 Publishing & Deployment
 
-### Future
+### Packages on NPM
+
+All packages are published to NPM under the `@oroya` scope:
+- [@oroya/core](https://www.npmjs.com/package/@oroya/core)
+- [@oroya/renderer-three](https://www.npmjs.com/package/@oroya/renderer-three)
+- [@oroya/renderer-svg](https://www.npmjs.com/package/@oroya/renderer-svg)
+- [@oroya/loader-gltf](https://www.npmjs.com/package/@oroya/loader-gltf)
+
+### Available on CDN
+
+All packages are automatically available on multiple CDNs:
+- **unpkg:** `https://unpkg.com/@oroya/core`
+- **jsDelivr:** `https://cdn.jsdelivr.net/npm/@oroya/core`
+- **esm.sh:** `https://esm.sh/@oroya/core`
+
+### Documentation Website
+
+Live at: **https://oroya-animate.vercel.app** (deployed via Vercel)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](docs/contributing.md) for details on:
+- Development setup
+- Code conventions
+- Pull request process
+- Issue reporting
+
+##  License
+
+MIT © [joshuacba08](https://github.com/joshuacba08)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Oroya AI Collaborator**
+
+[Report Bug](https://github.com/joshuacba08/oroya-animate/issues) • [Request Feature](https://github.com/joshuacba08/oroya-animate/issues) • [Discussions](https://github.com/joshuacba08/oroya-animate/discussions)
+
+</div>
 - [ ] Complete SVG backend (transform support, groups).
 - [ ] Canvas2D renderer.
 - [ ] Boolean operations 2D/3D.

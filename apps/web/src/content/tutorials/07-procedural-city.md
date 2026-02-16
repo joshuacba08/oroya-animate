@@ -5,7 +5,7 @@ order: 7
 level: "advanced"
 duration: "30 min"
 ---
-# Tutorial 7: Ciudad Procedural 🔴
+# Tutorial 7: Ciudad Procedural
 
 > **Nivel:** Avanzado  
 > **Tiempo estimado:** 30 minutos  
@@ -229,4 +229,4 @@ Todo gestionado por el scene graph con actualizaciones de matrices automáticas.
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 8: Multi-Renderer](./08-multi-renderer.md) — misma escena en Three.js y SVG.
+→ [Tutorial 8: Multi-Renderer](./08-multi-renderer.md) — misma escena en Three.js y SVG.

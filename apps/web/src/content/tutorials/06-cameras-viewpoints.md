@@ -5,7 +5,7 @@ order: 6
 level: "intermediate"
 duration: "15 min"
 ---
-# Tutorial 6: Cámaras y Puntos de Vista 🟡
+# Tutorial 6: Cámaras y Puntos de Vista
 
 > **Nivel:** Intermedio  
 > **Tiempo estimado:** 15 minutos  
@@ -133,7 +133,7 @@ function switchCamera(index: number) {
   });
 
   renderer.mount(scene); // Re-montar para que detecte la nueva cámara
-  console.log(`📷 Cámara activa: ${cameraNames[activeCameraIndex]}`);
+  console.log(`[Camera] Cámara activa: ${cameraNames[activeCameraIndex]}`);
 }
 
 // Escuchar teclado
@@ -217,10 +217,10 @@ character.transform.updateLocalMatrix();
 
 ## Resultado
 
-Una escena con múltiples puntos de vista intercambiables con el teclado (`1`, `2`, `3`) y una cámara animada que orbita la escena. 🎥
+Una escena con múltiples puntos de vista intercambiables con el teclado (`1`, `2`, `3`) y una cámara animada que orbita la escena.
 
 ---
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 7: Ciudad Procedural](./07-procedural-city.md) — generación algorítmica.
+→ [Tutorial 7: Ciudad Procedural](./07-procedural-city.md) — generación algorítmica.

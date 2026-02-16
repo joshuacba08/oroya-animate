@@ -29,12 +29,12 @@ Toda `Scene` tiene un nodo `root` que es la raíz del árbol. Todos los demás n
 ```mermaid
 graph TD
     ROOT["root (Node)"]
-    ROOT --> CAM["camera (Node)\n📷 Camera + Transform"]
+    ROOT --> CAM["camera (Node)\nCamera + Transform"]
     ROOT --> ENV["environment (Node)\n🔲 Transform"]
-    ENV --> FLOOR["floor (Node)\n📦 Geometry + Material + Transform"]
-    ENV --> PLAYER["player (Node)\n📦 Geometry + Material + Transform"]
-    PLAYER --> WEAPON["weapon (Node)\n📦 Geometry + Material + Transform"]
-    ROOT --> LIGHT["light (Node)\n💡 (futuro) Light + Transform"]
+    ENV --> FLOOR["floor (Node)\nGeometry + Material + Transform"]
+    ENV --> PLAYER["player (Node)\nGeometry + Material + Transform"]
+    PLAYER --> WEAPON["weapon (Node)\nGeometry + Material + Transform"]
+    ROOT --> LIGHT["light (Node)\nLight (futuro) + Transform"]
 ```
 
 ### Reglas del árbol

@@ -8,15 +8,21 @@
   "type": "module",
   "scripts": {
     "build": "pnpm --filter \"./packages/**\" build",
+    "build:web": "pnpm build && pnpm --filter \"web\" build",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "dev:vanilla": "pnpm --filter \"demo-vanilla\" dev",
     "dev:react": "pnpm --filter \"demo-react\" dev",
+    "dev:web": "pnpm --filter \"web\" dev",
     "clean": "pnpm -r exec rm -rf dist .turbo",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "sync-versions": "node scripts/sync-versions.js",
+    "publish:packages": "pnpm build && pnpm --filter \"./packages/**\" publish --access public",
+    "deploy:web": "pnpm build:web && vercel --prod"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
+    "glob": "^10.3.10",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   },

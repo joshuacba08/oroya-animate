@@ -5,7 +5,7 @@ order: 8
 level: "advanced"
 duration: "25 min"
 ---
-# Tutorial 8: Multi-Renderer 🔴
+# Tutorial 8: Multi-Renderer
 
 > **Nivel:** Avanzado  
 > **Tiempo estimado:** 25 minutos  
@@ -78,7 +78,7 @@ Necesitamos dos áreas: un canvas para Three.js y un contenedor para SVG:
   </style>
 </head>
 <body>
-  <h1>🔀 Multi-Renderer Demo</h1>
+  <h1>Multi-Renderer Demo</h1>
   <div class="renderers">
     <div class="renderer-panel">
       <h3>Three.js (WebGL 3D)</h3>
@@ -294,7 +294,7 @@ renderer.render();
 
 ## Resultado
 
-Una ventana dividida mostrando la misma escena renderizada simultáneamente en WebGL 3D y SVG 2D, demostrando que el scene graph es verdaderamente agnóstico del backend. 🔀
+Una ventana dividida mostrando la misma escena renderizada simultáneamente en WebGL 3D y SVG 2D, demostrando que el scene graph es verdaderamente agnóstico del backend.
 
 ---
 
@@ -302,8 +302,8 @@ Una ventana dividida mostrando la misma escena renderizada simultáneamente en W
 
 Has completado todos los tutoriales. Ahora puedes:
 
-- 🏗️ Construir tus propias escenas combinando las técnicas aprendidas.
-- 🔌 Crear un nuevo renderer (Canvas2D, WebGPU) siguiendo el patrón de `@oroya/renderer-three`.
-- 📦 Contribuir al proyecto — revisa la [guía de contribución](../contributing.md).
+- Construir tus propias escenas combinando las técnicas aprendidas.
+- Crear un nuevo renderer (Canvas2D, WebGPU) siguiendo el patrón de `@oroya/renderer-three`.
+- Contribuir al proyecto — revisa la [guía de contribución](../contributing.md).
 
-➡️ [Volver al índice de tutoriales](./README.md)
+→ [Volver al índice de tutoriales](./README.md)

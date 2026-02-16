@@ -5,7 +5,7 @@ order: 2
 level: "beginner"
 duration: "15 min"
 ---
-# Tutorial 2: Paleta de Colores 🟢
+# Tutorial 2: Paleta de Colores
 
 > **Nivel:** Principiante  
 > **Tiempo estimado:** 15 minutos  
@@ -141,7 +141,7 @@ animate();
 
 ## Resultado
 
-Cinco figuras geométricas de colores vibrantes rotando a diferentes velocidades, como una paleta de gemas flotantes. 💎
+Cinco figuras geométricas de colores vibrantes rotando a diferentes velocidades, como una paleta de gemas flotantes.
 
 ---
 
@@ -158,4 +158,4 @@ Cinco figuras geométricas de colores vibrantes rotando a diferentes velocidades
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 3: Guardar y Cargar Escenas](./03-save-load-scenes.md) — serialización JSON.
+→ [Tutorial 3: Guardar y Cargar Escenas](./03-save-load-scenes.md) — serialización JSON.

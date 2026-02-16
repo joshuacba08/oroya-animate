@@ -1,7 +1,31 @@
 {
   "name": "@oroya/renderer-three",
   "version": "0.3.0",
-  "description": "Three.js renderer for Oroya Animate.",
+  "description": "Three.js (WebGL) renderer for Oroya Animate scene graphs",
+  "keywords": [
+    "oroya",
+    "three",
+    "threejs",
+    "webgl",
+    "3d",
+    "renderer",
+    "graphics",
+    "typescript"
+  ],
+  "author": {
+    "name": "Oroya AI Collaborator",
+    "url": "https://github.com/joshuacba08"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuacba08/oroya-animate.git",
+    "directory": "packages/renderer-three"
+  },
+  "homepage": "https://oroya-animate.vercel.app",
+  "bugs": {
+    "url": "https://github.com/joshuacba08/oroya-animate/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -20,6 +44,10 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@oroya/core": "^0.3.0",
+    "three": "^0.165.0"
   },
   "dependencies": {
     "@oroya/core": "workspace:*",

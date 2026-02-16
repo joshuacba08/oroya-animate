@@ -5,7 +5,7 @@ order: 1
 level: "beginner"
 duration: "10 min"
 ---
-# Tutorial 1: Hello Cube 🟢
+# Tutorial 1: Hello Cube
 
 > **Nivel:** Principiante  
 > **Tiempo estimado:** 10 minutos  
@@ -125,7 +125,7 @@ animate();
 
 ## Resultado
 
-Un cubo azul brillante rotando suavemente sobre fondo oscuro. 🎉
+Un cubo azul brillante rotando suavemente sobre fondo oscuro.
 
 ---
 
@@ -180,4 +180,4 @@ animate();
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 2: Paleta de Colores](./02-color-palette.md) — múltiples formas y colores.
+→ [Tutorial 2: Paleta de Colores](./02-color-palette.md) — múltiples formas y colores.

@@ -5,7 +5,7 @@ order: 11
 level: "advanced"
 duration: "25 min"
 ---
-# Tutorial 11: SVG Interactivo 🔴
+# Tutorial 11: SVG Interactivo
 
 > **Nivel:** Avanzado  
 > **Tiempo estimado:** 25 minutos  
@@ -333,4 +333,4 @@ Has completado todos los tutoriales de SVG. Ahora puedes:
 - Crear dashboards interactivos SVG con event delegation.
 - Usar `renderToSVG` en Node.js para server-side rendering.
 
-➡️ [Volver al índice de tutoriales](./README.md)
+→ [Volver al índice de tutoriales](./README.md)

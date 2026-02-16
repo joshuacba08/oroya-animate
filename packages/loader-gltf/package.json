@@ -1,7 +1,32 @@
 {
   "name": "@oroya/loader-gltf",
   "version": "0.3.0",
-  "description": "glTF loader for Oroya Animate.",
+  "description": "glTF/GLB 3D model loader for Oroya Animate scene graphs",
+  "keywords": [
+    "oroya",
+    "gltf",
+    "glb",
+    "3d",
+    "loader",
+    "model",
+    "import",
+    "three",
+    "typescript"
+  ],
+  "author": {
+    "name": "Oroya AI Collaborator",
+    "url": "https://github.com/joshuacba08"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuacba08/oroya-animate.git",
+    "directory": "packages/loader-gltf"
+  },
+  "homepage": "https://oroya-animate.vercel.app",
+  "bugs": {
+    "url": "https://github.com/joshuacba08/oroya-animate/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -20,6 +45,10 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@oroya/core": "^0.3.0",
+    "three": "^0.165.0"
   },
   "dependencies": {
     "@oroya/core": "workspace:*",
