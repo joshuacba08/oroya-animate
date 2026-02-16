@@ -9,21 +9,24 @@ const levels = [
   {
     key: "beginner" as const,
     title: "Beginner",
-    emoji: "🟢",
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
+    iconColor: "text-success",
     badge: "badge-success",
     description: "Start here if you're new to Oroya Animate.",
   },
   {
     key: "intermediate" as const,
     title: "Intermediate",
-    emoji: "🟡",
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',
+    iconColor: "text-warning",
     badge: "badge-warning",
     description: "Build on the basics with more complex scenes and renderers.",
   },
   {
     key: "advanced" as const,
     title: "Advanced",
-    emoji: "🔴",
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    iconColor: "text-error",
     badge: "badge-error",
     description: "Push the boundaries with procedural generation and multi-renderer patterns.",
   },
@@ -43,7 +46,7 @@ const levels = [
     return (
       <section class="mb-10">
         <h2 class="flex items-center gap-2 not-prose">
-          <span>{level.emoji}</span>
+          <span class:list={[level.iconColor, "shrink-0"]} set:html={level.icon} />
           {level.title}
         </h2>
         <p class="text-sm text-base-content/50 mb-4 not-prose">{level.description}</p>
