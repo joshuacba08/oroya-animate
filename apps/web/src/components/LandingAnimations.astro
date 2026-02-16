@@ -1,0 +1,150 @@
+---
+/**
+ * LandingAnimations — GSAP animations for the landing page.
+ * Uses ScrollTrigger for scroll-based reveals.
+ * Place this component at the end of the landing page body.
+ */
+---
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ───── Hero: staggered entrance on load ───── */
+
+  gsap.set(".hero-anim", { opacity: 0, y: 30 });
+
+  gsap.to(".hero-anim", {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    stagger: 0.15,
+    ease: "power3.out",
+    delay: 0.2,
+  });
+
+  /* ───── Features: cards stagger in on scroll ───── */
+
+  gsap.set(".feature-card", { opacity: 0, y: 40 });
+
+  ScrollTrigger.batch(".feature-card", {
+    onEnter: (batch) =>
+      gsap.to(batch, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power2.out",
+      }),
+    start: "top 85%",
+    once: true,
+  });
+
+  /* ───── Features section header ───── */
+
+  gsap.from("#features > div > div:first-child", {
+    scrollTrigger: {
+      trigger: "#features",
+      start: "top 80%",
+      once: true,
+    },
+    opacity: 0,
+    y: 30,
+    duration: 0.7,
+    ease: "power2.out",
+  });
+
+  /* ───── Renderers: cards slide in from sides ───── */
+
+  const rendererCards = gsap.utils.toArray<HTMLElement>(".renderer-card");
+
+  rendererCards.forEach((card, i) => {
+    gsap.from(card, {
+      scrollTrigger: {
+        trigger: card,
+        start: "top 85%",
+        once: true,
+      },
+      opacity: 0,
+      x: i === 0 ? -60 : 60,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+  });
+
+  /* ───── Renderers: bottom pill ───── */
+
+  gsap.from("#renderers .mt-12", {
+    scrollTrigger: {
+      trigger: "#renderers .mt-12",
+      start: "top 90%",
+      once: true,
+    },
+    opacity: 0,
+    scale: 0.9,
+    duration: 0.5,
+    ease: "back.out(1.7)",
+  });
+
+  /* ───── Code Showcase: description + code block ───── */
+
+  gsap.from("#code .grid > div:first-child", {
+    scrollTrigger: {
+      trigger: "#code",
+      start: "top 75%",
+      once: true,
+    },
+    opacity: 0,
+    x: -50,
+    duration: 0.8,
+    ease: "power2.out",
+  });
+
+  gsap.from("#code .code-card", {
+    scrollTrigger: {
+      trigger: "#code",
+      start: "top 75%",
+      once: true,
+    },
+    opacity: 0,
+    x: 50,
+    duration: 0.8,
+    ease: "power2.out",
+    delay: 0.15,
+  });
+
+  /* ───── Get Started: scale-up entrance ───── */
+
+  gsap.from("#start .glass-card", {
+    scrollTrigger: {
+      trigger: "#start",
+      start: "top 80%",
+      once: true,
+    },
+    opacity: 0,
+    y: 40,
+    scale: 0.95,
+    duration: 0.8,
+    ease: "power3.out",
+  });
+
+  /* ───── Section headers: universal fade ───── */
+
+  gsap.utils
+    .toArray<HTMLElement>("#renderers > div > div:first-child, #code h2")
+    .forEach((el) => {
+      gsap.from(el, {
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          once: true,
+        },
+        opacity: 0,
+        y: 25,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    });
+</script>

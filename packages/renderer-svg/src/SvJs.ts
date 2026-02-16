@@ -5,7 +5,7 @@ export class SvJs {
     public element: SVGElement;
     public cursorX: number | null;
     public cursorY: number | null;
-    private child: SvJs | null = null; // Track the last created child for continuity if needed
+    public child: SvJs | null = null; // Track the last created child for continuity if needed
 
     /**
      * Create an SVG element.
