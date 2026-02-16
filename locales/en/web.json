@@ -67,6 +67,14 @@
     "step3": "Explore the docs",
     "readDocs": "Read the Documentation"
   },
+  "about": {
+    "title": "About the <span>Project</span>",
+    "subtitle": "Oroya Animate is an open-source graphics library created and maintained by Josué Oroya, a software engineer focused on graphics systems, developer tooling, and programming education.",
+    "paragraph1": "The project started as an experiment to separate scene logic from rendering engines, making it possible to reuse the same scene graph across different rendering backends like Three.js and SVG.",
+    "paragraph2": "Oroya Animate continues to evolve as a playground for graphics architecture, generative art, and interactive visualization tooling for the web.",
+    "creatorHeading": "About the Creator",
+    "creatorBio": "Software engineer based in Japan, passionate about graphics systems, open-source tooling, and making creative coding accessible to everyone."
+  },
   "footer": {
     "tagline": "Engine-agnostic 2D/3D graphics library for the modern web.",
     "documentation": "Documentation",
