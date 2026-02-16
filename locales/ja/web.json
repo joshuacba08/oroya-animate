@@ -36,7 +36,20 @@
     "threeDesc": "Three.jsとWebGLによる完全な3Dレンダリング。透視投影・正投影カメラ、PBRマテリアル、glTFモデル読み込み、リアルタイムインタラクションイベントをサポート。",
     "svgTitle": "SVGレンダラー",
     "svgDesc": "軽量ベクターグラフィックスレンダリング。ジェネラティブアート、データビジュアライゼーション、インタラクティブダイアグラム、CSSスタイリング対応の解像度非依存グラフィックスに最適。",
-    "swapNote": "同じシーングラフ — レンダラーを交換するだけ"
+    "swapNote": "同じシーングラフ — レンダラーを交換するだけ",
+    "threeBadges": {
+      "perspectiveCamera": "パースペクティブカメラ",
+      "materials": "マテリアル",
+      "gltfLoading": "glTF読み込み",
+      "interactionEvents": "インタラクションイベント"
+    },
+    "svgBadges": {
+      "path2d": "Path2D",
+      "gradients": "グラデーション",
+      "filters": "フィルター",
+      "animations": "アニメーション",
+      "interactive": "インタラクティブ"
+    }
   },
   "code": {
     "sectionTitle": "シンプルで<span>パワフル</span>なAPI",
@@ -87,6 +100,40 @@
       "apiReference": "APIリファレンス",
       "contributing": "コントリビュート",
       "principles": "原則"
+    },
+    "entries": {
+      "getting-started": {
+        "title": "はじめに",
+        "description": "Oroya Animateのセットアップと最初のシーン作成のクイックスタートガイド"
+      },
+      "architecture": {
+        "title": "アーキテクチャ",
+        "description": "設計哲学、モジュール境界、エンジン非依存アプローチ"
+      },
+      "scene-graph": {
+        "title": "シーングラフ",
+        "description": "ノード階層、トランスフォームシステム、ECSコンポーネントモデル"
+      },
+      "renderers": {
+        "title": "レンダラー",
+        "description": "Three.js WebGLおよびSVGレンダラーの実装の詳細"
+      },
+      "serialization": {
+        "title": "シリアライゼーション",
+        "description": "シーンの保存、読み込み、共有のためのJSONシリアライゼーション"
+      },
+      "api-reference": {
+        "title": "APIリファレンス",
+        "description": "Oroya Animateの全パッケージの完全なAPIドキュメント"
+      },
+      "contributing": {
+        "title": "コントリビュート",
+        "description": "開発環境のセットアップ、ワークフロー、貢献ガイドライン"
+      },
+      "programming-principles": {
+        "title": "プログラミング原則",
+        "description": "プロジェクトを導くコーディング規約と設計原則"
+      }
     }
   },
   "tutorials": {
@@ -99,7 +146,69 @@
     "advanced": "上級",
     "advancedDesc": "プロシージャル生成とマルチレンダラーパターンで限界に挑戦。",
     "previous": "前へ",
-    "next": "次へ"
+    "next": "次へ",
+    "badgeEasy": "簡単",
+    "badgeMid": "中間",
+    "badgeHard": "難しい",
+    "items": {
+      "helloCube": "Hello Cube",
+      "colorPalette": "カラーパレット",
+      "saveLoadScenes": "シーンの保存と読み込み",
+      "solarSystem": "太陽系",
+      "svgGenerativeArt": "SVGジェネラティブアート",
+      "camerasViewpoints": "カメラとビューポイント",
+      "svgGradientsFilters": "SVGグラデーションとフィルター",
+      "svgAnimations": "SVGアニメーション",
+      "proceduralCity": "プロシージャルシティ",
+      "multiRenderer": "マルチレンダラー",
+      "svgInteractive": "SVGインタラクティブ"
+    },
+    "entries": {
+      "01-hello-cube": {
+        "title": "Hello Cube",
+        "description": "回転するキューブで最初の3Dシーンを作成"
+      },
+      "02-color-palette": {
+        "title": "カラーパレット",
+        "description": "複数のジオメトリ、マテリアル、コンポジション"
+      },
+      "03-save-load-scenes": {
+        "title": "シーンの保存と読み込み",
+        "description": "シーンを永続化するためのJSONシリアライゼーション"
+      },
+      "04-solar-system": {
+        "title": "太陽系",
+        "description": "階層的トランスフォームと親子アニメーション"
+      },
+      "05-svg-generative-art": {
+        "title": "SVGジェネラティブアート",
+        "description": "SVGレンダラーとプロシージャル生成"
+      },
+      "06-cameras-viewpoints": {
+        "title": "カメラとビューポイント",
+        "description": "カメラの配置とダイナミックビューポイント"
+      },
+      "07-procedural-city": {
+        "title": "プロシージャルシティ",
+        "description": "複雑なシーンのアルゴリズム生成"
+      },
+      "08-multi-renderer": {
+        "title": "マルチレンダラー",
+        "description": "同じシーンを複数のバックエンドでレンダリング"
+      },
+      "09-svg-gradients-filters": {
+        "title": "SVGグラデーションとフィルター",
+        "description": "グラデーション、ブラー、ドロップシャドウ、クリップパスとマスク"
+      },
+      "10-svg-animations": {
+        "title": "SVGアニメーション",
+        "description": "animateとanimateTransformによる宣言的アニメーション"
+      },
+      "11-svg-interactive": {
+        "title": "SVGインタラクティブ",
+        "description": "イベント委任によるインタラクティブSVG"
+      }
+    }
   },
   "examples": {
     "badge": "ライブデモ",

@@ -8,6 +8,13 @@ const t = useTranslations(locale);
 const docs = await getCollection("docs");
 const sortedDocs = docs.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
 
+function docTitle(id: string, fallback: string): string {
+  return t(`docs.entries.${id}.title`) !== `docs.entries.${id}.title` ? t(`docs.entries.${id}.title`) : fallback;
+}
+function docDesc(id: string, fallback: string): string {
+  return t(`docs.entries.${id}.description`) !== `docs.entries.${id}.description` ? t(`docs.entries.${id}.description`) : fallback;
+}
+
 const categories = [
   {
     key: "guide",
@@ -59,12 +66,12 @@ const categories = [
             >
               <div class="flex items-start justify-between mb-2">
                 <h3 class="font-display font-semibold text-base-content group-hover:text-primary transition-colors">
-                  {doc.data.title}
+                  {docTitle(doc.id, doc.data.title)}
                 </h3>
                 <span class={`badge ${cat.color} badge-xs`}>{cat.key}</span>
               </div>
               <p class="text-sm text-base-content/50 leading-relaxed">
-                {doc.data.description}
+                {docDesc(doc.id, doc.data.description)}
               </p>
             </a>
           ))}

@@ -9,6 +9,17 @@ const t = useTranslations(locale);
 const tutorials = await getCollection("tutorials");
 const sorted = tutorials.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
 
+function tutTitle(id: string, fallback: string): string {
+  const key = `tutorials.entries.${id}.title`;
+  const val = t(key);
+  return val !== key ? val : fallback;
+}
+function tutDesc(id: string, fallback: string): string {
+  const key = `tutorials.entries.${id}.description`;
+  const val = t(key);
+  return val !== key ? val : fallback;
+}
+
 const levels = [
   {
     key: "beginner" as const,
@@ -68,7 +79,7 @@ const levels = [
             >
               <div class="flex items-start justify-between mb-2">
                 <h3 class="font-display font-semibold text-base-content group-hover:text-primary transition-colors">
-                  {tutorial.data.title}
+                  {tutTitle(tutorial.id, tutorial.data.title)}
                 </h3>
                 <div class="flex items-center gap-2 shrink-0">
                   {tutorial.data.duration && (
@@ -82,7 +93,7 @@ const levels = [
                 </div>
               </div>
               <p class="text-sm text-base-content/50 leading-relaxed">
-                {tutorial.data.description}
+                {tutDesc(tutorial.id, tutorial.data.description)}
               </p>
             </a>
           ))}

@@ -36,7 +36,20 @@
     "threeDesc": "Renderizado 3D completo con Three.js y WebGL. Soporte para cámaras perspectiva y ortográficas, materiales PBR, carga de modelos glTF y eventos de interacción en tiempo real.",
     "svgTitle": "Renderer SVG",
     "svgDesc": "Renderizado de gráficos vectoriales ligeros. Perfecto para arte generativo, visualización de datos, diagramas interactivos y gráficos independientes de resolución con soporte CSS.",
-    "swapNote": "Mismo grafo de escena — solo cambia el renderer"
+    "swapNote": "Mismo grafo de escena — solo cambia el renderer",
+    "threeBadges": {
+      "perspectiveCamera": "Cámara Perspectiva",
+      "materials": "Materiales",
+      "gltfLoading": "Carga glTF",
+      "interactionEvents": "Eventos de Interacción"
+    },
+    "svgBadges": {
+      "path2d": "Path2D",
+      "gradients": "Gradientes",
+      "filters": "Filtros",
+      "animations": "Animaciones",
+      "interactive": "Interactivo"
+    }
   },
   "code": {
     "sectionTitle": "API Simple y <span>Potente</span>",
@@ -87,6 +100,40 @@
       "apiReference": "Referencia API",
       "contributing": "Contribuir",
       "principles": "Principios"
+    },
+    "entries": {
+      "getting-started": {
+        "title": "Primeros Pasos",
+        "description": "Guía rápida para configurar Oroya Animate y crear tu primera escena"
+      },
+      "architecture": {
+        "title": "Arquitectura",
+        "description": "Filosofía de diseño, límites de módulos y el enfoque agnóstico de motor"
+      },
+      "scene-graph": {
+        "title": "Grafo de Escena",
+        "description": "Jerarquía de nodos, sistema de transformaciones y el modelo de componentes ECS"
+      },
+      "renderers": {
+        "title": "Renderers",
+        "description": "Implementaciones del renderer Three.js WebGL y SVG en profundidad"
+      },
+      "serialization": {
+        "title": "Serialización",
+        "description": "Serialización JSON para guardar, cargar y compartir escenas"
+      },
+      "api-reference": {
+        "title": "Referencia API",
+        "description": "Documentación API completa para todos los paquetes de Oroya Animate"
+      },
+      "contributing": {
+        "title": "Contribuir",
+        "description": "Configuración del desarrollo, flujo de trabajo y guías de contribución"
+      },
+      "programming-principles": {
+        "title": "Principios de Programación",
+        "description": "Convenciones de código y principios de diseño que guían el proyecto"
+      }
     }
   },
   "tutorials": {
@@ -99,7 +146,69 @@
     "advanced": "Avanzado",
     "advancedDesc": "Lleva al límite con generación procedural y patrones multi-renderer.",
     "previous": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "badgeEasy": "Fácil",
+    "badgeMid": "Medio",
+    "badgeHard": "Difícil",
+    "items": {
+      "helloCube": "Hola Cubo",
+      "colorPalette": "Paleta de Colores",
+      "saveLoadScenes": "Guardar y Cargar Escenas",
+      "solarSystem": "Sistema Solar",
+      "svgGenerativeArt": "Arte Generativo SVG",
+      "camerasViewpoints": "Cámaras y Vistas",
+      "svgGradientsFilters": "Gradientes y Filtros SVG",
+      "svgAnimations": "Animaciones SVG",
+      "proceduralCity": "Ciudad Procedural",
+      "multiRenderer": "Multi-Renderer",
+      "svgInteractive": "SVG Interactivo"
+    },
+    "entries": {
+      "01-hello-cube": {
+        "title": "Hola Cubo",
+        "description": "Crea tu primera escena 3D con un cubo rotatorio"
+      },
+      "02-color-palette": {
+        "title": "Paleta de Colores",
+        "description": "Múltiples geometrías, materiales y composición"
+      },
+      "03-save-load-scenes": {
+        "title": "Guardar y Cargar Escenas",
+        "description": "Serialización JSON para persistir escenas"
+      },
+      "04-solar-system": {
+        "title": "Sistema Solar",
+        "description": "Transformaciones jerárquicas y animaciones padre-hijo"
+      },
+      "05-svg-generative-art": {
+        "title": "Arte Generativo SVG",
+        "description": "Renderer SVG y generación procedural"
+      },
+      "06-cameras-viewpoints": {
+        "title": "Cámaras y Vistas",
+        "description": "Posicionamiento de cámaras y vistas dinámicas"
+      },
+      "07-procedural-city": {
+        "title": "Ciudad Procedural",
+        "description": "Generación algorítmica de escenas complejas"
+      },
+      "08-multi-renderer": {
+        "title": "Multi-Renderer",
+        "description": "La misma escena renderizada con múltiples backends"
+      },
+      "09-svg-gradients-filters": {
+        "title": "Gradientes y Filtros SVG",
+        "description": "Gradientes, blur, drop-shadow, clip-paths y máscaras"
+      },
+      "10-svg-animations": {
+        "title": "Animaciones SVG",
+        "description": "Animaciones declarativas con animate y animateTransform"
+      },
+      "11-svg-interactive": {
+        "title": "SVG Interactivo",
+        "description": "SVG interactivo con delegación de eventos"
+      }
+    }
   },
   "examples": {
     "badge": "Demos en Vivo",

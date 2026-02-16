@@ -7,6 +7,7 @@ import {
   Camera,
   CameraType,
 } from "@oroya/core";
+import { SvJs, Gen } from "@oroya/renderer-svg";
 import type { ExampleDef } from "./ExampleCard";
 
 function rotateY(angle: number) {
@@ -501,7 +502,7 @@ function createColourSpiral() {
     scene.add(dot);
   }
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -621,7 +622,7 @@ function createGradientGallery() {
     scene.add(c);
   }
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -707,7 +708,7 @@ function createCircleOverlay() {
   frame.transform.updateLocalMatrix();
   scene.add(frame);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -810,8 +811,223 @@ function createGradientSphere() {
   frame.transform.updateLocalMatrix();
   scene.add(frame);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
+}
+
+// ── SvJs: Porto Pareto ─────────────────────────────────────────────────
+
+function createPortoPareto() {
+  const svgSize = 1000;
+
+  // Initialize SvJs
+  const svg = new SvJs();
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
+
+  // Background
+  const skyGradientId = 'sky-gradient';
+  svg.createGradient(skyGradientId, 'linear', ['#f58b10', '#d21263', '#940c5e', '#23103a'], 90);
+  svg.rect(1000, 600, 0, 0).fill(`url(#${skyGradientId})`);
+
+  const waterGradientId = 'water-gradient';
+  svg.createGradient(waterGradientId, 'linear', ['#80e5ff10', '#70b566'], 90);
+  svg.rect(1000, 400, 0, 600).fill(`url(#${waterGradientId})`);
+
+  // City Group
+  const city = svg.g();
+
+  // Default params
+  const count = 60;
+  const minH = 20;
+  const spacing = 1000 / count;
+
+  for (let i = 0; i < count; i++) {
+    const paretoVal = Gen.pareto(minH);
+    const maxHeight = Gen.random(300, 500);
+    const height = Gen.constrain(paretoVal, minH, maxHeight);
+
+    const x = i * spacing;
+    const y = 600 - height; // Horizon at 600
+
+    city.rect(spacing - 2, height, x, y)
+      .fill('#1a1a2e')
+      .stroke('#000', 1);
+
+    city.rect(spacing - 2, height * 0.3, x, 600)
+      .fill('#1a1a2e', 0.3);
+  }
+
+  // Sun
+  svg.circle(60, 800, 150)
+    .fill('#ffcc33', 0.8)
+    .set({ filter: 'blur(4px)' });
+
+  return {
+    scene: svg,
+    animate: () => { }
+  };
+}
+
+// ── SvJs: Gaussian Distribution ────────────────────────────────────────
+
+function createGaussianDist() {
+  const svgSize = 1000;
+  const svg = new SvJs();
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
+
+  svg.rect(svgSize, svgSize).fill('#111');
+
+  const particles = svg.g();
+  const centerX = svgSize / 2;
+  const centerY = svgSize / 2;
+  const count = 2000;
+  const sd = 120;
+
+  for (let i = 0; i < count; i++) {
+    const x = Gen.gaussian(centerX, sd);
+    const y = Gen.gaussian(centerY, sd);
+
+    const d = Gen.dist(x, y, centerX, centerY);
+    const hue = Gen.map(d, 0, 400, 220, 340); // Blue to Pink
+
+    particles.circle(Gen.random(1, 4), x, y)
+      .fill(`hsl(${hue}, 80%, 70%)`, 0.6);
+  }
+
+  const graphGroup = svg.g();
+  graphGroup.line(0, centerY, 1000, centerY).stroke('#fff', 1, 0.2);
+
+  return {
+    scene: svg,
+    animate: () => { }
+  };
+}
+
+// ── SvJs: Colourful Grids ──────────────────────────────────────────────
+
+function createColourfulGrids() {
+  const svgSize = 1000;
+  const svg = new SvJs();
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
+
+  svg.rect(svgSize, svgSize).fill('#f0f0f0');
+
+  const gSize = 600;
+  const rows = 10;
+  const chance = 60;
+  const spacing = 10;
+
+  const increment = gSize / rows;
+  const cellSize = Math.abs(increment - spacing);
+  const offset = (svgSize - gSize) / 2;
+
+  const grid = svg.g();
+  grid.moveTo(offset, offset);
+
+  const palettes = [
+    ['#5465FF', '#788BFF', '#9BB1FF', '#BFD7FF', '#E2FDFF'],
+    ['#22577A', '#38A3A5', '#57CC99', '#80ED99', '#C7f9CC'],
+    ['#4C5760', '#93A8AC', '#D7CEB2', '#A59E8C', '#66635B']
+  ];
+  const palette = Gen.random(palettes);
+
+  function clipId(base: string) { return `clip-${base}-${Math.floor(Math.random() * 10000)}`; }
+
+  for (let y = 0; y < gSize; y += increment) {
+    for (let x = 0; x < gSize; x += increment) {
+      if (!Gen.chance(chance)) continue;
+
+      const cellId = `cell-${x}-${y}`;
+      const clip = svg.create('clipPath').set({ id: clipId(cellId) });
+      clip.rect(cellSize, cellSize, x, y);
+
+      const cellContent = grid.g();
+      cellContent.set({ 'clip-path': `url(#${clipId(cellId)})` });
+
+      const type = Gen.random(['circles', 'lines']);
+
+      if (type === 'circles') {
+        const cx = Gen.random([x, x + cellSize]);
+        const cy = Gen.random([y, y + cellSize]);
+        for (let i = 0; i < 5; i++) {
+          cellContent.circle(cellSize - (i * cellSize / 5), cx, cy)
+            .fill(palette[i % palette.length]);
+        }
+      } else {
+        for (let i = 0; i < 10; i++) {
+          cellContent.line(
+            Gen.random(x, x + cellSize), Gen.random(y, y + cellSize),
+            Gen.random(x, x + cellSize), Gen.random(y, y + cellSize)
+          ).stroke(palette[Gen.random(0, palette.length - 1)], 2);
+        }
+      }
+
+      grid.rect(cellSize, cellSize, x, y)
+        .fill('none')
+        .stroke('#ddd', 1);
+    }
+  }
+
+  return {
+    scene: svg,
+    animate: () => { }
+  };
+}
+
+// ── SvJs: Interactive Galaxy ───────────────────────────────────────────
+
+function createInteractiveGalaxy() {
+  const svgSize = 1000;
+  const svg = new SvJs();
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
+
+  svg.rect(svgSize, svgSize).fill('#050510');
+
+  const stars = svg.g();
+  const starElements: { el: SvJs, x: number, y: number, z: number }[] = [];
+
+  const count = 100;
+
+  for (let i = 0; i < count; i++) {
+    const x = Gen.random(0, svgSize);
+    const y = Gen.random(0, svgSize);
+    const z = Gen.random(0.5, 2, true);
+
+    const star = stars.circle(Gen.random(1, 3), x, y)
+      .fill('#fff', Gen.random(0.5, 1, true));
+
+    starElements.push({ el: star, x, y, z });
+  }
+
+  const cursorFollower = svg.circle(20, 0, 0)
+    .fill('none')
+    .stroke('#0ff', 2)
+    .set({ filter: 'blur(2px)' });
+
+  // Note: trackCursor attaches event listeners to the SVG element.
+  // Since we are running in a specific container, we rely on SvJs logic.
+  svg.trackCursor();
+
+  function animate() {
+    const mx = svg.cursorX ?? svgSize / 2;
+    const my = svg.cursorY ?? svgSize / 2;
+
+    cursorFollower.set({ cx: mx, cy: my });
+
+    starElements.forEach(star => {
+      const dx = (mx - svgSize / 2) * star.z * 0.1;
+      const dy = (my - svgSize / 2) * star.z * 0.1;
+      star.el.set({
+        cx: star.x + dx,
+        cy: star.y + dy
+      });
+    });
+  }
+
+  return {
+    scene: svg,
+    animate: animate
+  };
 }
 
 // ── Export all examples ────────────────────────────────────────────────
@@ -888,5 +1104,37 @@ export const EXAMPLES: ExampleDef[] = [
       "Ciudad generada algorítmicamente con edificios, parque central y torre. Demuestra generación procedural y agrupación jerárquica.",
     category: "3d",
     factory: createProceduralCity,
+  },
+  {
+    id: "porto-pareto",
+    title: "Porto Pareto",
+    description:
+      "Paisaje urbano generativo usando distribución de Pareto para alturas de edificios. Demuestra Gen.pareto y constrains.",
+    category: "svjs",
+    factory: createPortoPareto,
+  },
+  {
+    id: "gaussian-dist",
+    title: "Gaussian Distribution",
+    description:
+      "Visualización de distribución normal (campana de Gauss). Demuestra Gen.gaussian y mapeo de colores.",
+    category: "svjs",
+    factory: createGaussianDist,
+  },
+  {
+    id: "colourful-grids",
+    title: "Colourful Grids",
+    description:
+      "Grilla con patrones recortados usando clipPath y decisiones probabilísticas con Gen.chance.",
+    category: "svjs",
+    factory: createColourfulGrids,
+  },
+  {
+    id: "interactive-galaxy",
+    title: "Interactive Galaxy",
+    description:
+      "Sistema de partículas con efecto de paralaje que sigue al mouse. Demuestra trackCursor y reactividad.",
+    category: "svjs",
+    factory: createInteractiveGalaxy,
   },
 ];

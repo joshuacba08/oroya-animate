@@ -52,29 +52,29 @@ const tutorialSections: SidebarSection[] = [
     title: t('tutorials.beginner'),
     basePath: "/tutorials",
     items: [
-      { slug: "01-hello-cube", label: "Hello Cube" },
-      { slug: "02-color-palette", label: "Color Palette" },
-      { slug: "03-save-load-scenes", label: "Save & Load Scenes" },
+      { slug: "01-hello-cube", label: t('tutorials.items.helloCube') },
+      { slug: "02-color-palette", label: t('tutorials.items.colorPalette') },
+      { slug: "03-save-load-scenes", label: t('tutorials.items.saveLoadScenes') },
     ],
   },
   {
     title: t('tutorials.intermediate'),
     basePath: "/tutorials",
     items: [
-      { slug: "04-solar-system", label: "Solar System" },
-      { slug: "05-svg-generative-art", label: "SVG Generative Art" },
-      { slug: "06-cameras-viewpoints", label: "Cameras & Viewpoints" },
-      { slug: "09-svg-gradients-filters", label: "SVG Gradients & Filters" },
-      { slug: "10-svg-animations", label: "SVG Animations" },
+      { slug: "04-solar-system", label: t('tutorials.items.solarSystem') },
+      { slug: "05-svg-generative-art", label: t('tutorials.items.svgGenerativeArt') },
+      { slug: "06-cameras-viewpoints", label: t('tutorials.items.camerasViewpoints') },
+      { slug: "09-svg-gradients-filters", label: t('tutorials.items.svgGradientsFilters') },
+      { slug: "10-svg-animations", label: t('tutorials.items.svgAnimations') },
     ],
   },
   {
     title: t('tutorials.advanced'),
     basePath: "/tutorials",
     items: [
-      { slug: "07-procedural-city", label: "Procedural City" },
-      { slug: "08-multi-renderer", label: "Multi-Renderer" },
-      { slug: "11-svg-interactive", label: "SVG Interactive" },
+      { slug: "07-procedural-city", label: t('tutorials.items.proceduralCity') },
+      { slug: "08-multi-renderer", label: t('tutorials.items.multiRenderer') },
+      { slug: "11-svg-interactive", label: t('tutorials.items.svgInteractive') },
     ],
   },
 ];
@@ -151,9 +151,9 @@ function renderSections(sections: SidebarSection[], defaultBasePath: string) {
         <div class="mb-5">
           <h4 class="text-xs font-display font-semibold uppercase tracking-wider text-base-content/40 mb-2 pl-3 flex items-center gap-2">
             {section.title}
-            {section.title === t('tutorials.beginner') && <span class="badge badge-success badge-xs">Easy</span>}
-            {section.title === t('tutorials.intermediate') && <span class="badge badge-warning badge-xs">Mid</span>}
-            {section.title === t('tutorials.advanced') && <span class="badge badge-error badge-xs">Hard</span>}
+            {section.title === t('tutorials.beginner') && <span class="badge badge-success badge-xs">{t('tutorials.badgeEasy')}</span>}
+            {section.title === t('tutorials.intermediate') && <span class="badge badge-warning badge-xs">{t('tutorials.badgeMid')}</span>}
+            {section.title === t('tutorials.advanced') && <span class="badge badge-error badge-xs">{t('tutorials.badgeHard')}</span>}
           </h4>
           <ul class="space-y-0.5">
             {section.items.map((item) => (

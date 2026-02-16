@@ -180,12 +180,22 @@ export function Sidebar({ scenes, activeId, onSelect }: SidebarProps) {
   const { t } = useTranslation();
 
   // Group scenes by renderer
-  const grouped = RENDERER_ORDER.map((renderer) => ({
-    renderer,
-    meta: RENDERER_META[renderer],
-    Icon: RENDERER_ICONS[renderer],
-    scenes: scenes.filter((s) => s.renderer === renderer),
-  }));
+  const grouped = RENDERER_ORDER.map((renderer) => {
+    let groupScenes = scenes.filter((s) => s.renderer === renderer);
+
+    // Merge svjs into svg
+    if (renderer === 'svg') {
+      const svjsScenes = scenes.filter(s => s.renderer === 'svjs');
+      groupScenes = [...groupScenes, ...svjsScenes];
+    }
+
+    return {
+      renderer,
+      meta: RENDERER_META[renderer],
+      Icon: RENDERER_ICONS[renderer],
+      scenes: groupScenes,
+    };
+  });
 
   return (
     <div style={sidebarStyles}>

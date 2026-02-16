@@ -36,7 +36,20 @@
     "threeDesc": "Full 3D rendering powered by Three.js and WebGL. Support for perspective and orthographic cameras, PBR materials, glTF model loading, and real-time interaction events.",
     "svgTitle": "SVG Renderer",
     "svgDesc": "Lightweight vector graphics rendering. Perfect for generative art, data visualization, interactive diagrams, and resolution-independent graphics with CSS styling support.",
-    "swapNote": "Same scene graph — just swap the renderer"
+    "swapNote": "Same scene graph — just swap the renderer",
+    "threeBadges": {
+      "perspectiveCamera": "Perspective Camera",
+      "materials": "Materials",
+      "gltfLoading": "glTF Loading",
+      "interactionEvents": "Interaction Events"
+    },
+    "svgBadges": {
+      "path2d": "Path2D",
+      "gradients": "Gradients",
+      "filters": "Filters",
+      "animations": "Animations",
+      "interactive": "Interactive"
+    }
   },
   "code": {
     "sectionTitle": "Simple, <span>Powerful</span> API",
@@ -87,6 +100,40 @@
       "apiReference": "API Reference",
       "contributing": "Contributing",
       "principles": "Principles"
+    },
+    "entries": {
+      "getting-started": {
+        "title": "Getting Started",
+        "description": "Quick start guide for setting up Oroya Animate and creating your first scene"
+      },
+      "architecture": {
+        "title": "Architecture",
+        "description": "Design philosophy, module boundaries, and the engine-agnostic approach"
+      },
+      "scene-graph": {
+        "title": "Scene Graph",
+        "description": "Node hierarchy, transform system, and the ECS component model"
+      },
+      "renderers": {
+        "title": "Renderers",
+        "description": "Three.js WebGL and SVG renderer implementations in depth"
+      },
+      "serialization": {
+        "title": "Serialization",
+        "description": "JSON serialization for saving, loading, and sharing scenes"
+      },
+      "api-reference": {
+        "title": "API Reference",
+        "description": "Complete API documentation for all Oroya Animate packages"
+      },
+      "contributing": {
+        "title": "Contributing",
+        "description": "Development setup, workflow, and contribution guidelines"
+      },
+      "programming-principles": {
+        "title": "Programming Principles",
+        "description": "Coding conventions and design principles guiding the project"
+      }
     }
   },
   "tutorials": {
@@ -99,7 +146,69 @@
     "advanced": "Advanced",
     "advancedDesc": "Push the boundaries with procedural generation and multi-renderer patterns.",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "badgeEasy": "Easy",
+    "badgeMid": "Mid",
+    "badgeHard": "Hard",
+    "items": {
+      "helloCube": "Hello Cube",
+      "colorPalette": "Color Palette",
+      "saveLoadScenes": "Save & Load Scenes",
+      "solarSystem": "Solar System",
+      "svgGenerativeArt": "SVG Generative Art",
+      "camerasViewpoints": "Cameras & Viewpoints",
+      "svgGradientsFilters": "SVG Gradients & Filters",
+      "svgAnimations": "SVG Animations",
+      "proceduralCity": "Procedural City",
+      "multiRenderer": "Multi-Renderer",
+      "svgInteractive": "SVG Interactive"
+    },
+    "entries": {
+      "01-hello-cube": {
+        "title": "Hello Cube",
+        "description": "Create your first 3D scene with a rotating cube"
+      },
+      "02-color-palette": {
+        "title": "Color Palette",
+        "description": "Multiple geometries, materials, and composition"
+      },
+      "03-save-load-scenes": {
+        "title": "Save & Load Scenes",
+        "description": "JSON serialization for persisting scenes"
+      },
+      "04-solar-system": {
+        "title": "Solar System",
+        "description": "Hierarchical transforms and parent-child animations"
+      },
+      "05-svg-generative-art": {
+        "title": "SVG Generative Art",
+        "description": "SVG renderer and procedural generation"
+      },
+      "06-cameras-viewpoints": {
+        "title": "Cameras & Viewpoints",
+        "description": "Camera positioning and dynamic viewpoints"
+      },
+      "07-procedural-city": {
+        "title": "Procedural City",
+        "description": "Algorithmic generation of complex scenes"
+      },
+      "08-multi-renderer": {
+        "title": "Multi-Renderer",
+        "description": "Same scene rendered with multiple backends"
+      },
+      "09-svg-gradients-filters": {
+        "title": "SVG Gradients & Filters",
+        "description": "Gradients, blur, drop-shadow, clip-paths and masks"
+      },
+      "10-svg-animations": {
+        "title": "SVG Animations",
+        "description": "Declarative animations with animate and animateTransform"
+      },
+      "11-svg-interactive": {
+        "title": "SVG Interactive",
+        "description": "Interactive SVG with event delegation"
+      }
+    }
   },
   "examples": {
     "badge": "Live Demos",
