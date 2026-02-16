@@ -2,9 +2,9 @@ import type { DemoSceneDef } from '../types';
 import { cameraViewpointsControls, createCameraViewpointsScene } from './CameraViewpoints';
 import { circleOverlayControls, createCircleOverlayScene } from './CircleOverlay';
 import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
+import { colourSpiralControls, createColourSpiralScene } from './ColourSpiral';
 import { colorPaletteControls, createColorPaletteScene } from './ColorPalette';
-import { createGenerativeArtScene, generativeArtControls } from './GenerativeArt';
-import { createGradientShowcaseScene, gradientShowcaseControls } from './GradientShowcase';
+import { gradientGalleryControls, createGradientGalleryScene } from './GradientGallery';
 import { createHelloCubeScene, helloCubeControls } from './HelloCube';
 import { createHoverShowcaseScene, hoverShowcaseControls } from './HoverShowcase';
 import { createInteractiveDemoScene, interactiveDemoControls } from './InteractiveDemo';
@@ -123,29 +123,28 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     factory: createSvgInteractiveScene,
   },
   {
-    id: 'gradient-showcase',
-    label: 'Gradient Showcase',
-    description: 'Muestra de gradientes lineales y radiales con múltiples stops de color. Estilos: atardecer, océano, neón, arcoíris.',
+    id: 'colour-spiral',
+    label: 'Colour Spiral',
+    description: 'Espiral de puntos coloridos generados proceduralmente. Demuestra createSphere, fill con paleta de colores y posicionamiento polar.',
     renderer: 'svg',
-    controls: gradientShowcaseControls,
-    factory: createGradientShowcaseScene,
+    controls: colourSpiralControls,
+    factory: createColourSpiralScene,
+  },
+  {
+    id: 'gradient-gallery',
+    label: 'Gradient Gallery',
+    description: 'Barras con gradientes lineales verticales y círculos con gradientes radiales. Demuestra fillGradient lineal y radial.',
+    renderer: 'svg',
+    controls: gradientGalleryControls,
+    factory: createGradientGalleryScene,
   },
   {
     id: 'circle-overlay',
     label: 'Circle Overlay',
-    description: 'Círculos semi-transparentes superpuestos creando patrones de interferencia. Demuestra opacidad y composición de formas.',
+    description: 'Círculos translúcidos superpuestos creando profundidad. Demuestra opacity, strokeGradient y composición visual.',
     renderer: 'svg',
     controls: circleOverlayControls,
     factory: createCircleOverlayScene,
   },
-  {
-    id: 'generative-art',
-    label: 'Generative Art',
-    description: 'Composiciones de color inspiradas en artistas famosos: Albers, Mondrian, Bauhaus. Demuestra paletas de color y filtros.',
-    renderer: 'svg',
-    controls: generativeArtControls,
-    factory: createGenerativeArtScene,
-  },
   SvJsGenerativeDemo,
 ];
-

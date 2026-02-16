@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/react": "^4.0.0",
     "@oroya/core": "workspace:*",
+    "@oroya/renderer-svg": "workspace:^",
     "@oroya/renderer-three": "workspace:*",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.0.0",

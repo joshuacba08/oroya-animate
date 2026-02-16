@@ -1,119 +1,102 @@
 import {
-    Camera, CameraType,
-    createBox,
-    createSphere,
-    Material,
-    Node,
-    Scene,
+  Camera, CameraType,
+  createBox, createSphere, Material,
+  Node, Scene,
 } from '@oroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
+/* ── Controls ─────────────────────────────────────────────────────────── */
+
 export const circleOverlayControls: ControlDef[] = [
-  { type: 'slider', key: 'layers', label: 'Capas', min: 3, max: 12, step: 1, defaultValue: 6, rebuild: true },
-  {
-    type: 'select', key: 'colorScheme', label: 'Colores', defaultValue: 'teal', rebuild: true,
-    options: [
-      { value: 'teal', label: 'Turquesa' },
-      { value: 'warm', label: 'Cálido' },
-      { value: 'purple', label: 'Púrpura' },
-      { value: 'dual', label: 'Dual' },
-    ],
-  },
-  {
-    type: 'select', key: 'animate', label: 'Animar', defaultValue: 'yes', rebuild: false,
-    options: [
-      { value: 'yes', label: 'Sí' },
-      { value: 'no', label: 'No' },
-    ],
-  },
+  { type: 'slider', key: 'rings', label: 'Anillos', min: 3, max: 10, step: 1, defaultValue: 6, rebuild: true },
+  { type: 'slider', key: 'opacity', label: 'Opacidad', min: 0.05, max: 0.3, step: 0.01, defaultValue: 0.1, rebuild: true },
 ];
 
-const colorSchemes = {
-  teal: { r: 0.0, g: 0.6, b: 0.65 },
-  warm: { r: 0.85, g: 0.4, b: 0.2 },
-  purple: { r: 0.55, g: 0.3, b: 0.7 },
-  dual: { r: 0.0, g: 0.5, b: 0.75 }, // primary, secondary will be different
-};
+/* ── Scene factory ────────────────────────────────────────────────────── */
 
 export function createCircleOverlayScene(params: ParamValues) {
   const scene = new Scene();
-  const layers = (params.layers as number) || 6;
-  const scheme = (params.colorScheme as string) || 'teal';
+  const rings = (params.rings as number) || 6;
+  const alpha = (params.opacity as number) || 0.1;
 
-  const baseColor = colorSchemes[scheme as keyof typeof colorSchemes] ?? colorSchemes.teal;
-  const secondaryColor = scheme === 'dual' 
-    ? { r: 0.9, g: 0.35, b: 0.25 } 
-    : baseColor;
-
-  // Orthographic camera for 2D SVG rendering
-  const cam = new Node('camera');
+  const cam = new Node('cam');
   cam.addComponent(new Camera({
     type: CameraType.Orthographic,
-    left: 0, right: 1000,
-    top: 0, bottom: 1000,
+    left: 0, right: 1000, top: 0, bottom: 1000,
     near: 0.1, far: 100,
   }));
   scene.add(cam);
 
-  // Light background
-  const bg = new Node('background');
+  // Dark background
+  const bg = new Node('bg');
   bg.addComponent(createBox(1000, 1000, 0));
-  bg.addComponent(new Material({ fill: { r: 0.97, g: 0.97, b: 0.95 } }));
+  bg.addComponent(new Material({ fill: { r: 0.08, g: 0.09, b: 0.12 } }));
   bg.transform.position = { x: 500, y: 500, z: 0 };
+  bg.transform.updateLocalMatrix();
   scene.add(bg);
 
-  const circleNodes: Node[] = [];
-  const centerX = 500, centerY = 500;
-  const maxRadius = 350;
-  const minRadius = 60;
+  const cx = 500;
 
-  // Create overlapping circles from large to small
-  for (let i = 0; i < layers; i++) {
-    const t = i / (layers - 1);
-    const radius = maxRadius - t * (maxRadius - minRadius);
-    const opacity = 0.15 + t * 0.35;
+  // Concentric circle sets — two overlapping groups
+  for (let i = 1; i <= rings; i++) {
+    const r = 50 * i;
+    const cy1 = 800 - r; // Bottom → up
+    const cy2 = 200 + r; // Top → down
 
-    // Alternate colors for dual scheme
-    const useSecondary = scheme === 'dual' && i % 2 === 1;
-    const color = useSecondary ? secondaryColor : baseColor;
-
-    const circle = new Node(`circle-${i}`);
-    circle.addComponent(createSphere(radius, 64, 64));
-    circle.addComponent(new Material({
-      fill: color,
-      opacity: opacity,
+    // Blueish set (bottom up)
+    const blue = new Node(`blue-${i}`);
+    blue.addComponent(createSphere(r));
+    blue.addComponent(new Material({
+      fill: { r: 0.6, g: 0.93, b: 1.0 },
+      opacity: alpha,
     }));
-    circle.transform.position = {
-      x: centerX,
-      y: centerY,
-      z: 0,
-    };
-    scene.add(circle);
-    circleNodes.push(circle);
+    blue.transform.position = { x: cx, y: cy1, z: 0 };
+    blue.transform.updateLocalMatrix();
+    scene.add(blue);
+
+    // Greenish set (top down)
+    const green = new Node(`green-${i}`);
+    green.addComponent(createSphere(r));
+    green.addComponent(new Material({
+      fill: { r: 0.67, g: 1.0, b: 0.93 },
+      opacity: alpha,
+    }));
+    green.transform.position = { x: cx, y: cy2, z: 0 };
+    green.transform.updateLocalMatrix();
+    scene.add(green);
   }
 
-  // Outline circle
+  // Subtle outline circle
   const outline = new Node('outline');
-  outline.addComponent(createSphere(maxRadius + 10, 64, 64));
+  outline.addComponent(createSphere(320));
   outline.addComponent(new Material({
-    fill: { r: 0, g: 0, b: 0 },
-    opacity: 0,
-    stroke: { r: 0.3, g: 0.3, b: 0.3 },
+    stroke: { r: 0.67, g: 1.0, b: 0.93 },
     strokeWidth: 2,
+    opacity: 0.1,
   }));
-  outline.transform.position = { x: centerX, y: centerY, z: 0 };
+  outline.transform.position = { x: cx, y: 500, z: 0 };
+  outline.transform.updateLocalMatrix();
   scene.add(outline);
 
-  function animate(time: number, p: ParamValues) {
-    if (p.animate !== 'yes') return;
+  // Stroke gradient frame
+  const frame = new Node('frame');
+  frame.addComponent(createSphere(345));
+  frame.addComponent(new Material({
+    strokeGradient: {
+      type: 'linear',
+      x1: 0, y1: 0, x2: 0, y2: 1,
+      stops: [
+        { offset: 0, color: { r: 0.93, g: 0.93, b: 0.93 } },
+        { offset: 1, color: { r: 0.93, g: 0.93, b: 0.93 }, opacity: 0.08 },
+      ],
+    },
+    strokeWidth: 2.5,
+  }));
+  frame.transform.position = { x: cx, y: 500, z: 0 };
+  frame.transform.updateLocalMatrix();
+  scene.add(frame);
 
-    // Gentle breathing animation
-    circleNodes.forEach((node, i) => {
-      const phase = (i / circleNodes.length) * Math.PI * 2;
-      const scale = 1 + 0.03 * Math.sin(time * 0.001 + phase);
-      node.transform.scale = { x: scale, y: scale, z: 1 };
-    });
-  }
+  function animate(_time: number, _p: ParamValues) {}
 
   return { scene, animate };
 }

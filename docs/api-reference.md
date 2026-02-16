@@ -27,6 +27,9 @@ Complete reference for all packages in the Oroya Animate ecosystem.
 - [`@oroya/renderer-svg`](#oroyarenderer-svg)
   - [renderToSVG](#rendertosvg)
   - [renderToSVGElement](#rendertosvgelement)
+  - [SvJs](#svjs)
+  - [Gen](#gen-módulo)
+  - [Noise](#noise)
 - [`@oroya/loader-gltf`](#oroyaloader-gltf)
   - [loadGLTF](#loadgltf)
 - [Mapa completo de tipos](#mapa-completo-de-tipos)
@@ -1524,9 +1527,115 @@ writeFileSync('output.svg', svg);
 
 > **Ventaja clave:** Esta función es **pura** y no requiere DOM. Funciona en Node.js para server-side rendering.
 
+### `SvJs`
+
+Clase wrapper para manipulación de SVG con una API fluida y concisa. Ideal para gráficos generativos en el cliente.
+
+**Importación:**
+```typescript
+import { SvJs } from '@oroya/renderer-svg';
+```
+
+#### Constructor
+
+```typescript
+new SvJs(element?: string | SVGElement, namespace?: string)
+```
+
+- **`element`**: Nombre del tag a crear (por defecto `'svg'`) o un elemento existente.
+- **`namespace`**: Namespace XML (por defecto `'http://www.w3.org/2000/svg'`).
+
+#### Métodos Core
+
+| Método | Firma | Descripción |
+|--------|-------|-------------|
+| `addTo` | `addTo(node: Element): this` | Agrega el elemento al nodo DOM especificado. |
+| `create` | `create(element: string): SvJs` | Crea un hijo y lo retorna como instancia `SvJs`. |
+| `set` | `set(attrs: object): this` | Establece atributos. Convierte `_` a `-` (ej. `stroke_width` -> `stroke-width`). |
+| `delete` | `delete(): void` | Elimina el elemento del DOM. |
+| `save` | `save(): void` | Descarga el SVG como archivo. |
+
+#### Métodos Fluidos (Shortcuts)
+
+| Método | Firma | Descripción |
+|--------|-------|-------------|
+| `rect` | `rect(w, h, x?, y?): SvJs` | Crea un `<rect>`. |
+| `circle` | `circle(r, cx?, cy?): SvJs` | Crea un `<circle>`. |
+| `ellipse` | `ellipse(rx, ry, cx?, cy?): SvJs` | Crea un `<ellipse>`. |
+| `line` | `line(x1, y1, x2, y2): SvJs` | Crea un `<line>`. |
+| `polyline` | `polyline(points: number[]): SvJs` | Crea un `<polyline>`. |
+| `text` | `text(content, x?, y?): SvJs` | Crea un `<text>`. |
+| `g` | `g(): SvJs` | Crea un grupo `<g>`. |
+
+#### Métodos de Estilo Fluido
+
+Se pueden encadenar a cualquier instancia `SvJs`.
+
+| Método | Firma | Descripción |
+|--------|-------|-------------|
+| `fill` | `fill(color, opacity?): this` | Establece relleno y opacidad. |
+| `stroke` | `stroke(color, width?, opacity?): this` | Establece trazo, ancho y opacidad. |
+| `strokeDash` | `strokeDash(array): this` | Establece `stroke-dasharray`. |
+| `rotate` | `rotate(angle, cx?, cy?): this` | Aplica transformación de rotación. |
+| `scale` | `scale(sx, sy?): this` | Aplica transformación de escala. |
+| `move` | `moveTo(x, y): this` | Mueve el elemento respecto a su centro. |
+
+#### Helpers Avanzados
+
+| Método | Descripción |
+|--------|-------------|
+| `createCurve(points, curveFactor)` | Crea una curva Bézier suave a partir de puntos. |
+| `createGradient(id, type, colors, rot)` | Crea un gradiente lineal o radial en `<defs>`. |
+| `createFilter(id)` | Crea un filtro base en `<defs>`. |
+| `createPattern(id, w, h)` | Crea un patrón en `<defs>`. |
+| `trackCursor(cb)` | Activa el rastreo de cursor (`cursorX`, `cursorY`). |
+
+---
+
+### `Gen` (Módulo)
+
+Utilidades matemáticas y de aleatoriedad para arte generativo.
+
+**Importación:**
+```typescript
+import { Gen } from '@oroya/renderer-svg';
+```
+
+#### Funciones
+
+| Función | Firma | Descripción |
+|---------|-------|-------------|
+| `random` | `random(min, max): number` | Número aleatorio entre min y max. |
+| `chance` | `chance(p): boolean` | Retorna `true` con probabilidad `p` (0-1). |
+| `map` | `map(val, inMin, inMax, outMin, outMax)` | Mapea un valor de un rango a otro. |
+| `dist` | `dist(x1, y1, x2, y2): number` | Distancia euclidiana entre dos puntos. |
+| `constrain` | `constrain(val, min, max): number` | Restringe un valor entre min y max. |
+| `interp` | `interp(a, b, t): number` | Interpolación lineal (lerp). |
+| `gaussian` | `gaussian(mean, sd): number` | Número aleatorio con distribución normal. |
+| `pareto` | `pareto(min, alpha): number` | Número aleatorio con distribución de Pareto. |
+
+---
+
+### `Noise`
+
+Implementación de Perlin Noise simple.
+
+**Importación:**
+```typescript
+import { Noise } from '@oroya/renderer-svg';
+const noise = new Noise();
+```
+
+#### Métodos
+
+| Método | Firma | Descripción |
+|--------|-------|-------------|
+| `get` | `get(x, y): number` | Obtiene valor de ruido 2D en (x, y). |
+
 ---
 
 ## `@oroya/loader-gltf`
+
 
 ### `loadGLTF`
 
@@ -1664,6 +1773,9 @@ graph TD
 | `ThreeRenderer` | class | Rendering | `@oroya/renderer-three` |
 | `renderToSVG` | function | Rendering | `@oroya/renderer-svg` |
 | `renderToSVGElement` | function | Rendering | `@oroya/renderer-svg` |
+| `SvJs` | class | Rendering | `@oroya/renderer-svg` |
+| `Gen` | module | Utils | `@oroya/renderer-svg` |
+| `Noise` | class | Utils | `@oroya/renderer-svg` |
 | `TextGeometryDef` | interface | Types | `@oroya/core` |
 | `GradientDef` | type alias | Types | `@oroya/core` |
 | `LinearGradientDef` | interface | Types | `@oroya/core` |

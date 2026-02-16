@@ -1,0 +1,160 @@
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", function () {
+    // SVG icons
+    var copyIcon =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>' +
+      '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>' +
+      "</svg>";
+
+    var checkIcon =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<polyline points="20 6 9 17 4 12"/>' +
+      "</svg>";
+
+    function createCopyButton(getText) {
+      var btn = document.createElement("button");
+      btn.className = "copy-code-btn";
+      btn.title = "Copy to clipboard";
+      btn.innerHTML = copyIcon;
+
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var text = getText();
+        if (!text) return;
+
+        navigator.clipboard.writeText(text).then(function () {
+          btn.innerHTML = checkIcon;
+          btn.classList.add("copied");
+          setTimeout(function () {
+            btn.innerHTML = copyIcon;
+            btn.classList.remove("copied");
+          }, 2000);
+        });
+      });
+
+      return btn;
+    }
+
+    // 1. All <pre> blocks that contain <code> (Shiki, astro-code, code-highlight-wrapper)
+    document.querySelectorAll("pre").forEach(function (pre) {
+      // Skip mermaid blocks
+      if (
+        pre.getAttribute("data-language") === "mermaid" ||
+        pre.closest(".mermaid-container")
+      )
+        return;
+
+      // Skip if already has a copy button
+      if (pre.querySelector(".copy-code-btn")) return;
+
+      // For mockup-code blocks, add the button to the mockup-code parent
+      var mockup = pre.closest(".mockup-code");
+      if (mockup) {
+        if (mockup.querySelector(".copy-code-btn")) return;
+        mockup.style.position = "relative";
+        var btn = createCopyButton(function () {
+          var code = pre.querySelector("code");
+          return code ? code.textContent.trim() : pre.textContent.trim();
+        });
+        mockup.appendChild(btn);
+        return;
+      }
+
+      // For code-highlight-wrapper, add to the wrapper's parent (the card)
+      var highlightWrapper = pre.closest(".code-highlight-wrapper");
+      if (highlightWrapper) {
+        var card = highlightWrapper.closest(".code-card, .glass-card");
+        if (card && !card.querySelector(".copy-code-btn")) {
+          card.style.position = "relative";
+          var btn = createCopyButton(function () {
+            var code = pre.querySelector("code");
+            return code ? code.textContent.trim() : pre.textContent.trim();
+          });
+          card.appendChild(btn);
+        }
+        return;
+      }
+
+      // Standard pre > code blocks (docs, tutorials)
+      pre.style.position = "relative";
+      var btn = createCopyButton(function () {
+        var code = pre.querySelector("code");
+        return code ? code.textContent.trim() : pre.textContent.trim();
+      });
+      pre.appendChild(btn);
+    });
+  });
+</script>
+
+<style is:global>
+  .copy-code-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid oklch(0.5 0 0 / 0.2);
+    border-radius: 0.375rem;
+    background: oklch(0.2 0.02 265 / 0.6);
+    color: oklch(0.7 0 0);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Show on hover of parent */
+  pre:hover > .copy-code-btn,
+  .mockup-code:hover > .copy-code-btn,
+  .code-card:hover > .copy-code-btn,
+  .glass-card:hover > .copy-code-btn {
+    opacity: 1;
+  }
+
+  .copy-code-btn:hover {
+    background: oklch(0.3 0.03 265 / 0.8);
+    color: oklch(0.9 0 0);
+    border-color: oklch(0.5 0 0 / 0.35);
+  }
+
+  .copy-code-btn.copied {
+    color: oklch(0.7 0.15 150);
+    border-color: oklch(0.5 0.1 150 / 0.4);
+  }
+
+  /* Light theme adjustments */
+  [data-theme="light"] .copy-code-btn {
+    background: oklch(0.95 0.01 265 / 0.7);
+    color: oklch(0.4 0 0);
+    border-color: oklch(0.75 0.02 265 / 0.4);
+  }
+
+  [data-theme="light"] .copy-code-btn:hover {
+    background: oklch(0.9 0.01 265 / 0.9);
+    color: oklch(0.2 0 0);
+  }
+
+  /* But code blocks are always dark, so buttons inside pre should always use dark style */
+  pre .copy-code-btn,
+  .code-card .copy-code-btn,
+  .mockup-code .copy-code-btn {
+    background: oklch(0.2 0.02 265 / 0.6);
+    color: oklch(0.7 0 0);
+    border-color: oklch(0.5 0 0 / 0.2);
+  }
+
+  pre .copy-code-btn:hover,
+  .code-card .copy-code-btn:hover,
+  .mockup-code .copy-code-btn:hover {
+    background: oklch(0.3 0.03 265 / 0.8);
+    color: oklch(0.9 0 0);
+    border-color: oklch(0.5 0 0 / 0.35);
+  }
+</style>

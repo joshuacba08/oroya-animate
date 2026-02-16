@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar.astro";
 import DocsSidebar from "../components/DocsSidebar.astro";
 import Footer from "../components/Footer.astro";
 import MermaidInit from "../components/MermaidInit.astro";
+import CopyCodeInit from "../components/CopyCodeInit.astro";
 
 interface Props {
   title: string;
@@ -112,5 +113,7 @@ const fullTitle = `${title} — Oroya Animate Docs`;
 
     <!-- Mermaid diagram rendering -->
     <MermaidInit />
+    <!-- Copy code buttons -->
+    <CopyCodeInit />
   </body>
 </html>

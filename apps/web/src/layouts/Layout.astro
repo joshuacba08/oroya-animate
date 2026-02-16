@@ -1,5 +1,6 @@
 ---
 import "../assets/app.css";
+import CopyCodeInit from "../components/CopyCodeInit.astro";
 
 interface Props {
   title?: string;
@@ -60,5 +61,6 @@ const {
     </div>
 
     <slot />
+    <CopyCodeInit />
   </body>
 </html>
