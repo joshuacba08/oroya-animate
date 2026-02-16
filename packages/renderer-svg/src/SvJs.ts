@@ -497,114 +497,113 @@ export class SvJs {
             throw new Error('Invalid SVG element');
         }
     }
-}
 
-/* ── Fluent Construction Shortcuts ───────────────────────────── */
+    /* ── Fluent Construction Shortcuts ───────────────────────────── */
 
-/**
- * Create a <rect> element.
- */
-rect(width: number, height: number, x: number = 0, y: number = 0): SvJs {
-    const el = this.create('rect');
-    el.set({ width, height, x, y });
-    return el;
-}
-
-/**
- * Create a <circle> element.
- */
-circle(r: number, cx: number = 0, cy: number = 0): SvJs {
-    const el = this.create('circle');
-    el.set({ r, cx, cy });
-    return el;
-}
-
-/**
- * Create an <ellipse> element.
- */
-ellipse(rx: number, ry: number, cx: number = 0, cy: number = 0): SvJs {
-    const el = this.create('ellipse');
-    el.set({ rx, ry, cx, cy });
-    return el;
-}
-
-/**
- * Create a <line> element.
- */
-line(x1: number, y1: number, x2: number, y2: number): SvJs {
-    const el = this.create('line');
-    el.set({ x1, y1, x2, y2 });
-    return el;
-}
-
-/**
- * Create a <polyline> element.
- */
-polyline(points: number[] | number[][]): SvJs {
-    const el = this.create('polyline');
-    // Handle flat array or array of pairs
-    const pts = points.flat().join(' ');
-    el.set({ points: pts });
-    return el;
-}
-
-/**
- * Create a <text> element.
- */
-text(content: string, x: number = 0, y: number = 0): SvJs {
-    const el = this.create('text');
-    el.set({ x, y });
-    el.content(content);
-    return el;
-}
-
-/**
- * Create a <g> (group) element.
- */
-g(): SvJs {
-    return this.create('g');
-}
-
-/**
-* Create a <g> (group) element (alias).
-*/
-group(): SvJs {
-    return this.create('g');
-}
-
-/* ── Fluent Styling ──────────────────────────────────────────── */
-
-/**
- * Set fill color and optional opacity.
- */
-fill(color: string, opacity ?: number): this {
-    this.set({ fill: color });
-    if (opacity !== undefined) {
-        this.set({ fill_opacity: opacity });
+    /**
+     * Create a <rect> element.
+     */
+    rect(width: number, height: number, x: number = 0, y: number = 0): SvJs {
+        const el = this.create('rect');
+        el.set({ width, height, x, y });
+        return el;
     }
-    return this;
-}
 
-/**
- * Set stroke color, width, and optional opacity.
- */
-stroke(color: string, width ?: number, opacity ?: number): this {
-    this.set({ stroke: color });
-    if (width !== undefined) {
-        this.set({ stroke_width: width });
+    /**
+     * Create a <circle> element.
+     */
+    circle(r: number, cx: number = 0, cy: number = 0): SvJs {
+        const el = this.create('circle');
+        el.set({ r, cx, cy });
+        return el;
     }
-    if (opacity !== undefined) {
-        this.set({ stroke_opacity: opacity });
-    }
-    return this;
-}
 
-/**
- * Set stroke-dasharray.
- */
-strokeDash(array: number[] | string): this {
-    const val = Array.isArray(array) ? array.join(' ') : array;
-    this.set({ stroke_dasharray: val });
-    return this;
-}
+    /**
+     * Create an <ellipse> element.
+     */
+    ellipse(rx: number, ry: number, cx: number = 0, cy: number = 0): SvJs {
+        const el = this.create('ellipse');
+        el.set({ rx, ry, cx, cy });
+        return el;
+    }
+
+    /**
+     * Create a <line> element.
+     */
+    line(x1: number, y1: number, x2: number, y2: number): SvJs {
+        const el = this.create('line');
+        el.set({ x1, y1, x2, y2 });
+        return el;
+    }
+
+    /**
+     * Create a <polyline> element.
+     */
+    polyline(points: number[] | number[][]): SvJs {
+        const el = this.create('polyline');
+        // Handle flat array or array of pairs
+        const pts = points.flat().join(' ');
+        el.set({ points: pts });
+        return el;
+    }
+
+    /**
+     * Create a <text> element.
+     */
+    text(content: string, x: number = 0, y: number = 0): SvJs {
+        const el = this.create('text');
+        el.set({ x, y });
+        el.content(content);
+        return el;
+    }
+
+    /**
+     * Create a <g> (group) element.
+     */
+    g(): SvJs {
+        return this.create('g');
+    }
+
+    /**
+     * Create a <g> (group) element (alias).
+     */
+    group(): SvJs {
+        return this.create('g');
+    }
+
+    /* ── Fluent Styling ──────────────────────────────────────────── */
+
+    /**
+     * Set fill color and optional opacity.
+     */
+    fill(color: string, opacity?: number): this {
+        this.set({ fill: color });
+        if (opacity !== undefined) {
+            this.set({ fill_opacity: opacity });
+        }
+        return this;
+    }
+
+    /**
+     * Set stroke color, width, and optional opacity.
+     */
+    stroke(color: string, width?: number, opacity?: number): this {
+        this.set({ stroke: color });
+        if (width !== undefined) {
+            this.set({ stroke_width: width });
+        }
+        if (opacity !== undefined) {
+            this.set({ stroke_opacity: opacity });
+        }
+        return this;
+    }
+
+    /**
+     * Set stroke-dasharray.
+     */
+    strokeDash(array: number[] | string): this {
+        const val = Array.isArray(array) ? array.join(' ') : array;
+        this.set({ stroke_dasharray: val });
+        return this;
+    }
 }

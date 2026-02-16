@@ -20,8 +20,7 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
         svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
 
         // Background
-        const rect = svg.create('rect');
-        rect.set({ x: 0, y: 0, width: svgSize, height: svgSize, fill: bgColor });
+        svg.rect(svgSize, svgSize, 0, 0).fill(bgColor);
 
         const iterations = Number(params.iterations);
         const baseHue = Number(params.hue);
@@ -45,16 +44,10 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
             hue = hue % 360;
 
             // Create our ellipse
-            let ellipse = svg.create('ellipse');
-            ellipse.set({
-                cx: center,
-                cy: center,
-                rx: radiusX,
-                ry: radiusY,
-                fill: 'none',
-                stroke: `hsl(${hue} 80% 80% / 0.6)`,
-                transform: `rotate(${rotation} ${center} ${center})`
-            });
+            svg.ellipse(radiusX, radiusY, center, center)
+                .fill('none') // Default fill is usually black in SVG, explicit none
+                .stroke(`hsl(${hue} 80% 80% / 0.6)`)
+                .rotate(rotation, center, center);
         }
 
         return {

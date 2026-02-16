@@ -1,82 +1,33 @@
----
-/**
- * MermaidInit — client-side Mermaid diagram renderer.
- * Finds all `<code class="language-mermaid">` blocks produced by Astro's
- * markdown pipeline and replaces them with rendered SVG diagrams.
- *
- * Drop this component once inside any layout that renders markdown with
- * mermaid fenced code blocks.
- */
----
+<!-- Mermaid CDN -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" is:inline></script>
 
-<script>
-  import mermaid from "mermaid";
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", function () {
+    var blocks = document.querySelectorAll('pre[data-language="mermaid"]');
+    if (blocks.length === 0) return;
 
-  function initMermaid() {
     mermaid.initialize({
       startOnLoad: false,
       theme: "dark",
-      themeVariables: {
-        primaryColor: "#a78bfa",
-        primaryTextColor: "#e2e8f0",
-        primaryBorderColor: "#7c3aed",
-        secondaryColor: "#1e293b",
-        tertiaryColor: "#0f172a",
-        lineColor: "#60a5fa",
-        textColor: "#e2e8f0",
-        mainBkg: "#1e1b4b",
-        nodeBorder: "#7c3aed",
-        clusterBkg: "#1e1b4b22",
-        clusterBorder: "#4c1d95",
-        titleColor: "#e2e8f0",
-        edgeLabelBackground: "#1e1b4b",
-        nodeTextColor: "#e2e8f0",
-      },
-      fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-      flowchart: { htmlLabels: true, curve: "basis" },
-      securityLevel: "loose",
+      fontFamily: "Inter, sans-serif",
     });
 
-    const codeBlocks = document.querySelectorAll<HTMLElement>(
-      "pre > code.language-mermaid"
-    );
+    blocks.forEach(function (pre, i) {
+      var text = pre.textContent.trim();
+      if (!text) return;
 
-    codeBlocks.forEach(async (codeEl, idx) => {
-      const pre = codeEl.parentElement;
-      if (!pre) return;
-
-      const graphDefinition = codeEl.textContent?.trim() ?? "";
-      if (!graphDefinition) return;
-
-      const id = `mermaid-diagram-${idx}`;
-
-      try {
-        const { svg } = await mermaid.render(id, graphDefinition);
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "mermaid-diagram";
-        wrapper.innerHTML = svg;
-
-        pre.replaceWith(wrapper);
-      } catch (err) {
-        console.error(`[MermaidInit] Failed to render diagram #${idx}:`, err);
-      }
+      var div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = text;
+      pre.replaceWith(div);
     });
-  }
 
-  // Run after DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMermaid);
-  } else {
-    initMermaid();
-  }
-
-  // Support Astro view transitions
-  document.addEventListener("astro:after-swap", initMermaid);
+    mermaid.run({ nodes: document.querySelectorAll(".mermaid") });
+  });
 </script>
 
 <style is:global>
-  .mermaid-diagram {
+  .mermaid {
     display: flex;
     justify-content: center;
     margin: 1.5rem 0;
@@ -87,7 +38,7 @@
     overflow-x: auto;
   }
 
-  .mermaid-diagram svg {
+  .mermaid svg {
     max-width: 100%;
     height: auto;
   }
