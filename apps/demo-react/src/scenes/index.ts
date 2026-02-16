@@ -3,11 +3,15 @@ import { cameraViewpointsControls, createCameraViewpointsScene } from './CameraV
 import { circleOverlayControls, createCircleOverlayScene } from './CircleOverlay';
 import { clickPlaygroundControls, createClickPlaygroundScene } from './ClickPlayground';
 import { colourSpiralControls, createColourSpiralScene } from './ColourSpiral';
+import { colourfulGridsControls, createColourfulGridsScene } from './ColourfulGrids';
 import { colorPaletteControls, createColorPaletteScene } from './ColorPalette';
+import { gaussianDistControls, createGaussianDistScene } from './GaussianDist';
 import { gradientGalleryControls, createGradientGalleryScene } from './GradientGallery';
 import { createHelloCubeScene, helloCubeControls } from './HelloCube';
 import { createHoverShowcaseScene, hoverShowcaseControls } from './HoverShowcase';
 import { createInteractiveDemoScene, interactiveDemoControls } from './InteractiveDemo';
+import { interactiveGalaxyControls, createInteractiveGalaxyScene } from './InteractiveGalaxy';
+import { portoParetoControls, createPortoParetoScene } from './PortoPareto';
 import { createProceduralCityScene, proceduralCityControls } from './ProceduralCity';
 import { createShapeGridScene, shapeGridControls } from './ShapeGrid';
 import { createSolarSystemScene, solarSystemControls } from './SolarSystem';
@@ -145,6 +149,38 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'svg',
     controls: circleOverlayControls,
     factory: createCircleOverlayScene,
+  },
+  {
+    id: 'porto-pareto',
+    label: 'Porto Pareto',
+    description: 'Paisaje urbano generativo usando distribución de Pareto para alturas de edificios. Demuestra Gen.pareto y constrains.',
+    renderer: 'svg',
+    controls: portoParetoControls,
+    factory: createPortoParetoScene,
+  },
+  {
+    id: 'gaussian-dist',
+    label: 'Gaussian Distribution',
+    description: 'Visualización de distribución normal (campana de Gauss). Demuestra Gen.gaussian y mapeo de colores.',
+    renderer: 'svg',
+    controls: gaussianDistControls,
+    factory: createGaussianDistScene,
+  },
+  {
+    id: 'colourful-grids',
+    label: 'Colourful Grids',
+    description: 'Grilla con patrones recortados usando clipPath y decisiones probabilísticas con Gen.chance.',
+    renderer: 'svg',
+    controls: colourfulGridsControls,
+    factory: createColourfulGridsScene,
+  },
+  {
+    id: 'interactive-galaxy',
+    label: 'Interactive Galaxy',
+    description: 'Sistema de partículas con efecto de paralaje que sigue al mouse. Demuestra trackCursor y reactividad.',
+    renderer: 'svg',
+    controls: interactiveGalaxyControls,
+    factory: createInteractiveGalaxyScene,
   },
   SvJsGenerativeDemo,
 ];

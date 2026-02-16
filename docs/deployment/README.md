@@ -1,12 +1,15 @@
-# Deployment & Publishing
+# Deployment & Publishing - Complete Guide
 
-This directory contains guides for deploying and publishing Oroya Animate.
+This directory contains comprehensive guides for deploying and publishing Oroya Animate.
 
 ## 📚 Documentation
 
+### Core Guides
 - **[NPM Publishing](./npm-publishing.md)** - Complete guide to publishing packages to NPM
 - **[CDN Setup](./cdn-setup.md)** - Using Oroya Animate directly from CDN
 - **[Vercel Deployment](./vercel-deployment.md)** - Deploy the documentation website to Vercel
+- **[Package Metadata](./package-metadata.md)** - Optimize package discoverability on NPM
+- **[Deployment Checklist](./CHECKLIST.md)** - Comprehensive release checklist
 
 ## 🚀 Quick Start
 
@@ -39,9 +42,9 @@ vercel login
 vercel --prod
 ```
 
-## 🔧 Configuration Files
+## ⚙️ Configuration Files Created
 
-The following configuration files are already set up:
+All configuration files are ready to use:
 
 - [`/.github/workflows/ci.yml`](../../.github/workflows/ci.yml) - Continuous Integration
 - [`/.github/workflows/publish.yml`](../../.github/workflows/publish.yml) - NPM Publishing
@@ -50,77 +53,142 @@ The following configuration files are already set up:
 - [`/.npmrc`](../../.npmrc) - NPM configuration
 - [`/scripts/sync-versions.js`](../../scripts/sync-versions.js) - Version synchronization
 
+## 📦 Package Updates
+
+All 4 packages now include:
+- ✅ Complete metadata (keywords, author, repository, homepage)
+- ✅ README.md with examples and badges
+- ✅ Peer dependencies configuration
+- ✅ SEO-optimized descriptions
+
+Updated packages:
+- `packages/core/package.json` + README.md
+- `packages/renderer-three/package.json` + README.md
+- `packages/renderer-svg/package.json` + README.md
+- `packages/loader-gltf/package.json` + README.md
+
 ## 🔐 Required Secrets
 
 ### For NPM Publishing
 
 Add to GitHub Secrets (Settings → Secrets → Actions):
 
-- `NPM_TOKEN` - NPM authentication token (generate with `npm token create`)
+- `NPM_TOKEN` - NPM authentication token
+  ```bash
+  npm token create --read-write
+  ```
 
 ### For Vercel Deployment
 
 Add to GitHub Secrets:
 
 - `VERCEL_TOKEN` - Vercel authentication token
-- `VERCEL_ORG_ID` - Vercel organization ID
-- `VERCEL_PROJECT_ID` - Vercel project ID
+- `VERCEL_ORG_ID` - Organization ID
+- `VERCEL_PROJECT_ID` - Project ID
 
-Get these values by running:
+Get these values:
 ```bash
 vercel link
 cat .vercel/project.json
 ```
 
-## 📊 Deployment Flow
+## 📊 Automated Deployment Flow
 
-```mermaid
-graph TD
-    A[Push Code] --> B{Branch?}
-    B -->|main| C[CI Tests]
-    B -->|PR| D[CI Tests + Preview]
-    C --> E[Auto Deploy to Vercel]
-    D --> F[Deploy Preview]
-    
-    G[Create Tag v*] --> H[Run Tests]
-    H --> I[Build Packages]
-    I --> J[Publish to NPM]
-    J --> K[Create GitHub Release]
-    K --> L[Available on CDN]
+```
+Developer
+   ↓
+Push code or create tag
+   ↓
+GitHub Actions
+   ↓
+├─ CI Tests (on every push/PR)
+├─ NPM Publish (on version tag)
+└─ Vercel Deploy (on main branch)
+   ↓
+Published & Deployed
+   ↓
+├─ NPM Registry
+├─ CDN (unpkg, jsDelivr, esm.sh)
+└─ Vercel (oroya-animate.vercel.app)
 ```
 
-## 🎯 Checklist for First Deploy
+## 🎯 First-Time Setup Checklist
 
 ### NPM Publishing
-
-- [ ] Create NPM account
-- [ ] Create `@oroya` organization on NPM
-- [ ] Generate NPM token
+- [ ] Create NPM account at [npmjs.com](https://www.npmjs.com)
+- [ ] Create `@oroya` organization
+- [ ] Generate NPM token: `npm token create --read-write`
 - [ ] Add `NPM_TOKEN` to GitHub Secrets
-- [ ] Test local build: `pnpm build`
-- [ ] Create version tag: `git tag v0.3.0`
-- [ ] Push tag: `git push --tags`
-- [ ] Verify on npmjs.com
+- [ ] Test build: `pnpm build && pnpm test`
+- [ ] Create test tag to verify automation
 
 ### Vercel Deployment
-
-- [ ] Create Vercel account
-- [ ] Install Vercel CLI: `npm i -g vercel`
+- [ ] Create Vercel account at [vercel.com](https://vercel.com)
+- [ ] Install CLI: `npm install -g vercel`
 - [ ] Login: `vercel login`
 - [ ] Link project: `vercel link`
-- [ ] Get Vercel secrets: `cat .vercel/project.json`
-- [ ] Add secrets to GitHub
-- [ ] Push to main branch
-- [ ] Verify deployment on Vercel dashboard
+- [ ] Get secrets: `cat .vercel/project.json`
+- [ ] Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` to GitHub Secrets
+- [ ] Push to main to test automatic deployment
+
+## 📝 New Package.json Scripts
+
+The root `package.json` now includes:
+
+```json
+{
+  "build:web": "Build packages and web app",
+  "dev:web": "Run web app in development",
+  "sync-versions": "Synchronize package versions",
+  "publish:packages": "Build and publish all packages",
+  "deploy:web": "Build and deploy website to Vercel"
+}
+```
+
+## 🔄 Normal Release Workflow
+
+1. **Develop** - Make changes, add features
+2. **Test** - `pnpm test && pnpm typecheck`
+3. **Version** - `node scripts/sync-versions.js X.Y.Z`
+4. **Commit** - `git commit -am "Release vX.Y.Z"`
+5. **Tag** - `git tag vX.Y.Z`
+6. **Push** - `git push && git push --tags`
+7. **Monitor** - Watch GitHub Actions complete
+8. **Verify** - Check NPM, CDN, and Vercel
+
+## ✅ Success Indicators
+
+Everything is working correctly when:
+
+- ✅ CI passes on every PR
+- ✅ Tags trigger NPM publish automatically
+- ✅ Packages appear on npmjs.com within minutes
+- ✅ CDN links work immediately (unpkg, jsDelivr)
+- ✅ Website deploys on push to main
+- ✅ PR previews are created automatically
+- ✅ All README badges show correct status
 
 ## 🐛 Troubleshooting
 
-See individual guides for detailed troubleshooting:
+See detailed troubleshooting in each guide:
 - [NPM Publishing Issues](./npm-publishing.md#-troubleshooting)
 - [CDN Issues](./cdn-setup.md#-limitations--considerations)
 - [Vercel Issues](./vercel-deployment.md#-troubleshooting)
+
+## 📚 Additional Resources
+
+- [Semantic Versioning](https://semver.org/)
+- [NPM Documentation](https://docs.npmjs.com/)
+- [Vercel Documentation](https://vercel.com/docs)
+- [GitHub Actions](https://docs.github.com/en/actions)
 
 ## 📞 Support
 
 - GitHub Issues: https://github.com/joshuacba08/oroya-animate/issues
 - Discussions: https://github.com/joshuacba08/oroya-animate/discussions
+
+---
+
+**Last Updated:** 2026-02-16  
+**Documentation Version:** 1.0.0
+
