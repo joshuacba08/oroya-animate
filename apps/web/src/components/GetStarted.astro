@@ -4,8 +4,8 @@ import { getLocaleFromUrl, useTranslations, getLocalizedPath } from '../i18n';
 const locale = getLocaleFromUrl(Astro.url);
 const t = useTranslations(locale);
 
-const sceneCode = `import { Scene, Node, createBox, Material } from '@oroya/core'
-import { ThreeRenderer } from '@oroya/renderer-three'
+const sceneCode = `import { Scene, Node, createBox, Material } from '@joroya/core'
+import { ThreeRenderer } from '@joroya/renderer-three'
 
 const scene = new Scene()
 
@@ -42,7 +42,7 @@ renderer.render()`;
             <span class="font-display font-semibold text-sm">{t('getStarted.step1')}</span>
           </div>
           <div class="mockup-code terminal-dark">
-            <pre data-prefix="$" class="text-sm"><code class="font-mono">pnpm add @oroya/core @oroya/renderer-three three</code></pre>
+            <pre data-prefix="$" class="text-sm"><code class="font-mono">pnpm add @joroya/core @joroya/renderer-three three</code></pre>
           </div>
         </div>
 

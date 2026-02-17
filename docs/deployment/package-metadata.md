@@ -239,7 +239,7 @@ Ensure all links work:
 
 ## 📊 NPM Profile Optimization
 
-### Organization Profile (@oroya)
+### Organization Profile (@joroya)
 
 Set up at https://www.npmjs.com/settings/oroya/profile:
 
@@ -248,7 +248,7 @@ Set up at https://www.npmjs.com/settings/oroya/profile:
   "name": "Oroya Animate",
   "description": "Engine-agnostic 2D/3D graphics library for the web",
   "website": "https://oroya-animate.vercel.app",
-  "twitter": "@oroya_animate",
+  "twitter": "@joroya_animate",
   "github": "joshuacba08"
 }
 ```

@@ -54,20 +54,20 @@ jobs:
             ## Changes in v${{ steps.version.outputs.VERSION }}
             
             ### Packages Published
-            - `@oroya/core@${{ steps.version.outputs.VERSION }}`
-            - `@oroya/renderer-three@${{ steps.version.outputs.VERSION }}`
-            - `@oroya/renderer-svg@${{ steps.version.outputs.VERSION }}`
-            - `@oroya/loader-gltf@${{ steps.version.outputs.VERSION }}`
+            - `@joroya/core@${{ steps.version.outputs.VERSION }}`
+            - `@joroya/renderer-three@${{ steps.version.outputs.VERSION }}`
+            - `@joroya/renderer-svg@${{ steps.version.outputs.VERSION }}`
+            - `@joroya/loader-gltf@${{ steps.version.outputs.VERSION }}`
             
             ### Installation
             ```bash
-            npm install @oroya/core @oroya/renderer-three
+            npm install @joroya/core @joroya/renderer-three
             ```
             
             ### CDN
             ```html
             <script type="module">
-              import { Scene } from 'https://unpkg.com/@oroya/core@${{ steps.version.outputs.VERSION }}/dist/index.js';
+              import { Scene } from 'https://unpkg.com/@joroya/core@${{ steps.version.outputs.VERSION }}/dist/index.js';
             </script>
             ```
           draft: false

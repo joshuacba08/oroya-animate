@@ -49,7 +49,7 @@ Use this checklist to ensure all steps are completed for successful deployment a
 
 ### One-Time Setup
 - [ ] NPM account created
-- [ ] `@oroya` organization created on NPM
+- [ ] `@joroya` organization created on NPM
 - [ ] Team members added to organization (if applicable)
 - [ ] NPM token generated: `npm token create --read-write`
 - [ ] Token added to GitHub Secrets as `NPM_TOKEN`

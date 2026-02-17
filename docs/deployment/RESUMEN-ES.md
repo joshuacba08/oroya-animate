@@ -106,7 +106,7 @@ Se ha creado toda la documentación y configuración necesaria para publicar el 
 
 ```bash
 # Crear cuenta en npmjs.com
-# Crear organización @oroya
+# Crear organización @joroya
 
 # Generar token
 npm token create --read-write
@@ -206,7 +206,7 @@ curl https://oroya-animate.vercel.app
 ### Antes de la Primera Publicación
 
 - [ ] Cuenta NPM creada
-- [ ] Organización `@oroya` creada en NPM
+- [ ] Organización `@joroya` creada en NPM
 - [ ] NPM_TOKEN agregado a GitHub Secrets
 - [ ] Tests pasando: `pnpm test`
 - [ ] Build exitoso: `pnpm build`

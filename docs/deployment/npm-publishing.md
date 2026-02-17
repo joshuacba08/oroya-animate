@@ -24,7 +24,7 @@ npm login
 
 ### 2. NPM Organization (Recommended)
 
-Create an organization `@oroya` on NPM:
+Create an organization `@joroya` on NPM:
 - Go to https://www.npmjs.com/org/create
 - Create organization named `joroya`
 - This allows scoped packages like `@joroya/core`

@@ -116,7 +116,7 @@ Published & Deployed
 
 ### NPM Publishing
 - [ ] Create NPM account at [npmjs.com](https://www.npmjs.com)
-- [ ] Create `@oroya` organization
+- [ ] Create `@joroya` organization
 - [ ] Generate NPM token: `npm token create --read-write`
 - [ ] Add `NPM_TOKEN` to GitHub Secrets
 - [ ] Test build: `pnpm build && pnpm test`

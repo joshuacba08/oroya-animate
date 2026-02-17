@@ -18,15 +18,19 @@ A professional, engine-agnostic 2D/3D graphics library for the web. Built with T
 
 Oroya Animate is a high-level graphics library that decouples scene logic from rendering implementation. It allows developers to define complex scene graphs once and render them using different backends like Three.js (WebGL), SVG, or Canvas2D.
 
-## ? Key Features
+## 🎯 Key Features
 
-- **??? TypeScript First:** Fully typed API for a robust development experience.
-- **??? Modular Architecture:** Monorepo structure for clear separation of concerns.
-- **?? Engine Agnostic:** Define your scene once, render it anywhere.
-- **?? Multiple Backends:** Official support for Three.js (3D) and SVG (2D).
-- **?? glTF Support:** Load complex 3D models directly into the agnostic scene graph.
-- **?? Scene-Graph Camera:** Define cameras as nodes in the scene graph with full transform support.
-- **?? React Friendly:** Optimized wrappers for modern frontend frameworks.
+- **🦺 TypeScript First:** Fully typed API for a robust development experience.
+- **🧩 Modular Architecture:** Monorepo structure for clear separation of concerns.
+- **🔌 Engine Agnostic:** Define your scene once, render it anywhere.
+- **🎨 Multiple Backends:** Official support for Three.js (3D) and SVG (2D).
+- **📦 glTF Support:** Load complex 3D models directly into the agnostic scene graph.
+- **🎥 Scene-Graph Camera:** Perspective & Orthographic cameras as scene graph nodes.
+- **🎬 Animation System:** Keyframe-based animation with `AnimationMixer` and interpolation.
+- **🖱️ Interactivity:** Built-in event system with raycasting (3D) and DOM events (SVG).
+- **🌐 Orbit Controls:** Mouse/touch camera controls for 3D scenes.
+- **🎨 Generative Art:** SvJs engine with noise, distributions, and SVG primitives.
+- **⚛️ React Friendly:** Optimized wrappers for modern frontend frameworks.
 
 ##  Project Structure
 
@@ -41,6 +45,7 @@ This project is managed as a monorepo using `pnpm` workspaces:
 ### Apps
 - [`demo-react`](apps/demo-react): Showcase of Oroya Animate working with React and Three.js.
 - [`demo-vanilla`](apps/demo-vanilla): Minimal examples using vanilla JavaScript.
+- [`web`](apps/web): Documentation website powered by Astro (deployed to Vercel).
 
 ## ?? Documentation
 
@@ -88,8 +93,8 @@ yarn add @joroya/core @joroya/renderer-three
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.4.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.4.0/dist/index.js';
   
   // Your code here
 </script>
@@ -186,16 +191,40 @@ renderer.render();
 - [x] New documentation: [Programming Principles](docs/programming-principles.md).
 - [x] New documentation: [Build Errors Postmortem](docs/troubleshooting/build-errors-postmortem.md).
 
-### v0.4.0 ? Model Loading & Animation (Next)
+### v0.4.0 — Interactivity, Animation & Generative Art ✅
+- [x] **Animation system**: `AnimationClip`, `AnimationMixer`, `KeyframeTrack` with linear/step/cubicspline interpolation.
+- [x] **Interactivity system**: `EventEmitter`, `Interactive` component, `InteractionEvent`, `BoundingBox` (AABB).
+- [x] **Raycasting** in Three.js renderer for 3D pointer events (click, hover, drag).
+- [x] **DOM event delegation** in SVG renderer for 2D interactivity.
+- [x] **Orbit controls**: `OrbitControlsWrapper` for camera manipulation (orbit, pan, zoom).
+- [x] **Orthographic camera** support in renderers.
+- [x] **Buffer geometry** and **Text geometry** support with AABB computation.
+- [x] **SvJs generative art engine**: `SvJs` class, `Gen` module (gaussian, pareto, noise), `Noise` (Perlin).
+- [x] **SVG advanced features**: gradients, filters, clip-paths, masks, `<animate>` / `<animateTransform>`.
+- [x] **Documentation website** (`apps/web`) deployed to Vercel via Astro.
+- [x] **i18n infrastructure**: Translation support for English, Spanish, and Japanese.
+- [x] Feature EPICs: [OA-001](docs/features/OA-001/EPICA.md) to [OA-004](docs/features/OA-004/EPIC.md).
+
+### v0.5.0 — Renderer Completion & 3D Pipeline (Next)
 - [ ] Full glTF/GLB loader (geometry + materials from Blender).
-- [ ] Animation system (keyframes, timelines).
-- [ ] Orthographic camera support.
-- [ ] Orbital camera controls.
-- [?? Publishing & Deployment
+- [ ] Complete SVG backend (transform support, groups).
+- [ ] Canvas2D renderer.
+- [ ] Boolean operations 2D/3D.
+- [ ] Cubic spline interpolation for animations.
+- [ ] Proper quaternion SLERP.
+
+### v1.0.0 — Production Ready (Vision)
+- [ ] WASM high-performance modules.
+- [ ] Visual scene editor.
+- [ ] Framework wrappers (Vue, Angular).
+- [ ] Plugin system for custom components.
+- [ ] Physics integration.
+
+## 🚀 Publishing & Deployment
 
 ### Packages on NPM
 
-All packages are published to NPM under the `@oroya` scope:
+All packages are published to NPM under the `@joroya` scope:
 - [@joroya/core](https://www.npmjs.com/package/@joroya/core)
 - [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
@@ -212,7 +241,7 @@ All packages are automatically available on multiple CDNs:
 
 Live at: **https://oroya-animate.vercel.app** (deployed via Vercel)
 
-## ?? Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](docs/contributing.md) for details on:
 - Development setup
@@ -220,26 +249,16 @@ Contributions are welcome! Please read our [Contributing Guide](docs/contributin
 - Pull request process
 - Issue reporting
 
-##  License
+## 📄 License
 
-MIT c [joshuacba08](https://github.com/joshuacba08)
+MIT © [joshuacba08](https://github.com/joshuacba08)
 
 ---
 
 <div align="center">
 
-**Made with ?? by the Oroya AI Collaborator**
+**Made with ❤️ by the Oroya AI Collaborator**
 
-[Report Bug](https://github.com/joshuacba08/oroya-animate/issues) ? [Request Feature](https://github.com/joshuacba08/oroya-animate/issues) ? [Discussions](https://github.com/joshuacba08/oroya-animate/discussions)
+[Report Bug](https://github.com/joshuacba08/oroya-animate/issues) · [Request Feature](https://github.com/joshuacba08/oroya-animate/issues) · [Discussions](https://github.com/joshuacba08/oroya-animate/discussions)
 
 </div>
-- [ ] Complete SVG backend (transform support, groups).
-- [ ] Canvas2D renderer.
-- [ ] Boolean operations 2D/3D.
-- [ ] WASM high-performance modules.
-- [ ] Visual scene editor.
-- [ ] Framework wrappers (Vue, Angular).
-
-##  License
-
-MIT  [joshuacba08](https://github.com/joshuacba08)
