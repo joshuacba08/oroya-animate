@@ -20,5 +20,8 @@ export * from './nodes/Node';
 export * from './scene/Scene';
 export * from './serialization/json';
 export * from './animation';
+export type { Vec3, Quat } from './components/Transform';
+export * from './components/InstancedMeshComponent';
+export * from './nodes/InstancedMesh';
 
 

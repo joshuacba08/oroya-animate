@@ -15,6 +15,7 @@ export enum ComponentType {
   RigidBody = 'RigidBody',
   Collider = 'Collider',
   Script = 'Script',
+  InstancedMesh = 'InstancedMesh',
 }
 
 /**

@@ -24,6 +24,7 @@ import { SvJs, Gen } from "@joroya/renderer-svg";
 import type { ExampleDef } from "./ExampleCard";
 import { createTexturesScene } from "../../scenes/textures";
 import { createLookAtScene } from "../../scenes/look-at";
+import { createPhysicsScene } from "../../scenes/physics-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3201,5 +3202,12 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Demonstrates the lookAt() method. Watcher objects track a moving target in real-time.",
     category: "3d",
     factory: createLookAtScene,
+  },
+  {
+    id: "physics-demo",
+    title: "Physics: Jenga",
+    description: "Simulation using Rapier physics engine. Dynamic cubes falling on a static floor with full collision detection.",
+    category: "3d",
+    factory: createPhysicsScene,
   },
 ];

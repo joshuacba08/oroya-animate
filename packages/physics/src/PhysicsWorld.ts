@@ -45,7 +45,7 @@ export class PhysicsWorld {
      * @param delta Time elapsed since last frame (currently Rapier uses fixed timestep internally, 
      * so we might just call step() or configure timestep)
      */
-    public step(delta: number): void {
+    public step(_delta: number): void {
         if (!this.raw) return;
         // Rapier usage: world.step() advances by the configured timestep (default 1/60)
         this.raw.step();

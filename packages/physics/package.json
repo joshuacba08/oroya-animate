@@ -2,7 +2,8 @@
     "name": "@joroya/physics",
     "version": "0.1.0",
     "description": "Physics engine integration for Oroya Animate using Rapier",
-    "main": "./dist/index.js",
+    "type": "module",
+    "main": "./dist/index.cjs",
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {

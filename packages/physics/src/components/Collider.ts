@@ -1,4 +1,4 @@
-import { Component, ComponentType, Vec3, Quat } from '@joroya/core';
+import { Component, ComponentType } from '@joroya/core';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { PhysicsWorld } from '../PhysicsWorld';
 import { RigidBody } from './RigidBody';

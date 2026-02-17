@@ -1,7 +1,14 @@
 {
     "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "lib": [
+            "ESNext"
+        ],
+        "composite": false
+    },
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",

@@ -1,6 +1,6 @@
 import { Scene, Node, ComponentType } from '@joroya/core';
 import { PhysicsWorld } from './PhysicsWorld';
-import { RigidBody, RigidBodyType } from './components/RigidBody';
+import { RigidBody } from './components/RigidBody';
 import { Collider } from './components/Collider';
 
 /**
@@ -9,8 +9,6 @@ import { Collider } from './components/Collider';
 export class PhysicsSystem {
     private world: PhysicsWorld;
     private scene: Scene;
-    private accumulator: number = 0;
-    private stepSize: number = 1 / 60;
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -33,6 +31,10 @@ export class PhysicsSystem {
      * Simulation step. Call this in your animation loop.
      * @param dt Delta time in seconds
      */
+    /**
+     * Simulation step. Call this in your animation loop.
+     * @param dt Delta time in seconds
+     */
     public update(dt: number): void {
         if (!this.world.raw) return;
 
@@ -41,7 +43,7 @@ export class PhysicsSystem {
 
         // Sync Physics -> Scene Graph
         this.scene.traverse((node) => {
-            const rb = node.components.find(c => c instanceof RigidBody) as RigidBody | undefined;
+            const rb = node.getComponent<RigidBody>(ComponentType.RigidBody);
 
             if (rb && rb.raw && (rb.raw.isDynamic() || rb.raw.isKinematic())) {
                 const translation = rb.raw.translation();
@@ -62,19 +64,16 @@ export class PhysicsSystem {
     }
 
     private initNodePhysics(node: Node): void {
-        const rb = node.components.find(c => c instanceof RigidBody) as RigidBody | undefined;
+        const rb = node.getComponent<RigidBody>(ComponentType.RigidBody);
         if (rb && !rb.raw) {
             // Initialize RigidBody with current Transform
             rb.init(node.transform.position, node.transform.rotation);
 
-            // Find and init colliders on this node
-            // Note: In complex setups, colliders might be on child nodes, 
-            // but Rapier expects colliders to be attached to a RigidBody.
-            // For v0.7, we support Colliders on the same node as RigidBody.
-            const colliders = node.components.filter(c => c instanceof Collider) as Collider[];
-            colliders.forEach(c => {
-                if (!c.raw) c.init(rb);
-            });
+            // Find and init collider on this node
+            const collider = node.getComponent<Collider>(ComponentType.Collider);
+            if (collider && !collider.raw) {
+                collider.init(rb);
+            }
         }
     }
 }

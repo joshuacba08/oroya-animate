@@ -10,10 +10,12 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.6",
     "@astrojs/react": "^4.0.0",
     "@astrojs/sitemap": "^3.7.0",
     "@joroya/core": "workspace:*",
     "@joroya/loader-gltf": "workspace:*",
+    "@joroya/physics": "workspace:^",
     "@joroya/renderer-canvas2d": "workspace:*",
     "@joroya/renderer-svg": "workspace:^",
     "@joroya/renderer-three": "workspace:*",
@@ -28,7 +30,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.0.0",
-    "three": "^0.165.0"
+    "three": "^0.165.0",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.0",
