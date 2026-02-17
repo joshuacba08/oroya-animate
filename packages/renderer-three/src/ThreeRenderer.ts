@@ -40,6 +40,8 @@ import {
   PostProcessing,
   ToneMapping,
   ParticleSystem,
+  AudioListener as OroyaAudioListener,
+  AudioSource as OroyaAudioSource,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -73,6 +75,11 @@ export class ThreeRenderer {
   // Texture loading system
   private readonly textureLoader = new THREE.TextureLoader();
   private readonly textureCache = new Map<string, THREE.Texture>();
+
+  // Audio system
+  private readonly audioLoader = new THREE.AudioLoader();
+  private readonly audioCache = new Map<string, AudioBuffer>();
+  private audioListener: THREE.AudioListener | null = null;
 
   constructor(options: ThreeRendererOptions) {
     this.canvas = options.canvas;
@@ -423,6 +430,14 @@ export class ThreeRenderer {
   dispose() {
     this.disableInteraction();
     this.disableOrbitControls();
+
+    // Stop all audio
+    if (this.audioListener && this.audioListener.context.state !== 'closed') {
+      try {
+        this.audioListener.context.suspend();
+      } catch { }
+    }
+
     this.renderer.dispose();
   }
 
@@ -611,20 +626,87 @@ export class ThreeRenderer {
         if (geoComponent.definition.castShadow) threeObject.castShadow = true;
         if (geoComponent.definition.receiveShadow) threeObject.receiveShadow = true;
       }
-    } else if (oroyaNode.hasComponent(ComponentType.Camera)) {
-      const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
-      threeObject = this.createThreeCamera(camComponent);
-    } else if (oroyaNode.hasComponent(ComponentType.Light)) {
-      const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
-      threeObject = this.createThreeLight(lightComponent);
-    } else if (oroyaNode.hasComponent(ComponentType.ParticleSystem)) {
-      const psComponent = oroyaNode.getComponent<ParticleSystem>(ComponentType.ParticleSystem)!;
-      threeObject = this.createThreeParticleSystem(psComponent);
-    } else {
-      threeObject = new THREE.Group();
+      if (oroyaNode.hasComponent(ComponentType.Camera)) {
+        const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
+        threeObject = this.createThreeCamera(camComponent);
+
+        // If we already have a listener that wasn't attached, attach it now
+        if (this.audioListener && !this.audioListener.parent) {
+          threeObject.add(this.audioListener);
+        }
+      } else if (oroyaNode.hasComponent(ComponentType.Light)) {
+        const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
+        threeObject = this.createThreeLight(lightComponent);
+      } else if (oroyaNode.hasComponent(ComponentType.ParticleSystem)) {
+        const psComponent = oroyaNode.getComponent<ParticleSystem>(ComponentType.ParticleSystem)!;
+        threeObject = this.createThreeParticleSystem(psComponent);
+      } else if (oroyaNode.hasComponent(ComponentType.AudioListener)) {
+        // Usually attached to camera, but can be standalone
+        const alComponent = oroyaNode.getComponent<OroyaAudioListener>(ComponentType.AudioListener)!;
+        threeObject = this.createThreeAudioListener(alComponent);
+      } else if (oroyaNode.hasComponent(ComponentType.AudioSource)) {
+        const asComponent = oroyaNode.getComponent<OroyaAudioSource>(ComponentType.AudioSource)!;
+        threeObject = this.createThreeAudioSource(asComponent);
+      } else {
+        threeObject = new THREE.Group();
+      }
+
+      return threeObject;
     }
 
-    return threeObject;
+  private createThreeAudioListener(comp: OroyaAudioListener): THREE.AudioListener {
+    if (!this.audioListener) {
+      this.audioListener = new THREE.AudioListener();
+    }
+    this.audioListener.setMasterVolume(comp.definition.masterVolume);
+    return this.audioListener;
+  }
+
+  private createThreeAudioSource(comp: OroyaAudioSource): THREE.PositionalAudio {
+    if (!this.audioListener) {
+      // If no listener exists yet, create one but don't attach it to scene yet (wait for camera)
+      // Ideally AudioListener component should exist. If not, default fallback?
+      this.audioListener = new THREE.AudioListener();
+      // We need to attach it to the camera later if not done so.
+      if (this.activeCamera) this.activeCamera.add(this.audioListener);
+      else this.scene.add(this.audioListener);
+    }
+
+    const audio = new THREE.PositionalAudio(this.audioListener);
+
+    const def = comp.definition;
+    audio.setRefDistance(def.refDistance);
+    audio.setRolloffFactor(def.rolloffFactor);
+    audio.setDistanceModel(def.distanceModel);
+    audio.setMaxDistance(def.maxDistance);
+    audio.setDirectionalCone(def.coneInnerAngle, def.coneOuterAngle, def.coneOuterGain);
+    audio.setVolume(def.volume);
+    audio.setLoop(def.loop);
+
+    // Load buffer
+    this.loadAudioBuffer(def.url).then(buffer => {
+      if (buffer) {
+        audio.setBuffer(buffer);
+        if (def.autoplay) {
+          audio.play();
+        }
+      }
+    });
+
+    return audio;
+  }
+
+  private async loadAudioBuffer(url: string): Promise<AudioBuffer | null> {
+    if (this.audioCache.has(url)) return this.audioCache.get(url)!;
+
+    try {
+      const buffer = await this.audioLoader.loadAsync(url);
+      this.audioCache.set(url, buffer);
+      return buffer;
+    } catch (e) {
+      console.error(`Failed to load audio: ${url}`, e);
+      return null;
+    }
   }
 
   private createThreeParticleSystem(ps: ParticleSystem): THREE.Points {
