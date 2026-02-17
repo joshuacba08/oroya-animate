@@ -2,6 +2,8 @@ import type { AnimationClip } from './AnimationClip';
 import type { KeyframeTrack } from './KeyframeTrack';
 import type { Scene } from '../scene/Scene';
 import type { Vec3, Quat } from '../components/Transform';
+import { slerp } from '../math/Quaternion';
+import { hermite, lerpVec3 } from '../math/Interpolation';
 
 /**
  * The AnimationMixer is responsible for playing animation clips on a scene.
@@ -134,39 +136,106 @@ export class AnimationMixer {
 
         // If we're at or past the last keyframe, return the last value
         if (time >= times[times.length - 1]) {
-            return this.extractValue(values, times.length - 1, property);
+            return this.extractValue(values, times.length - 1, property, interpolation);
         }
 
         // Calculate interpolation factor
         const alpha = t2 === t1 ? 0 : (time - t1) / (t2 - t1);
 
-        const v1 = this.extractValue(values, i1, property);
-        const v2 = this.extractValue(values, i2, property);
-
-        if (!v1 || !v2) {
-            return null;
-        }
-
         // Perform interpolation based on mode
         switch (interpolation) {
             case 'step':
-                return v1;
-            case 'linear':
+                return this.extractValue(values, i1, property, interpolation);
+
+            case 'linear': {
+                const v1 = this.extractValue(values, i1, property, interpolation);
+                const v2 = this.extractValue(values, i2, property, interpolation);
+                if (!v1 || !v2) return null;
                 return this.lerp(v1, v2, alpha, property);
-            case 'cubicspline':
-                // TODO: Implement cubic spline interpolation
-                return this.lerp(v1, v2, alpha, property);
+            }
+
+            case 'cubicspline': {
+                // glTF CUBICSPLINE format: [in-tangent, value, out-tangent] for each keyframe
+                // Extract values and tangents
+                const stride = property === 'rotation' ? 4 : 3;
+                const offset1 = i1 * 3 * stride; // 3 values per keyframe (in, value, out)
+                const offset2 = i2 * 3 * stride;
+
+                // Extract p0 (value at i1) and m0 (out-tangent at i1)
+                const p0 = this.extractValueAtOffset(values, offset1 + stride, property);
+                const m0 = this.extractValueAtOffset(values, offset1 + 2 * stride, property);
+
+                // Extract p1 (value at i2) and m1 (in-tangent at i2)
+                const p1 = this.extractValueAtOffset(values, offset2 + stride, property);
+                const m1 = this.extractValueAtOffset(values, offset2, property);
+
+                if (!p0 || !m0 || !p1 || !m1) {
+                    // Fallback to linear if cubic spline data is malformed
+                    const v1 = this.extractValue(values, i1, property, 'linear');
+                    const v2 = this.extractValue(values, i2, property, 'linear');
+                    if (!v1 || !v2) return null;
+                    return this.lerp(v1, v2, alpha, property);
+                }
+
+                // Apply Hermite interpolation
+                if (property === 'rotation') {
+                    // For quaternions, we still use SLERP (cubic spline for quaternions is complex)
+                    return slerp(p0 as Quat, p1 as Quat, alpha);
+                } else {
+                    // For position/scale, use Hermite spline
+                    const td = t2 - t1; // Time delta
+                    return hermite(
+                        alpha,
+                        p0 as Vec3,
+                        { x: m0.x * td, y: m0.y * td, z: m0.z * td }, // Scale tangent by time delta
+                        p1 as Vec3,
+                        { x: m1.x * td, y: m1.y * td, z: m1.z * td }
+                    );
+                }
+            }
+
             default:
-                return v1;
+                return this.extractValue(values, i1, property, interpolation);
         }
     }
 
     /**
      * Extract a single value (Vec3 or Quat) from the flat values array.
+     * For CUBICSPLINE, the index points to the middle value (not in-tangent).
      */
-    private extractValue(values: Float32Array, index: number, property: string): Vec3 | Quat | null {
+    private extractValue(
+        values: Float32Array,
+        index: number,
+        property: string,
+        interpolation: string
+    ): Vec3 | Quat | null {
+        const stride = property === 'rotation' ? 4 : 3;
+        let offset: number;
+
+        if (interpolation === 'cubicspline') {
+            // CUBICSPLINE: [in-tangent, value, out-tangent] per keyframe
+            offset = index * 3 * stride + stride; // Point to the middle (value)
+        } else {
+            // LINEAR or STEP: just the value
+            offset = index * stride;
+        }
+
+        return this.extractValueAtOffset(values, offset, property);
+    }
+
+    /**
+     * Extract a value at a specific offset in the values array.
+     */
+    private extractValueAtOffset(
+        values: Float32Array,
+        offset: number,
+        property: string
+    ): Vec3 | Quat | null {
+        if (offset < 0 || offset >= values.length) {
+            return null;
+        }
+
         if (property === 'rotation') {
-            const offset = index * 4;
             return {
                 x: values[offset],
                 y: values[offset + 1],
@@ -174,7 +243,6 @@ export class AnimationMixer {
                 w: values[offset + 3],
             };
         } else {
-            const offset = index * 3;
             return {
                 x: values[offset],
                 y: values[offset + 1],
@@ -184,27 +252,16 @@ export class AnimationMixer {
     }
 
     /**
-     * Linear interpolation between two values.
+     * Interpolation between two values.
+     * Uses SLERP for quaternions, linear for Vec3.
      */
     private lerp(v1: Vec3 | Quat, v2: Vec3 | Quat, alpha: number, property: string): Vec3 | Quat {
         if (property === 'rotation') {
-            // Quaternion slerp (simplified linear interpolation for now)
-            const q1 = v1 as Quat;
-            const q2 = v2 as Quat;
-            return {
-                x: q1.x + (q2.x - q1.x) * alpha,
-                y: q1.y + (q2.y - q1.y) * alpha,
-                z: q1.z + (q2.z - q1.z) * alpha,
-                w: q1.w + (q2.w - q1.w) * alpha,
-            };
+            // Use proper spherical linear interpolation for quaternions
+            return slerp(v1 as Quat, v2 as Quat, alpha);
         } else {
-            const p1 = v1 as Vec3;
-            const p2 = v2 as Vec3;
-            return {
-                x: p1.x + (p2.x - p1.x) * alpha,
-                y: p1.y + (p2.y - p1.y) * alpha,
-                z: p1.z + (p2.z - p1.z) * alpha,
-            };
+            // Linear interpolation for position and scale
+            return lerpVec3(v1 as Vec3, v2 as Vec3, alpha);
         }
     }
 

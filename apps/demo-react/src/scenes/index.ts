@@ -20,6 +20,7 @@ import { createSvgInteractiveScene, svgInteractiveControls } from './SvgInteract
 import { createSvgShowcaseScene, svgShowcaseControls } from './SvgShowcase';
 import { createWheelAndBubblingScene, wheelAndBubblingControls } from './WheelAndBubbling';
 import { SvJsGenerativeDemo } from './SvJsGenerativeDemo';
+import { createNestedTransformsScene, nestedTransformsControls } from './NestedTransforms';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -149,6 +150,14 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'svg',
     controls: circleOverlayControls,
     factory: createCircleOverlayScene,
+  },
+  {
+    id: 'nested-transforms',
+    label: 'Nested Transforms',
+    description: 'Jerarquía de transformaciones anidadas (parent → child → grandchild). Verifica que localMatrix + grupos SVG componen correctamente.',
+    renderer: 'svg',
+    controls: nestedTransformsControls,
+    factory: createNestedTransformsScene,
   },
   {
     id: 'porto-pareto',

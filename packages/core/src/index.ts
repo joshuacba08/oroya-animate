@@ -10,6 +10,8 @@ export * from './events/InteractionEvent';
 export * from './geometry/primitives';
 export * from './math/BoundingBox';
 export * from './math/Matrix4';
+export * from './math/Quaternion';
+export * from './math/Interpolation';
 export * from './nodes/Node';
 export * from './scene/Scene';
 export * from './serialization/json';
