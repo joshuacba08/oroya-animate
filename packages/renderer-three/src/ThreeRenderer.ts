@@ -28,6 +28,8 @@ import {
   LightType,
   Environment as OroyaEnvironment,
   FogType,
+  InstancedMeshComponent,
+  InstancedMesh,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -176,6 +178,35 @@ export class ThreeRenderer {
             threeMat.opacity = oroyaMat.definition.opacity;
             threeMat.transparent = oroyaMat.definition.opacity < 1.0;
           }
+        }
+
+        // Sync InstancedMesh data
+        if (threeObject instanceof THREE.InstancedMesh && oroyaNode.hasComponent(ComponentType.InstancedMesh)) {
+          const instanced = oroyaNode.getComponent<InstancedMeshComponent>(ComponentType.InstancedMesh)!;
+          if (instanced.matricesDirty) {
+            threeObject.instanceMatrix.set(instanced.instanceMatrix);
+            threeObject.instanceMatrix.needsUpdate = true;
+
+            // Update Bounding Sphere for Culling
+            if (oroyaNode instanceof InstancedMesh) {
+              const sphere = oroyaNode.computeBoundingSphere();
+              if (!threeObject.geometry.boundingSphere) {
+                threeObject.geometry.boundingSphere = new THREE.Sphere();
+              }
+              threeObject.geometry.boundingSphere.set(
+                new THREE.Vector3(sphere.center.x, sphere.center.y, sphere.center.z),
+                sphere.radius
+              );
+            }
+
+            instanced.matricesDirty = false;
+          }
+          if (instanced.colorsDirty && instanced.instanceColor && threeObject.instanceColor) {
+            threeObject.instanceColor.set(instanced.instanceColor);
+            threeObject.instanceColor.needsUpdate = true;
+            instanced.colorsDirty = false;
+          }
+          threeObject.count = instanced.count;
         }
       }
     });
@@ -410,7 +441,15 @@ export class ThreeRenderer {
   private createThreeObject(oroyaNode: OroyaNode): THREE.Object3D | null {
     let threeObject: THREE.Object3D | null = null;
 
-    if (oroyaNode.hasComponent(ComponentType.Geometry)) {
+    if (oroyaNode.hasComponent(ComponentType.InstancedMesh)) {
+      const instancedComponent = oroyaNode.getComponent<InstancedMeshComponent>(ComponentType.InstancedMesh)!;
+      const geoComponent = oroyaNode.getComponent<OroyaGeometry>(ComponentType.Geometry);
+      const matComponent = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material);
+
+      if (geoComponent && matComponent) {
+        threeObject = this.createThreeInstancedMesh(instancedComponent, geoComponent, matComponent);
+      }
+    } else if (oroyaNode.hasComponent(ComponentType.Geometry)) {
       const geoComponent = oroyaNode.getComponent<OroyaGeometry>(ComponentType.Geometry)!;
       const matComponent = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material);
       const threeGeometry = this.createThreeGeometry(geoComponent);
@@ -429,6 +468,32 @@ export class ThreeRenderer {
     }
 
     return threeObject;
+  }
+
+  private createThreeInstancedMesh(
+    instanced: InstancedMeshComponent,
+    geo: OroyaGeometry,
+    mat: OroyaMaterial
+  ): THREE.InstancedMesh | null {
+    const threeGeo = this.createThreeGeometry(geo);
+    const threeMat = this.createThreeMaterial(mat);
+
+    if (!threeGeo || !threeMat) return null;
+
+    const mesh = new THREE.InstancedMesh(threeGeo, threeMat, instanced.capacity);
+    mesh.count = instanced.count;
+
+    mesh.instanceMatrix.set(instanced.instanceMatrix);
+    mesh.instanceMatrix.needsUpdate = true;
+
+    if (instanced.instanceColor) {
+      // THREE.InstancedMesh doesn't create instanceColor attribute by default
+      mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(instanced.capacity * 3), 3);
+      mesh.instanceColor.set(instanced.instanceColor);
+      mesh.instanceColor.needsUpdate = true;
+    }
+
+    return mesh;
   }
 
   private createThreeGeometry(oroyaGeo: OroyaGeometry): THREE.BufferGeometry | null {

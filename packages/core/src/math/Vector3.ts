@@ -49,3 +49,16 @@ export function distanceTo(a: Vec3, b: Vec3): number {
 export function copy(v: Vec3): Vec3 {
     return { ...v };
 }
+
+export function applyMatrix4(v: Vec3, m: readonly number[]): Vec3 {
+    const x = v.x, y = v.y, z = v.z;
+    const e = m;
+
+    const w = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+
+    return {
+        x: (e[0] * x + e[4] * y + e[8] * z + e[12]) * w,
+        y: (e[1] * x + e[5] * y + e[9] * z + e[13]) * w,
+        z: (e[2] * x + e[6] * y + e[10] * z + e[14]) * w
+    };
+}

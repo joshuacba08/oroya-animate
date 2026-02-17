@@ -25,6 +25,7 @@ import type { ExampleDef } from "./ExampleCard";
 import { createTexturesScene } from "../../scenes/textures";
 import { createLookAtScene } from "../../scenes/look-at";
 import { createPhysicsScene } from "../../scenes/physics-demo";
+import { createInstancingScene } from "../../scenes/instancing-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3209,5 +3210,12 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Simulation using Rapier physics engine. Dynamic cubes falling on a static floor with full collision detection.",
     category: "3d",
     factory: createPhysicsScene,
+  },
+  {
+    id: "instancing-demo",
+    title: "Performance: Instancing",
+    description: "Renders 2000 dynamic cubes using InstancedMesh. Demonstrates high-performance rendering with matrix and color updates.",
+    category: "3d",
+    factory: createInstancingScene,
   },
 ];

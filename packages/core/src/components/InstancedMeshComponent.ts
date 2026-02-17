@@ -51,7 +51,7 @@ export class InstancedMeshComponent extends Component {
 
         // Initialize matrices to identity
         for (let i = 0; i < count; i++) {
-            this.setMatrixAt(i, Matrix4Identity);
+            this.setMatrixAt(i, Matrix4Identity as unknown as Matrix4);
         }
     }
 

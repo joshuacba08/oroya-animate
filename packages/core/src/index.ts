@@ -23,5 +23,7 @@ export * from './animation';
 export type { Vec3, Quat } from './components/Transform';
 export * from './components/InstancedMeshComponent';
 export * from './nodes/InstancedMesh';
+export * from './math/BoundingSphere';
+export * from './math/Frustum';
 
 
