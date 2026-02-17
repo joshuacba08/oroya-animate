@@ -39,6 +39,7 @@ import {
   InstancedMesh,
   PostProcessing,
   ToneMapping,
+  ParticleSystem,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -233,6 +234,8 @@ export class ThreeRenderer {
       this.orbitControls.update();
     }
 
+    this.updateParticleSystems();
+
     // Check for PostProcessing component on active camera or scene environment
     // For now, let's check the active camera node
     let ppDef: any = null;
@@ -320,6 +323,46 @@ export class ThreeRenderer {
     }
 
     this.composer.render();
+  }
+
+  private updateParticleSystems() {
+    // Iterate all objects to find particle systems
+    // Optimization: Maintain a list instead of traversing or using nodeMap values
+    for (const obj of this.nodeMap.values()) {
+      if (obj.userData?.isParticleSystem) {
+        const points = obj as THREE.Points;
+        const ps = obj.userData.component as ParticleSystem;
+
+        // Update Geometry from PS state
+        const positions = points.geometry.attributes.position.array as Float32Array;
+        const colors = points.geometry.attributes.color.array as Float32Array;
+        // const sizes = points.geometry.attributes.size.array as Float32Array; 
+
+        let activeCount = 0;
+        for (let i = 0; i < ps.particles.length; i++) {
+          const p = ps.particles[i];
+
+          positions[i * 3] = p.position.x;
+          positions[i * 3 + 1] = p.position.y;
+          positions[i * 3 + 2] = p.position.z;
+
+          colors[i * 3] = p.color.r;
+          colors[i * 3 + 1] = p.color.g;
+          colors[i * 3 + 2] = p.color.b;
+
+          // sizes[i] = p.size; // PointsMaterial doesn't support attribute size out of box
+
+          activeCount++;
+        }
+
+        // Hide remaining
+        // A better way is to set drawRange
+        points.geometry.setDrawRange(0, activeCount);
+
+        points.geometry.attributes.position.needsUpdate = true;
+        points.geometry.attributes.color.needsUpdate = true;
+      }
+    }
   }
 
   setSize(width: number, height: number) {
@@ -574,11 +617,53 @@ export class ThreeRenderer {
     } else if (oroyaNode.hasComponent(ComponentType.Light)) {
       const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
       threeObject = this.createThreeLight(lightComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.ParticleSystem)) {
+      const psComponent = oroyaNode.getComponent<ParticleSystem>(ComponentType.ParticleSystem)!;
+      threeObject = this.createThreeParticleSystem(psComponent);
     } else {
       threeObject = new THREE.Group();
     }
 
     return threeObject;
+  }
+
+  private createThreeParticleSystem(ps: ParticleSystem): THREE.Points {
+    // Create initial geometry
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(ps.definition.maxParticles * 3);
+    const colors = new Float32Array(ps.definition.maxParticles * 3);
+    const sizes = new Float32Array(ps.definition.maxParticles);
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    // Material
+    // Using PointsMaterial
+    const texture = ps.definition.texture ? this.loadTexture(ps.definition.texture) : null;
+
+    const material = new THREE.PointsMaterial({
+      size: 1, // Base size, attribute will scale if shader supports it, but standard material doesn't support attribute size easily without custom shader.
+      // Actually standard PointsMaterial uses 'size' uniform. 
+      // To support per-particle size, we might need ShaderMaterial, but for MVP let's use fixed size or vertex colors.
+      // THREE.PointsMaterial DOES support vertexColors: true.
+      vertexColors: true,
+      map: texture,
+      transparent: true,
+      opacity: 1,
+      depthWrite: false, // For transparency
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+
+    const points = new THREE.Points(geometry, material);
+    points.frustumCulled = false; // Always render
+
+    // Store reference to update later
+    // We can attach it to userData to retrieve it during update loop
+    points.userData = { isParticleSystem: true, component: ps };
+
+    return points;
   }
 
   private createThreeInstancedMesh(

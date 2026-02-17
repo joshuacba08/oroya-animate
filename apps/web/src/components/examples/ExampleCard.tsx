@@ -100,11 +100,20 @@ export function ThreeRenderer3D({ example, eager }: RendererProps) {
       renderer.mount(threeScene);
       rendererRef.current = renderer;
 
+      let lastTime = performance.now() * 0.001;
       const loop = (time: number) => {
         if (disposed) return;
         try {
           const t = time * 0.001;
+          const dt = t - lastTime;
+          lastTime = t;
+
           animate(t);
+
+          if (typeof (threeScene as any).update === 'function') {
+            (threeScene as any).update(dt);
+          }
+
           renderer.render();
         } catch { /* swallow animation errors */ }
         rafRef.current = requestAnimationFrame(loop);
