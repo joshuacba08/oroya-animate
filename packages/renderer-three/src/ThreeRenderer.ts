@@ -26,6 +26,8 @@ import {
   GeometryDef,
   Light as OroyaLight,
   LightType,
+  Environment as OroyaEnvironment,
+  FogType,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -53,6 +55,10 @@ export class ThreeRenderer {
   private readonly canvas: HTMLCanvasElement;
   private abortController: AbortController | null = null;
 
+  // Texture loading system
+  private readonly textureLoader = new THREE.TextureLoader();
+  private readonly textureCache = new Map<string, THREE.Texture>();
+
   constructor(options: ThreeRendererOptions) {
     this.canvas = options.canvas;
 
@@ -74,9 +80,63 @@ export class ThreeRenderer {
     this.rebuildScene();
   }
 
+  /**
+   * Apply environment settings (background, fog, ambient light) from the scene.
+   */
+  private applyEnvironment(oroyaScene: OroyaScene): void {
+    // Find Environment component in scene
+    let envNode: OroyaNode | null = null;
+    oroyaScene.traverse((node) => {
+      if (node.hasComponent(ComponentType.Environment)) {
+        envNode = node;
+      }
+    });
+
+    if (!envNode) {
+      // Clear environment if none found
+      this.scene.background = null;
+      this.scene.fog = null;
+      return;
+    }
+
+    const env = (envNode as OroyaNode).getComponent<OroyaEnvironment>(ComponentType.Environment)!;
+    const def = env.definition;
+
+    // Background
+    if (def.background) {
+      if (typeof def.background === 'string') {
+        const tex = this.loadTexture(def.background);
+        if (tex) this.scene.background = tex;
+      } else {
+        this.scene.background = new THREE.Color(
+          def.background.r,
+          def.background.g,
+          def.background.b
+        );
+      }
+    }
+
+    // Fog
+    if (def.fog) {
+      if (def.fog.type === FogType.Linear) {
+        this.scene.fog = new THREE.Fog(
+          new THREE.Color(def.fog.color.r, def.fog.color.g, def.fog.color.b),
+          def.fog.near,
+          def.fog.far
+        );
+      } else {
+        this.scene.fog = new THREE.FogExp2(
+          new THREE.Color(def.fog.color.r, def.fog.color.g, def.fog.color.b),
+          def.fog.density
+        );
+      }
+    }
+  }
+
   render() {
     if (!this.oroyaScene || !this.activeCamera) return;
 
+    this.applyEnvironment(this.oroyaScene);
     this.oroyaScene.updateWorldMatrices();
 
     this.oroyaScene.root.traverse((oroyaNode) => {
@@ -495,19 +555,34 @@ export class ThreeRenderer {
     return resultMesh.geometry;
   }
 
-  private createThreeMaterial(oroyaMat?: OroyaMaterial): THREE.Material {
-    if (!oroyaMat) {
-      return new THREE.MeshStandardMaterial({ color: 0xcccccc });
+  /**
+   * Load a texture from a URI with caching.
+   */
+  private loadTexture(url: string): THREE.Texture | null {
+    if (this.textureCache.has(url)) {
+      return this.textureCache.get(url)!;
     }
 
-    const { definition } = oroyaMat;
-    const props: THREE.MeshStandardMaterialParameters = {};
+    try {
+      const texture = this.textureLoader.load(url);
+      this.textureCache.set(url, texture);
+      return texture;
+    } catch (e) {
+      console.warn(`Failed to load texture: ${url}`, e);
+      return null;
+    }
+  }
+
+  private createThreeMaterial(oroyaMat?: OroyaMaterial): THREE.Material {
+    const definition = oroyaMat?.definition ?? {};
+
+    const props: THREE.MeshStandardMaterialParameters = {
+      transparent: definition.opacity !== undefined && definition.opacity < 1,
+      opacity: definition.opacity ?? 1,
+    };
+
     if (definition.color) {
       props.color = new THREE.Color(definition.color.r, definition.color.g, definition.color.b);
-    }
-    if (definition.opacity !== undefined) {
-      props.opacity = definition.opacity;
-      props.transparent = definition.opacity < 1.0;
     }
     if (definition.metalness !== undefined) {
       props.metalness = definition.metalness;
@@ -519,7 +594,52 @@ export class ThreeRenderer {
       props.emissive = new THREE.Color(definition.emissive.r, definition.emissive.g, definition.emissive.b);
     }
 
-    return new THREE.MeshStandardMaterial(props);
+    const mat = new THREE.MeshStandardMaterial(props);
+
+    // Load texture maps
+    if (definition.map) {
+      const tex = this.loadTexture(definition.map);
+      if (tex) mat.map = tex;
+    }
+    if (definition.normalMap) {
+      const tex = this.loadTexture(definition.normalMap);
+      if (tex) {
+        mat.normalMap = tex;
+        const scale = definition.normalScale ?? 1;
+        mat.normalScale = new THREE.Vector2(scale, scale);
+      }
+    }
+    if (definition.roughnessMap) {
+      const tex = this.loadTexture(definition.roughnessMap);
+      if (tex) mat.roughnessMap = tex;
+    }
+    if (definition.metalnessMap) {
+      const tex = this.loadTexture(definition.metalnessMap);
+      if (tex) mat.metalnessMap = tex;
+    }
+    if (definition.emissiveMap) {
+      const tex = this.loadTexture(definition.emissiveMap);
+      if (tex) {
+        mat.emissiveMap = tex;
+        mat.emissiveIntensity = definition.emissiveIntensity ?? 1;
+      }
+    }
+    if (definition.aoMap) {
+      const tex = this.loadTexture(definition.aoMap);
+      if (tex) {
+        mat.aoMap = tex;
+        mat.aoMapIntensity = definition.aoMapIntensity ?? 1;
+      }
+    }
+    if (definition.envMap) {
+      const tex = this.loadTexture(definition.envMap);
+      if (tex) {
+        mat.envMap = tex;
+        mat.envMapIntensity = definition.envMapIntensity ?? 1;
+      }
+    }
+
+    return mat;
   }
 
   private createThreeCamera(oroyaCam: OroyaCamera): THREE.Camera | null {

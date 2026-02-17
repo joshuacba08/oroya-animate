@@ -30,6 +30,20 @@ cam.addComponent(new Camera({
 cam.transform.position = { x: 0, y: 2, z: 5 };
 scene.add(cam);
 
+// Iluminación
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+scene.add(ambient);
+
+const sun = new Node("sun");
+sun.addComponent(new Light({
+  type: LightType.Directional,
+  intensity: 0.9,
+  target: { x: 0, y: 0, z: 0 },
+}));
+sun.transform.position = { x: 3, y: 6, z: 4 };
+scene.add(sun);
+
 // Suelo
 const ground = new Node("ground");
 ground.addComponent(createBox(10, 0.15, 10));
@@ -86,6 +100,20 @@ cam.addComponent(new Camera({
 }));
 cam.transform.position = { x: 0, y: 3, z: 8 };
 scene.add(cam);
+
+// Iluminación
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.5 }));
+scene.add(ambient);
+
+const sun = new Node("sun");
+sun.addComponent(new Light({
+  type: LightType.Directional,
+  intensity: 0.8,
+  target: { x: 0, y: 0, z: 0 },
+}));
+sun.transform.position = { x: 4, y: 6, z: 5 };
+scene.add(sun);
 
 // Esfera central
 const center = new Node("center");
@@ -329,10 +357,29 @@ cam.addComponent(new Camera({
 cam.transform.position = { x: 0, y: 8, z: 14 };
 scene.add(cam);
 
+// Iluminación
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.3 }));
+scene.add(ambient);
+
+// Luz puntual en el sol (simula emisión)
+const sunLight = new Node("sun-light");
+sunLight.addComponent(new Light({
+  type: LightType.Point,
+  color: { r: 1, g: 0.95, b: 0.8 },
+  intensity: 2.0,
+  distance: 30,
+  decay: 1,
+}));
+scene.add(sunLight);
+
 // Sol
 const sun = new Node("sun");
 sun.addComponent(createSphere(1.2, 32, 32));
-sun.addComponent(new Material({ color: { r: 1, g: 0.85, b: 0.2 } }));
+sun.addComponent(new Material({
+  color: { r: 1, g: 0.85, b: 0.2 },
+  emissive: { r: 1, g: 0.7, b: 0.1 },
+}));
 scene.add(sun);
 
 // Planeta 1 — órbita del sol
@@ -434,6 +481,20 @@ cam.addComponent(new Camera({
 }));
 cam.transform.position = { x: 0, y: 2, z: 5 };
 scene.add(cam);
+
+// Iluminación básica
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+scene.add(ambient);
+
+const sun = new Node("sun");
+sun.addComponent(new Light({
+  type: LightType.Directional,
+  intensity: 0.8,
+  target: { x: 0, y: 0, z: 0 },
+}));
+sun.transform.position = { x: 3, y: 6, z: 4 };
+scene.add(sun);
 
 // --- Tu código aquí ---
 // Ejemplo:

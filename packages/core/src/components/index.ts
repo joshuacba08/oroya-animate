@@ -21,6 +21,8 @@ export type {
 } from './Geometry';
 export { Light, LightType } from './Light';
 export type { LightDef, AmbientLightDef, DirectionalLightDef, PointLightDef, SpotLightDef } from './Light';
+export { Environment, FogType } from './Environment';
+export type { EnvironmentDef, FogDef, LinearFogDef, ExponentialFogDef } from './Environment';
 export { Material } from './Material';
 export type { ColorRGB, GradientDef, GradientStop, LinearGradientDef, MaterialDef, RadialGradientDef, SvgBlurEffect, SvgClipPathDef, SvgDropShadowEffect, SvgFilterDef, SvgFilterEffect, SvgMaskDef } from './Material';
 export { Transform } from './Transform';

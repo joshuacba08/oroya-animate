@@ -26,6 +26,9 @@ import { createNestedTransformsScene, nestedTransformsControls } from './NestedT
 import { createCanvasParticlesScene, canvasParticlesControls } from './CanvasParticles';
 import { createCSGDemoScene, csgControls } from './CSGDemo';
 
+import { TexturesDemo } from './TexturesDemo';
+import { LookAtDemo } from './LookAtDemo';
+
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
     id: 'interactive-demo',
@@ -214,4 +217,6 @@ export const DEMO_SCENES: DemoSceneDef[] = [
   LightingDemoScene,
   ExtendedPrimitivesDemo,
   SvJsGenerativeDemo,
+  TexturesDemo,
+  LookAtDemo,
 ];

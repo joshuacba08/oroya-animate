@@ -7,12 +7,19 @@ const locale = getLocaleFromUrl(Astro.url);
 const t = useTranslations(locale);
 
 const docs = await getCollection("docs");
+const localizedDocs = await getCollection("docs-ja");
 const sortedDocs = docs.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
 
+const localizedMap = new Map(localizedDocs.map((d) => [d.id, d]));
+
 function docTitle(id: string, fallback: string): string {
+  const localized = localizedMap.get(id);
+  if (localized) return localized.data.title;
   return t(`docs.entries.${id}.title`) !== `docs.entries.${id}.title` ? t(`docs.entries.${id}.title`) : fallback;
 }
 function docDesc(id: string, fallback: string): string {
+  const localized = localizedMap.get(id);
+  if (localized?.data.description) return localized.data.description;
   return t(`docs.entries.${id}.description`) !== `docs.entries.${id}.description` ? t(`docs.entries.${id}.description`) : fallback;
 }
 

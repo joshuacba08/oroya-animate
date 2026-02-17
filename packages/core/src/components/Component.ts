@@ -11,6 +11,7 @@ export enum ComponentType {
   Interactive = 'Interactive',
   Animation = 'Animation',
   Light = 'Light',
+  Environment = 'Environment',
 }
 
 /**

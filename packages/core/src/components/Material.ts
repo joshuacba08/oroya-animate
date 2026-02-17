@@ -193,9 +193,59 @@ export interface MaterialDef {
   emissive?: ColorRGB;
 
   /**
-   * Texture map URI (for future texture support).
+   * Texture map URI (diffuse/color texture).
    */
   map?: string;
+
+  /**
+   * Normal map URI for bump/normal mapping.
+   */
+  normalMap?: string;
+
+  /**
+   * Roughness map URI for PBR roughness texture.
+   */
+  roughnessMap?: string;
+
+  /**
+   * Metalness map URI for PBR metalness texture.
+   */
+  metalnessMap?: string;
+
+  /**
+   * Emissive map URI for self-illuminated texture.
+   */
+  emissiveMap?: string;
+
+  /**
+   * Ambient occlusion map URI.
+   */
+  aoMap?: string;
+
+  /**
+   * Environment map URI for reflections.
+   */
+  envMap?: string;
+
+  /**
+   * Normal map intensity/scale. Default: 1.
+   */
+  normalScale?: number;
+
+  /**
+   * Emissive map brightness multiplier. Default: 1.
+   */
+  emissiveIntensity?: number;
+
+  /**
+   * Ambient occlusion map strength. Default: 1.
+   */
+  aoMapIntensity?: number;
+
+  /**
+   * Environment reflection strength. Default: 1.
+   */
+  envMapIntensity?: number;
 }
 
 /**

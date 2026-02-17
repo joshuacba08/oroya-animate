@@ -6,24 +6,24 @@ category: "concepts"
 ---
 # Architecture Overview
 
-Oroya Animate sigue una arquitectura desacoplada donde la representación de la escena es completamente independiente de la tecnología de renderizado.
+Oroya Animate follows a decoupled architecture where the scene representation is completely independent of the rendering technology.
 
 ---
 
-## Principio fundamental
+## Core Principle
 
 > **"Define once, render anywhere."**
->  EEl scene graph es la única fuente de verdad. Los renderers son traductores.
+> The scene graph is the single source of truth. Renderers are translators.
 
 ```mermaid
 graph TD
-    subgraph "Capa de entrada"
+    subgraph "Input Layer"
         UC["User Code"]
         GLTF["glTF / GLB Files"]
-        JSON["JSON Serializado"]
+        JSON["Serialized JSON"]
     end
 
-    subgraph "@joroya/core  EMotor agnóstico"
+    subgraph "@joroya/core — Engine-agnostic core"
         SG["Scene Graph"]
         N["Node"]
         T["Transform"]
@@ -34,15 +34,15 @@ graph TD
         MATH["Math (Matrix4)"]
     end
 
-    subgraph "Capa de salida"
+    subgraph "Output Layer"
         R3["@joroya/renderer-three"]
         RS["@joroya/renderer-svg"]
         R_FUTURE["Future: Canvas2D, WebGPU..."]
     end
 
-    subgraph "Resultado"
-        WEBGL["WebGL Canvas (píxeles)"]
-        SVG["SVG String (vectores)"]
+    subgraph "Result"
+        WEBGL["WebGL Canvas (pixels)"]
+        SVG["SVG String (vectors)"]
     end
 
     UC -->|"builds"| SG
@@ -59,7 +59,7 @@ graph TD
 
     SG -->|"mount + render"| R3
     SG -->|"renderToSVG()"| RS
-    SG -.->|"futuro"| R_FUTURE
+    SG -.->|"future"| R_FUTURE
 
     R3 --> WEBGL
     RS --> SVG
@@ -67,16 +67,16 @@ graph TD
 
 ---
 
-## Capas de la arquitectura
+## Architecture Layers
 
-| Capa | Paquete | Responsabilidad | Dependencias |
-|------|---------|-----------------|--------------|
-| **Core** | `@joroya/core` | Scene graph, componentes, transforms, serialización, math | `uuid` (única dependencia) |
-| **Renderer 3D** | `@joroya/renderer-three` | Traducción a Three.js WebGL | `@joroya/core`, `three` |
-| **Renderer SVG** | `@joroya/renderer-svg` | Generación de SVG puro | `@joroya/core` |
-| **Loader glTF** | `@joroya/loader-gltf` | Importación de modelos 3D | `@joroya/core`, `three` |
+| Layer | Package | Responsibility | Dependencies |
+|-------|---------|----------------|--------------|
+| **Core** | `@joroya/core` | Scene graph, components, transforms, serialization, math | `uuid` (only dependency) |
+| **3D Renderer** | `@joroya/renderer-three` | Translation to Three.js WebGL | `@joroya/core`, `three` |
+| **SVG Renderer** | `@joroya/renderer-svg` | Pure SVG generation | `@joroya/core` |
+| **glTF Loader** | `@joroya/loader-gltf` | 3D model importing | `@joroya/core`, `three` |
 
-### Grafo de dependencias
+### Dependency Graph
 
 ```mermaid
 graph BT
@@ -98,36 +98,36 @@ graph BT
     DEMO -->|"depends on"| R3
 ```
 
-> **Regla clave:** Las flechas de dependencia son **unidireccionales** y siempre apuntan hacia `@joroya/core`. El core **nunca** importa de los renderers ni de los loaders.
+> **Key rule:** Dependency arrows are **unidirectional** and always point towards `@joroya/core`. The core **never** imports from renderers or loaders.
 
 ---
 
-## El patrón "Compiler"
+## The "Compiler" Pattern
 
-Los renderers funcionan como **compiladores**: traducen una representación intermedia (el scene graph) a un formato de salida específico.
+Renderers work like **compilers**: they translate an intermediate representation (the scene graph) into a specific output format.
 
 ```mermaid
 flowchart LR
-    IR["Scene Graph\n(Representación intermedia)"] -->|"ThreeRenderer"| OUT1["THREE.Scene\nTHREE.Mesh\nTHREE.Camera"]
+    IR["Scene Graph\n(Intermediate representation)"] -->|"ThreeRenderer"| OUT1["THREE.Scene\nTHREE.Mesh\nTHREE.Camera"]
     IR -->|"renderToSVG()"| OUT2["<svg>\n  <path/>\n</svg>"]
     IR -.->|"Future: WebGPU"| OUT3["GPUBuffer\nGPURenderPipeline"]
 ```
 
-| Concepto | Compilador clásico | Oroya Animate |
-|----------|-------------------|---------------|
-| Código fuente | Archivo `.c` | User Code (TypeScript) |
-| Representación intermedia | AST / IR | Scene Graph |
+| Concept | Classic Compiler | Oroya Animate |
+|---------|-----------------|---------------|
+| Source code | `.c` file | User Code (TypeScript) |
+| Intermediate representation | AST / IR | Scene Graph |
 | Backend | x86, ARM, WASM | Three.js, SVG, WebGPU |
-| Salida | Código máquina | Píxeles, vectores |
+| Output | Machine code | Pixels, vectors |
 
-Este patrón permite:
-- **Agregar backends** sin modificar el core.
-- **Testear sin renderer**  Ela lógica vive en el scene graph.
-- **Server-side rendering**  Eel SVG renderer funciona en Node.js sin DOM.
+This pattern enables:
+- **Adding backends** without modifying the core.
+- **Testing without a renderer** — logic lives in the scene graph.
+- **Server-side rendering** — the SVG renderer works in Node.js without DOM.
 
 ---
 
-## Ciclo de vida del renderizado
+## Rendering Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -137,55 +137,55 @@ sequenceDiagram
     participant T as Transform
     participant R as Renderer
 
-    Note over U,R: FASE 1  EPreparación
+    Note over U,R: PHASE 1 — Preparation
     U->>S: new Scene()
     U->>N: new Node('box')
     U->>N: addComponent(createBox(...))
     U->>N: addComponent(new Material(...))
     U->>S: scene.add(node)
 
-    Note over U,R: FASE 2  EMontaje
+    Note over U,R: PHASE 2 — Mounting
     U->>R: renderer.mount(scene)
     R->>S: scene.traverse(callback)
-    R->>R: Crear objetos del backend
-    R->>R: Detectar cámara activa
+    R->>R: Create backend objects
+    R->>R: Detect active camera
 
-    Note over U,R: FASE 3  ERender loop
+    Note over U,R: PHASE 3 — Render loop
     loop requestAnimationFrame
         U->>T: transform.rotation = {...}
         U->>T: transform.updateLocalMatrix()
         U->>R: renderer.render()
         R->>S: scene.updateWorldMatrices()
         S->>N: node.updateWorldMatrix(parentMatrix)
-        N->>T: worldMatrix = parent ÁElocal
-        R->>R: Sincronizar con backend
-        R->>R: Dibujar frame
+        N->>T: worldMatrix = parent × local
+        R->>R: Sync with backend
+        R->>R: Draw frame
     end
 
-    Note over U,R: FASE 4  ECleanup
+    Note over U,R: PHASE 4 — Cleanup
     U->>R: renderer.dispose()
 ```
 
-### Detalle de cada fase
+### Phase Details
 
-| Fase | Acción | Quién la ejecuta |
-|------|--------|-------------------|
-| **1. Preparación** | Construir el scene graph con nodos, componentes y relaciones padre-hijo | User code |
-| **2. Montaje** | `renderer.mount(scene)`  Erecorrer el árbol y crear los objetos del backend | Renderer |
-| **3. Render loop** | Mutar transforms ↁE`updateLocalMatrix()` ↁE`renderer.render()` ↁEpropagar matrices ↁEdibujar | User code + Renderer |
-| **4. Cleanup** | `renderer.dispose()`  Eliberar recursos GPU/memoria | User code |
+| Phase | Action | Executed by |
+|-------|--------|-------------|
+| **1. Preparation** | Build the scene graph with nodes, components, and parent-child relationships | User code |
+| **2. Mounting** | `renderer.mount(scene)` — traverse the tree and create backend objects | Renderer |
+| **3. Render loop** | Mutate transforms → `updateLocalMatrix()` → `renderer.render()` → propagate matrices → draw | User code + Renderer |
+| **4. Cleanup** | `renderer.dispose()` — release GPU/memory resources | User code |
 
 ---
 
-## Modelo Entity-Component System (ECS) simplificado
+## Simplified Entity-Component System (ECS)
 
-Oroya usa un **ECS ligero** donde:
+Oroya uses a **lightweight ECS** where:
 
-| ECS Term | Oroya Equivalent | Descripción |
+| ECS Term | Oroya Equivalent | Description |
 |----------|-----------------|-------------|
-| **Entity** | `Node` | Contenedor con ID y jerarquía |
-| **Component** | `Transform`, `Geometry`, `Material`, `Camera` | Datos adjuntos a un nodo |
-| **System** | Renderers, `updateWorldMatrices()` | Lógica que procesa componentes |
+| **Entity** | `Node` | Container with ID and hierarchy |
+| **Component** | `Transform`, `Geometry`, `Material`, `Camera` | Data attached to a node |
+| **System** | Renderers, `updateWorldMatrices()` | Logic that processes components |
 
 ```mermaid
 graph LR
@@ -195,13 +195,13 @@ graph LR
 
     subgraph "Components"
         T["Transform\nposition, rotation, scale"]
-        G["Geometry\nBox 1ÁEÁE"]
+        G["Geometry\nBox 1×1×1"]
         M["Material\ncolor: blue"]
     end
 
     subgraph "Systems"
-        S1["updateWorldMatrices()\nPropaga matrices"]
-        S2["ThreeRenderer.render()\nDibuja con Three.js"]
+        S1["updateWorldMatrices()\nPropagates matrices"]
+        S2["ThreeRenderer.render()\nDraws with Three.js"]
     end
 
     N --> T
@@ -212,18 +212,18 @@ graph LR
     M --> S2
 ```
 
-### Reglas del ECS
+### ECS Rules
 
-1. **Un componente por tipo por nodo**  ENo se pueden tener dos `Geometry` en un mismo nodo.
-2. **Transform es automático**  ETodos los nodos lo tienen desde su creación.
-3. **Los componentes son datos**  ENo contienen lógica de renderizado.
-4. **Los renderers son los "systems"**  ELeen componentes y producen salida visual.
+1. **One component per type per node** — You cannot have two `Geometry` components on the same node.
+2. **Transform is automatic** — All nodes have it from creation.
+3. **Components are data** — They contain no rendering logic.
+4. **Renderers are the "systems"** — They read components and produce visual output.
 
 ---
 
-## Extensibilidad
+## Extensibility
 
-### Agregar un nuevo renderer
+### Adding a new renderer
 
 ```typescript
 class MyRenderer {
@@ -234,7 +234,7 @@ class MyRenderer {
     scene.traverse(node => {
       const geo = node.getComponent<Geometry>(ComponentType.Geometry);
       const mat = node.getComponent<Material>(ComponentType.Material);
-      // Crear objetos del motor/framework destino
+      // Create objects for the target engine/framework
     });
   }
 
@@ -242,17 +242,17 @@ class MyRenderer {
     if (!this.scene) return;
     this.scene.updateWorldMatrices();
     this.scene.traverse(node => {
-      // Leer node.transform.worldMatrix
-      // Sincronizar con los objetos del motor
+      // Read node.transform.worldMatrix
+      // Sync with engine objects
     });
-    // Dibujar frame
+    // Draw frame
   }
 
-  dispose(): void { /* liberar recursos */ }
+  dispose(): void { /* release resources */ }
 }
 ```
 
-### Agregar un nuevo loader
+### Adding a new loader
 
 ```typescript
 async function loadMyFormat(url: string): Promise<Scene> {
@@ -273,31 +273,31 @@ async function loadMyFormat(url: string): Promise<Scene> {
 
 ---
 
-## Estructura del monorepo
+## Monorepo Structure
 
 ```
 oroya-animate/
 ├── packages/
-━E  ├── core/               ↁEMotor agnóstico (Scene, Node, Components, Math)
-━E  ├── renderer-three/      ↁEBackend Three.js WebGL
-━E  ├── renderer-svg/        ↁEBackend SVG puro
-━E  └── loader-gltf/         ↁEImportador de modelos glTF
+│   ├── core/               → Engine-agnostic core (Scene, Node, Components, Math)
+│   ├── renderer-three/      → Three.js WebGL backend
+│   ├── renderer-svg/        → Pure SVG backend
+│   └── loader-gltf/         → glTF model importer
 ├── apps/
-━E  └── demo-react/          ↁEAplicación demo (Vite + React)
-├── docs/                    ↁEDocumentación del proyecto
-└── package.json             ↁERoot del monorepo (pnpm workspaces)
+│   └── demo-react/          → Demo application (Vite + React)
+├── docs/                    → Project documentation
+└── package.json             → Monorepo root (pnpm workspaces)
 ```
 
 ---
 
-## Decisiones de diseño
+## Design Decisions
 
-| Decisión | Alternativa rechazada | Razón |
-|----------|----------------------|-------|
-| Scene graph como IR | API directa sobre Three.js | Permite múltiples backends y testing sin GPU |
-| ECS simplificado (1 comp/tipo) | ECS completo con Systems | Menor complejidad para el alcance actual |
-| Quaterniones para rotación | Ángulos de Euler | Sin gimbal lock, interpolación natural (SLERP) |
-| Matrices column-major | Matrices row-major | Compatible con WebGL y Three.js |
-| `uuid` para IDs de nodo | IDs incrementales | IDs únicos globalmente, necesario para serialización |
-| `tsup` como bundler | `tsc`, `rollup`, `esbuild` | DTS + CJS + ESM en un solo tool con configuración mínima |
-| pnpm workspaces | npm/yarn workspaces | Más rápido, deduplicación estricta, mejor para monorepos |
+| Decision | Rejected Alternative | Reason |
+|----------|---------------------|--------|
+| Scene graph as IR | Direct API over Three.js | Enables multiple backends and GPU-free testing |
+| Simplified ECS (1 comp/type) | Full ECS with Systems | Lower complexity for current scope |
+| Quaternions for rotation | Euler angles | No gimbal lock, natural interpolation (SLERP) |
+| Column-major matrices | Row-major matrices | Compatible with WebGL and Three.js |
+| `uuid` for node IDs | Incremental IDs | Globally unique IDs, required for serialization |
+| `tsup` as bundler | `tsc`, `rollup`, `esbuild` | DTS + CJS + ESM in a single tool with minimal config |
+| pnpm workspaces | npm/yarn workspaces | Faster, strict deduplication, better for monorepos |

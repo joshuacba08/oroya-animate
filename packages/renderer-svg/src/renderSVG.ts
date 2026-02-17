@@ -20,6 +20,11 @@ import {
   RadialGradientDef,
   Scene,
   SphereGeometryDef,
+  CylinderGeometryDef,
+  PlaneGeometryDef,
+  ConeGeometryDef,
+  TorusGeometryDef,
+  CircleGeometryDef,
   SvgAnimateDef,
   SvgAnimateTransformDef,
   SvgClipPathDef,
@@ -172,7 +177,7 @@ class GradientCollector {
   /** Whether any definitions have been registered. */
   get isEmpty(): boolean {
     return this.map.size === 0 && this.filterMap.size === 0 &&
-           this.clipPathMap.size === 0 && this.maskMap.size === 0;
+      this.clipPathMap.size === 0 && this.maskMap.size === 0;
   }
 
   /** Generate the `<defs>…</defs>` string. Returns empty string if no defs. */
@@ -540,6 +545,73 @@ function geometryToSvgString(geo: Geometry, mat: Material | undefined, gradients
       return wrapTag('text', `font-size="${fontSize}" font-family="${fontFamily}" font-weight="${fontWeight}" text-anchor="${textAnchor}" dominant-baseline="${dominantBaseline}" ${style}`, false, escaped);
     }
 
+    case GeometryPrimitive.Cylinder: {
+      const cylDef = geo.definition as CylinderGeometryDef;
+      const radiusTop = cylDef.radiusTop ?? 1;
+      const radiusBottom = cylDef.radiusBottom ?? 1;
+      const height = cylDef.height;
+
+      // Project as side view: rectangle with ellipses at top/bottom
+      const maxRadius = Math.max(radiusTop, radiusBottom);
+      const width = maxRadius * 2;
+      const x = -maxRadius;
+      const y = -height / 2;
+
+      // For simplicity, render as a rectangle (side view projection)
+      return wrapTag('rect', `x="${x}" y="${y}" width="${width}" height="${height}" ${style}`, true);
+    }
+
+    case GeometryPrimitive.Plane: {
+      const planeDef = geo.definition as PlaneGeometryDef;
+      const x = -planeDef.width / 2;
+      const y = -planeDef.height / 2;
+      return wrapTag('rect', `x="${x}" y="${y}" width="${planeDef.width}" height="${planeDef.height}" ${style}`, true);
+    }
+
+    case GeometryPrimitive.Cone: {
+      const coneDef = geo.definition as ConeGeometryDef;
+      const { radius, height } = coneDef;
+      const halfHeight = height / 2;
+
+      // Project as triangle (side view)
+      const points = `0,${-halfHeight} ${-radius},${halfHeight} ${radius},${halfHeight}`;
+      return wrapTag('polygon', `points="${points}" ${style}`, true);
+    }
+
+    case GeometryPrimitive.Torus: {
+      const torusDef = geo.definition as TorusGeometryDef;
+      const { radius, tube } = torusDef;
+
+      // Project as annulus (ring) - use SVG circle with stroke
+      // For a true annulus, we'd need a path, but a thick-stroked circle approximates it
+      return wrapTag('circle', `cx="0" cy="0" r="${radius}" stroke-width="${tube * 2}" ${style}`, true);
+    }
+
+    case GeometryPrimitive.Circle: {
+      const circleDef = geo.definition as CircleGeometryDef;
+      const { radius, thetaStart, thetaLength } = circleDef;
+      const fullCircle = !thetaStart && (!thetaLength || thetaLength >= Math.PI * 2);
+
+      if (fullCircle) {
+        // Full circle
+        return wrapTag('circle', `cx="0" cy="0" r="${radius}" ${style}`, true);
+      } else {
+        // Partial circle - render as path with arc
+        const start = thetaStart ?? 0;
+        const length = thetaLength ?? Math.PI * 2;
+        const end = start + length;
+
+        const x1 = Math.cos(start) * radius;
+        const y1 = Math.sin(start) * radius;
+        const x2 = Math.cos(end) * radius;
+        const y2 = Math.sin(end) * radius;
+
+        const largeArc = length > Math.PI ? 1 : 0;
+        const d = `M 0,0 L ${x1},${y1} A ${radius},${radius} 0 ${largeArc},1 ${x2},${y2} Z`;
+        return wrapTag('path', `d="${d}" ${style}`, true);
+      }
+    }
+
     default:
       return null;
   }
@@ -696,6 +768,78 @@ function geometryToDomElement(geo: Geometry, NS: string): SVGElement | null {
       el.setAttribute('dominant-baseline', textDef.dominantBaseline ?? 'auto');
       el.textContent = textDef.text;
       return el;
+    }
+
+    case GeometryPrimitive.Cylinder: {
+      const cylDef = geo.definition as CylinderGeometryDef;
+      const radiusTop = cylDef.radiusTop ?? 1;
+      const radiusBottom = cylDef.radiusBottom ?? 1;
+      const height = cylDef.height;
+      const maxRadius = Math.max(radiusTop, radiusBottom);
+      const el = document.createElementNS(NS, 'rect') as SVGElement;
+      el.setAttribute('x', String(-maxRadius));
+      el.setAttribute('y', String(-height / 2));
+      el.setAttribute('width', String(maxRadius * 2));
+      el.setAttribute('height', String(height));
+      return el;
+    }
+
+    case GeometryPrimitive.Plane: {
+      const planeDef = geo.definition as PlaneGeometryDef;
+      const el = document.createElementNS(NS, 'rect') as SVGElement;
+      el.setAttribute('x', String(-planeDef.width / 2));
+      el.setAttribute('y', String(-planeDef.height / 2));
+      el.setAttribute('width', String(planeDef.width));
+      el.setAttribute('height', String(planeDef.height));
+      return el;
+    }
+
+    case GeometryPrimitive.Cone: {
+      const coneDef = geo.definition as ConeGeometryDef;
+      const { radius, height } = coneDef;
+      const halfHeight = height / 2;
+      const el = document.createElementNS(NS, 'polygon') as SVGElement;
+      const points = `0,${-halfHeight} ${-radius},${halfHeight} ${radius},${halfHeight}`;
+      el.setAttribute('points', points);
+      return el;
+    }
+
+    case GeometryPrimitive.Torus: {
+      const torusDef = geo.definition as TorusGeometryDef;
+      const { radius, tube } = torusDef;
+      const el = document.createElementNS(NS, 'circle') as SVGElement;
+      el.setAttribute('cx', '0');
+      el.setAttribute('cy', '0');
+      el.setAttribute('r', String(radius));
+      el.setAttribute('stroke-width', String(tube * 2));
+      return el;
+    }
+
+    case GeometryPrimitive.Circle: {
+      const circleDef = geo.definition as CircleGeometryDef;
+      const { radius, thetaStart, thetaLength } = circleDef;
+      const fullCircle = !thetaStart && (!thetaLength || thetaLength >= Math.PI * 2);
+
+      if (fullCircle) {
+        const el = document.createElementNS(NS, 'circle') as SVGElement;
+        el.setAttribute('cx', '0');
+        el.setAttribute('cy', '0');
+        el.setAttribute('r', String(radius));
+        return el;
+      } else {
+        const start = thetaStart ?? 0;
+        const length = thetaLength ?? Math.PI * 2;
+        const end = start + length;
+        const x1 = Math.cos(start) * radius;
+        const y1 = Math.sin(start) * radius;
+        const x2 = Math.cos(end) * radius;
+        const y2 = Math.sin(end) * radius;
+        const largeArc = length > Math.PI ? 1 : 0;
+        const d = `M 0,0 L ${x1},${y1} A ${radius},${radius} 0 ${largeArc},1 ${x2},${y2} Z`;
+        const el = document.createElementNS(NS, 'path') as SVGElement;
+        el.setAttribute('d', d);
+        return el;
+      }
     }
 
     default:
