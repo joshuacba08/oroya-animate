@@ -1,7 +1,7 @@
 import {
     Scene, Node, createBox, createSphere, Material, Camera, CameraType,
     Interactive,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const interactiveDemoControls: ControlDef[] = [

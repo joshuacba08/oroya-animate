@@ -7,7 +7,7 @@ Oroya Animate sigue una arquitectura desacoplada donde la representación de la 
 ## Principio fundamental
 
 > **"Define once, render anywhere."**
-> — El scene graph es la única fuente de verdad. Los renderers son traductores.
+>  EEl scene graph es la única fuente de verdad. Los renderers son traductores.
 
 ```mermaid
 graph TD
@@ -17,7 +17,7 @@ graph TD
         JSON["JSON Serializado"]
     end
 
-    subgraph "@oroya/core — Motor agnóstico"
+    subgraph "@joroya/core  EMotor agnóstico"
         SG["Scene Graph"]
         N["Node"]
         T["Transform"]
@@ -29,8 +29,8 @@ graph TD
     end
 
     subgraph "Capa de salida"
-        R3["@oroya/renderer-three"]
-        RS["@oroya/renderer-svg"]
+        R3["@joroya/renderer-three"]
+        RS["@joroya/renderer-svg"]
         R_FUTURE["Future: Canvas2D, WebGPU..."]
     end
 
@@ -40,7 +40,7 @@ graph TD
     end
 
     UC -->|"builds"| SG
-    GLTF -->|"@oroya/loader-gltf"| SG
+    GLTF -->|"@joroya/loader-gltf"| SG
     JSON -->|"deserialize()"| SG
     SG -->|"serialize()"| JSON
 
@@ -65,19 +65,19 @@ graph TD
 
 | Capa | Paquete | Responsabilidad | Dependencias |
 |------|---------|-----------------|--------------|
-| **Core** | `@oroya/core` | Scene graph, componentes, transforms, serialización, math | `uuid` (única dependencia) |
-| **Renderer 3D** | `@oroya/renderer-three` | Traducción a Three.js WebGL | `@oroya/core`, `three` |
-| **Renderer SVG** | `@oroya/renderer-svg` | Generación de SVG puro | `@oroya/core` |
-| **Loader glTF** | `@oroya/loader-gltf` | Importación de modelos 3D | `@oroya/core`, `three` |
+| **Core** | `@joroya/core` | Scene graph, componentes, transforms, serialización, math | `uuid` (única dependencia) |
+| **Renderer 3D** | `@joroya/renderer-three` | Traducción a Three.js WebGL | `@joroya/core`, `three` |
+| **Renderer SVG** | `@joroya/renderer-svg` | Generación de SVG puro | `@joroya/core` |
+| **Loader glTF** | `@joroya/loader-gltf` | Importación de modelos 3D | `@joroya/core`, `three` |
 
 ### Grafo de dependencias
 
 ```mermaid
 graph BT
-    CORE["@oroya/core"]
-    R3["@oroya/renderer-three"]
-    RS["@oroya/renderer-svg"]
-    LG["@oroya/loader-gltf"]
+    CORE["@joroya/core"]
+    R3["@joroya/renderer-three"]
+    RS["@joroya/renderer-svg"]
+    LG["@joroya/loader-gltf"]
     THREE["three (npm)"]
     UUID["uuid (npm)"]
     DEMO["apps/demo-react"]
@@ -92,7 +92,7 @@ graph BT
     DEMO -->|"depends on"| R3
 ```
 
-> **Regla clave:** Las flechas de dependencia son **unidireccionales** y siempre apuntan hacia `@oroya/core`. El core **nunca** importa de los renderers ni de los loaders.
+> **Regla clave:** Las flechas de dependencia son **unidireccionales** y siempre apuntan hacia `@joroya/core`. El core **nunca** importa de los renderers ni de los loaders.
 
 ---
 
@@ -116,8 +116,8 @@ flowchart LR
 
 Este patrón permite:
 - **Agregar backends** sin modificar el core.
-- **Testear sin renderer** — la lógica vive en el scene graph.
-- **Server-side rendering** — el SVG renderer funciona en Node.js sin DOM.
+- **Testear sin renderer**  Ela lógica vive en el scene graph.
+- **Server-side rendering**  Eel SVG renderer funciona en Node.js sin DOM.
 
 ---
 
@@ -131,32 +131,32 @@ sequenceDiagram
     participant T as Transform
     participant R as Renderer
 
-    Note over U,R: FASE 1 — Preparación
+    Note over U,R: FASE 1  EPreparación
     U->>S: new Scene()
     U->>N: new Node('box')
     U->>N: addComponent(createBox(...))
     U->>N: addComponent(new Material(...))
     U->>S: scene.add(node)
 
-    Note over U,R: FASE 2 — Montaje
+    Note over U,R: FASE 2  EMontaje
     U->>R: renderer.mount(scene)
     R->>S: scene.traverse(callback)
     R->>R: Crear objetos del backend
     R->>R: Detectar cámara activa
 
-    Note over U,R: FASE 3 — Render loop
+    Note over U,R: FASE 3  ERender loop
     loop requestAnimationFrame
         U->>T: transform.rotation = {...}
         U->>T: transform.updateLocalMatrix()
         U->>R: renderer.render()
         R->>S: scene.updateWorldMatrices()
         S->>N: node.updateWorldMatrix(parentMatrix)
-        N->>T: worldMatrix = parent × local
+        N->>T: worldMatrix = parent ÁElocal
         R->>R: Sincronizar con backend
         R->>R: Dibujar frame
     end
 
-    Note over U,R: FASE 4 — Cleanup
+    Note over U,R: FASE 4  ECleanup
     U->>R: renderer.dispose()
 ```
 
@@ -165,9 +165,9 @@ sequenceDiagram
 | Fase | Acción | Quién la ejecuta |
 |------|--------|-------------------|
 | **1. Preparación** | Construir el scene graph con nodos, componentes y relaciones padre-hijo | User code |
-| **2. Montaje** | `renderer.mount(scene)` — recorrer el árbol y crear los objetos del backend | Renderer |
-| **3. Render loop** | Mutar transforms → `updateLocalMatrix()` → `renderer.render()` → propagar matrices → dibujar | User code + Renderer |
-| **4. Cleanup** | `renderer.dispose()` — liberar recursos GPU/memoria | User code |
+| **2. Montaje** | `renderer.mount(scene)`  Erecorrer el árbol y crear los objetos del backend | Renderer |
+| **3. Render loop** | Mutar transforms ↁE`updateLocalMatrix()` ↁE`renderer.render()` ↁEpropagar matrices ↁEdibujar | User code + Renderer |
+| **4. Cleanup** | `renderer.dispose()`  Eliberar recursos GPU/memoria | User code |
 
 ---
 
@@ -189,7 +189,7 @@ graph LR
 
     subgraph "Components"
         T["Transform\nposition, rotation, scale"]
-        G["Geometry\nBox 1×2×1"]
+        G["Geometry\nBox 1ÁEÁE"]
         M["Material\ncolor: blue"]
     end
 
@@ -208,10 +208,10 @@ graph LR
 
 ### Reglas del ECS
 
-1. **Un componente por tipo por nodo** — No se pueden tener dos `Geometry` en un mismo nodo.
-2. **Transform es automático** — Todos los nodos lo tienen desde su creación.
-3. **Los componentes son datos** — No contienen lógica de renderizado.
-4. **Los renderers son los "systems"** — Leen componentes y producen salida visual.
+1. **Un componente por tipo por nodo**  ENo se pueden tener dos `Geometry` en un mismo nodo.
+2. **Transform es automático**  ETodos los nodos lo tienen desde su creación.
+3. **Los componentes son datos**  ENo contienen lógica de renderizado.
+4. **Los renderers son los "systems"**  ELeen componentes y producen salida visual.
 
 ---
 
@@ -272,14 +272,14 @@ async function loadMyFormat(url: string): Promise<Scene> {
 ```
 oroya-animate/
 ├── packages/
-│   ├── core/               ← Motor agnóstico (Scene, Node, Components, Math)
-│   ├── renderer-three/      ← Backend Three.js WebGL
-│   ├── renderer-svg/        ← Backend SVG puro
-│   └── loader-gltf/         ← Importador de modelos glTF
+━E  ├── core/               ↁEMotor agnóstico (Scene, Node, Components, Math)
+━E  ├── renderer-three/      ↁEBackend Three.js WebGL
+━E  ├── renderer-svg/        ↁEBackend SVG puro
+━E  └── loader-gltf/         ↁEImportador de modelos glTF
 ├── apps/
-│   └── demo-react/          ← Aplicación demo (Vite + React)
-├── docs/                    ← Documentación del proyecto
-└── package.json             ← Root del monorepo (pnpm workspaces)
+━E  └── demo-react/          ↁEAplicación demo (Vite + React)
+├── docs/                    ↁEDocumentación del proyecto
+└── package.json             ↁERoot del monorepo (pnpm workspaces)
 ```
 
 ---

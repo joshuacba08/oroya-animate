@@ -1,5 +1,5 @@
 {
-  "name": "@oroya/loader-gltf",
+  "name": "@joroya/loader-gltf",
   "version": "0.3.0",
   "description": "glTF/GLB 3D model loader for Oroya Animate scene graphs",
   "keywords": [
@@ -47,11 +47,11 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@oroya/core": "^0.3.0",
+    "@joroya/core": "^0.3.0",
     "three": "^0.165.0"
   },
   "dependencies": {
-    "@oroya/core": "workspace:*",
+    "@joroya/core": "workspace:*",
     "three": "^0.165.0"
   },
   "devDependencies": {

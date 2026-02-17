@@ -1,4 +1,4 @@
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 import { hexToRgb } from '../types';
 

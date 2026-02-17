@@ -1,6 +1,6 @@
 # Renderers
 
-Los renderers de Oroya Animate son **traductores** que convierten el scene graph agnóstico en salida visual. El core no conoce a los renderers — cada uno lee el scene graph y produce su propia representación.
+Los renderers de Oroya Animate son **traductores** que convierten el scene graph agnóstico en salida visual. El core no conoce a los renderers  Ecada uno lee el scene graph y produce su propia representación.
 
 ---
 
@@ -8,9 +8,9 @@ Los renderers de Oroya Animate son **traductores** que convierten el scene graph
 
 ```mermaid
 graph TD
-    SG["Scene Graph\n(@oroya/core)"]
-    R3["ThreeRenderer\n(@oroya/renderer-three)"]
-    RS["renderToSVG\n(@oroya/renderer-svg)"]
+    SG["Scene Graph\n(@joroya/core)"]
+    R3["ThreeRenderer\n(@joroya/renderer-three)"]
+    RS["renderToSVG\n(@joroya/renderer-svg)"]
     WEBGL["WebGL Canvas (3D)"]
     SVG["SVG String (2D)"]
 
@@ -24,20 +24,20 @@ graph TD
 |---------|----------------|---------------|
 | **Paradigma** | Instancia con estado (class) | Función pura (stateless) |
 | **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
-| **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
-| **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
-| **Vectorial** | ❌ Rasterizado | ✅ Infinitamente escalable |
+| **Requiere DOM** | ✁ESí (`HTMLCanvasElement`) | ❁ENo (funciona en Node.js) |
+| **3D** | ✁EPerspectiva, luces, sombras | ❁ESolo 2D |
+| **Vectorial** | ❁ERasterizado | ✁EInfinitamente escalable |
 
 ---
 
-## `@oroya/renderer-three` — Three.js (WebGL)
+## `@joroya/renderer-three`  EThree.js (WebGL)
 
 El renderer principal para visualización 3D interactiva.
 
 ### Setup
 
 ```typescript
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas') as HTMLCanvasElement,
@@ -75,14 +75,14 @@ sequenceDiagram
     Note over U,TS: Montaje
     U->>TR: mount(scene)
     TR->>TS: clear + add lights
-    TR->>TR: traverse → create Mesh/Group/Camera per node
+    TR->>TR: traverse ↁEcreate Mesh/Group/Camera per node
     TR->>TR: Set first Camera as activeCamera
 
     Note over U,TS: Render loop
     loop requestAnimationFrame
         U->>TR: render()
         TR->>TR: updateWorldMatrices()
-        TR->>TS: sync worldMatrix → Three.js objects
+        TR->>TS: sync worldMatrix ↁEThree.js objects
         TR->>TR: webglRenderer.render()
     end
 ```
@@ -94,7 +94,7 @@ sequenceDiagram
 | Node sin Geometry ni Camera | `THREE.Group` |
 | Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
 | Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
-| Node + `Geometry(Path2D)` | ❌ Ignorado |
+| Node + `Geometry(Path2D)` | ❁EIgnorado |
 | Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
 | `Material` con `color` | `MeshStandardMaterial({ color })` |
 | `Material` con `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
@@ -120,8 +120,8 @@ flowchart TD
 ### Ejemplo completo
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
 
@@ -155,16 +155,16 @@ requestAnimationFrame(loop);
 
 ---
 
-## `@oroya/renderer-svg` — SVG (2D)
+## `@joroya/renderer-svg`  ESVG (2D)
 
 Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### `renderToSVG` — String puro (server-safe)
+### `renderToSVG`  EString puro (server-safe)
 
 Función pura y stateless que retorna un string SVG. Funciona en Node.js sin DOM.
 
 ```typescript
-import { renderToSVG } from '@oroya/renderer-svg';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 ```
@@ -177,12 +177,12 @@ const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 | `height` | `number` | *(requerido)* | Alto del SVG |
 | `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox personalizado |
 
-### `renderToSVGElement` — DOM interactivo
+### `renderToSVGElement`  EDOM interactivo
 
 Crea un `SVGSVGElement` real con event delegation. Los nodos con componente `Interactive` reciben listeners de pointer/click/wheel.
 
 ```typescript
-import { renderToSVGElement } from '@oroya/renderer-svg';
+import { renderToSVGElement } from '@joroya/renderer-svg';
 
 const { svg, dispose } = renderToSVGElement(scene, {
   width: 800,
@@ -228,10 +228,10 @@ flowchart TD
     START["renderToSVG / renderToSVGElement"] --> UPDATE["scene.updateWorldMatrices()"]
     UPDATE --> WALK["Recorrer árbol recursivamente"]
     WALK --> GEO{"¿Geometry?"}
-    GEO -->|"Path2D"| PATH["→ path"]
-    GEO -->|"Box"| RECT["→ rect"]
-    GEO -->|"Sphere"| CIRCLE["→ circle"]
-    GEO -->|"Text"| TEXT["→ text"]
+    GEO -->|"Path2D"| PATH["ↁEpath"]
+    GEO -->|"Box"| RECT["ↁErect"]
+    GEO -->|"Sphere"| CIRCLE["ↁEcircle"]
+    GEO -->|"Text"| TEXT["ↁEtext"]
     GEO -->|"Ninguno"| GROUP["Solo g si tiene hijos"]
     PATH & RECT & CIRCLE & TEXT --> MAT{"¿Material?"}
     MAT -->|"fill/stroke"| STYLE["fill + stroke + opacity"]
@@ -254,7 +254,7 @@ flowchart TD
 | Geometría | Elemento SVG generado |
 |-----------|----------------------|
 | `Path2D` | `<path d="...">` |
-| `Box` | `<rect>` (width × height, depth ignorado) |
+| `Box` | `<rect>` (width ÁEheight, depth ignorado) |
 | `Sphere` | `<circle>` (radio) |
 | `Text` | `<text>` con font-size, font-family, font-weight, text-anchor, dominant-baseline |
 
@@ -463,7 +463,7 @@ new Material({
 El componente `Animation` permite agregar animaciones SVG declarativas (`<animate>` y `<animateTransform>`) que se ejecutan en el navegador sin JavaScript.
 
 ```typescript
-import { Animation } from '@oroya/core';
+import { Animation } from '@joroya/core';
 
 const circle = new Node('pulse');
 circle.addComponent(createSphere(30));
@@ -549,53 +549,53 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 
 | Geometría | Three.js | SVG |
 |-----------|----------|-----|
-| `Box` | ✅ | ✅ `<rect>` |
-| `Sphere` | ✅ | ✅ `<circle>` |
-| `Path2D` | ❌ | ✅ `<path>` |
-| `Text` | ❌ | ✅ `<text>` |
+| `Box` | ✁E| ✁E`<rect>` |
+| `Sphere` | ✁E| ✁E`<circle>` |
+| `Path2D` | ❁E| ✁E`<path>` |
+| `Text` | ❁E| ✁E`<text>` |
 
 ### Soporte de material
 
 | Propiedad | Three.js | SVG |
 |-----------|----------|-----|
-| `color` | ✅ | ❌ |
-| `opacity` | ✅ | ✅ |
-| `fill` | ❌ | ✅ |
-| `stroke` | ❌ | ✅ |
-| `strokeWidth` | ❌ | ✅ |
-| `fillGradient` | ❌ | ✅ |
-| `strokeGradient` | ❌ | ✅ |
-| `filter` | ❌ | ✅ |
-| `clipPath` | ❌ | ✅ |
-| `mask` | ❌ | ✅ |
+| `color` | ✁E| ❁E|
+| `opacity` | ✁E| ✁E|
+| `fill` | ❁E| ✁E|
+| `stroke` | ❁E| ✁E|
+| `strokeWidth` | ❁E| ✁E|
+| `fillGradient` | ❁E| ✁E|
+| `strokeGradient` | ❁E| ✁E|
+| `filter` | ❁E| ✁E|
+| `clipPath` | ❁E| ✁E|
+| `mask` | ❁E| ✁E|
 
 ### Soporte de transforms
 
 | Feature | Three.js | SVG |
 |---------|----------|-----|
-| Position (translate) | ✅ | ✅ `matrix()` |
-| Rotation | ✅ | ✅ `matrix()` |
-| Scale | ✅ | ✅ `matrix()` |
-| Jerarquía (`<g>`) | ✅ Groups | ✅ `<g>` |
+| Position (translate) | ✁E| ✁E`matrix()` |
+| Rotation | ✁E| ✁E`matrix()` |
+| Scale | ✁E| ✁E`matrix()` |
+| Jerarquía (`<g>`) | ✁EGroups | ✁E`<g>` |
 
 ### Soporte de componentes especiales
 
 | Feature | Three.js | SVG |
 |---------|----------|-----|
-| `Camera` (Perspective) | ✅ | ❌ |
-| `Camera` (Orthographic) | ❌ | ✅ viewBox |
-| `Interactive` (eventos) | ✅ Raycaster | ✅ Event delegation |
-| `Animation` (SVG nativo) | ❌ | ✅ `<animate>` / `<animateTransform>` |
-| `cssClass` / `cssId` | ❌ | ✅ atributos `class` / `id` |
+| `Camera` (Perspective) | ✁E| ❁E|
+| `Camera` (Orthographic) | ❁E| ✁EviewBox |
+| `Interactive` (eventos) | ✁ERaycaster | ✁EEvent delegation |
+| `Animation` (SVG nativo) | ❁E| ✁E`<animate>` / `<animateTransform>` |
+| `cssClass` / `cssId` | ❁E| ✁Eatributos `class` / `id` |
 
 ---
 
 ## Crear un renderer personalizado
 
-El contrato es simple — implementar `mount`, `render` y `dispose`:
+El contrato es simple  Eimplementar `mount`, `render` y `dispose`:
 
 ```typescript
-import { Scene, ComponentType, Geometry, Material, GeometryPrimitive } from '@oroya/core';
+import { Scene, ComponentType, Geometry, Material, GeometryPrimitive } from '@joroya/core';
 
 export class Canvas2DRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -642,8 +642,8 @@ export class Canvas2DRenderer {
 | Paso | Descripción |
 |------|-------------|
 | 1 | Crear paquete en `packages/renderer-xxx/` |
-| 2 | Agregar `@oroya/core` como dependencia |
-| 3 | Implementar `mount()` — recorrer árbol y crear objetos |
-| 4 | Implementar `render()` — sincronizar transforms y dibujar |
-| 5 | Implementar `dispose()` — liberar recursos |
+| 2 | Agregar `@joroya/core` como dependencia |
+| 3 | Implementar `mount()`  Erecorrer árbol y crear objetos |
+| 4 | Implementar `render()`  Esincronizar transforms y dibujar |
+| 5 | Implementar `dispose()`  Eliberar recursos |
 | 6 | Documentar geometrías y materiales soportados |

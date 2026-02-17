@@ -4,7 +4,7 @@ description: "Coding conventions and design principles guiding the project"
 order: 8
 category: "development"
 ---
-# Principios de Programación — Oroya Animate
+# Principios de Programación  EOroya Animate
 
 Principios y convenciones que guían el desarrollo del monorepo. Nacen de lecciones aprendidas durante la evolución del proyecto.
 
@@ -15,11 +15,11 @@ Principios y convenciones que guían el desarrollo del monorepo. Nacen de leccio
 ### 1.1 Dependencias en una sola dirección
 
 ```
-@oroya/core ← renderers ← loaders ← apps
+@joroya/core ↁErenderers ↁEloaders ↁEapps
 ```
 
-- `@oroya/core` **nunca** importa de renderers, loaders ni de librerías externas de rendering (Three.js, etc.).
-- Los renderers solo importan de `@oroya/core`.
+- `@joroya/core` **nunca** importa de renderers, loaders ni de librerías externas de rendering (Three.js, etc.).
+- Los renderers solo importan de `@joroya/core`.
 - Las apps importan de cualquier paquete.
 
 > **Por qué:** Mantener el core desacoplado permite que funcione en cualquier entorno (browser, Node.js, WebWorkers) y que se puedan agregar nuevos renderers sin tocar el core.
@@ -29,17 +29,17 @@ Principios y convenciones que guían el desarrollo del monorepo. Nacen de leccio
 Antes de que un paquete downstream use una propiedad nueva, esa propiedad **debe existir primero** en la interfaz del paquete upstream.
 
 ```typescript
-// ✅ Primero definir en @oroya/core
+// ✁EPrimero definir en @joroya/core
 export interface MaterialDef {
   fill?: ColorRGB;
 }
 
-// ✅ Luego usar en @oroya/renderer-svg
+// ✁ELuego usar en @joroya/renderer-svg
 const fill = material.definition.fill;
 ```
 
 ```typescript
-// ❌ Nunca usar propiedades que no están en la interfaz
+// ❁ENunca usar propiedades que no están en la interfaz
 const fill = (material.definition as any).fill;
 ```
 
@@ -55,7 +55,7 @@ Cada directorio que se importe como módulo **debe** tener un `index.ts` que re-
 
 ```
 components/
-├── index.ts          ← obligatorio si se importa como '../components'
+├── index.ts          ↁEobligatorio si se importa como '../components'
 ├── Component.ts
 ├── Transform.ts
 └── Geometry.ts
@@ -106,17 +106,17 @@ La condición `types` debe ser la **primera** en el objeto de exports. Node.js e
 
 El `tsconfig.base.json` tiene `"strict": true`. Nunca desactivar flags individuales de strictness. Esto incluye:
 
-- `noImplicitAny` — todo debe tener tipo explícito o inferido.
-- `noUnusedLocals` — no dejar imports o variables sin usar.
-- `noUnusedParameters` — no dejar parámetros sin usar.
+- `noImplicitAny`  Etodo debe tener tipo explícito o inferido.
+- `noUnusedLocals`  Eno dejar imports o variables sin usar.
+- `noUnusedParameters`  Eno dejar parámetros sin usar.
 
 ### 3.2 No usar `any` como escape
 
 ```typescript
-// ❌
+// ❁E
 const data = response as any;
 
-// ✅
+// ✁E
 interface ApiResponse { ... }
 const data = response as ApiResponse;
 ```
@@ -128,8 +128,8 @@ Si TypeScript no puede inferir un tipo, crear una interfaz. Si es un tipo extern
 En un monorepo, las dependencias de tipos **no se comparten** entre paquetes. Si `renderer-three` tiene `@types/three`, `loader-gltf` igual necesita declararlo por separado.
 
 ```json
-// ❌ "Ya está instalado en otro paquete"
-// ✅ Declararlo explícitamente
+// ❁E"Ya está instalado en otro paquete"
+// ✁EDeclararlo explícitamente
 {
   "devDependencies": {
     "@types/three": "^0.165.0"
@@ -163,11 +163,11 @@ Eliminar imports que no se usen. Configura tu editor para organizar imports al g
 Nunca insertar saltos de línea literales dentro de strings con comillas simples/dobles:
 
 ```typescript
-// ❌ Salto de línea literal rompe la compilación
+// ❁ESalto de línea literal rompe la compilación
 paths.join('
     ')
 
-// ✅ Usar escape sequence
+// ✁EUsar escape sequence
 paths.join('\n    ')
 ```
 
@@ -175,10 +175,10 @@ paths.join('\n    ')
 
 Cada `Component` en el sistema ECS debe representar **un solo aspecto** del nodo:
 
-- `Transform` → posición, rotación, escala
-- `Geometry` → forma geométrica
-- `Material` → apariencia visual
-- `Camera` → proyección y viewport
+- `Transform` ↁEposición, rotación, escala
+- `Geometry` ↁEforma geométrica
+- `Material` ↁEapariencia visual
+- `Camera` ↁEproyección y viewport
 
 No mezclar datos de geometría con datos de material en un mismo componente.
 
@@ -245,7 +245,7 @@ pnpm typecheck  # ¿los tipos son correctos?
 
 | Principio | Regla clave |
 |-----------|-------------|
-| Dependencias unidireccionales | Core → Renderers → Apps. Nunca al revés. |
+| Dependencias unidireccionales | Core ↁERenderers ↁEApps. Nunca al revés. |
 | Barrel files | Directorio importado = necesita `index.ts` |
 | Extensiones correctas | Verificar la salida real de tsup |
 | `types` primero | Siempre primera condición en `exports` |

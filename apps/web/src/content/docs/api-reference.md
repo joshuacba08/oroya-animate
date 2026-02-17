@@ -13,7 +13,7 @@ Complete reference for all packages in the Oroya Animate ecosystem.
 ## Tabla de contenidos
 
 - [Visión general de la arquitectura](#visión-general-de-la-arquitectura)
-- [`@oroya/core`](#oroyacore)
+- [`@joroya/core`](#oroyacore)
   - [Scene](#scene)
   - [Node](#node)
   - [Component (base)](#component-base-abstracta)
@@ -26,14 +26,14 @@ Complete reference for all packages in the Oroya Animate ecosystem.
   - [InteractionEvent](#interactionevent)
   - [Factory Functions](#factory-functions)
   - [Serialization](#serialización)
-  - [Math — Matrix4](#math--matrix4)
-  - [Math — BoundingBox](#math--boundingbox)
-- [`@oroya/renderer-three`](#oroyarenderer-three)
+  - [Math  EMatrix4](#math--matrix4)
+  - [Math  EBoundingBox](#math--boundingbox)
+- [`@joroya/renderer-three`](#oroyarenderer-three)
   - [ThreeRenderer](#threerenderer)
-- [`@oroya/renderer-svg`](#oroyarenderer-svg)
+- [`@joroya/renderer-svg`](#oroyarenderer-svg)
   - [renderToSVG](#rendertosvg)
   - [renderToSVGElement](#rendertosvgelement)
-- [`@oroya/loader-gltf`](#oroyaloader-gltf)
+- [`@joroya/loader-gltf`](#oroyaloader-gltf)
   - [loadGLTF](#loadgltf)
 - [Mapa completo de tipos](#mapa-completo-de-tipos)
 
@@ -43,7 +43,7 @@ Complete reference for all packages in the Oroya Animate ecosystem.
 
 ```mermaid
 graph TD
-    subgraph "@oroya/core"
+    subgraph "@joroya/core"
         Scene --> Node
         Node --> Transform
         Node --> Geometry
@@ -57,17 +57,17 @@ graph TD
         Transform -.->|"uses"| Matrix4
     end
 
-    subgraph "@oroya/renderer-three"
+    subgraph "@joroya/renderer-three"
         ThreeRenderer -->|"reads"| Scene
         ThreeRenderer -->|"produces"| WebGL["WebGL Canvas"]
     end
 
-    subgraph "@oroya/renderer-svg"
+    subgraph "@joroya/renderer-svg"
         renderToSVG -->|"reads"| Scene
         renderToSVG -->|"produces"| SVGStr["SVG String"]
     end
 
-    subgraph "@oroya/loader-gltf"
+    subgraph "@joroya/loader-gltf"
         loadGLTF -->|"produces"| Scene
     end
 ```
@@ -100,7 +100,7 @@ sequenceDiagram
 
 ---
 
-## `@oroya/core`
+## `@joroya/core`
 
 ### Exports completos
 
@@ -148,7 +148,7 @@ El contenedor de nivel superior del scene graph.
 **Archivo fuente:** [Scene.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/scene/Scene.ts)
 
 ```typescript
-import { Scene } from '@oroya/core';
+import { Scene } from '@joroya/core';
 const scene = new Scene();
 ```
 
@@ -156,7 +156,7 @@ const scene = new Scene();
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
-| *(ninguno)* | — | Crea una escena con un nodo raíz llamado `'root'` |
+| *(ninguno)* |  E| Crea una escena con un nodo raíz llamado `'root'` |
 
 #### Propiedades
 
@@ -187,10 +187,10 @@ scene.add(parent);
 scene.add(child, parent); // child es hijo de parent, no del root
 
 scene.traverse(node => console.log(node.name));
-// → 'root', 'group', 'child'
+// ↁE'root', 'group', 'child'
 
 const found = scene.findNodeByName('child');
-console.log(found?.parent?.name); // → 'group'
+console.log(found?.parent?.name); // ↁE'group'
 ```
 
 ---
@@ -335,12 +335,12 @@ classDiagram
 
 | Valor | String | Usado por |
 |-------|--------|-----------|
-| `Transform` | `'Transform'` | `Transform` — automático en cada `Node` |
-| `Geometry` | `'Geometry'` | `Geometry` — define la forma |
-| `Material` | `'Material'` | `Material` — define la apariencia |
-| `Camera` | `'Camera'` | `Camera` — define el punto de vista |
-| `Interactive` | `'Interactive'` | `Interactive` — habilita eventos de interacción |
-| `Animation` | `'Animation'` | `Animation` — animaciones SVG nativas |
+| `Transform` | `'Transform'` | `Transform`  Eautomático en cada `Node` |
+| `Geometry` | `'Geometry'` | `Geometry`  Edefine la forma |
+| `Material` | `'Material'` | `Material`  Edefine la apariencia |
+| `Camera` | `'Camera'` | `Camera`  Edefine el punto de vista |
+| `Interactive` | `'Interactive'` | `Interactive`  Ehabilita eventos de interacción |
+| `Animation` | `'Animation'` | `Animation`  Eanimaciones SVG nativas |
 
 > **Regla ECS:** Cada nodo puede tener **máximo un componente** de cada tipo. Agregar un segundo componente del mismo tipo reemplaza al anterior.
 
@@ -374,7 +374,7 @@ Define la posición, rotación y escala de un nodo en espacio 3D. Se crea **auto
 ```mermaid
 graph LR
     A["position + rotation + scale"] -->|"updateLocalMatrix()"| B["localMatrix"]
-    B -->|"× parent.worldMatrix"| C["worldMatrix"]
+    B -->|"ÁEparent.worldMatrix"| C["worldMatrix"]
     C -->|"renderer reads"| D["Posición final en pantalla"]
 ```
 
@@ -465,19 +465,19 @@ graph TD
 
 | Comando | Argumentos | Descripción |
 |---------|-----------|-------------|
-| `M` | `[x, y]` | Move to — mover sin dibujar |
-| `L` | `[x, y]` | Line to — línea recta |
+| `M` | `[x, y]` | Move to  Emover sin dibujar |
+| `L` | `[x, y]` | Line to  Elínea recta |
 | `C` | `[cx1, cy1, cx2, cy2, x, y]` | Cubic Bézier |
 | `Q` | `[cx, cy, x, y]` | Quadratic Bézier |
 | `A` | `[rx, ry, rotation, largeArc, sweep, x, y]` | Arc |
-| `Z` | `[]` | Close path — cerrar el camino |
+| `Z` | `[]` | Close path  Ecerrar el camino |
 
 #### `TextGeometryDef`
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `GeometryPrimitive.Text` | — | Discriminante |
-| `text` | `string` | — | Contenido del texto |
+| `type` | `GeometryPrimitive.Text` |  E| Discriminante |
+| `text` | `string` |  E| Contenido del texto |
 | `fontSize` | `number` | `16` | Tamaño de fuente (px) |
 | `fontFamily` | `string` | `'sans-serif'` | Familia tipográfica |
 | `fontWeight` | `string` | `'normal'` | Peso: `'normal'`, `'bold'`, `'100'`–`'900'` |
@@ -488,10 +488,10 @@ graph TD
 
 | GeometryDef | Three.js | SVG |
 |------------|----------|-----|
-| `BoxGeometryDef` | ✅ → `THREE.BoxGeometry` | ✅ → `<rect>` |
-| `SphereGeometryDef` | ✅ → `THREE.SphereGeometry` | ✅ → `<circle>` |
-| `Path2DGeometryDef` | ❌ ignorado | ✅ → `<path d="...">` |
-| `TextGeometryDef` | ❌ ignorado | ✅ → `<text>` |
+| `BoxGeometryDef` | ✁EↁE`THREE.BoxGeometry` | ✁EↁE`<rect>` |
+| `SphereGeometryDef` | ✁EↁE`THREE.SphereGeometry` | ✁EↁE`<circle>` |
+| `Path2DGeometryDef` | ❁Eignorado | ✁EↁE`<path d="...">` |
+| `TextGeometryDef` | ❁Eignorado | ✁EↁE`<text>` |
 
 ---
 
@@ -511,11 +511,11 @@ new Material(definition?: MaterialDef)  // default: {}
 
 | Campo | Tipo | Rango | Descripción |
 |-------|------|-------|-------------|
-| `r` | `number` | 0.0 – 1.0 | Componente rojo |
-| `g` | `number` | 0.0 – 1.0 | Componente verde |
-| `b` | `number` | 0.0 – 1.0 | Componente azul |
+| `r` | `number` | 0.0  E1.0 | Componente rojo |
+| `g` | `number` | 0.0  E1.0 | Componente verde |
+| `b` | `number` | 0.0  E1.0 | Componente azul |
 
-> **Conversión:** Para convertir de hex `#3399ff` a RGB normalizado: `{ r: 0x33/255, g: 0x99/255, b: 0xff/255 }` → `{ r: 0.2, g: 0.6, b: 1.0 }`
+> **Conversión:** Para convertir de hex `#3399ff` a RGB normalizado: `{ r: 0x33/255, g: 0x99/255, b: 0xff/255 }` ↁE`{ r: 0.2, g: 0.6, b: 1.0 }`
 
 #### `MaterialDef`
 
@@ -561,12 +561,12 @@ type SvgFilterEffect = SvgBlurEffect | SvgDropShadowEffect;
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `'dropShadow'` | — | Discriminante |
-| `dx` | `number` | — | Desplazamiento horizontal de la sombra |
-| `dy` | `number` | — | Desplazamiento vertical de la sombra |
-| `stdDeviation` | `number` | — | Radio de desenfoque de la sombra |
+| `type` | `'dropShadow'` |  E| Discriminante |
+| `dx` | `number` |  E| Desplazamiento horizontal de la sombra |
+| `dy` | `number` |  E| Desplazamiento vertical de la sombra |
+| `stdDeviation` | `number` |  E| Radio de desenfoque de la sombra |
 | `floodColor` | `string` | `undefined` | Color de la sombra (e.g., `'black'`, `'#333'`) |
-| `floodOpacity` | `number` | `undefined` | Opacidad de la sombra (0–1) |
+| `floodOpacity` | `number` | `undefined` | Opacidad de la sombra (0 E) |
 
 #### `SvgClipPathDef`
 
@@ -582,7 +582,7 @@ Aplica una máscara de luminancia al nodo.
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `path` | `Path2DCommand[]` | — | Comandos del path de la máscara |
+| `path` | `Path2DCommand[]` |  E| Comandos del path de la máscara |
 | `fill` | `string` | `undefined` | Color de relleno de la máscara (e.g., `'white'`) |
 | `opacity` | `number` | `undefined` | Opacidad del path de la máscara |
 
@@ -621,32 +621,32 @@ const clipped = new Material({
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `'linear'` | — | Discriminante |
-| `x1` | `number` | `0` | Coordenada X inicio (0–1) |
-| `y1` | `number` | `0` | Coordenada Y inicio (0–1) |
-| `x2` | `number` | `1` | Coordenada X fin (0–1) |
-| `y2` | `number` | `0` | Coordenada Y fin (0–1) |
-| `stops` | `GradientStop[]` | — | Paradas de color |
+| `type` | `'linear'` |  E| Discriminante |
+| `x1` | `number` | `0` | Coordenada X inicio (0 E) |
+| `y1` | `number` | `0` | Coordenada Y inicio (0 E) |
+| `x2` | `number` | `1` | Coordenada X fin (0 E) |
+| `y2` | `number` | `0` | Coordenada Y fin (0 E) |
+| `stops` | `GradientStop[]` |  E| Paradas de color |
 
 #### `RadialGradientDef`
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `'radial'` | — | Discriminante |
-| `cx` | `number` | `0.5` | Centro X (0–1) |
-| `cy` | `number` | `0.5` | Centro Y (0–1) |
-| `r` | `number` | `0.5` | Radio (0–1) |
-| `fx` | `number` | `undefined` | Foco X (0–1), opcional |
-| `fy` | `number` | `undefined` | Foco Y (0–1), opcional |
-| `stops` | `GradientStop[]` | — | Paradas de color |
+| `type` | `'radial'` |  E| Discriminante |
+| `cx` | `number` | `0.5` | Centro X (0 E) |
+| `cy` | `number` | `0.5` | Centro Y (0 E) |
+| `r` | `number` | `0.5` | Radio (0 E) |
+| `fx` | `number` | `undefined` | Foco X (0 E), opcional |
+| `fy` | `number` | `undefined` | Foco Y (0 E), opcional |
+| `stops` | `GradientStop[]` |  E| Paradas de color |
 
 #### `GradientStop`
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `offset` | `number` | Posición en el gradiente (0–1) |
+| `offset` | `number` | Posición en el gradiente (0 E) |
 | `color` | `ColorRGB` | Color en esta parada |
-| `opacity` | `number` | *(opcional)* Opacidad de la parada (0–1) |
+| `opacity` | `number` | *(opcional)* Opacidad de la parada (0 E) |
 
 #### Ejemplo: Material para ambos renderers
 
@@ -694,15 +694,15 @@ new Camera(definition: CameraDef)
 
 | Valor | String | Estado |
 |-------|--------|--------|
-| `Perspective` | `'Perspective'` | ✅ Implementado |
-| `Orthographic` | `'Orthographic'` | ✅ Implementado |
+| `Perspective` | `'Perspective'` | ✁EImplementado |
+| `Orthographic` | `'Orthographic'` | ✁EImplementado |
 
 #### `PerspectiveCameraDef`
 
 | Campo | Tipo | Descripción | Valor típico |
 |-------|------|-------------|--------------|
-| `type` | `CameraType.Perspective` | Discriminante | — |
-| `fov` | `number` | Campo de visión en grados | 45 – 90 |
+| `type` | `CameraType.Perspective` | Discriminante |  E|
+| `fov` | `number` | Campo de visión en grados | 45  E90 |
 | `aspect` | `number` | Relación de aspecto (ancho / alto) | `window.innerWidth / window.innerHeight` |
 | `near` | `number` | Plano de corte cercano | 0.1 |
 | `far` | `number` | Plano de corte lejano | 1000 |
@@ -711,13 +711,13 @@ new Camera(definition: CameraDef)
 
 ```
               far plane
-          ┌─────────────────┐
+          ┌─────────────────━E
          /                   \
         /     Visible         \
        /      Volume           \
       /      (frustum)          \
      /                           \
-    └─────────────────────────────┘
+    └─────────────────────────────━E
      ├── near plane ──┤
               △
            Camera
@@ -743,7 +743,7 @@ scene.add(cam);
 
 | Campo | Tipo | Descripción | Valor típico |
 |-------|------|-------------|-------------|
-| `type` | `CameraType.Orthographic` | Discriminante | — |
+| `type` | `CameraType.Orthographic` | Discriminante |  E|
 | `left` | `number` | Borde izquierdo del frustum | `-400` |
 | `right` | `number` | Borde derecho del frustum | `400` |
 | `top` | `number` | Borde superior del frustum | `-300` |
@@ -806,8 +806,8 @@ Genera un elemento `<animate>` que anima un atributo escalar.
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `'animate'` | — | Discriminante |
-| `attributeName` | `string` | — | Atributo SVG a animar (e.g., `'opacity'`, `'r'`, `'fill'`) |
+| `type` | `'animate'` |  E| Discriminante |
+| `attributeName` | `string` |  E| Atributo SVG a animar (e.g., `'opacity'`, `'r'`, `'fill'`) |
 | `from` | `string` | `undefined` | Valor inicial |
 | `to` | `string` | `undefined` | Valor final |
 | `values` | `string` | `undefined` | Lista de valores separados por `;` (alternativa a from/to) |
@@ -815,7 +815,7 @@ Genera un elemento `<animate>` que anima un atributo escalar.
 | `repeatCount` | `string` | `undefined` | Repeticiones: un número o `'indefinite'` |
 | `begin` | `string` | `undefined` | Cuándo empieza (e.g., `'0s'`, `'click'`) |
 | `fill` | `string` | `undefined` | Comportamiento al terminar: `'freeze'` o `'remove'` |
-| `keyTimes` | `string` | `undefined` | Tiempos clave separados por `;` (0–1) |
+| `keyTimes` | `string` | `undefined` | Tiempos clave separados por `;` (0 E) |
 | `keySplines` | `string` | `undefined` | Curvas Bézier para interpolación entre keyframes |
 | `calcMode` | `string` | `undefined` | Modo de cálculo: `'linear'`, `'discrete'`, `'paced'`, `'spline'` |
 
@@ -825,8 +825,8 @@ Genera un elemento `<animateTransform>` que anima una transformación geométric
 
 | Campo | Tipo | Default | Descripción |
 |-------|------|---------|-------------|
-| `type` | `'animateTransform'` | — | Discriminante |
-| `transformType` | `string` | — | Tipo de transformación: `'translate'`, `'scale'`, `'rotate'`, `'skewX'`, `'skewY'` |
+| `type` | `'animateTransform'` |  E| Discriminante |
+| `transformType` | `string` |  E| Tipo de transformación: `'translate'`, `'scale'`, `'rotate'`, `'skewX'`, `'skewY'` |
 | `from` | `string` | `undefined` | Valor inicial (e.g., `'0 50 50'` para rotación) |
 | `to` | `string` | `undefined` | Valor final |
 | `values` | `string` | `undefined` | Lista de valores separados por `;` |
@@ -896,7 +896,7 @@ interface InteractiveDef {
 #### Uso
 
 ```typescript
-import { Node, Interactive, createBox } from '@oroya/core';
+import { Node, Interactive, createBox } from '@joroya/core';
 
 const button = new Node('button');
 button.addComponent(createBox(2, 1, 0.2));
@@ -957,7 +957,7 @@ class EventEmitter<EventMap extends Record<string, any>> {
 #### Ejemplo de uso directo
 
 ```typescript
-import { EventEmitter } from '@oroya/core';
+import { EventEmitter } from '@joroya/core';
 
 type MyEvents = {
   'data-loaded': { id: string; data: any };
@@ -1083,7 +1083,7 @@ function createBox(width?: number, height?: number, depth?: number): Geometry
 | `depth` | `number` | `1` | Profundidad (eje Z) |
 
 ```typescript
-const cube = createBox();          // Cubo 1×1×1
+const cube = createBox();          // Cubo 1ÁEÁE
 const plank = createBox(5, 0.2, 1); // Tabla plana
 ```
 
@@ -1164,11 +1164,11 @@ Convierte todo el scene graph a una cadena JSON formateada con indentación de 2
 
 | Componente | ¿Se serializa? | Datos incluidos |
 |------------|----------------|-----------------|
-| `Transform` | ✅ | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | ✅ | `definition` completo (tipo + parámetros) |
-| `Material` | ✅ | `definition` completo (color, opacity, fill, stroke, etc.) |
-| `Camera` | ✅ | `definition` completo (type, fov/aspect/near/far para Perspective; left/right/top/bottom/near/far para Orthographic) |
-| `Animation` | ✅ | Array de `SvgAnimationDef` (animate y animateTransform) |
+| `Transform` | ✁E| `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
+| `Geometry` | ✁E| `definition` completo (tipo + parámetros) |
+| `Material` | ✁E| `definition` completo (color, opacity, fill, stroke, etc.) |
+| `Camera` | ✁E| `definition` completo (type, fov/aspect/near/far para Perspective; left/right/top/bottom/near/far para Orthographic) |
+| `Animation` | ✁E| Array de `SvgAnimationDef` (animate y animateTransform) |
 
 #### `deserialize`
 
@@ -1227,9 +1227,9 @@ graph TD
 
 ---
 
-### Math — Matrix4
+### Math  EMatrix4
 
-Utilidades matemáticas para transformaciones 3D con matrices 4×4.
+Utilidades matemáticas para transformaciones 3D con matrices 4ÁE.
 
 **Archivo fuente:** [Matrix4.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/Matrix4.ts)
 
@@ -1286,7 +1286,7 @@ Construye una matriz de transformación a partir de posición, rotación (quater
 function multiplyMatrices(a: Matrix4, b: Matrix4): Matrix4
 ```
 
-Multiplica dos matrices 4×4. El orden es importante: `result = A × B` (A se aplica después de B).
+Multiplica dos matrices 4ÁE. El orden es importante: `result = A ÁEB` (A se aplica después de B).
 
 Usada internamente por `Node.updateWorldMatrix()`:
 
@@ -1296,7 +1296,7 @@ worldMatrix = multiplyMatrices(parent.worldMatrix, this.localMatrix)
 
 ---
 
-### Math — BoundingBox
+### Math  EBoundingBox
 
 **Archivo fuente:** [BoundingBox.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/BoundingBox.ts)
 
@@ -1342,7 +1342,7 @@ function pointInAABB(point: { x: number; y: number; z: number }, aabb: AABB): bo
 
 ---
 
-## `@oroya/renderer-three`
+## `@joroya/renderer-three`
 
 ### `ThreeRenderer`
 
@@ -1439,7 +1439,7 @@ renderer.dispose();
 
 ---
 
-## `@oroya/renderer-svg`
+## `@joroya/renderer-svg`
 
 ### `renderToSVG`
 
@@ -1503,16 +1503,16 @@ dispose();
 
 1. Llama a `scene.updateWorldMatrices()` para sincronizar transforms.
 2. Recorre recursivamente el árbol de nodos generando `<g>` para la jerarquía.
-3. Geometrías soportadas: `Path2D` → `<path>`, `Box` → `<rect>`, `Sphere` → `<circle>`, `Text` → `<text>`.
+3. Geometrías soportadas: `Path2D` ↁE`<path>`, `Box` ↁE`<rect>`, `Sphere` ↁE`<circle>`, `Text` ↁE`<text>`.
 4. Si el nodo tiene un `Material`, aplica `fill`, `stroke`, `stroke-width`, `opacity`, `fillGradient` y `strokeGradient`.
 5. Los gradientes generan un bloque `<defs>` al inicio del SVG con `<linearGradient>` / `<radialGradient>`.
 6. El `localMatrix` de cada nodo se aplica como `transform="matrix(a,b,c,d,e,f)"`.
-7. Los colores se convierten de RGB normalizado (0–1) a `rgb(R, G, B)` con valores 0–255.
+7. Los colores se convierten de RGB normalizado (0 E) a `rgb(R, G, B)` con valores 0 E55.
 
 #### Ejemplo
 
 ```typescript
-import { renderToSVG } from '@oroya/renderer-svg';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const svg = renderToSVG(scene, {
   width: 800,
@@ -1532,7 +1532,7 @@ writeFileSync('output.svg', svg);
 
 ---
 
-## `@oroya/loader-gltf`
+## `@joroya/loader-gltf`
 
 ### `loadGLTF`
 
@@ -1548,7 +1548,7 @@ async function loadGLTF(url: string): Promise<Scene>
 |-----------|------|-------------|
 | `url` | `string` | URL del archivo .gltf o .glb |
 
-#### Traducción (simplificada — v0.3)
+#### Traducción (simplificada  Ev0.3)
 
 | glTF Element | Oroya Node |
 |-------------|------------|
@@ -1556,7 +1556,7 @@ async function loadGLTF(url: string): Promise<Scene>
 | `THREE.Mesh` | `Node` + `createBox(1,1,1)` (placeholder) + `Material` con color si disponible |
 | Hijos del objeto | Nodos hijos recursivos |
 
-> **⚠️ Limitaciones actuales:** La geometría real del glTF no se traduce — se usa un box placeholder. Los materiales solo extraen el color base. Las animaciones no se importan. Esto se mejorará en v0.4.
+> **⚠�E�ELimitaciones actuales:** La geometría real del glTF no se traduce  Ese usa un box placeholder. Los materiales solo extraen el color base. Las animaciones no se importan. Esto se mejorará en v0.4.
 
 ---
 
@@ -1625,55 +1625,55 @@ graph TD
 
 | Export | Tipo | Categoría | Paquete |
 |--------|------|-----------|---------|
-| `Scene` | class | Scene graph | `@oroya/core` |
-| `Node` | class | Scene graph | `@oroya/core` |
-| `Component` | abstract class | ECS | `@oroya/core` |
-| `ComponentType` | enum | ECS | `@oroya/core` |
-| `Transform` | class | Components | `@oroya/core` |
-| `Vec3` | interface | Types | `@oroya/core` |
-| `Quat` | interface | Types | `@oroya/core` |
-| `Geometry` | class | Components | `@oroya/core` |
-| `GeometryPrimitive` | enum | Components | `@oroya/core` |
-| `BoxGeometryDef` | interface | Types | `@oroya/core` |
-| `SphereGeometryDef` | interface | Types | `@oroya/core` |
-| `Path2DGeometryDef` | interface | Types | `@oroya/core` |
-| `Path2DCommand` | interface | Types | `@oroya/core` |
-| `GeometryDef` | type alias | Types | `@oroya/core` |
-| `Material` | class | Components | `@oroya/core` |
-| `ColorRGB` | interface | Types | `@oroya/core` |
-| `MaterialDef` | interface | Types | `@oroya/core` |
-| `Camera` | class | Components | `@oroya/core` |
-| `CameraType` | enum | Components | `@oroya/core` |
-| `PerspectiveCameraDef` | interface | Types | `@oroya/core` |
-| `CameraDef` | type alias | Types | `@oroya/core` |
-| `OrthographicCameraDef` | interface | Types | `@oroya/core` |
-| `Interactive` | class | Components | `@oroya/core` |
-| `Animation` | class | Components | `@oroya/core` |
-| `SvgAnimateDef` | interface | Types | `@oroya/core` |
-| `SvgAnimateTransformDef` | interface | Types | `@oroya/core` |
-| `SvgAnimationDef` | type alias | Types | `@oroya/core` |
-| `SvgFilterDef` | interface | Types | `@oroya/core` |
-| `SvgFilterEffect` | type alias | Types | `@oroya/core` |
-| `SvgBlurEffect` | interface | Types | `@oroya/core` |
-| `SvgDropShadowEffect` | interface | Types | `@oroya/core` |
-| `SvgClipPathDef` | interface | Types | `@oroya/core` |
-| `SvgMaskDef` | interface | Types | `@oroya/core` |
-| `createBox` | function | Factory | `@oroya/core` |
-| `createSphere` | function | Factory | `@oroya/core` |
-| `createPath2D` | function | Factory | `@oroya/core` |
-| `serialize` | function | Serialization | `@oroya/core` |
-| `deserialize` | function | Serialization | `@oroya/core` |
-| `Matrix4` | type alias | Math | `@oroya/core` |
-| `Matrix4Identity` | constant | Math | `@oroya/core` |
-| `composeMatrix` | function | Math | `@oroya/core` |
-| `multiplyMatrices` | function | Math | `@oroya/core` |
-| `ThreeRenderer` | class | Rendering | `@oroya/renderer-three` |
-| `renderToSVG` | function | Rendering | `@oroya/renderer-svg` |
-| `renderToSVGElement` | function | Rendering | `@oroya/renderer-svg` |
-| `TextGeometryDef` | interface | Types | `@oroya/core` |
-| `GradientDef` | type alias | Types | `@oroya/core` |
-| `LinearGradientDef` | interface | Types | `@oroya/core` |
-| `RadialGradientDef` | interface | Types | `@oroya/core` |
-| `GradientStop` | interface | Types | `@oroya/core` |
-| `createText` | function | Factory | `@oroya/core` |
-| `loadGLTF` | async function | Loading | `@oroya/loader-gltf` |
+| `Scene` | class | Scene graph | `@joroya/core` |
+| `Node` | class | Scene graph | `@joroya/core` |
+| `Component` | abstract class | ECS | `@joroya/core` |
+| `ComponentType` | enum | ECS | `@joroya/core` |
+| `Transform` | class | Components | `@joroya/core` |
+| `Vec3` | interface | Types | `@joroya/core` |
+| `Quat` | interface | Types | `@joroya/core` |
+| `Geometry` | class | Components | `@joroya/core` |
+| `GeometryPrimitive` | enum | Components | `@joroya/core` |
+| `BoxGeometryDef` | interface | Types | `@joroya/core` |
+| `SphereGeometryDef` | interface | Types | `@joroya/core` |
+| `Path2DGeometryDef` | interface | Types | `@joroya/core` |
+| `Path2DCommand` | interface | Types | `@joroya/core` |
+| `GeometryDef` | type alias | Types | `@joroya/core` |
+| `Material` | class | Components | `@joroya/core` |
+| `ColorRGB` | interface | Types | `@joroya/core` |
+| `MaterialDef` | interface | Types | `@joroya/core` |
+| `Camera` | class | Components | `@joroya/core` |
+| `CameraType` | enum | Components | `@joroya/core` |
+| `PerspectiveCameraDef` | interface | Types | `@joroya/core` |
+| `CameraDef` | type alias | Types | `@joroya/core` |
+| `OrthographicCameraDef` | interface | Types | `@joroya/core` |
+| `Interactive` | class | Components | `@joroya/core` |
+| `Animation` | class | Components | `@joroya/core` |
+| `SvgAnimateDef` | interface | Types | `@joroya/core` |
+| `SvgAnimateTransformDef` | interface | Types | `@joroya/core` |
+| `SvgAnimationDef` | type alias | Types | `@joroya/core` |
+| `SvgFilterDef` | interface | Types | `@joroya/core` |
+| `SvgFilterEffect` | type alias | Types | `@joroya/core` |
+| `SvgBlurEffect` | interface | Types | `@joroya/core` |
+| `SvgDropShadowEffect` | interface | Types | `@joroya/core` |
+| `SvgClipPathDef` | interface | Types | `@joroya/core` |
+| `SvgMaskDef` | interface | Types | `@joroya/core` |
+| `createBox` | function | Factory | `@joroya/core` |
+| `createSphere` | function | Factory | `@joroya/core` |
+| `createPath2D` | function | Factory | `@joroya/core` |
+| `serialize` | function | Serialization | `@joroya/core` |
+| `deserialize` | function | Serialization | `@joroya/core` |
+| `Matrix4` | type alias | Math | `@joroya/core` |
+| `Matrix4Identity` | constant | Math | `@joroya/core` |
+| `composeMatrix` | function | Math | `@joroya/core` |
+| `multiplyMatrices` | function | Math | `@joroya/core` |
+| `ThreeRenderer` | class | Rendering | `@joroya/renderer-three` |
+| `renderToSVG` | function | Rendering | `@joroya/renderer-svg` |
+| `renderToSVGElement` | function | Rendering | `@joroya/renderer-svg` |
+| `TextGeometryDef` | interface | Types | `@joroya/core` |
+| `GradientDef` | type alias | Types | `@joroya/core` |
+| `LinearGradientDef` | interface | Types | `@joroya/core` |
+| `RadialGradientDef` | interface | Types | `@joroya/core` |
+| `GradientStop` | interface | Types | `@joroya/core` |
+| `createText` | function | Factory | `@joroya/core` |
+| `loadGLTF` | async function | Loading | `@joroya/loader-gltf` |

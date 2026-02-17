@@ -15,15 +15,15 @@ duration: "25 min"
 
 ## Concepto: Efectos visuales SVG
 
-El renderer SVG de Oroya genera automáticamente bloques `<defs>` con gradientes, filtros, clip-paths y masks cuando los defines en el `MaterialDef` de un nodo. No necesitas escribir SVG a mano — el renderer traduce la API declarativa a markup válido.
+El renderer SVG de Oroya genera automáticamente bloques `<defs>` con gradientes, filtros, clip-paths y masks cuando los defines en el `MaterialDef` de un nodo. No necesitas escribir SVG a mano  Eel renderer traduce la API declarativa a markup válido.
 
 ```mermaid
 graph LR
     MD["MaterialDef"] --> R["renderToSVG"]
-    R -->|"fillGradient"| D1["defs → linearGradient / radialGradient"]
-    R -->|"filter"| D2["defs → filter → feGaussianBlur / feDropShadow"]
-    R -->|"clipPath"| D3["defs → clipPath → path"]
-    R -->|"mask"| D4["defs → mask → path"]
+    R -->|"fillGradient"| D1["defs ↁElinearGradient / radialGradient"]
+    R -->|"filter"| D2["defs ↁEfilter ↁEfeGaussianBlur / feDropShadow"]
+    R -->|"clipPath"| D3["defs ↁEclipPath ↁEpath"]
+    R -->|"mask"| D4["defs ↁEmask ↁEpath"]
 ```
 
 ---
@@ -34,8 +34,8 @@ graph LR
 import {
   Scene, Node, Camera, CameraType, Material,
   createBox, createSphere, createPath2D, createText,
-} from '@oroya/core';
-import { renderToSVG } from '@oroya/renderer-svg';
+} from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 
@@ -104,7 +104,7 @@ sun.addComponent(createSphere(60));
 sun.addComponent(new Material({
   fillGradient: {
     type: 'radial',
-    cx: 0.4, cy: 0.4, r: 0.6,  // Centro desplazado → efecto 3D
+    cx: 0.4, cy: 0.4, r: 0.6,  // Centro desplazado ↁEefecto 3D
     stops: [
       { offset: 0, color: { r: 1, g: 1, b: 0.8 } },       // Centro brillante
       { offset: 0.6, color: { r: 1, g: 0.8, b: 0 } },     // Amarillo medio
@@ -338,4 +338,4 @@ Puedes explorar todos estos efectos en la demo **"SVG Showcase"** del demo-react
 
 ## Siguiente tutorial
 
-→ [Tutorial 10: Animaciones SVG Nativas](./10-svg-animations.md) — animaciones declarativas sin JavaScript.
+ↁE[Tutorial 10: Animaciones SVG Nativas](./10-svg-animations.md)  Eanimaciones declarativas sin JavaScript.

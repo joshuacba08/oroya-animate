@@ -1,6 +1,6 @@
 /**
  * Self-contained HelloCube scene for the landing page.
- * No external dependencies beyond @oroya/core.
+ * No external dependencies beyond @joroya/core.
  */
 import {
   Scene,
@@ -10,7 +10,7 @@ import {
   Material,
   Camera,
   CameraType,
-} from "@oroya/core";
+} from "@joroya/core";
 
 function composeYX(yAngle: number, xAngle: number) {
   const sy = Math.sin(yAngle / 2);
@@ -64,7 +64,7 @@ export function createHelloCubeScene(aspect: number) {
   pedestal.transform.position = { x: 0, y: -1.3, z: 0 };
   scene.add(pedestal);
 
-  // Main cube — indigo/blue
+  // Main cube  Eindigo/blue
   const cube = new Node("cube");
   cube.addComponent(createBox(size, size, size));
   cube.addComponent(

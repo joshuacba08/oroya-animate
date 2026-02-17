@@ -2,7 +2,7 @@
 
 Use this checklist to ensure all steps are completed for successful deployment and publishing.
 
-## ✅ Pre-Publishing Checklist
+## ✁EPre-Publishing Checklist
 
 ### 1. Code Quality
 - [ ] All tests passing: `pnpm test`
@@ -31,7 +31,7 @@ Use this checklist to ensure all steps are completed for successful deployment a
 
 ### 4. Package Configuration
 - [ ] `package.json` files have correct:
-  - [ ] `name` with `@oroya/` scope
+  - [ ] `name` with `@joroya/` scope
   - [ ] `version` field
   - [ ] `license` field (MIT)
   - [ ] `main`, `module`, `types` exports
@@ -68,23 +68,23 @@ Use this checklist to ensure all steps are completed for successful deployment a
 - [ ] Login to NPM: `npm login`
 - [ ] Publish all packages: `pnpm publish:packages`
 - [ ] Verify each package on npmjs.com:
-  - [ ] `@oroya/core`
-  - [ ] `@oroya/renderer-three`
-  - [ ] `@oroya/renderer-svg`
-  - [ ] `@oroya/loader-gltf`
+  - [ ] `@joroya/core`
+  - [ ] `@joroya/renderer-three`
+  - [ ] `@joroya/renderer-svg`
+  - [ ] `@joroya/loader-gltf`
 
 ## 🌐 CDN Verification
 
 After NPM publishing, verify CDN availability:
 
 - [ ] unpkg.com:
-  - [ ] https://unpkg.com/@oroya/core@X.Y.Z/
-  - [ ] https://unpkg.com/@oroya/core@X.Y.Z/dist/index.js
+  - [ ] https://unpkg.com/@joroya/core@X.Y.Z/
+  - [ ] https://unpkg.com/@joroya/core@X.Y.Z/dist/index.js
 - [ ] jsDelivr:
-  - [ ] https://cdn.jsdelivr.net/npm/@oroya/core@X.Y.Z/
-  - [ ] https://cdn.jsdelivr.net/npm/@oroya/core@X.Y.Z/dist/index.js
+  - [ ] https://cdn.jsdelivr.net/npm/@joroya/core@X.Y.Z/
+  - [ ] https://cdn.jsdelivr.net/npm/@joroya/core@X.Y.Z/dist/index.js
 - [ ] esm.sh:
-  - [ ] https://esm.sh/@oroya/core@X.Y.Z
+  - [ ] https://esm.sh/@joroya/core@X.Y.Z
 
 ## 📦 Vercel Deployment
 
@@ -158,16 +158,16 @@ cd test-oroya-install
 npm init -y
 
 # Install packages
-npm install @oroya/core@X.Y.Z @oroya/renderer-three@X.Y.Z
+npm install @joroya/core@X.Y.Z @joroya/renderer-three@X.Y.Z
 
 # Test import
-node --input-type=module -e "import('@oroya/core').then(m => console.log('✅ Core:', Object.keys(m).length, 'exports'))"
+node --input-type=module -e "import('@joroya/core').then(m => console.log('✁ECore:', Object.keys(m).length, 'exports'))"
 
-node --input-type=module -e "import('@oroya/renderer-three').then(m => console.log('✅ Three:', Object.keys(m).length, 'exports'))"
+node --input-type=module -e "import('@joroya/renderer-three').then(m => console.log('✁EThree:', Object.keys(m).length, 'exports'))"
 
 # Test TypeScript types
-echo "import { Scene } from '@oroya/core';" > test.ts
-npx tsc --noEmit test.ts && echo "✅ TypeScript types OK"
+echo "import { Scene } from '@joroya/core';" > test.ts
+npx tsc --noEmit test.ts && echo "✁ETypeScript types OK"
 
 # Cleanup
 cd ..
@@ -181,7 +181,7 @@ If something goes wrong:
 ### NPM Rollback
 ```bash
 # Deprecate broken version
-npm deprecate @oroya/core@X.Y.Z "Broken release, use X.Y.Z-1 instead"
+npm deprecate @joroya/core@X.Y.Z "Broken release, use X.Y.Z-1 instead"
 
 # Publish fixed version
 node scripts/sync-versions.js X.Y.Z+1

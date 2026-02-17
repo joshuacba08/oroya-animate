@@ -15,7 +15,7 @@ Crear una escena, exportarla como JSON, y luego importarla para demostrar que la
 ## Paso 1: Construir una escena
 
 ```typescript
-import { Scene, Node, createBox, createSphere, Material, serialize, deserialize } from '@oroya/core';
+import { Scene, Node, createBox, createSphere, Material, serialize, deserialize } from '@joroya/core';
 
 // Crear escena original
 const scene = new Scene();
@@ -50,12 +50,12 @@ La función `serialize` recorre todo el scene graph y convierte cada nodo y sus 
 
 | Dato | ¿Se preserva? |
 |------|----------------|
-| Nombre del nodo | ✅ |
-| ID único (UUID) | ✅ |
-| Jerarquía padre-hijo | ✅ |
-| Transform (position, rotation, scale) | ✅ |
-| Geometry (tipo y parámetros) | ✅ |
-| Material (color, opacity) | ✅ |
+| Nombre del nodo | ✁E|
+| ID único (UUID) | ✁E|
+| Jerarquía padre-hijo | ✁E|
+| Transform (position, rotation, scale) | ✁E|
+| Geometry (tipo y parámetros) | ✁E|
+| Material (color, opacity) | ✁E|
 
 ---
 
@@ -67,17 +67,17 @@ const restoredScene = deserialize(json);
 // Verificar que la escena se restauró
 const foundCube = restoredScene.findNodeByName('hero-cube');
 console.log(foundCube?.transform.position);
-// → { x: -2, y: 0, z: -0 }
+// ↁE{ x: -2, y: 0, z: -0 }
 
 const foundSphere = restoredScene.findNodeByName('companion-sphere');
 console.log(foundSphere?.transform.position);
-// → { x: 2, y: 1, z: -1 }
+// ↁE{ x: 2, y: 1, z: -1 }
 ```
 
-La escena restaurada es **completamente funcional** — puede montarse directamente en cualquier renderer:
+La escena restaurada es **completamente funcional**  Epuede montarse directamente en cualquier renderer:
 
 ```typescript
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const renderer = new ThreeRenderer({ canvas, width, height });
 renderer.mount(restoredScene);   // La escena restaurada funciona igual
@@ -134,4 +134,4 @@ Una escena que puede ser guardada, compartida y restaurada sin perder ningún da
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 4: Sistema Solar](./04-solar-system.md) — transforms jerárquicos y animación.
+➡�E�E[Tutorial 4: Sistema Solar](./04-solar-system.md)  Etransforms jerárquicos y animación.

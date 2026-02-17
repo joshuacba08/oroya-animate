@@ -18,14 +18,7 @@ duration: "25 min"
 Esta es la propuesta de valor central de Oroya Animate:
 
 ```
-         ┌─────────────────┐
-         │   @oroya/core    │
-         │    Scene Graph   │
-         └────────┬────────┘
-                  │
-        ┌─────────┴─────────┐
-        │                   │
-   Three.js (3D)       SVG (2D)
+         ┌─────────────────━E         ━E  @joroya/core    ━E         ━E   Scene Graph   ━E         └────────┬────────━E                  ━E        ┌─────────┴─────────━E        ━E                  ━E   Three.js (3D)       SVG (2D)
    WebGL canvas      SVG markup
 ```
 
@@ -42,7 +35,7 @@ Necesitamos dos áreas: un canvas para Three.js y un contenedor para SVG:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Multi-Renderer — Oroya Animate</title>
+  <title>Multi-Renderer  EOroya Animate</title>
   <style>
     body {
       margin: 0;
@@ -99,14 +92,12 @@ Necesitamos dos áreas: un canvas para Three.js y un contenedor para SVG:
 ## Paso 2: Crear la escena compartida
 
 ```typescript
-import { Scene, Node, createBox, createSphere, createPath2D, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
-import { renderToSVG } from '@oroya/renderer-svg';
+import { Scene, Node, createBox, createSphere, createPath2D, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
+import { renderToSVG } from '@joroya/renderer-svg';
 
-// ═══════════════════════════════════════════
-// ESCENA COMPARTIDA — definida una sola vez
-// ═══════════════════════════════════════════
-const scene = new Scene();
+// ══════════════════════════════════════════╁E// ESCENA COMPARTIDA  Edefinida una sola vez
+// ══════════════════════════════════════════╁Econst scene = new Scene();
 
 // Objetos 3D (para Three.js)
 const cube = new Node('cube');
@@ -177,20 +168,16 @@ function createStarPath(
 ## Paso 4: Renderizar con ambos backends
 
 ```typescript
-// ═══════════════════════════════════════════
-// RENDERER THREE.JS — renderizado 3D 
-// ═══════════════════════════════════════════
-const threeRenderer = new ThreeRenderer({
+// ══════════════════════════════════════════╁E// RENDERER THREE.JS  Erenderizado 3D 
+// ══════════════════════════════════════════╁Econst threeRenderer = new ThreeRenderer({
   canvas: document.getElementById('three-canvas') as HTMLCanvasElement,
   width: 400,
   height: 400,
 });
 threeRenderer.mount(scene);
 
-// ═══════════════════════════════════════════
-// RENDERER SVG — renderizado 2D
-// ═══════════════════════════════════════════
-function updateSVG() {
+// ══════════════════════════════════════════╁E// RENDERER SVG  Erenderizado 2D
+// ══════════════════════════════════════════╁Efunction updateSVG() {
   const svgString = renderToSVG(scene, {
     width: 400,
     height: 400,
@@ -199,10 +186,8 @@ function updateSVG() {
   document.getElementById('svg-container')!.innerHTML = svgString;
 }
 
-// ═══════════════════════════════════════════
-// ANIMACIÓN — ambos renderers leen la misma escena
-// ═══════════════════════════════════════════
-let time = 0;
+// ══════════════════════════════════════════╁E// ANIMACIÓN  Eambos renderers leen la misma escena
+// ══════════════════════════════════════════╁Elet time = 0;
 let lastSvgUpdate = 0;
 
 function animate() {
@@ -246,12 +231,12 @@ animate();
 
 | Elemento | Three.js | SVG |
 |----------|----------|-----|
-| `cube` (Box) | ✅ Cubo 3D con sombras | ❌ Sin soporte para Box |
-| `sphere` (Sphere) | ✅ Esfera 3D | ❌ Sin soporte para Sphere |
-| `star` (Path2D) | ❌ Sin soporte para Path2D | ✅ Estrella vectorial |
-| `camera` | ✅ Define el punto de vista | ❌ No aplica |
+| `cube` (Box) | ✁ECubo 3D con sombras | ❁ESin soporte para Box |
+| `sphere` (Sphere) | ✁EEsfera 3D | ❁ESin soporte para Sphere |
+| `star` (Path2D) | ❁ESin soporte para Path2D | ✁EEstrella vectorial |
+| `camera` | ✁EDefine el punto de vista | ❁ENo aplica |
 
-Cada renderer ignora los componentes que no sabe manejar. Esto es **intencional** — permite que la misma escena tenga contenido para diferentes backends.
+Cada renderer ignora los componentes que no sabe manejar. Esto es **intencional**  Epermite que la misma escena tenga contenido para diferentes backends.
 
 ---
 
@@ -269,10 +254,10 @@ graph LR
 
 ### Beneficios de este patrón
 
-1. **Código DRY** — La escena se define una vez.
-2. **Testeable** — Se puede verificar la escena sin renderer.
-3. **Extensible** — Agregar un nuevo renderer (Canvas2D, WebGPU) no requiere cambiar el core.
-4. **Server-side** — El SVG renderer funciona en Node.js sin browser.
+1. **Código DRY**  ELa escena se define una vez.
+2. **Testeable**  ESe puede verificar la escena sin renderer.
+3. **Extensible**  EAgregar un nuevo renderer (Canvas2D, WebGPU) no requiere cambiar el core.
+4. **Server-side**  EEl SVG renderer funciona en Node.js sin browser.
 
 ---
 
@@ -287,7 +272,7 @@ document.getElementById('preview')!.innerHTML = preview;
 const renderer = new ThreeRenderer({ canvas, width: 1920, height: 1080 });
 renderer.mount(scene);
 renderer.render();
-// → Capturar canvas como imagen para export
+// ↁECapturar canvas como imagen para export
 ```
 
 ---
@@ -303,7 +288,7 @@ Una ventana dividida mostrando la misma escena renderizada simultáneamente en W
 Has completado todos los tutoriales. Ahora puedes:
 
 - Construir tus propias escenas combinando las técnicas aprendidas.
-- Crear un nuevo renderer (Canvas2D, WebGPU) siguiendo el patrón de `@oroya/renderer-three`.
-- Contribuir al proyecto — revisa la [guía de contribución](../contributing.md).
+- Crear un nuevo renderer (Canvas2D, WebGPU) siguiendo el patrón de `@joroya/renderer-three`.
+- Contribuir al proyecto  Erevisa la [guía de contribución](../contributing.md).
 
-→ [Volver al índice de tutoriales](./README.md)
+ↁE[Volver al índice de tutoriales](./README.md)

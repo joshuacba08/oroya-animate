@@ -1,4 +1,4 @@
-import type { Scene } from '@oroya/core';
+import type { Scene } from '@joroya/core';
 
 /* ── Control definitions ─────────────────────────────────────────────── */
 

@@ -8,7 +8,7 @@ Each package should have these fields in `package.json`:
 
 ```json
 {
-  "name": "@oroya/package-name",
+  "name": "@joroya/package-name",
   "version": "0.3.0",
   "description": "Clear, concise description of what this package does",
   "keywords": [
@@ -45,7 +45,7 @@ Each package should have these fields in `package.json`:
 
 ## 📦 Package-Specific Metadata
 
-### @oroya/core
+### @joroya/core
 
 ```json
 {
@@ -67,7 +67,7 @@ Each package should have these fields in `package.json`:
 }
 ```
 
-### @oroya/renderer-three
+### @joroya/renderer-three
 
 ```json
 {
@@ -83,13 +83,13 @@ Each package should have these fields in `package.json`:
     "typescript"
   ],
   "peerDependencies": {
-    "@oroya/core": "^0.3.0",
+    "@joroya/core": "^0.3.0",
     "three": "^0.165.0"
   }
 }
 ```
 
-### @oroya/renderer-svg
+### @joroya/renderer-svg
 
 ```json
 {
@@ -105,12 +105,12 @@ Each package should have these fields in `package.json`:
     "generative-art"
   ],
   "peerDependencies": {
-    "@oroya/core": "^0.3.0"
+    "@joroya/core": "^0.3.0"
   }
 }
 ```
 
-### @oroya/loader-gltf
+### @joroya/loader-gltf
 
 ```json
 {
@@ -127,7 +127,7 @@ Each package should have these fields in `package.json`:
     "typescript"
   ],
   "peerDependencies": {
-    "@oroya/core": "^0.3.0",
+    "@joroya/core": "^0.3.0",
     "three": "^0.165.0"
   }
 }
@@ -140,19 +140,19 @@ Each package should have its own `README.md` with:
 ### Template Structure
 
 ```markdown
-# @oroya/[package-name]
+# @joroya/[package-name]
 
 > Short tagline describing the package
 
-[![NPM Version](https://img.shields.io/npm/v/@oroya/[package-name])](https://www.npmjs.com/package/@oroya/[package-name])
-[![License](https://img.shields.io/npm/l/@oroya/[package-name])](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/[package-name])](https://www.npmjs.com/package/@joroya/[package-name])
+[![License](https://img.shields.io/npm/l/@joroya/[package-name])](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 
 Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
 
 ## Installation
 
 \`\`\`bash
-npm install @oroya/[package-name]
+npm install @joroya/[package-name]
 \`\`\`
 
 ## Quick Example
@@ -210,9 +210,9 @@ Make it:
 - **Searchable:** Include relevant keywords naturally
 
 **Good Examples:**
-- ✅ "Core scene graph and component system for building 2D/3D graphics with any rendering backend"
-- ❌ "A package for Oroya" (too vague)
-- ❌ "This is a really amazing super cool graphics library that does everything you could ever want" (too long, fluff)
+- ✁E"Core scene graph and component system for building 2D/3D graphics with any rendering backend"
+- ❁E"A package for Oroya" (too vague)
+- ❁E"This is a really amazing super cool graphics library that does everything you could ever want" (too long, fluff)
 
 ### 2. Keywords
 
@@ -232,10 +232,10 @@ Choose 5-12 keywords that:
 ### 3. Links
 
 Ensure all links work:
-- Homepage → Documentation site
-- Repository → GitHub repo
-- Issues → GitHub issues
-- Funding → (Optional) GitHub Sponsors or other
+- Homepage ↁEDocumentation site
+- Repository ↁEGitHub repo
+- Issues ↁEGitHub issues
+- Funding ↁE(Optional) GitHub Sponsors or other
 
 ## 📊 NPM Profile Optimization
 
@@ -264,10 +264,10 @@ Professional, engine-agnostic 2D/3D graphics library for the web.
 
 ## Packages
 
-- [@oroya/core](https://www.npmjs.com/package/@oroya/core) - Core scene graph
-- [@oroya/renderer-three](https://www.npmjs.com/package/@oroya/renderer-three) - Three.js renderer
-- [@oroya/renderer-svg](https://www.npmjs.com/package/@oroya/renderer-svg) - SVG renderer
-- [@oroya/loader-gltf](https://www.npmjs.com/package/@oroya/loader-gltf) - glTF loader
+- [@joroya/core](https://www.npmjs.com/package/@joroya/core) - Core scene graph
+- [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three) - Three.js renderer
+- [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg) - SVG renderer
+- [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf) - glTF loader
 
 ## Resources
 
@@ -276,7 +276,7 @@ Professional, engine-agnostic 2D/3D graphics library for the web.
 - [Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
 ```
 
-## 🏷️ Version Tags
+## 🏷�E�EVersion Tags
 
 Use NPM tags for different release channels:
 
@@ -296,8 +296,8 @@ pnpm publish --tag legacy
 
 Users install with:
 ```bash
-npm install @oroya/core@beta
-npm install @oroya/core@next
+npm install @joroya/core@beta
+npm install @joroya/core@next
 ```
 
 ## 📈 Discoverability Tips
@@ -322,10 +322,10 @@ Fill all optional fields - they improve searchability.
 ### 4. Badges in README
 
 ```markdown
-[![NPM Version](https://img.shields.io/npm/v/@oroya/core)](https://www.npmjs.com/package/@oroya/core)
-[![NPM Downloads](https://img.shields.io/npm/dm/@oroya/core)](https://www.npmjs.com/package/@oroya/core)
-[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@oroya/core)](https://bundlephobia.com/package/@oroya/core)
-[![License](https://img.shields.io/npm/l/@oroya/core)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/core)](https://www.npmjs.com/package/@joroya/core)
+[![NPM Downloads](https://img.shields.io/npm/dm/@joroya/core)](https://www.npmjs.com/package/@joroya/core)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@joroya/core)](https://bundlephobia.com/package/@joroya/core)
+[![License](https://img.shields.io/npm/l/@joroya/core)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue)](https://www.typescriptlang.org/)
 ```
 
@@ -391,7 +391,7 @@ packages.forEach(path => {
   Object.assign(pkg, commonMetadata);
   
   writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
-  console.log(`✅ Updated ${pkg.name}`);
+  console.log(`✁EUpdated ${pkg.name}`);
 });
 ```
 

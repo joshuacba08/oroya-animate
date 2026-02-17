@@ -1,4 +1,4 @@
-import { SvJs, Gen } from '@oroya/renderer-svg';
+import { SvJs, Gen } from '@joroya/renderer-svg';
 import type { DemoSceneDef, ParamValues } from '../types';
 
 export const SvJsGenerativeDemo: DemoSceneDef = {

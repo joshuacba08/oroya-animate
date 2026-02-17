@@ -28,8 +28,8 @@ A diferencia del renderer Three.js (que produce píxeles en un canvas), `renderT
 Los paths en Oroya usan la misma sintaxis que SVG (`M`, `L`, `C`, `Z`, etc.):
 
 ```typescript
-import { Scene, Node, createPath2D, Material } from '@oroya/core';
-import { renderToSVG } from '@oroya/renderer-svg';
+import { Scene, Node, createPath2D, Material } from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 
@@ -71,7 +71,7 @@ document.body.innerHTML = svgString;
 
 ---
 
-## Paso 3: Arte generativo — Patrón de espiral
+## Paso 3: Arte generativo  EPatrón de espiral
 
 Ahora algo más interesante. Generamos una espiral usando matemáticas:
 
@@ -215,4 +215,4 @@ Un mosaico de colores con cuadrados, diamantes y triángulos generados procedura
 
 ## Siguiente tutorial
 
-→ [Tutorial 6: Cámaras y Puntos de Vista](./06-cameras-viewpoints.md) — posicionando cámaras.
+ↁE[Tutorial 6: Cámaras y Puntos de Vista](./06-cameras-viewpoints.md)  Eposicionando cámaras.

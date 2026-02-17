@@ -70,6 +70,39 @@ export function computeLocalAABB(def: GeometryDef): AABB {
             };
         }
 
+
+        case GeometryPrimitive.Buffer: {
+            // Compute AABB from vertex positions
+            const positions = def.positions;
+            if (positions.length === 0) {
+                return {
+                    min: { x: 0, y: 0, z: 0 },
+                    max: { x: 0, y: 0, z: 0 },
+                };
+            }
+
+            let minX = Infinity, minY = Infinity, minZ = Infinity;
+            let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
+
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                if (z < minZ) minZ = z;
+                if (z > maxZ) maxZ = z;
+            }
+
+            return {
+                min: { x: minX, y: minY, z: minZ },
+                max: { x: maxX, y: maxY, z: maxZ },
+            };
+        }
+
         case GeometryPrimitive.Text: {
             // Text AABB cannot be accurately computed without font metrics.
             // Return a zero-size box at the origin as a placeholder.

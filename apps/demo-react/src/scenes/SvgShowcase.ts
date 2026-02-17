@@ -1,8 +1,8 @@
 import {
   Scene, Node, Material, Camera, CameraType,
   createBox, createSphere, createPath2D, createText,
-} from '@oroya/core';
-import type { Path2DCommand } from '@oroya/core';
+} from '@joroya/core';
+import type { Path2DCommand } from '@joroya/core';
 import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 import { hexToRgb } from '../types';
@@ -216,7 +216,7 @@ export function createSvgShowcaseScene(params: ParamValues) {
   maskLabel.transform.updateLocalMatrix();
   scene.add(maskLabel);
 
-  // ── 6. Path2D — Bézier curve ───────────────────────────────────────
+  // ── 6. Path2D  EBézier curve ───────────────────────────────────────
   const bezier = new Node('bezier');
   bezier.addComponent(createPath2D([
     { command: 'M', args: [580, 340] },
@@ -270,9 +270,9 @@ export function createSvgShowcaseScene(params: ParamValues) {
   lineLabel.transform.updateLocalMatrix();
   scene.add(lineLabel);
 
-  // ── No JS animation needed — it's a static showcase ────────────────
+  // ── No JS animation needed  Eit's a static showcase ────────────────
   function animate(_time: number, _p: ParamValues) {
-    // Static scene — nothing to animate per frame
+    // Static scene  Enothing to animate per frame
   }
 
   return { scene, animate };

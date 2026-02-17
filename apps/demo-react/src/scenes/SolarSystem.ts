@@ -1,4 +1,4 @@
-import { Scene, Node, createSphere, Material, Camera, CameraType } from '@oroya/core';
+import { Scene, Node, createSphere, Material, Camera, CameraType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const solarSystemControls: ControlDef[] = [

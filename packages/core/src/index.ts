@@ -13,5 +13,6 @@ export * from './math/Matrix4';
 export * from './nodes/Node';
 export * from './scene/Scene';
 export * from './serialization/json';
+export * from './animation';
 
 

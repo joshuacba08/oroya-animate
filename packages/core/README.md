@@ -1,34 +1,34 @@
-# @oroya/core
+# @joroya/core
 
 > Core scene graph and component system for building 2D/3D graphics with any rendering backend
 
-[![NPM Version](https://img.shields.io/npm/v/@oroya/core?style=flat-square)](https://www.npmjs.com/package/@oroya/core)
-[![License](https://img.shields.io/npm/l/@oroya/core?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
-[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@oroya/core?style=flat-square)](https://bundlephobia.com/package/@oroya/core)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/core?style=flat-square)](https://www.npmjs.com/package/@joroya/core)
+[![License](https://img.shields.io/npm/l/@joroya/core?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/@joroya/core?style=flat-square)](https://bundlephobia.com/package/@joroya/core)
 
 Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
 
 ## Features
 
 - 🎯 **Engine-Agnostic Scene Graph** - Define your scene once, render anywhere
-- 🏗️ **Component System** - Modular architecture with reusable components
+- 🏗�E�E**Component System** - Modular architecture with reusable components
 - 🔄 **Transform Hierarchy** - Full parent-child transform propagation
 - 📦 **Geometry Primitives** - Box, Sphere, Circle, Path2D, and more
 - 🎨 **Material System** - Color, stroke, fill properties
 - 🎥 **Camera Component** - Perspective and orthographic cameras
 - 📝 **Serialization** - Save and load scenes as JSON
-- 🛡️ **TypeScript First** - Fully typed API
+- 🛡�E�E**TypeScript First** - Fully typed API
 
 ## Installation
 
 ```bash
-npm install @oroya/core
+npm install @joroya/core
 ```
 
 ## Quick Example
 
 ```typescript
-import { Scene, Node, createBox, Material } from '@oroya/core';
+import { Scene, Node, createBox, Material } from '@joroya/core';
 
 // Create a scene
 const scene = new Scene();
@@ -99,14 +99,14 @@ node.addComponent(material);
 
 ## Rendering
 
-`@oroya/core` is rendering backend agnostic. Use with:
+`@joroya/core` is rendering backend agnostic. Use with:
 
-- **[@oroya/renderer-three](https://www.npmjs.com/package/@oroya/renderer-three)** - WebGL via Three.js
-- **[@oroya/renderer-svg](https://www.npmjs.com/package/@oroya/renderer-svg)** - Lightweight SVG
+- **[@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)** - WebGL via Three.js
+- **[@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)** - Lightweight SVG
 - Or create your own renderer!
 
 ```typescript
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas'),
@@ -128,7 +128,7 @@ renderer.render(scene, cameraNode);
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
   
   const scene = new Scene();
   const node = new Node('test');

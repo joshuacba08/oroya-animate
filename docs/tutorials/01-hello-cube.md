@@ -2,7 +2,7 @@
 
 > **Nivel:** Principiante  
 > **Tiempo estimado:** 10 minutos  
-> **Qué aprenderás:** Crear una escena mínima con un cubo 3D que rota usando `@oroya/core` y `@oroya/renderer-three`.
+> **Qué aprenderás:** Crear una escena mínima con un cubo 3D que rota usando `@joroya/core` y `@joroya/renderer-three`.
 
 ---
 
@@ -22,7 +22,7 @@ Crea un archivo HTML con un `<canvas>`:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hello Cube — Oroya Animate</title>
+  <title>Hello Cube  EOroya Animate</title>
   <style>
     body { margin: 0; overflow: hidden; background: #1a1a2e; }
     canvas { display: block; }
@@ -40,8 +40,8 @@ Crea un archivo HTML con un `<canvas>`:
 ## Paso 2: Crear la escena
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 // 1. Crear la escena
 const scene = new Scene();
@@ -69,7 +69,7 @@ scene.add(cube);
 
 1. **`Scene`** es el contenedor raíz del scene graph.
 2. **`Node`** es un elemento del árbol. Cada nodo tiene un `Transform` automático.
-3. **`createBox(1,1,1)`** crea un componente de geometría de caja de 1×1×1.
+3. **`createBox(1,1,1)`** crea un componente de geometría de caja de 1ÁEÁE.
 4. **`Material`** define el color de la superficie (RGB normalizado: 0 a 1).
 5. **`Camera`** define el punto de vista desde donde se renderiza.
 
@@ -125,8 +125,8 @@ Un cubo azul brillante rotando suavemente sobre fondo oscuro. 🎉
 ## Código completo
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
 
@@ -173,4 +173,4 @@ animate();
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 2: Paleta de Colores](./02-color-palette.md) — múltiples formas y colores.
+➡�E�E[Tutorial 2: Paleta de Colores](./02-color-palette.md)  Emúltiples formas y colores.

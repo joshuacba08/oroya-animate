@@ -175,7 +175,27 @@ export interface MaterialDef {
    */
   mask?: SvgMaskDef;
 
-  // more properties like roughness, metalness, etc. can be added here
+  /**
+   * Metalness for PBR materials (0 = dielectric, 1 = metallic).
+   * Used by Three.js MeshStandardMaterial.
+   */
+  metalness?: number;
+
+  /**
+   * Roughness for PBR materials (0 = smooth, 1 = rough).
+   * Used by Three.js MeshStandardMaterial.
+   */
+  roughness?: number;
+
+  /**
+   * Emissive color for self-illuminated materials.
+   */
+  emissive?: ColorRGB;
+
+  /**
+   * Texture map URI (for future texture support).
+   */
+  map?: string;
 }
 
 /**

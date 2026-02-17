@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { Scene } from "@oroya/core";
-import { Camera, CameraType, ComponentType } from "@oroya/core";
-import { ThreeRenderer } from "@oroya/renderer-three";
-import { renderToSVG, SvJs } from "@oroya/renderer-svg";
+import type { Scene } from "@joroya/core";
+import { Camera, CameraType, ComponentType } from "@joroya/core";
+import { ThreeRenderer } from "@joroya/renderer-three";
+import { renderToSVG, SvJs } from "@joroya/renderer-svg";
 
 export interface ExampleDef {
   id: string;
@@ -15,17 +15,19 @@ export interface ExampleDef {
   };
 }
 
-interface ExampleCardProps {
+interface RendererProps {
   example: ExampleDef;
+  eager?: boolean;
 }
 
-function ThreeCard({ example }: ExampleCardProps) {
+export function ThreeRenderer3D({ example, eager }: RendererProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<ThreeRenderer | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(eager ?? false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    if (eager) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -41,7 +43,7 @@ function ThreeCard({ example }: ExampleCardProps) {
 
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, []);
+  }, [eager]);
 
   useEffect(() => {
     if (!isVisible || !canvasRef.current) return;
@@ -53,7 +55,6 @@ function ThreeCard({ example }: ExampleCardProps) {
 
       const { scene, animate } = example.factory();
 
-      // Ensure it's a 3D scene
       if (!(scene as any).root) throw new Error("Not a 3D scene");
       const threeScene = scene as Scene;
 
@@ -107,12 +108,13 @@ function ThreeCard({ example }: ExampleCardProps) {
   );
 }
 
-function SvgCard({ example }: ExampleCardProps) {
+export function SvgRenderer({ example, eager }: RendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(eager ?? false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    if (eager) return;
     const el = containerRef.current;
     if (!el) return;
 
@@ -128,14 +130,13 @@ function SvgCard({ example }: ExampleCardProps) {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [eager]);
 
   useEffect(() => {
     if (!isVisible || !containerRef.current) return;
 
     try {
       const { scene } = example.factory();
-      // Ensure it's a Scene (legacy SVG)
       if (!(scene as any).root) throw new Error("Not a Scene graph");
 
       const size = 1000;
@@ -172,12 +173,13 @@ function SvgCard({ example }: ExampleCardProps) {
   );
 }
 
-function SvJsCard({ example }: ExampleCardProps) {
+export function SvJsRenderer({ example, eager }: RendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(eager ?? false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    if (eager) return;
     const el = containerRef.current;
     if (!el) return;
 
@@ -193,29 +195,23 @@ function SvJsCard({ example }: ExampleCardProps) {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [eager]);
 
   useEffect(() => {
     if (!isVisible || !containerRef.current) return;
 
     try {
       const { scene, animate } = example.factory();
-      const svjs = scene as any as SvJs; // Cast to SvJs
+      const svjs = scene as any as SvJs;
 
       if (!svjs.element) throw new Error("Not a valid SvJs instance");
 
       containerRef.current.innerHTML = '';
       containerRef.current.appendChild(svjs.element);
 
-      // Ensure it fits
       svjs.set({ width: '100%', height: '100%' });
 
       let animationFrameId: number;
-      // Some SvJs demos have internal animation loops (like InteractiveGalaxy), 
-      // but others might rely on this loop. 
-      // However, the factory pattern in web seems to return an 'animate' function meant to be called in RAF.
-      // If the demo uses SvJs, it might or might not need external RAF.
-      // We'll run it anyway.
       const loop = (time: number) => {
         const t = time * 0.001;
         animate(t);
@@ -249,40 +245,60 @@ function SvJsCard({ example }: ExampleCardProps) {
   );
 }
 
-export function ExampleCard({ example }: ExampleCardProps) {
-  const getBadgeColor = (cat: string) => {
-    switch (cat) {
-      case '3d': return 'badge-primary';
-      case 'svg': return 'badge-success';
-      case 'svjs': return 'badge-secondary';
-      default: return 'badge-neutral';
-    }
-  };
+export function DemoRenderer({ example, eager }: RendererProps) {
+  if (example.category === "svg") return <SvgRenderer example={example} eager={eager} />;
+  if (example.category === "svjs") return <SvJsRenderer example={example} eager={eager} />;
+  return <ThreeRenderer3D example={example} eager={eager} />;
+}
 
-  const getLabel = (cat: string) => {
-    switch (cat) {
-      case '3d': return 'Three.js';
-      case 'svg': return 'SVG';
-      case 'svjs': return 'svgnx';
-      default: return cat;
-    }
-  };
+export function getBadgeColor(cat: string) {
+  switch (cat) {
+    case '3d': return 'badge-primary';
+    case 'svg': return 'badge-success';
+    case 'svjs': return 'badge-secondary';
+    default: return 'badge-neutral';
+  }
+}
 
+export function getCategoryLabel(cat: string) {
+  switch (cat) {
+    case '3d': return 'Three.js';
+    case 'svg': return 'SVG';
+    case 'svjs': return 'SvJs';
+    default: return cat;
+  }
+}
+
+interface ExampleCardProps {
+  example: ExampleDef;
+  onClick?: () => void;
+}
+
+export function ExampleCard({ example, onClick }: ExampleCardProps) {
   return (
-    <div className="group glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02]">
+    <div
+      className="group glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
+    >
       <div className="relative aspect-square bg-base-300/30">
-        {example.category === "svg" ? (
-          <SvgCard example={example} />
-        ) : example.category === "svjs" ? (
-          <SvJsCard example={example} />
-        ) : (
-          <ThreeCard example={example} />
-        )}
+        <DemoRenderer example={example} />
         <div className="absolute top-3 right-3">
           <span
             className={`badge badge-sm font-mono ${getBadgeColor(example.category)}`}
           >
-            {getLabel(example.category)}
+            {getCategoryLabel(example.category)}
+          </span>
+        </div>
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-base-content/0 group-hover:bg-base-content/10 transition-colors duration-300 flex items-center justify-center">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-base-100/90 backdrop-blur-sm text-base-content text-sm font-medium px-4 py-2 rounded-full shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" className="inline-block w-4 h-4 mr-1.5 -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            </svg>
+            Abrir demo
           </span>
         </div>
       </div>
@@ -290,7 +306,7 @@ export function ExampleCard({ example }: ExampleCardProps) {
         <h3 className="font-display font-semibold text-lg mb-1.5">
           {example.title}
         </h3>
-        <p className="text-sm text-base-content/50 leading-relaxed">
+        <p className="text-sm text-base-content/50 leading-relaxed line-clamp-2">
           {example.description}
         </p>
       </div>

@@ -1,5 +1,5 @@
 {
-  "name": "@oroya/renderer-three",
+  "name": "@joroya/renderer-three",
   "version": "0.3.0",
   "description": "Three.js (WebGL) renderer for Oroya Animate scene graphs",
   "keywords": [
@@ -46,11 +46,11 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@oroya/core": "^0.3.0",
+    "@joroya/core": "^0.3.0",
     "three": "^0.165.0"
   },
   "dependencies": {
-    "@oroya/core": "workspace:*",
+    "@joroya/core": "workspace:*",
     "three": "^0.165.0"
   },
   "devDependencies": {

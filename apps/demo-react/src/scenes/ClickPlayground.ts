@@ -1,19 +1,19 @@
 import {
     Scene, Node, createBox, createSphere, Material, Camera, CameraType,
     Interactive,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 /**
- * Click Playground – demuestra click, pointerdown, pointerup con efectos
+ * Click Playground  Edemuestra click, pointerdown, pointerup con efectos
  * visuales que responden al estado del puntero.
  *
  * Objetos:
- *   1. Click Counter    – click incrementa un contador visual (escala)
- *   2. Toggle On/Off    – click alterna entre dos estados (color + posición)
- *   3. Press Effect     – pointerdown/up muestra efecto de presión (escala)
- *   4. Color Cycler     – click cicla entre colores
- *   5. Explode/Collect  – click dispersa/reagrupa esferas hijas
+ *   1. Click Counter     Eclick incrementa un contador visual (escala)
+ *   2. Toggle On/Off     Eclick alterna entre dos estados (color + posición)
+ *   3. Press Effect      Epointerdown/up muestra efecto de presión (escala)
+ *   4. Color Cycler      Eclick cicla entre colores
+ *   5. Explode/Collect   Eclick dispersa/reagrupa esferas hijas
  */
 
 export const clickPlaygroundControls: ControlDef[] = [
@@ -47,7 +47,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     scene.add(cameraNode);
 
     // ══════════════════════════════════════════════════
-    // 1. Click Counter – crece con cada click
+    // 1. Click Counter  Ecrece con cada click
     // ══════════════════════════════════════════════════
     const counterState = { clicks: 0, targetScale: 1 };
     const counterNode = new Node('click-counter');
@@ -67,7 +67,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     });
 
     // ══════════════════════════════════════════════════
-    // 2. Toggle On/Off – alterna estado
+    // 2. Toggle On/Off  Ealterna estado
     // ══════════════════════════════════════════════════
     const toggleState = { on: false, targetY: 0 };
     const toggleNode = new Node('toggle');
@@ -89,7 +89,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     });
 
     // ══════════════════════════════════════════════════
-    // 3. Press Effect – pointerdown/up muestra presión
+    // 3. Press Effect  Epointerdown/up muestra presión
     // ══════════════════════════════════════════════════
     const pressState = { pressed: false, currentScale: 1 };
     const pressNode = new Node('press-effect');
@@ -116,7 +116,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     });
 
     // ══════════════════════════════════════════════════
-    // 4. Color Cycler – click cicla entre colores
+    // 4. Color Cycler  Eclick cicla entre colores
     // ══════════════════════════════════════════════════
     const cyclerState = { colorIndex: 0, targetColor: { ...CYCLE_COLORS[0] }, currentColor: { ...CYCLE_COLORS[0] } };
     const cyclerNode = new Node('color-cycler');
@@ -135,7 +135,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     });
 
     // ══════════════════════════════════════════════════
-    // 5. Explode/Collect – dispersa/reagrupa esferas
+    // 5. Explode/Collect  Edispersa/reagrupa esferas
     // ══════════════════════════════════════════════════
     const explodeState = { exploded: false, t: 0 };
     const explodeParent = new Node('explode-group');
@@ -193,7 +193,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
     function animate(time: number, p: ParamValues) {
         const speed = p.animSpeed as number;
 
-        // 1. Counter – smooth scale
+        // 1. Counter  Esmooth scale
         {
             const s = counterNode.transform.scale?.x ?? 1;
             const target = counterState.targetScale;
@@ -211,7 +211,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
             counterNode.transform.updateLocalMatrix();
         }
 
-        // 2. Toggle – smooth position + color
+        // 2. Toggle  Esmooth position + color
         {
             const currentY = toggleNode.transform.position?.y ?? 0;
             const targetY = toggleState.targetY;
@@ -240,7 +240,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
             toggleNode.transform.updateLocalMatrix();
         }
 
-        // 3. Press – scale spring
+        // 3. Press  Escale spring
         {
             const targetScale = pressState.pressed ? 0.7 : 1.0;
             pressState.currentScale += (targetScale - pressState.currentScale) * 0.15 * speed;
@@ -258,7 +258,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
             pressNode.transform.updateLocalMatrix();
         }
 
-        // 4. Color Cycler – smooth color lerp
+        // 4. Color Cycler  Esmooth color lerp
         {
             const c = cyclerState.currentColor;
             const t = cyclerState.targetColor;
@@ -276,7 +276,7 @@ export function createClickPlaygroundScene(_params: ParamValues) {
             cyclerNode.transform.updateLocalMatrix();
         }
 
-        // 5. Explode/Collect – orbit positions
+        // 5. Explode/Collect  Eorbit positions
         {
             const targetT = explodeState.exploded ? 1 : 0;
             explodeState.t += (targetT - explodeState.t) * 0.06 * speed;

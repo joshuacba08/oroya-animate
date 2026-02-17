@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { SvJs } from '@oroya/renderer-svg';
+import type { SvJs } from '@joroya/renderer-svg';
 
 interface OroyaSvJsProps {
     scene: SvJs; // The scene here is the SvJs root instance

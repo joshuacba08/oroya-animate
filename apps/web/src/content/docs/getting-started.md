@@ -4,11 +4,11 @@ description: "Quick start guide for setting up Oroya Animate and creating your f
 order: 1
 category: "guide"
 ---
-ï»¿# Getting Started with Oroya Animate
+E¿# Getting Started with Oroya Animate
 
 Welcome! This guide will help you get your first 3D scene up and running using **Oroya Animate**, a renderer-agnostic scene graph engine for the web.
 
-Oroya Animate separates your scene definition from the rendering backend. You describe your world once using `@oroya/core` and then choose how to render it - WebGL via Three.js, SVG for static graphics, or any future backend.
+Oroya Animate separates your scene definition from the rendering backend. You describe your world once using `@joroya/core` and then choose how to render it - WebGL via Three.js, SVG for static graphics, or any future backend.
 
 ---
 
@@ -18,25 +18,25 @@ Install the packages you need from npm using your preferred package manager:
 
 ```bash
 # npm
-npm install @oroya/core @oroya/renderer-three
+npm install @joroya/core @joroya/renderer-three
 
 # yarn
-yarn add @oroya/core @oroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three
 
 # pnpm
-pnpm add @oroya/core @oroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three
 ```
 
 ### Available packages
 
 | Package | Description |
 |---|---|
-| `@oroya/core` | Scene graph, nodes, components, serialization, math utilities |
-| `@oroya/renderer-three` | WebGL renderer powered by Three.js |
-| `@oroya/renderer-svg` | SVG renderer for 2D path-based graphics |
-| `@oroya/loader-gltf` | Load glTF models into an Oroya scene |
+| `@joroya/core` | Scene graph, nodes, components, serialization, math utilities |
+| `@joroya/renderer-three` | WebGL renderer powered by Three.js |
+| `@joroya/renderer-svg` | SVG renderer for 2D path-based graphics |
+| `@joroya/loader-gltf` | Load glTF models into an Oroya scene |
 
-> **Note:** `@oroya/renderer-three` and `@oroya/loader-gltf` have `three` as a peer dependency. Make sure it is installed in your project: `npm install three`.
+> **Note:** `@joroya/renderer-three` and `@joroya/loader-gltf` have `three` as a peer dependency. Make sure it is installed in your project: `npm install three`.
 
 ---
 
@@ -67,8 +67,8 @@ This minimal example creates a scene with a camera and a red cube, then renders 
 ### 2. Scene Setup (`main.ts`)
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 // --- Scene ---
 const scene = new Scene();
@@ -180,7 +180,7 @@ Oroya provides factory functions for creating geometry components:
 ### Box
 
 ```typescript
-import { createBox } from '@oroya/core';
+import { createBox } from '@joroya/core';
 
 const box = createBox(2, 1, 3); // width, height, depth
 node.addComponent(box);
@@ -189,7 +189,7 @@ node.addComponent(box);
 ### Sphere
 
 ```typescript
-import { createSphere } from '@oroya/core';
+import { createSphere } from '@joroya/core';
 
 const sphere = createSphere(0.5, 32, 32); // radius, widthSegments, heightSegments
 node.addComponent(sphere);
@@ -198,7 +198,7 @@ node.addComponent(sphere);
 ### Path2D (for SVG rendering)
 
 ```typescript
-import { createPath2D } from '@oroya/core';
+import { createPath2D } from '@joroya/core';
 
 const triangle = createPath2D([
   { command: 'moveTo', args: [50, 0] },
@@ -216,7 +216,7 @@ node.addComponent(triangle);
 The `Material` component controls the visual appearance of a node. Its properties adapt to the chosen renderer.
 
 ```typescript
-import { Material } from '@oroya/core';
+import { Material } from '@joroya/core';
 
 // For 3D (Three.js renderer)
 node.addComponent(new Material({
@@ -241,7 +241,7 @@ Colors use the `ColorRGB` format where each channel ranges from `0` to `1`.
 A camera defines the viewpoint from which the scene is rendered. Attach it to a node and position it using the node's transform.
 
 ```typescript
-import { Camera, CameraType } from '@oroya/core';
+import { Camera, CameraType } from '@joroya/core';
 
 const cameraNode = new Node('camera');
 cameraNode.addComponent(new Camera({
@@ -267,10 +267,10 @@ The `ThreeRenderer` uses the first camera it finds in the scene. If none is pres
 
 ### Three.js (WebGL)
 
-Use `@oroya/renderer-three` for interactive, high-performance 3D scenes.
+Use `@joroya/renderer-three` for interactive, high-performance 3D scenes.
 
 ```typescript
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas') as HTMLCanvasElement,
@@ -295,10 +295,10 @@ The renderer automatically adds ambient and directional lights to the Three.js s
 
 ### SVG
 
-Use `@oroya/renderer-svg` for scalable 2D vector output - ideal for documentation, icons, or static illustrations.
+Use `@joroya/renderer-svg` for scalable 2D vector output - ideal for documentation, icons, or static illustrations.
 
 ```typescript
-import { renderToSVG } from '@oroya/renderer-svg';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const svgString = renderToSVG(scene, {
   width: 200,
@@ -362,15 +362,15 @@ requestAnimationFrame(animate);
 
 ## Loading glTF Models
 
-The `@oroya/loader-gltf` package lets you load standard glTF/GLB files and convert them into Oroya scene nodes.
+The `@joroya/loader-gltf` package lets you load standard glTF/GLB files and convert them into Oroya scene nodes.
 
 ```bash
-npm install @oroya/loader-gltf three
+npm install @joroya/loader-gltf three
 ```
 
 ```typescript
-import { loadGLTF } from '@oroya/loader-gltf';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { loadGLTF } from '@joroya/loader-gltf';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const gltfScene = await loadGLTF('/models/robot.glb');
 
@@ -395,7 +395,7 @@ requestAnimationFrame(loop);
 Oroya scenes can be serialized to JSON and deserialized back, making it easy to save/load scenes or transmit them over the network.
 
 ```typescript
-import { serialize, deserialize } from '@oroya/core';
+import { serialize, deserialize } from '@joroya/core';
 
 // Save scene to JSON
 const json = serialize(scene);
@@ -414,8 +414,8 @@ Wrap Oroya in a React component to integrate it into your UI:
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 function OroyaCanvas({ scene }: { scene: Scene }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

@@ -13,10 +13,10 @@ Cuando un nodo hijo rota, lo hace **relativo a su padre**. Si el padre también 
 ```
 Scene
 └── Sol (esfera amarilla, rota sobre sí mismo)
-    ├── Pivot Tierra (nodo vacío, rota → genera la órbita)
-    │   └── Tierra (esfera azul, desplazada en X)
-    │       ├── Pivot Luna (nodo vacío, rota más rápido)
-    │       │   └── Luna (esfera gris, desplazada en X)
+    ├── Pivot Tierra (nodo vacío, rota ↁEgenera la órbita)
+    ━E  └── Tierra (esfera azul, desplazada en X)
+    ━E      ├── Pivot Luna (nodo vacío, rota más rápido)
+    ━E      ━E  └── Luna (esfera gris, desplazada en X)
     └── Pivot Marte (nodo vacío, rota más lento)
         └── Marte (esfera roja, desplazada en X)
 ```
@@ -26,8 +26,8 @@ Scene
 ## Paso 1: Crear el Sol
 
 ```typescript
-import { Scene, Node, createSphere, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createSphere, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
 
@@ -119,15 +119,15 @@ function animate() {
   sun.transform.rotation = rotateY(time * 0.5);
   sun.transform.updateLocalMatrix();
 
-  // Pivot de la Tierra rota → la Tierra orbita el Sol
+  // Pivot de la Tierra rota ↁEla Tierra orbita el Sol
   earthPivot.transform.rotation = rotateY(time * 2);
   earthPivot.transform.updateLocalMatrix();
 
-  // Pivot de la Luna rota más rápido → la Luna orbita la Tierra
+  // Pivot de la Luna rota más rápido ↁEla Luna orbita la Tierra
   moonPivot.transform.rotation = rotateY(time * 8);
   moonPivot.transform.updateLocalMatrix();
 
-  // Pivot de Marte rota más lento → Marte tiene órbita más lenta
+  // Pivot de Marte rota más lento ↁEMarte tiene órbita más lenta
   marsPivot.transform.rotation = rotateY(time * 1.2);
   marsPivot.transform.updateLocalMatrix();
 
@@ -145,12 +145,12 @@ animate();
 La magia está en `updateWorldMatrices()` (llamado internamente por `renderer.render()`):
 
 1. El **Sol** tiene su propia worldMatrix.
-2. El **earthPivot** multiplica su rotación local × la worldMatrix del Sol.
-3. La **Tierra** multiplica su posición local (X=5) × la worldMatrix del pivotEarth. Resultado: orbita a distancia 5 del Sol.
+2. El **earthPivot** multiplica su rotación local ÁEla worldMatrix del Sol.
+3. La **Tierra** multiplica su posición local (X=5) ÁEla worldMatrix del pivotEarth. Resultado: orbita a distancia 5 del Sol.
 4. La **Luna** hace lo mismo relativo a la Tierra.
 
 ```
-worldMatrix(luna) = local(luna) × local(moonPivot) × local(earth) × local(earthPivot) × local(sun)
+worldMatrix(luna) = local(luna) ÁElocal(moonPivot) ÁElocal(earth) ÁElocal(earthPivot) ÁElocal(sun)
 ```
 
 ---
@@ -166,4 +166,4 @@ worldMatrix(luna) = local(luna) × local(moonPivot) × local(earth) × local(ear
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md) — renderer SVG y Path2D.
+➡�E�E[Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md)  Erenderer SVG y Path2D.

@@ -1,4 +1,4 @@
-import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@oroya/core';
+import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const cameraViewpointsControls: ControlDef[] = [
@@ -251,7 +251,7 @@ export function createCameraViewpointsScene(params: ParamValues) {
     crown.transform.position.y = 4.5 + Math.sin(time * 1.5) * 0.15;
     crown.transform.updateLocalMatrix();
 
-    // Animate floating inner spheres — orbit slowly + bob
+    // Animate floating inner spheres  Eorbit slowly + bob
     scene.traverse((node) => {
       if (node.name.startsWith('float-')) {
         const idx = parseInt(node.name.split('-')[1], 10);

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { Scene } from "@oroya/core";
-import { Camera, CameraType, ComponentType } from "@oroya/core";
-import { ThreeRenderer } from "@oroya/renderer-three";
+import type { Scene } from "@joroya/core";
+import { Camera, CameraType, ComponentType } from "@joroya/core";
+import { ThreeRenderer } from "@joroya/renderer-three";
 
 interface SceneResult {
   scene: Scene;
   animate: (time: number) => void;
-  cameraNode?: import("@oroya/core").Node;
+  cameraNode?: import("@joroya/core").Node;
 }
 
 interface LiveDemoProps {

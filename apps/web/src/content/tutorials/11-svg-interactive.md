@@ -32,7 +32,7 @@ sequenceDiagram
     User->>SVG: click / hover / wheel
     SVG->>Oroya: dispatch InteractionEvent
     Oroya->>Handler: node.on('click', handler)
-    Note over Oroya: Event bubbling (hijo → padre)
+    Note over Oroya: Event bubbling (hijo ↁEpadre)
 ```
 
 ---
@@ -44,8 +44,8 @@ import {
   Scene, Node, Camera, CameraType,
   Material, Interactive,
   createBox, createSphere, createPath2D,
-} from '@oroya/core';
-import { renderToSVGElement } from '@oroya/renderer-svg';
+} from '@joroya/core';
+import { renderToSVGElement } from '@joroya/renderer-svg';
 ```
 
 ---
@@ -166,7 +166,7 @@ group.on('click', (e) => {
 
 ---
 
-## Paso 7: Grilla interactiva — ejemplo completo
+## Paso 7: Grilla interactiva  Eejemplo completo
 
 Un ejemplo práctico con múltiples elementos interactivos:
 
@@ -298,7 +298,7 @@ const result = renderToSVGElement(scene, {
 // Actualizar la referencia de dispose
 ```
 
-> **Nota:** A diferencia de Three.js (que re-renderiza en un loop), el SVG renderer es funcional — cada llamada genera un SVG nuevo. Para animaciones, usa el componente `Animation` (SVG nativo) o re-renderiza periódicamente.
+> **Nota:** A diferencia de Three.js (que re-renderiza en un loop), el SVG renderer es funcional  Ecada llamada genera un SVG nuevo. Para animaciones, usa el componente `Animation` (SVG nativo) o re-renderiza periódicamente.
 
 ---
 
@@ -333,4 +333,4 @@ Has completado todos los tutoriales de SVG. Ahora puedes:
 - Crear dashboards interactivos SVG con event delegation.
 - Usar `renderToSVG` en Node.js para server-side rendering.
 
-→ [Volver al índice de tutoriales](./README.md)
+ↁE[Volver al índice de tutoriales](./README.md)

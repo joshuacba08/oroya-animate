@@ -26,7 +26,7 @@ import {
   SvgFilterDef,
   SvgMaskDef,
   TextGeometryDef,
-} from '@oroya/core';
+} from '@joroya/core';
 
 // ─── Shared Helpers ─────────────────────────────────────────
 
@@ -72,7 +72,7 @@ function orthoViewBox(cam: OrthographicCameraDef, camNode: Node): string {
 }
 
 /**
- * Extract a 2D affine transform `matrix(a,b,c,d,e,f)` from a column-major 4×4 matrix.
+ * Extract a 2D affine transform `matrix(a,b,c,d,e,f)` from a column-major 4ÁE matrix.
  * Returns an empty string when the matrix is identity (no transform needed).
  *
  * Column-major layout:
@@ -113,7 +113,7 @@ function pathToD(path: { command: string; args: number[] }[]): string {
  */
 class GradientCollector {
   private counter = 0;
-  private map = new Map<GradientDef, string>(); // gradient def → id
+  private map = new Map<GradientDef, string>(); // gradient def ↁEid
   private filterMap = new Map<SvgFilterDef, string>();
   private clipPathMap = new Map<SvgClipPathDef, string>();
   private maskMap = new Map<SvgMaskDef, string>();
@@ -606,7 +606,7 @@ function renderNodeToString(node: Node, indent: string, gradients: GradientColle
     return lines.join('\n');
   }
 
-  // Leaf node without geometry — nothing to render
+  // Leaf node without geometry  Enothing to render
   return '';
 }
 
@@ -777,7 +777,7 @@ function renderNodeToDom(
 
     parent.appendChild(g);
   } else if (geoEl) {
-    // Leaf with geometry but no transform — append directly
+    // Leaf with geometry but no transform  Eappend directly
     geoEl.setAttribute('data-oroya-id', node.id);
     applyCssAttrs(geoEl, node);
     applyStyleAttrsToElement(geoEl, mat, gradients);
@@ -786,7 +786,7 @@ function renderNodeToDom(
     nodeElementMap.set(node.id, geoEl);
     parent.appendChild(geoEl);
   }
-  // else: leaf without geometry — skip
+  // else: leaf without geometry  Eskip
 }
 
 /**
@@ -797,10 +797,10 @@ function renderNodeToDom(
  * transforms compose naturally through SVG nesting.
  *
  * Supported geometries:
- * - **Path2D** → `<path>`
- * - **Box** → `<rect>` (width × height, depth ignored)
- * - **Sphere** → `<circle>` (radius)
- * - **Text** → `<text>`
+ * - **Path2D** ↁE`<path>`
+ * - **Box** ↁE`<rect>` (width ÁEheight, depth ignored)
+ * - **Sphere** ↁE`<circle>` (radius)
+ * - **Text** ↁE`<text>`
  *
  * Gradients defined in `MaterialDef.fillGradient` / `strokeGradient` are
  * automatically collected and emitted as `<defs>` in the SVG.

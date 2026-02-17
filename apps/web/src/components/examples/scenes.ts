@@ -3,11 +3,16 @@ import {
   Node,
   createBox,
   createSphere,
+  Geometry,
+  GeometryPrimitive,
   Material,
   Camera,
   CameraType,
-} from "@oroya/core";
-import { SvJs, Gen } from "@oroya/renderer-svg";
+  AnimationMixer,
+  type AnimationClip,
+} from "@joroya/core";
+import { loadGLTF } from "@joroya/loader-gltf";
+import { SvJs, Gen } from "@joroya/renderer-svg";
 import type { ExampleDef } from "./ExampleCard";
 
 function rotateY(angle: number) {
@@ -649,11 +654,11 @@ function createCircleOverlay() {
 
   const cx = 500;
 
-  // Concentric circle sets — two overlapping groups
+  // Concentric circle sets  Etwo overlapping groups
   for (let i = 1; i <= 6; i++) {
     const r = 50 * i;
-    const cy1 = 800 - r; // Bottom → up
-    const cy2 = 200 + r; // Top → down
+    const cy1 = 800 - r; // Bottom ↁEup
+    const cy2 = 200 + r; // Top ↁEdown
 
     // Blueish set (bottom up)
     const blue = new Node(`blue-${i}`);
@@ -1030,9 +1035,260 @@ function createInteractiveGalaxy() {
   };
 }
 
+// ── PBR Material Showcase ──────────────────────────────────────────────
+
+function createPBRShowcase() {
+  const scene = new Scene();
+
+  const cam = new Node("camera");
+  cam.addComponent(
+    new Camera({
+      type: CameraType.Perspective,
+      fov: 50,
+      aspect: 16 / 9,
+      near: 0.1,
+      far: 200,
+    })
+  );
+  cam.transform.position = { x: 0, y: 2, z: 8 };
+  scene.add(cam);
+
+  // Ground plane
+  const ground = new Node("ground");
+  ground.addComponent(createBox(16, 0.1, 16));
+  ground.addComponent(
+    new Material({
+      color: { r: 0.08, g: 0.08, b: 0.12 },
+      metalness: 0.3,
+      roughness: 0.9,
+    })
+  );
+  ground.transform.position = { x: 0, y: -1.5, z: 0 };
+  scene.add(ground);
+
+  // Create a row of spheres with varying metalness/roughness
+  const spheres: Node[] = [];
+  const count = 5;
+  const spacing = 2.2;
+  const totalWidth = (count - 1) * spacing;
+
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const sphere = new Node(`pbr-sphere-${i}`);
+    sphere.addComponent(createSphere(0.7, 32, 32));
+    sphere.addComponent(
+      new Material({
+        color: { r: 0.85, g: 0.55, b: 0.25 },
+        metalness: t,
+        roughness: 1.0 - t,
+        emissive: { r: t * 0.15, g: t * 0.05, b: 0 },
+      })
+    );
+    sphere.transform.position = { x: i * spacing - totalWidth / 2, y: 0, z: 0 };
+    scene.add(sphere);
+    spheres.push(sphere);
+  }
+
+  // Create a second row of boxes with different PBR combos
+  const boxes: Node[] = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const box = new Node(`pbr-box-${i}`);
+    box.addComponent(createBox(0.9, 0.9, 0.9));
+    box.addComponent(
+      new Material({
+        color: { r: 0.2 + t * 0.6, g: 0.3, b: 0.85 - t * 0.5 },
+        metalness: 1.0 - t,
+        roughness: t,
+      })
+    );
+    box.transform.position = { x: i * spacing - totalWidth / 2, y: 0, z: -2.5 };
+    scene.add(box);
+    boxes.push(box);
+  }
+
+  // Emissive beacon
+  const beacon = new Node("beacon");
+  beacon.addComponent(createSphere(0.35, 24, 24));
+  beacon.addComponent(
+    new Material({
+      color: { r: 1.0, g: 0.3, b: 0.1 },
+      metalness: 0.0,
+      roughness: 0.4,
+      emissive: { r: 1.0, g: 0.2, b: 0.05 },
+    })
+  );
+  beacon.transform.position = { x: 0, y: 2, z: 0 };
+  scene.add(beacon);
+
+  function animate(time: number) {
+    for (let i = 0; i < spheres.length; i++) {
+      spheres[i].transform.position.y = Math.sin(time * 1.2 + i * 0.8) * 0.3;
+      spheres[i].transform.updateLocalMatrix();
+    }
+    for (let i = 0; i < boxes.length; i++) {
+      boxes[i].transform.rotation = composeYX(time * (0.3 + i * 0.15), 0.3);
+      boxes[i].transform.updateLocalMatrix();
+    }
+    beacon.transform.position.y = 2 + Math.sin(time * 2.5) * 0.3;
+    beacon.transform.updateLocalMatrix();
+  }
+
+  return { scene, animate };
+}
+
+// ── Orthographic Camera Demo ───────────────────────────────────────────
+
+function createOrthoDemo() {
+  const scene = new Scene();
+
+  const cam = new Node("ortho-camera");
+  cam.addComponent(
+    new Camera({
+      type: CameraType.Orthographic,
+      left: -8,
+      right: 8,
+      top: 8,
+      bottom: -8,
+      near: 0.1,
+      far: 100,
+    })
+  );
+  cam.transform.position = { x: 5, y: 8, z: 5 };
+  scene.add(cam);
+
+  // Ground plane
+  const ground = new Node("ground");
+  ground.addComponent(createBox(18, 0.08, 18));
+  ground.addComponent(
+    new Material({
+      color: { r: 0.12, g: 0.12, b: 0.16 },
+      metalness: 0.1,
+      roughness: 0.95,
+    })
+  );
+  ground.transform.position = { x: 0, y: -0.04, z: 0 };
+  scene.add(ground);
+
+  // Isometric-like grid of towers
+  const towers: Node[] = [];
+  const gridSize = 5;
+  const spacing = 2.5;
+  const offset = ((gridSize - 1) * spacing) / 2;
+
+  for (let x = 0; x < gridSize; x++) {
+    for (let z = 0; z < gridSize; z++) {
+      const dist = Math.sqrt(
+        Math.pow(x - (gridSize - 1) / 2, 2) + Math.pow(z - (gridSize - 1) / 2, 2)
+      );
+      const height = 0.5 + (1 - dist / (gridSize * 0.7)) * 3;
+
+      const tower = new Node(`tower-${x}-${z}`);
+      tower.addComponent(createBox(1.2, Math.max(0.3, height), 1.2));
+
+      const r = 0.15 + (x / gridSize) * 0.5;
+      const g = 0.2 + (z / gridSize) * 0.4;
+      const b = 0.6;
+      tower.addComponent(
+        new Material({
+          color: { r, g, b },
+          metalness: 0.4,
+          roughness: 0.6,
+        })
+      );
+      tower.transform.position = {
+        x: x * spacing - offset,
+        y: Math.max(0.3, height) / 2,
+        z: z * spacing - offset,
+      };
+      scene.add(tower);
+      towers.push(tower);
+    }
+  }
+
+  function animate(time: number) {
+    let idx = 0;
+    for (let x = 0; x < gridSize; x++) {
+      for (let z = 0; z < gridSize; z++) {
+        const dist = Math.sqrt(
+          Math.pow(x - (gridSize - 1) / 2, 2) + Math.pow(z - (gridSize - 1) / 2, 2)
+        );
+        const height = 0.5 + (1 - dist / (gridSize * 0.7)) * 3 +
+          Math.sin(time * 1.5 - dist * 0.8) * 0.5;
+        const h = Math.max(0.3, height);
+
+        towers[idx].transform.position.y = h / 2;
+        towers[idx].transform.scale = { x: 1, y: h / Math.max(0.3, 0.5 + (1 - dist / (gridSize * 0.7)) * 3), z: 1 };
+        towers[idx].transform.updateLocalMatrix();
+        idx++;
+      }
+    }
+  }
+
+  return { scene, animate };
+}
+
 // ── Export all examples ────────────────────────────────────────────────
 
+function createGLTFDemo() {
+  const scene = new Scene();
+  const mixer = new AnimationMixer(scene);
+
+  const cam = new Node("camera");
+  cam.addComponent(
+    new Camera({
+      type: CameraType.Perspective,
+      fov: 60,
+      aspect: 16 / 9,
+      near: 0.1,
+      far: 100,
+    })
+  );
+  cam.transform.position = { x: 0, y: 1.5, z: 4 };
+  scene.add(cam);
+
+  // Lighting (simulated by adding emissive materials or just ambient light in renderer)
+  // Our renderer has default lights, so the model should be visible.
+
+  // Load the model asynchronously
+  // Note: The factory function is synchronous, but we can load async content into the scene.
+  loadGLTF('/models/BoxAnimated.glb').then(({ scene: gltfScene, animations }: { scene: Scene, animations: AnimationClip[] }) => {
+    // Add the glTF scene root to our main scene
+    scene.root.add(gltfScene.root);
+
+    // Play the first animation if available
+    if (animations.length > 0) {
+      mixer.play(animations[0]);
+    }
+  }).catch((err: unknown) => {
+    console.error("Failed to load glTF model:", err);
+  });
+
+  let lastTime = -1;
+
+  return {
+    scene,
+    animate: (time: number) => {
+      // time is in seconds
+      if (lastTime === -1) {
+        lastTime = time;
+      }
+      const delta = time - lastTime;
+      lastTime = time;
+      mixer.update(delta);
+    }
+  };
+}
+
 export const EXAMPLES: ExampleDef[] = [
+  {
+    id: "gltf-animation",
+    title: "glTF Animation",
+    description: "Carga de modelo .glb (BoxAnimated) y reproducción de animaciones usando AnimationMixer.",
+    category: "3d",
+    factory: createGLTFDemo,
+  },
+
   {
     id: "colour-spiral",
     title: "Colour Spiral",
@@ -1136,5 +1392,21 @@ export const EXAMPLES: ExampleDef[] = [
       "Sistema de partículas con efecto de paralaje que sigue al mouse. Demuestra trackCursor y reactividad.",
     category: "svjs",
     factory: createInteractiveGalaxy,
+  },
+  {
+    id: "pbr-showcase",
+    title: "PBR Material Showcase",
+    description:
+      "Esferas y cubos con materiales PBR variando metalness, roughness y emissive. Demuestra las nuevas propiedades de Material para renderizado físico.",
+    category: "3d",
+    factory: createPBRShowcase,
+  },
+  {
+    id: "ortho-demo",
+    title: "Orthographic Camera",
+    description:
+      "Vista ortográfica isométrica de una grilla de torres animadas. Demuestra CameraType.Orthographic con perspectiva sin distorsión.",
+    category: "3d",
+    factory: createOrthoDemo,
   },
 ];

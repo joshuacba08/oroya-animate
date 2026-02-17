@@ -1,9 +1,9 @@
-# @oroya/renderer-three
+# @joroya/renderer-three
 
 > Three.js (WebGL) renderer for Oroya Animate scene graphs
 
-[![NPM Version](https://img.shields.io/npm/v/@oroya/renderer-three?style=flat-square)](https://www.npmjs.com/package/@oroya/renderer-three)
-[![License](https://img.shields.io/npm/l/@oroya/renderer-three?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/renderer-three?style=flat-square)](https://www.npmjs.com/package/@joroya/renderer-three)
+[![License](https://img.shields.io/npm/l/@joroya/renderer-three?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 
 Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
 
@@ -19,14 +19,14 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 ## Installation
 
 ```bash
-npm install @oroya/core @oroya/renderer-three three
+npm install @joroya/core @joroya/renderer-three three
 ```
 
 ## Quick Example
 
 ```typescript
-import { Scene, Node, Camera, CameraType, createBox, Material } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, Camera, CameraType, createBox, Material } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 // Create scene
 const scene = new Scene();
@@ -97,8 +97,8 @@ renderer.dispose(): void
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
   
   // Your code here
 </script>

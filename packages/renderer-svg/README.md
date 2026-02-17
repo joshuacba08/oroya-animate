@@ -1,9 +1,9 @@
-# @oroya/renderer-svg
+# @joroya/renderer-svg
 
 > Lightweight SVG renderer for Oroya Animate scene graphs
 
-[![NPM Version](https://img.shields.io/npm/v/@oroya/renderer-svg?style=flat-square)](https://www.npmjs.com/package/@oroya/renderer-svg)
-[![License](https://img.shields.io/npm/l/@oroya/renderer-svg?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/renderer-svg?style=flat-square)](https://www.npmjs.com/package/@joroya/renderer-svg)
+[![License](https://img.shields.io/npm/l/@joroya/renderer-svg?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 
 Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
 
@@ -14,19 +14,19 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 - 🎭 **Filters & Gradients** - Advanced SVG features support
 - 🔄 **Server-Side Rendering** - Works in Node.js
 - 📦 **2D Primitives** - Circle, rectangle, path, and more
-- 🖼️ **Export** - Save as SVG files or DOM elements
+- 🖼�E�E**Export** - Save as SVG files or DOM elements
 
 ## Installation
 
 ```bash
-npm install @oroya/core @oroya/renderer-svg
+npm install @joroya/core @joroya/renderer-svg
 ```
 
 ## Quick Example
 
 ```typescript
-import { Scene, Node, createCircle, Material } from '@oroya/core';
-import { renderSVG } from '@oroya/renderer-svg';
+import { Scene, Node, createCircle, Material } from '@joroya/core';
+import { renderSVG } from '@joroya/renderer-svg';
 
 // Create scene
 const scene = new Scene();
@@ -74,8 +74,8 @@ Returns a native SVG DOM element that can be appended to the document or exporte
 Perfect for creating generative art and data visualizations:
 
 ```typescript
-import { Scene, Node, createPath2D, Material } from '@oroya/core';
-import { renderSVG } from '@oroya/renderer-svg';
+import { Scene, Node, createPath2D, Material } from '@joroya/core';
+import { renderSVG } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 
@@ -132,8 +132,8 @@ link.click();
 
 ```html
 <script type="module">
-  import { Scene, Node, createCircle } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
-  import { renderSVG } from 'https://unpkg.com/@oroya/renderer-svg@0.3.0/dist/index.js';
+  import { Scene, Node, createCircle } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
   
   // Your code here
 </script>

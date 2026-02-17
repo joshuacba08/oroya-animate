@@ -2,7 +2,7 @@ import {
   Camera, CameraType,
   createBox, createSphere, Material,
   Node, Scene,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 /* ── Controls ─────────────────────────────────────────────────────────── */
@@ -37,11 +37,11 @@ export function createCircleOverlayScene(params: ParamValues) {
 
   const cx = 500;
 
-  // Concentric circle sets — two overlapping groups
+  // Concentric circle sets  Etwo overlapping groups
   for (let i = 1; i <= rings; i++) {
     const r = 50 * i;
-    const cy1 = 800 - r; // Bottom → up
-    const cy2 = 200 + r; // Top → down
+    const cy1 = 800 - r; // Bottom ↁEup
+    const cy2 = 200 + r; // Top ↁEdown
 
     // Blueish set (bottom up)
     const blue = new Node(`blue-${i}`);

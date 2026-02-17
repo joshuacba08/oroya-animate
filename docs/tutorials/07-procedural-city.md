@@ -15,8 +15,8 @@ En lugar de colocar objetos uno por uno, definimos **reglas** que generan la ciu
 ## Paso 1: Definir los parámetros de la ciudad
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 interface CityConfig {
   gridSize: number;       // Grilla NxN de cuadras
@@ -115,7 +115,7 @@ for (let row = 0; row < config.gridSize; row++) {
 
 ---
 
-## Paso 4: Agregar detalles — Parque central y torre destacada
+## Paso 4: Agregar detalles  EParque central y torre destacada
 
 ```typescript
 // Parque central (cuadra central diferente)
@@ -204,10 +204,10 @@ Todo gestionado por el scene graph con actualizaciones de matrices automáticas.
 
 ## Técnicas aplicadas
 
-1. **Generación procedural** — Sin hardcodear posiciones, todo es algorítmico.
-2. **Agrupación jerárquica** — Cada cuadra es un nodo padre, facilitando operaciones como "eliminar toda la cuadra".
-3. **Scene graph como datos** — Usar `findNodeByName` para localizar y modificar secciones.
-4. **Variación controlada** — Aleatorización dentro de rangos definidos para resultados orgánicos pero coherentes.
+1. **Generación procedural**  ESin hardcodear posiciones, todo es algorítmico.
+2. **Agrupación jerárquica**  ECada cuadra es un nodo padre, facilitando operaciones como "eliminar toda la cuadra".
+3. **Scene graph como datos**  EUsar `findNodeByName` para localizar y modificar secciones.
+4. **Variación controlada**  EAleatorización dentro de rangos definidos para resultados orgánicos pero coherentes.
 
 ---
 
@@ -222,4 +222,4 @@ Todo gestionado por el scene graph con actualizaciones de matrices automáticas.
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 8: Multi-Renderer](./08-multi-renderer.md) — misma escena en Three.js y SVG.
+➡�E�E[Tutorial 8: Multi-Renderer](./08-multi-renderer.md)  Emisma escena en Three.js y SVG.

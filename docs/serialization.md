@@ -20,7 +20,7 @@ Oroya Animate incluye un sistema de serialización JSON que permite guardar y ca
 La función `serialize` convierte todo el scene graph a un string JSON formateado:
 
 ```typescript
-import { Scene, Node, createBox, Material, serialize } from '@oroya/core';
+import { Scene, Node, createBox, Material, serialize } from '@joroya/core';
 
 const scene = new Scene();
 
@@ -52,7 +52,7 @@ flowchart LR
 La función `deserialize` reconstruye una `Scene` funcional desde un string JSON:
 
 ```typescript
-import { deserialize } from '@oroya/core';
+import { deserialize } from '@joroya/core';
 
 const restoredScene = deserialize(json);
 
@@ -60,10 +60,10 @@ const found = restoredScene.findNodeByName('hero-cube');
 console.log(found?.transform.position); // { x: 3, y: 0, z: -1 }
 ```
 
-La escena restaurada es completamente funcional — puede montarse en cualquier renderer:
+La escena restaurada es completamente funcional  Epuede montarse en cualquier renderer:
 
 ```typescript
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const renderer = new ThreeRenderer({ canvas, width, height });
 renderer.mount(restoredScene);
@@ -175,17 +175,17 @@ Todos los componentes se serializan usando spread (`{ ...component }`):
 | `Geometry` | `definition` completo (tipo + parámetros de geometría) |
 | `Material` | `definition` completo (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
 | `Camera` | `definition` completo (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
-| `Animation` | `animations[]` — array de `SvgAnimationDef` (animate / animateTransform) |
+| `Animation` | `animations[]`  Earray de `SvgAnimationDef` (animate / animateTransform) |
 
 ### En deserialización (`deserialize`)
 
 | Componente | ¿Se restaura? | Método |
 |------------|----------------|--------|
-| `Transform` | ✅ | `Object.assign(new Transform(), data)` |
-| `Geometry` | ✅ | `new Geometry(data.definition)` |
-| `Material` | ✅ | `new Material(data.definition)` |
-| `Camera` | ✅ | `new Camera(data.definition)` |
-| `Animation` | ✅ | `new Animation(data.animations)` |
+| `Transform` | ✁E| `Object.assign(new Transform(), data)` |
+| `Geometry` | ✁E| `new Geometry(data.definition)` |
+| `Material` | ✁E| `new Material(data.definition)` |
+| `Camera` | ✁E| `new Camera(data.definition)` |
+| `Animation` | ✁E| `new Animation(data.animations)` |
 
 > **Nota:** Todos los componentes se serializan y deserializan correctamente, incluyendo `Camera` y `Animation`.
 
@@ -193,23 +193,23 @@ Todos los componentes se serializan usando spread (`{ ...component }`):
 
 | Dato | ¿Se preserva? |
 |------|----------------|
-| UUID del nodo | ✅ Exacto |
-| Nombre del nodo | ✅ |
-| Jerarquía padre-hijo | ✅ |
-| Posición | ✅ |
-| Rotación (quaternion) | ✅ |
-| Escala | ✅ |
-| Matrices (local + world) | ✅ |
-| Tipo de geometría | ✅ |
-| Parámetros de geometría | ✅ |
-| Color del material | ✅ |
-| Opacidad | ✅ |
-| Fill/Stroke (SVG) | ✅ |
-| Gradientes (fill/stroke) | ✅ |
-| Filter / ClipPath / Mask | ✅ |
-| Cámara (Perspective + Orthographic) | ✅ |
-| Animaciones SVG | ✅ |
-| `cssClass` / `cssId` | ✅ |
+| UUID del nodo | ✁EExacto |
+| Nombre del nodo | ✁E|
+| Jerarquía padre-hijo | ✁E|
+| Posición | ✁E|
+| Rotación (quaternion) | ✁E|
+| Escala | ✁E|
+| Matrices (local + world) | ✁E|
+| Tipo de geometría | ✁E|
+| Parámetros de geometría | ✁E|
+| Color del material | ✁E|
+| Opacidad | ✁E|
+| Fill/Stroke (SVG) | ✁E|
+| Gradientes (fill/stroke) | ✁E|
+| Filter / ClipPath / Mask | ✁E|
+| Cámara (Perspective + Orthographic) | ✁E|
+| Animaciones SVG | ✁E|
+| `cssClass` / `cssId` | ✁E|
 
 ---
 
@@ -271,8 +271,8 @@ input.addEventListener('change', async (e) => {
 
 ```typescript
 // Recibir la escena serializada, renderizar a SVG en el servidor
-import { deserialize } from '@oroya/core';
-import { renderToSVG } from '@oroya/renderer-svg';
+import { deserialize } from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 function handleRequest(jsonBody: string): string {
   const scene = deserialize(jsonBody);
@@ -286,7 +286,7 @@ Guardar escenas como `.json` permite:
 
 ```
 scenes/
-├── level-01.json    ← Versionado con git
+├── level-01.json    ↁEVersionado con git
 ├── level-02.json
 └── hub-world.json
 ```
@@ -309,7 +309,7 @@ Los diffs de Git muestran exactamente qué cambió:
 | Limitación | Impacto | Workaround |
 |------------|---------|------------|
 | UUIDs se preservan | Dos escenas del mismo JSON tendrán nodos con IDs idénticos | Regenerar IDs post-deserialización si se necesitan escenas independientes |
-| Camera no se deserializa | ~~La escena pierde su cámara al restaurar~~ | ✅ **Resuelto** — Camera y Animation se deserializan correctamente |
+| Camera no se deserializa | ~~La escena pierde su cámara al restaurar~~ | ✁E**Resuelto**  ECamera y Animation se deserializan correctamente |
 | Componentes desconocidos | Si se agrega un tipo custom y no se registra en el `switch`, se ignora | Extender `deserializeNode()` con nuevos tipos |
 | xxxxxxxxxx const snapshot = new Map<string, Vec3>();​scene.traverse(node => {  const wm = node.transform.worldMatrix;  snapshot.set(node.id, {    x: wm[12], // posición X del mundo    y: wm[13], // posición Y del mundo    z: wm[14], // posición Z del mundo  });});typescript | Archivos grandes para escenas con muchos nodos | Futuro: serialización binaria (MessagePack) |
-| Sin referencia a `component.node` | La referencia circular `component → node` se pierde | Se reconstruye automáticamente por `addComponent()` |
+| Sin referencia a `component.node` | La referencia circular `component ↁEnode` se pierde | Se reconstruye automáticamente por `addComponent()` |

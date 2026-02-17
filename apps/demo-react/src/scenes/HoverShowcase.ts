@@ -1,11 +1,11 @@
 import {
     Scene, Node, createBox, createSphere, Material, Camera, CameraType,
     Interactive,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 /**
- * Hover Showcase – demuestra pointerenter / pointerleave con 5 efectos
+ * Hover Showcase  Edemuestra pointerenter / pointerleave con 5 efectos
  * distintos y diferentes cursores CSS.
  *
  * Cada objeto tiene un efecto hover único:

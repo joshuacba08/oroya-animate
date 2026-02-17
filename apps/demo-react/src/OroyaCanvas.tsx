@@ -1,5 +1,5 @@
-import { Scene, Camera, CameraType, ComponentType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Camera, CameraType, ComponentType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 import { useEffect, useRef, useCallback } from 'react';
 
 export type AnimateCallback = (time: number, scene: Scene) => void;

@@ -1,4 +1,4 @@
-import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@oroya/core';
+import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const proceduralCityControls: ControlDef[] = [
@@ -277,7 +277,7 @@ export function createProceduralCityScene(params: ParamValues) {
         const bx = (rand() - 0.5) * Math.max(0, maxOffX) * 2;
         const bz = (rand() - 0.5) * Math.max(0, maxOffZ) * 2;
 
-        // Building body — color based on height (taller = lighter)
+        // Building body  Ecolor based on height (taller = lighter)
         const heightRatio = height / (maxHeight * 1.5);
         const bColor = lerpColor(
           randomColor(rand, cs.buildingBase, cs.buildingVariance),

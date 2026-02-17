@@ -21,7 +21,7 @@ Los archivos `primitives.ts`, `Node.ts` y `json.ts` importaban desde `'../compon
 
 ### Consecuencia
 
-El build de `@oroya/core` fallaba completamente — ni CJS, ni ESM, ni las declaraciones de tipos podían generarse.
+El build de `@joroya/core` fallaba completamente  Eni CJS, ni ESM, ni las declaraciones de tipos podían generarse.
 
 ### Solución aplicada
 
@@ -56,7 +56,7 @@ export { Camera, CameraType } from './Camera';
 ### Error
 
 ```
-X [ERROR] Failed to resolve entry for package "@oroya/core".
+X [ERROR] Failed to resolve entry for package "@joroya/core".
 The package may have incorrect main/module/exports specified in its package.json.
 ```
 
@@ -76,8 +76,8 @@ Los 4 `package.json` de los paquetes declaraban:
 ```
 
 Pero **tsup**, cuando el paquete tiene `"type": "module"`, genera:
-- ESM → `index.js` (no `.mjs`)
-- CJS → `index.cjs`
+- ESM ↁE`index.js` (no `.mjs`)
+- CJS ↁE`index.cjs`
 
 El archivo `./dist/index.mjs` nunca existía.
 
@@ -156,8 +156,8 @@ También se eliminaron los campos `"references"` ya que son innecesarios cuando 
 
 - **Regla**: Si usás tsup para generar `.d.ts`, no uses `composite: true` en ese tsconfig.
 - **Alternativa**: Tener dos tsconfigs:
-  - `tsconfig.json` — para el IDE y `tsc --build` (con `composite: true`)
-  - `tsconfig.build.json` — para tsup (con `composite: false`)
+  - `tsconfig.json`  Epara el IDE y `tsc --build` (con `composite: true`)
+  - `tsconfig.build.json`  Epara tsup (con `composite: false`)
   
   ```typescript
   // tsup.config.ts
@@ -187,7 +187,7 @@ El campo `exports` tenía `types` como última condición:
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"  // ← nunca se alcanza
+      "types": "./dist/index.d.ts"  // ↁEnunca se alcanza
     }
   }
 }
@@ -216,7 +216,7 @@ TypeScript podría no encontrar las declaraciones de tipos del paquete, causando
 ### Cómo evitarlo
 
 - **Regla**: `types` siempre debe ser la **primera** condición en `exports`.
-- **Referencia**: [TypeScript docs — Bundler Module Resolution](https://www.typescriptlang.org/docs/handbook/modules/reference.html#packagejson-exports)
+- **Referencia**: [TypeScript docs  EBundler Module Resolution](https://www.typescriptlang.org/docs/handbook/modules/reference.html#packagejson-exports)
 - **Automatización**: [Are The Types Wrong?](https://arethetypeswrong.github.io/) analiza paquetes publicados y detecta estos problemas.
 
 ---
@@ -264,7 +264,7 @@ error TS2339: Property 'stroke' does not exist on type 'MaterialDef'.
 
 ### Causa
 
-El renderer SVG (`@oroya/renderer-svg`) usaba propiedades `fill`, `stroke` y `strokeWidth` del material, pero la interfaz `MaterialDef` en `@oroya/core` solo definía `color` y `opacity`.
+El renderer SVG (`@joroya/renderer-svg`) usaba propiedades `fill`, `stroke` y `strokeWidth` del material, pero la interfaz `MaterialDef` en `@joroya/core` solo definía `color` y `opacity`.
 
 ### Consecuencia
 
@@ -287,7 +287,7 @@ export interface MaterialDef {
 ### Cómo evitarlo
 
 - **Regla**: Al diseñar interfaces compartidas, definirlas **antes** de implementar los consumidores.
-- **Práctica**: Usar un approach "contract-first" — cuando un paquete downstream necesita nuevas propiedades, actualizar primero la interfaz en el paquete core y luego implementar.
+- **Práctica**: Usar un approach "contract-first"  Ecuando un paquete downstream necesita nuevas propiedades, actualizar primero la interfaz en el paquete core y luego implementar.
 - **Automatización**: Compilar siempre todos los paquetes juntos (`pnpm build`) para detectar inconsistencias entre paquetes.
 
 ---
@@ -305,19 +305,19 @@ error TS1161: Unterminated regular expression literal.
 En `renderSVG.ts`, se usaba un salto de línea real dentro de un `join()` en un template literal:
 
 ```typescript
-// ❌ Salto de línea literal dentro de comillas simples
+// ❁ESalto de línea literal dentro de comillas simples
 ${paths.join('
       ')}
 ```
 
 ### Consecuencia
 
-Error de sintaxis que impedía la compilación del paquete `@oroya/renderer-svg`.
+Error de sintaxis que impedía la compilación del paquete `@joroya/renderer-svg`.
 
 ### Solución aplicada
 
 ```typescript
-// ✅ Usar escape sequence
+// ✁EUsar escape sequence
 ${paths.join('\n      ')}
 ```
 
@@ -339,7 +339,7 @@ error TS7006: Parameter 'child' implicitly has an 'any' type.
 
 ### Causa
 
-El paquete `@oroya/loader-gltf` dependía de `three` pero no tenía `@types/three` en `devDependencies`. El paquete hermano `@oroya/renderer-three` sí lo tenía, pero en un monorepo las dependencias no se comparten automáticamente entre paquetes.
+El paquete `@joroya/loader-gltf` dependía de `three` pero no tenía `@types/three` en `devDependencies`. El paquete hermano `@joroya/renderer-three` sí lo tenía, pero en un monorepo las dependencias no se comparten automáticamente entre paquetes.
 
 ### Consecuencia
 

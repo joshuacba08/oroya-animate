@@ -83,7 +83,7 @@ Click **Deploy** button. Vercel will:
 4. Build Astro site
 5. Deploy to CDN
 
-## ⚙️ Configuration Files
+## ⚙︁EConfiguration Files
 
 ### vercel.json
 
@@ -149,7 +149,7 @@ Or place in `apps/web/` directory:
 
 ### Important Notes
 
-⚠️ **Vercel needs access to workspace packages:**
+⚠�E�E**Vercel needs access to workspace packages:**
 - Build must run from monorepo root or include pnpm install at root
 - Packages must be built before building the web app
 - `workspace:*` dependencies must be resolved
@@ -202,12 +202,12 @@ Update root `package.json` to add deployment script:
 
 ### Environment Variables (Optional)
 
-Add in Vercel Dashboard → Settings → Environment Variables:
+Add in Vercel Dashboard ↁESettings ↁEEnvironment Variables:
 
 ```bash
 # Example variables
 PUBLIC_SITE_URL=https://oroya-animate.vercel.app
-PUBLIC_NPM_PACKAGE=@oroya/core
+PUBLIC_NPM_PACKAGE=@joroya/core
 PUBLIC_GITHUB_REPO=joshuacba08/oroya-animate
 ```
 
@@ -220,7 +220,7 @@ const siteUrl = import.meta.env.PUBLIC_SITE_URL;
 
 ### 1. Add Domain in Vercel
 
-1. Go to Project Settings → Domains
+1. Go to Project Settings ↁEDomains
 2. Add your domain (e.g., `oroya-animate.com`)
 3. Follow DNS configuration instructions
 
@@ -257,8 +257,8 @@ export default defineConfig({
 
 Vercel automatically deploys:
 
-- **Production:** Commits to `main` branch → `oroya-animate.vercel.app`
-- **Preview:** Pull requests → Unique preview URL per PR
+- **Production:** Commits to `main` branch ↁE`oroya-animate.vercel.app`
+- **Preview:** Pull requests ↁEUnique preview URL per PR
 
 ### Manual Deployment
 
@@ -278,8 +278,8 @@ vercel --prod --scope your-team
 ### Automatic Checks on PRs
 
 Vercel adds build status to PRs:
-- ✅ Build successful → "Visit Preview"
-- ❌ Build failed → See logs
+- ✁EBuild successful ↁE"Visit Preview"
+- ❁EBuild failed ↁESee logs
 
 ### Deployment Comments
 
@@ -290,7 +290,7 @@ Vercel bot comments on PRs with:
 
 ### Configure in GitHub
 
-Repository Settings → Integrations → Vercel:
+Repository Settings ↁEIntegrations ↁEVercel:
 - Enable status checks
 - Enable preview comments
 - Require build success before merge
@@ -313,7 +313,7 @@ For staging environments:
 
 ### Authentication
 
-Configure in Vercel Dashboard → Settings → Deployment Protection.
+Configure in Vercel Dashboard ↁESettings ↁEDeployment Protection.
 
 ## 📈 Analytics & Monitoring
 

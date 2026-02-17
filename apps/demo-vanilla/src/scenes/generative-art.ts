@@ -3,7 +3,7 @@ import {
     createBox, createSphere, Material,
     Node,
     Scene,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const generativeArtControls: ControlDef[] = [

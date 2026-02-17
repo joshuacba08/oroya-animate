@@ -7,18 +7,18 @@ This guide explains how to use Oroya Animate packages directly from CDN without 
 Oroya Animate packages are automatically available on multiple CDNs once published to NPM:
 
 ### 1. **unpkg** (Recommended)
-- URL: `https://unpkg.com/@oroya/[package]@[version]`
+- URL: `https://unpkg.com/@joroya/[package]@[version]`
 - Auto-updates: Yes
 - Fast: Yes
 - Examples below use unpkg
 
 ### 2. **jsDelivr**
-- URL: `https://cdn.jsdelivr.net/npm/@oroya/[package]@[version]`
+- URL: `https://cdn.jsdelivr.net/npm/@joroya/[package]@[version]`
 - CDN Stats: Available
 - Multi-CDN: Yes
 
 ### 3. **esm.sh**
-- URL: `https://esm.sh/@oroya/[package]@[version]`
+- URL: `https://esm.sh/@joroya/[package]@[version]`
 - Optimized for Deno
 - TypeScript support
 
@@ -28,36 +28,36 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
 ```html
 <!-- ESM (Module) - Latest -->
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@oroya/core/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core/dist/index.js';
 </script>
 
 <!-- ESM - Specific Version -->
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
 </script>
 
 <!-- CommonJS -->
-<script src="https://unpkg.com/@oroya/core@0.3.0/dist/index.cjs"></script>
+<script src="https://unpkg.com/@joroya/core@0.3.0/dist/index.cjs"></script>
 ```
 
 ### Three.js Renderer
 ```html
 <script type="module">
-  import { ThreeRenderer } from 'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
 </script>
 ```
 
 ### SVG Renderer
 ```html
 <script type="module">
-  import { renderSVG } from 'https://unpkg.com/@oroya/renderer-svg@0.3.0/dist/index.js';
+  import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
 </script>
 ```
 
 ### glTF Loader
 ```html
 <script type="module">
-  import { loadGLTF } from 'https://unpkg.com/@oroya/loader-gltf@0.3.0/dist/index.js';
+  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@0.3.0/dist/index.js';
 </script>
 ```
 
@@ -88,9 +88,9 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
       CameraType, 
       createBox, 
       Material 
-    } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+    } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
     
-    import { ThreeRenderer } from 'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js';
+    import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
 
     // Create scene
     const scene = new Scene();
@@ -170,9 +170,9 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
       Node, 
       createCircle, 
       Material 
-    } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+    } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
     
-    import { renderSVG } from 'https://unpkg.com/@oroya/renderer-svg@0.3.0/dist/index.js';
+    import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
 
     // Create scene
     const scene = new Scene();
@@ -213,30 +213,30 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
 </html>
 ```
 
-## ⚙️ Version Pinning Strategies
+## ⚙︁EVersion Pinning Strategies
 
 ### Latest Version (Auto-update)
 ```javascript
 // Always latest - not recommended for production
-import { Scene } from 'https://unpkg.com/@oroya/core/dist/index.js';
+import { Scene } from 'https://unpkg.com/@joroya/core/dist/index.js';
 ```
 
 ### Latest Minor Version
 ```javascript
 // Latest patch within 0.3.x
-import { Scene } from 'https://unpkg.com/@oroya/core@0.3/dist/index.js';
+import { Scene } from 'https://unpkg.com/@joroya/core@0.3/dist/index.js';
 ```
 
 ### Exact Version (Recommended)
 ```javascript
 // Exact version - most stable
-import { Scene } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
 ```
 
 ### SHA Hash (Maximum Stability)
 ```javascript
 // Immutable by commit hash
-import { Scene } from 'https://unpkg.com/@oroya/core@0.3.0?hash=abc123';
+import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0?hash=abc123';
 ```
 
 ## 🎨 Import Maps (Better DX)
@@ -250,9 +250,9 @@ Use import maps for cleaner imports:
   <script type="importmap">
     {
       "imports": {
-        "@oroya/core": "https://unpkg.com/@oroya/core@0.3.0/dist/index.js",
-        "@oroya/renderer-three": "https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js",
-        "@oroya/renderer-svg": "https://unpkg.com/@oroya/renderer-svg@0.3.0/dist/index.js",
+        "@joroya/core": "https://unpkg.com/@joroya/core@0.3.0/dist/index.js",
+        "@joroya/renderer-three": "https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js",
+        "@joroya/renderer-svg": "https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js",
         "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
       }
     }
@@ -261,8 +261,8 @@ Use import maps for cleaner imports:
 <body>
   <script type="module">
     // Clean imports!
-    import { Scene, Node } from '@oroya/core';
-    import { ThreeRenderer } from '@oroya/renderer-three';
+    import { Scene, Node } from '@joroya/core';
+    import { ThreeRenderer } from '@joroya/renderer-three';
     
     // Your code here...
   </script>
@@ -275,7 +275,7 @@ Use import maps for cleaner imports:
 Use esm.sh for built-in TypeScript support:
 
 ```typescript
-import { Scene, Node } from 'https://esm.sh/@oroya/core@0.3.0';
+import { Scene, Node } from 'https://esm.sh/@joroya/core@0.3.0';
 
 const scene: Scene = new Scene();
 const node: Node = new Node('test');
@@ -285,30 +285,30 @@ const node: Node = new Node('test');
 
 ### View All Files
 ```
-https://unpkg.com/@oroya/core@0.3.0/
+https://unpkg.com/@joroya/core@0.3.0/
 ```
 
 ### View package.json
 ```
-https://unpkg.com/@oroya/core@0.3.0/package.json
+https://unpkg.com/@joroya/core@0.3.0/package.json
 ```
 
 ### View Type Definitions
 ```
-https://unpkg.com/@oroya/core@0.3.0/dist/index.d.ts
+https://unpkg.com/@joroya/core@0.3.0/dist/index.d.ts
 ```
 
 ## ⚡ Performance Optimization
 
 ### 1. Use HTTP/2 Server Push
 ```html
-<link rel="modulepreload" href="https://unpkg.com/@oroya/core@0.3.0/dist/index.js">
+<link rel="modulepreload" href="https://unpkg.com/@joroya/core@0.3.0/dist/index.js">
 ```
 
 ### 2. Bundle for Production
 For production, consider bundling:
 ```bash
-npm install @oroya/core @oroya/renderer-three
+npm install @joroya/core @joroya/renderer-three
 # Use Vite, Webpack, or Rollup to bundle
 ```
 
@@ -319,8 +319,8 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('oroya-v1').then((cache) => {
       return cache.addAll([
-        'https://unpkg.com/@oroya/core@0.3.0/dist/index.js',
-        'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js'
+        'https://unpkg.com/@joroya/core@0.3.0/dist/index.js',
+        'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js'
       ]);
     })
   );
@@ -333,9 +333,9 @@ self.addEventListener('install', (event) => {
 <script type="module">
   async function loadOroya() {
     const cdns = [
-      'https://unpkg.com/@oroya/core@0.3.0/dist/index.js',
-      'https://cdn.jsdelivr.net/npm/@oroya/core@0.3.0/dist/index.js',
-      'https://esm.sh/@oroya/core@0.3.0'
+      'https://unpkg.com/@joroya/core@0.3.0/dist/index.js',
+      'https://cdn.jsdelivr.net/npm/@joroya/core@0.3.0/dist/index.js',
+      'https://esm.sh/@joroya/core@0.3.0'
     ];
     
     for (const cdn of cdns) {
@@ -356,19 +356,19 @@ self.addEventListener('install', (event) => {
 ## 📊 CDN Analytics
 
 ### unpkg Statistics
-View download stats: `https://unpkg.com/@oroya/core/stats`
+View download stats: `https://unpkg.com/@joroya/core/stats`
 
 ### jsDelivr Statistics
-View stats: `https://www.jsdelivr.com/package/npm/@oroya/core`
+View stats: `https://www.jsdelivr.com/package/npm/@joroya/core`
 
 ## 🚨 Limitations & Considerations
 
-### ⚠️ Not Recommended For:
+### ⚠�E�ENot Recommended For:
 - Large production applications (use npm + bundler)
 - Applications requiring tree-shaking
 - Projects with complex dependency management
 
-### ✅ Perfect For:
+### ✁EPerfect For:
 - Quick prototypes and experiments
 - CodePen, JSFiddle, CodeSandbox
 - Educational content and tutorials
@@ -387,8 +387,8 @@ body { margin: 0; }
 canvas { display: block; }
 
 <!-- JS -->
-import { Scene, Node, Camera, CameraType, createBox, Material } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
-import { ThreeRenderer } from 'https://unpkg.com/@oroya/renderer-three@0.3.0/dist/index.js';
+import { Scene, Node, Camera, CameraType, createBox, Material } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
 
 // Your code here
 ```

@@ -10,7 +10,7 @@ import {
     Material,
     Node,
     Scene,
-} from '@oroya/core';
+} from '@joroya/core';
 import { renderToSVG } from '../src/renderSVG';
 
 // ─── Helper ─────────────────────────────────────────────────

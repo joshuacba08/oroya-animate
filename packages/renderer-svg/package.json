@@ -1,5 +1,5 @@
 {
-  "name": "@oroya/renderer-svg",
+  "name": "@joroya/renderer-svg",
   "version": "0.3.0",
   "description": "Lightweight SVG renderer for Oroya Animate scene graphs",
   "keywords": [
@@ -46,10 +46,10 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@oroya/core": "^0.3.0"
+    "@joroya/core": "^0.3.0"
   },
   "dependencies": {
-    "@oroya/core": "workspace:*"
+    "@joroya/core": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.1.0",

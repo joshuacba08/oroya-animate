@@ -19,8 +19,8 @@ En Oroya Animate, la cámara es un **nodo más** del scene graph. Esto significa
 ## Paso 1: Crear una escena con objetos de referencia
 
 ```typescript
-import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
 
@@ -203,7 +203,7 @@ character.add(followCam);
 // Cuando el personaje se mueve, la cámara lo sigue automáticamente
 character.transform.position = { x: 5, y: 0, z: 0 };
 character.transform.updateLocalMatrix();
-// → La cámara ahora está en (5, 3, 8) en coordenadas del mundo
+// ↁELa cámara ahora está en (5, 3, 8) en coordenadas del mundo
 ```
 
 ---
@@ -216,4 +216,4 @@ Una escena con múltiples puntos de vista intercambiables con el teclado (`1`, `
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 7: Ciudad Procedural](./07-procedural-city.md) — generación algorítmica.
+➡�E�E[Tutorial 7: Ciudad Procedural](./07-procedural-city.md)  Egeneración algorítmica.

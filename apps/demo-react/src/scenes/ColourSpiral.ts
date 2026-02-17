@@ -1,7 +1,7 @@
 import {
   Scene, Node, Material, Camera, CameraType,
   createBox, createSphere,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 /* ── Controls ─────────────────────────────────────────────────────────── */

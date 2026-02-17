@@ -1,8 +1,8 @@
 import {
   Scene, Node, Material, Camera, CameraType, Animation,
   createBox, createSphere, createPath2D, createText,
-} from '@oroya/core';
-import type { Path2DCommand } from '@oroya/core';
+} from '@joroya/core';
+import type { Path2DCommand } from '@joroya/core';
 import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 
@@ -221,9 +221,9 @@ export function createSvgAnimationsScene(params: ParamValues) {
   footer.transform.updateLocalMatrix();
   scene.add(footer);
 
-  // ── No JS animation needed — SVG animations run natively ───────────
+  // ── No JS animation needed  ESVG animations run natively ───────────
   function animate(_time: number, _p: ParamValues) {
-    // All animations are declarative SVG — no per-frame JS needed
+    // All animations are declarative SVG  Eno per-frame JS needed
   }
 
   return { scene, animate };

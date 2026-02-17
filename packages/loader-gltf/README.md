@@ -1,16 +1,16 @@
-# @oroya/loader-gltf
+# @joroya/loader-gltf
 
 > glTF/GLB 3D model loader for Oroya Animate scene graphs
 
-[![NPM Version](https://img.shields.io/npm/v/@oroya/loader-gltf?style=flat-square)](https://www.npmjs.com/package/@oroya/loader-gltf)
-[![License](https://img.shields.io/npm/l/@oroya/loader-gltf?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@joroya/loader-gltf?style=flat-square)](https://www.npmjs.com/package/@joroya/loader-gltf)
+[![License](https://img.shields.io/npm/l/@joroya/loader-gltf?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 
 Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
 
 ## Features
 
 - 📦 **glTF/GLB Support** - Load industry-standard 3D models
-- 🏗️ **Scene Graph Conversion** - Automatically converts to Oroya nodes
+- 🏗�E�E**Scene Graph Conversion** - Automatically converts to Oroya nodes
 - 🎨 **Material Import** - Preserves materials and textures
 - 🦴 **Mesh Support** - Handles complex geometry
 - 🔄 **Blender Compatible** - Export from Blender and import seamlessly
@@ -19,14 +19,14 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 ## Installation
 
 ```bash
-npm install @oroya/core @oroya/loader-gltf three
+npm install @joroya/core @joroya/loader-gltf three
 ```
 
 ## Quick Example
 
 ```typescript
-import { Scene } from '@oroya/core';
-import { loadGLTF } from '@oroya/loader-gltf';
+import { Scene } from '@joroya/core';
+import { loadGLTF } from '@joroya/loader-gltf';
 
 const scene = new Scene();
 
@@ -53,10 +53,10 @@ Loads a glTF or GLB file and returns a Node containing the entire scene hierarch
 
 ## Supported Features
 
-- ✅ Meshes and geometry
-- ✅ Materials (basic)
-- ✅ Node hierarchy
-- ✅ Transformations
+- ✁EMeshes and geometry
+- ✁EMaterials (basic)
+- ✁ENode hierarchy
+- ✁ETransformations
 - 🚧 Animations (coming soon)
 - 🚧 Skinning/rigging (planned)
 - 🚧 Morph targets (planned)
@@ -64,9 +64,9 @@ Loads a glTF or GLB file and returns a Node containing the entire scene hierarch
 ## Usage Example
 
 ```typescript
-import { Scene, Node, Camera, CameraType } from '@oroya/core';
-import { loadGLTF } from '@oroya/loader-gltf';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, Camera, CameraType } from '@joroya/core';
+import { loadGLTF } from '@joroya/loader-gltf';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 async function main() {
   const scene = new Scene();
@@ -133,8 +133,8 @@ try {
 
 ```html
 <script type="module">
-  import { Scene } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
-  import { loadGLTF } from 'https://unpkg.com/@oroya/loader-gltf@0.3.0/dist/index.js';
+  import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@0.3.0/dist/index.js';
   
   const scene = new Scene();
   const model = await loadGLTF('/model.glb');

@@ -1,6 +1,6 @@
 # 🚀 Documentación de Publicación y Despliegue - Resumen Ejecutivo
 
-## ✅ Trabajo Completado
+## ✁ETrabajo Completado
 
 Se ha creado toda la documentación y configuración necesaria para publicar el proyecto Oroya Animate en NPM, CDN, y desplegar el sitio web en Vercel.
 
@@ -112,7 +112,7 @@ Se ha creado toda la documentación y configuración necesaria para publicar el 
 npm token create --read-write
 
 # Agregar token a GitHub Secrets
-# Repositorio → Settings → Secrets → Actions → New secret
+# Repositorio ↁESettings ↁESecrets ↁEActions ↁENew secret
 # Name: NPM_TOKEN
 # Value: [tu token]
 ```
@@ -170,10 +170,10 @@ git push origin v0.4.0
 
 ```bash
 # NPM
-npm view @oroya/core version
+npm view @joroya/core version
 
 # CDN
-curl https://unpkg.com/@oroya/core@0.4.0/package.json
+curl https://unpkg.com/@joroya/core@0.4.0/package.json
 
 # Website
 curl https://oroya-animate.vercel.app
@@ -183,19 +183,19 @@ curl https://oroya-animate.vercel.app
 
 ```
 1. Developer crea tag vX.Y.Z
-   ↓
+   ↁE
 2. GitHub Actions:
    - Ejecuta tests
    - Build de paquetes
    - Publica en NPM
    - Crea GitHub Release
-   ↓
+   ↁE
 3. Disponible en:
    - NPM Registry
    - unpkg.com
    - jsDelivr
    - esm.sh
-   ↓
+   ↁE
 4. Push a main:
    - Build del sitio web
    - Deploy a Vercel
@@ -225,25 +225,25 @@ git tag v0.3.1
 git push origin v0.3.1
 
 # Verificar que GitHub Actions:
-# 1. Ejecuta tests ✓
-# 2. Publica en NPM ✓
-# 3. Crea release ✓
+# 1. Ejecuta tests ✁E
+# 2. Publica en NPM ✁E
+# 3. Crea release ✁E
 
 # Verificar manualmente:
-npm install @oroya/core@0.3.1
+npm install @joroya/core@0.3.1
 ```
 
 ## 🎨 URLs Finales
 
 Después de configurar todo:
 
-- **NPM Org**: https://www.npmjs.com/org/oroya
+- **NPM Org**: https://www.npmjs.com/org/joroya
 - **Packages**:
-  - https://www.npmjs.com/package/@oroya/core
-  - https://www.npmjs.com/package/@oroya/renderer-three
-  - https://www.npmjs.com/package/@oroya/renderer-svg
-  - https://www.npmjs.com/package/@oroya/loader-gltf
-- **CDN**: https://unpkg.com/@oroya/core
+  - https://www.npmjs.com/package/@joroya/core
+  - https://www.npmjs.com/package/@joroya/renderer-three
+  - https://www.npmjs.com/package/@joroya/renderer-svg
+  - https://www.npmjs.com/package/@joroya/loader-gltf
+- **CDN**: https://unpkg.com/@joroya/core
 - **Website**: https://oroya-animate.vercel.app (o tu dominio custom)
 - **GitHub**: https://github.com/joshuacba08/oroya-animate
 
@@ -258,7 +258,7 @@ Todo está documentado en `docs/deployment/`:
 5. **CHECKLIST.md** - Checklist exhaustivo
 6. **README.md** - Resumen y quick start
 
-## 🆘 Soporte
+## �E Soporte
 
 Si encuentras problemas:
 
@@ -269,23 +269,23 @@ Si encuentras problemas:
 
 ## ✨ Ventajas del Setup
 
-✅ **Automatización Completa**
+✁E**Automatización Completa**
 - Publish en NPM automático con tags
 - Deploy en Vercel automático en main
 - Preview deployments en PRs
 
-✅ **Múltiples Opciones de Distribución**
+✁E**Múltiples Opciones de Distribución**
 - NPM para desarrollo profesional
 - CDN para prototipos rápidos
 - Website para documentación
 
-✅ **Best Practices**
+✁E**Best Practices**
 - Semantic versioning
 - CI/CD con GitHub Actions
 - Metadata completo para discoverability
 - TypeScript types incluidos
 
-✅ **Developer Experience**
+✁E**Developer Experience**
 - Scripts convenientes en package.json
 - Sincronización de versiones automatizada
 - Documentación completa
@@ -304,7 +304,7 @@ Si encuentras problemas:
 
 Después del lanzamiento:
 
-- Downloads en NPM (npmjs.com/package/@oroya/core)
+- Downloads en NPM (npmjs.com/package/@joroya/core)
 - Stars en GitHub
 - Issues y pull requests
 - Visitas al website (Vercel Analytics)

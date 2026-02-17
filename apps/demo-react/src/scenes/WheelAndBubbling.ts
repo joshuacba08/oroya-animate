@@ -1,14 +1,14 @@
 import {
     Scene, Node, createBox, createSphere, Material, Camera, CameraType,
     Interactive,
-} from '@oroya/core';
+} from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 /**
- * Wheel & Bubbling Demo – demuestra dos conceptos:
+ * Wheel & Bubbling Demo  Edemuestra dos conceptos:
  *
  * A) WHEEL EVENTS: Objetos que cambian de tamaño con la rueda del mouse.
- *    Cada columna es una "torre" de cubos apilados – wheel agrega/quita niveles.
+ *    Cada columna es una "torre" de cubos apilados  Ewheel agrega/quita niveles.
  *
  * B) EVENT BUBBLING: Grupo padre con hijos anidados. Los eventos
  *    se propagan del hijo al padre. Demuestra `stopPropagation()`.
@@ -80,7 +80,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
         };
         wheelObjects.push(entry);
 
-        // Wheel → scale
+        // Wheel ↁEscale
         node.on('wheel', (e) => {
             const nativeEvent = e.nativeEvent as WheelEvent;
             const delta = -nativeEvent.deltaY * 0.003;
@@ -132,7 +132,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
         console.log(`   -> Event BUBBLED from "${e.target.name}" to "bubbling-parent"`);
     });
 
-    // Child A – click bubbles up to parent
+    // Child A  Eclick bubbles up to parent
     const childA = new Node('child-A-bubbles');
     childA.addComponent(createSphere(0.45, 20, 20));
     const childAMat = new Material({ color: { r: 0.95, g: 0.55, b: 0.18 } });
@@ -150,7 +150,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
         console.log(`   target: "${e.target.name}", currentTarget: "${e.currentTarget.name}"`);
     });
 
-    // Child B – click does NOT bubble (stopPropagation)
+    // Child B  Eclick does NOT bubble (stopPropagation)
     const childB = new Node('child-B-stops');
     childB.addComponent(createBox(0.8, 0.8, 0.8));
     const childBMat = new Material({ color: { r: 0.60, g: 0.18, b: 0.95 } });
@@ -168,7 +168,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
         console.log(`[Bubbling] Child B clicked - stopPropagation() called, does NOT bubble`);
     });
 
-    // Child C – lower, also bubbles
+    // Child C  Elower, also bubbles
     const childC = new Node('child-C-bubbles');
     childC.addComponent(createBox(0.6, 0.6, 0.6));
     const childCMat = new Material({ color: { r: 0.18, g: 0.87, b: 0.70 } });
@@ -237,7 +237,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
     function animate(time: number, p: ParamValues) {
         const sensitivity = p.sensitivity as number;
 
-        // A) Wheel objects – smooth scale
+        // A) Wheel objects  Esmooth scale
         for (const wo of wheelObjects) {
             wo.currentScale += (wo.targetScale * sensitivity + (1 - sensitivity) * wo.targetScale - wo.currentScale) * 0.1;
             const s = wo.currentScale;
@@ -254,7 +254,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
             wo.node.transform.updateLocalMatrix();
         }
 
-        // B) Bubbling – flash timers
+        // B) Bubbling  Eflash timers
         const dt = 0.016; // ~60fps
         {
             parentState.flashTimer = Math.max(0, parentState.flashTimer - dt * 2);
@@ -314,7 +314,7 @@ export function createWheelAndBubblingScene(_params: ParamValues) {
             childC.transform.updateLocalMatrix();
         }
 
-        // C) Pointer tracker – smooth follow
+        // C) Pointer tracker  Esmooth follow
         {
             const currentX = trackerDot.transform.position?.x ?? -2;
             const currentY = trackerDot.transform.position?.y ?? -3.5;

@@ -15,8 +15,8 @@ Construir una escena con 5 figuras geométricas de diferentes colores dispuestas
 ## Paso 1: Crear la escena base
 
 ```typescript
-import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@oroya/core';
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@joroya/core';
+import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
 
@@ -88,7 +88,7 @@ palette.forEach((shape) => {
 ### Conceptos clave
 
 - **`createBox(w, h, d)`** y **`createSphere(r, wSeg, hSeg)`** son factory functions que devuelven un componente `Geometry`.
-- Cada nodo es **independiente** — tiene su propia posición, geometría y material.
+- Cada nodo es **independiente**  Etiene su propia posición, geometría y material.
 - Pueden mezclarse diferentes tipos de geometría en la misma escena.
 
 ---
@@ -151,4 +151,4 @@ Cinco figuras geométricas de colores vibrantes rotando a diferentes velocidades
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 3: Guardar y Cargar Escenas](./03-save-load-scenes.md) — serialización JSON.
+➡�E�E[Tutorial 3: Guardar y Cargar Escenas](./03-save-load-scenes.md)  Eserialización JSON.

@@ -1,4 +1,4 @@
-import { SvJs, Gen } from '@oroya/renderer-svg';
+import { SvJs, Gen } from '@joroya/renderer-svg';
 import type { ControlDef, ParamValues } from '../types';
 
 export const interactiveGalaxyControls: ControlDef[] = [

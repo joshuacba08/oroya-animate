@@ -1,5 +1,5 @@
-import { Scene } from '@oroya/core';
-import { renderToSVGElement } from '@oroya/renderer-svg';
+import { Scene } from '@joroya/core';
+import { renderToSVGElement } from '@joroya/renderer-svg';
 import { useEffect, useRef, useCallback } from 'react';
 
 export type AnimateCallback = (time: number, scene: Scene) => void;

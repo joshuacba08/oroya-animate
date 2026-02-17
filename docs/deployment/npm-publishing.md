@@ -6,10 +6,10 @@ This guide explains how to publish Oroya Animate packages to NPM.
 
 The monorepo contains 4 publishable packages:
 
-- `@oroya/core` - Core scene graph and components
-- `@oroya/renderer-three` - Three.js (WebGL) renderer
-- `@oroya/renderer-svg` - SVG renderer
-- `@oroya/loader-gltf` - glTF model loader
+- `@joroya/core` - Core scene graph and components
+- `@joroya/renderer-three` - Three.js (WebGL) renderer
+- `@joroya/renderer-svg` - SVG renderer
+- `@joroya/loader-gltf` - glTF model loader
 
 ## 🔧 Prerequisites
 
@@ -26,18 +26,18 @@ npm login
 
 Create an organization `@oroya` on NPM:
 - Go to https://www.npmjs.com/org/create
-- Create organization named `oroya`
-- This allows scoped packages like `@oroya/core`
+- Create organization named `joroya`
+- This allows scoped packages like `@joroya/core`
 
 ### 3. Package Configuration
 
 All packages are already configured with:
-- ✅ Correct `name` field with `@oroya/` scope
-- ✅ `version` field (currently 0.3.0)
-- ✅ `license` field (MIT)
-- ✅ `main`, `module`, `types` exports
-- ✅ `files` array specifying dist folder
-- ✅ Proper `exports` field for dual ESM/CJS support
+- ✁ECorrect `name` field with `@joroya/` scope
+- ✁E`version` field (currently 0.3.0)
+- ✁E`license` field (MIT)
+- ✁E`main`, `module`, `types` exports
+- ✁E`files` array specifying dist folder
+- ✁EProper `exports` field for dual ESM/CJS support
 
 ## 🚀 Publishing Process
 
@@ -103,10 +103,10 @@ git push origin v0.3.0
 ```
 
 The GitHub Action will:
-1. ✅ Run tests
-2. ✅ Build packages
-3. ✅ Publish to NPM
-4. ✅ Create GitHub Release
+1. ✁ERun tests
+2. ✁EBuild packages
+3. ✁EPublish to NPM
+4. ✁ECreate GitHub Release
 
 ## 📝 Pre-Publishing Checklist
 
@@ -131,7 +131,7 @@ npm token create --read-write
 ```
 
 ### 2. Add to GitHub Secrets
-1. Go to GitHub repository → Settings → Secrets and variables → Actions
+1. Go to GitHub repository ↁESettings ↁESecrets and variables ↁEActions
 2. Click "New repository secret"
 3. Name: `NPM_TOKEN`
 4. Value: Paste the token from step 1
@@ -150,16 +150,16 @@ Oroya Animate follows [Semantic Versioning (SemVer)](https://semver.org/):
 ### Version Update Commands
 
 ```bash
-# Patch (0.3.0 → 0.3.1)
+# Patch (0.3.0 ↁE0.3.1)
 pnpm --filter "./packages/**" exec npm version patch
 
-# Minor (0.3.0 → 0.4.0)
+# Minor (0.3.0 ↁE0.4.0)
 pnpm --filter "./packages/**" exec npm version minor
 
-# Major (0.3.0 → 1.0.0)
+# Major (0.3.0 ↁE1.0.0)
 pnpm --filter "./packages/**" exec npm version major
 
-# Pre-release (0.3.0 → 0.3.1-beta.0)
+# Pre-release (0.3.0 ↁE0.3.1-beta.0)
 pnpm --filter "./packages/**" exec npm version prerelease --preid=beta
 ```
 
@@ -188,11 +188,11 @@ packagePaths.forEach(path => {
   const pkg = JSON.parse(readFileSync(path, 'utf-8'));
   pkg.version = newVersion;
   writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
-  console.log(`✅ Updated ${path} to ${newVersion}`);
+  console.log(`✁EUpdated ${path} to ${newVersion}`);
 });
 ```
 
-## 🏷️ Publishing Beta/Alpha Versions
+## 🏷�E�EPublishing Beta/Alpha Versions
 
 For pre-release versions:
 
@@ -206,7 +206,7 @@ pnpm --filter "./packages/**" publish --access public --tag beta
 
 Install beta versions:
 ```bash
-npm install @oroya/core@beta
+npm install @joroya/core@beta
 ```
 
 ## 📊 Post-Publishing Verification
@@ -215,27 +215,27 @@ After publishing, verify:
 
 ### 1. Check NPM Registry
 Visit:
-- https://www.npmjs.com/package/@oroya/core
-- https://www.npmjs.com/package/@oroya/renderer-three
-- https://www.npmjs.com/package/@oroya/renderer-svg
-- https://www.npmjs.com/package/@oroya/loader-gltf
+- https://www.npmjs.com/package/@joroya/core
+- https://www.npmjs.com/package/@joroya/renderer-three
+- https://www.npmjs.com/package/@joroya/renderer-svg
+- https://www.npmjs.com/package/@joroya/loader-gltf
 
 ### 2. Test Installation
 ```bash
 # Create a test project
 mkdir test-oroya && cd test-oroya
 npm init -y
-npm install @oroya/core @oroya/renderer-three
+npm install @joroya/core @joroya/renderer-three
 
 # Test import
-node -e "import('@oroya/core').then(m => console.log(Object.keys(m)))"
+node -e "import('@joroya/core').then(m => console.log(Object.keys(m)))"
 ```
 
 ### 3. Test CDN Links
 ```html
 <!-- Test on unpkg.com -->
 <script type="module">
-  import { Scene } from 'https://unpkg.com/@oroya/core@0.3.0/dist/index.js';
+  import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
   console.log(Scene);
 </script>
 ```

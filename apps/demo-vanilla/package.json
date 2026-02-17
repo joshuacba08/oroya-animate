@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@oroya/core": "workspace:*",
-    "@oroya/renderer-three": "workspace:*"
+    "@joroya/core": "workspace:*",
+    "@joroya/renderer-three": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.4.5",

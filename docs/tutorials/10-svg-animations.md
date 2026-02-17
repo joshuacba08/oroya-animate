@@ -12,7 +12,7 @@ Las animaciones SVG nativas se declaran dentro del markup SVG y el navegador las
 
 - **Exportación:** El archivo `.svg` es auto-animado al abrirlo en un browser.
 - **Performance:** El motor de renderizado del browser optimiza las animaciones.
-- **Server-side:** Funciona con `renderToSVG()` — el string SVG incluye las animaciones.
+- **Server-side:** Funciona con `renderToSVG()`  Eel string SVG incluye las animaciones.
 
 ```mermaid
 graph LR
@@ -32,8 +32,8 @@ import {
   Scene, Node, Camera, CameraType,
   Material, Animation,
   createBox, createSphere, createPath2D,
-} from '@oroya/core';
-import { renderToSVG } from '@oroya/renderer-svg';
+} from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 
@@ -132,7 +132,7 @@ scalable.addComponent(new Animation([
   {
     type: 'animateTransform',
     transformType: 'scale',
-    values: '1;1.5;1',           // Tres keyframes: normal → grande → normal
+    values: '1;1.5;1',           // Tres keyframes: normal ↁEgrande ↁEnormal
     dur: '1.5s',
     repeatCount: 'indefinite',
   },
@@ -271,8 +271,8 @@ oneShot.addComponent(new Animation([
 ```
 
 > **`fill="remove"` vs `fill="freeze"`:**  
-> - `remove` (default) — al terminar, vuelve al valor original.  
-> - `freeze` — mantiene el valor final de la animación.
+> - `remove` (default)  Eal terminar, vuelve al valor original.  
+> - `freeze`  Emantiene el valor final de la animación.
 
 ---
 
@@ -327,4 +327,4 @@ Explora todas estas animaciones en la demo **"SVG Animations"** del demo-react.
 
 ## Siguiente tutorial
 
-➡️ [Tutorial 11: SVG Interactivo](./11-svg-interactive.md) — event delegation con `renderToSVGElement`.
+➡�E�E[Tutorial 11: SVG Interactivo](./11-svg-interactive.md)  Eevent delegation con `renderToSVGElement`.

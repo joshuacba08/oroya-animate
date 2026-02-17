@@ -8,6 +8,7 @@ export enum GeometryPrimitive {
   Sphere = 'Sphere',
   Path2D = 'Path2D',
   Text = 'Text',
+  Buffer = 'Buffer',
 }
 
 /**
@@ -66,9 +67,25 @@ export interface TextGeometryDef {
 }
 
 /**
+ * The definition for a buffer geometry with arbitrary mesh data.
+ * Used for loading complex models from glTF/GLB files.
+ */
+export interface BufferGeometryDef {
+  type: GeometryPrimitive.Buffer;
+  /** Vertex positions as flat xyz array. */
+  positions: Float32Array;
+  /** Vertex normals as flat xyz array (optional). */
+  normals?: Float32Array;
+  /** UV coordinates as flat uv array (optional). */
+  uvs?: Float32Array;
+  /** Triangle indices (optional, for indexed geometry). */
+  indices?: Uint16Array | Uint32Array;
+}
+
+/**
  * A union of all possible geometry definitions.
  */
-export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef;
+export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef | BufferGeometryDef;
 
 /**
  * A component that defines the geometry of a node.

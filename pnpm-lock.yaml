@@ -23,13 +23,13 @@ importers:
 
   apps/demo-react:
     dependencies:
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@oroya/renderer-svg':
+      '@joroya/renderer-svg':
         specifier: workspace:*
         version: link:../../packages/renderer-svg
-      '@oroya/renderer-three':
+      '@joroya/renderer-three':
         specifier: workspace:*
         version: link:../../packages/renderer-three
       i18next:
@@ -69,10 +69,10 @@ importers:
 
   apps/demo-vanilla:
     dependencies:
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@oroya/renderer-three':
+      '@joroya/renderer-three':
         specifier: workspace:*
         version: link:../../packages/renderer-three
     devDependencies:
@@ -91,13 +91,16 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.7.0
         version: 3.7.0
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@oroya/renderer-svg':
+      '@joroya/loader-gltf':
+        specifier: workspace:*
+        version: link:../../packages/loader-gltf
+      '@joroya/renderer-svg':
         specifier: workspace:^
         version: link:../../packages/renderer-svg
-      '@oroya/renderer-three':
+      '@joroya/renderer-three':
         specifier: workspace:*
         version: link:../../packages/renderer-three
       '@tailwindcss/typography':
@@ -156,7 +159,7 @@ importers:
 
   packages/loader-gltf:
     dependencies:
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../core
       three:
@@ -175,7 +178,7 @@ importers:
 
   packages/renderer-svg:
     dependencies:
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -188,7 +191,7 @@ importers:
 
   packages/renderer-three:
     dependencies:
-      '@oroya/core':
+      '@joroya/core':
         specifier: workspace:*
         version: link:../core
       three:

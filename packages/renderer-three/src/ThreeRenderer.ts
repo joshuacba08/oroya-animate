@@ -9,11 +9,14 @@ import {
   GeometryPrimitive,
   BoxGeometryDef,
   SphereGeometryDef,
+  BufferGeometryDef,
   PerspectiveCameraDef,
+  OrthographicCameraDef,
   Interactive,
   InteractionEventType,
   createInteractionEvent,
-} from '@oroya/core';
+} from '@joroya/core';
+import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
 interface ThreeRendererOptions {
   canvas: HTMLCanvasElement;
@@ -27,6 +30,7 @@ export class ThreeRenderer {
   private readonly scene: THREE.Scene;
   private activeCamera: THREE.Camera | null = null;
   private oroyaScene: OroyaScene | null = null;
+  private orbitControls: OrbitControlsWrapper | null = null;
   private nodeMap: Map<string, THREE.Object3D> = new Map();
 
   // ── Interaction state ─────────────────────────────────────
@@ -65,7 +69,23 @@ export class ThreeRenderer {
     this.oroyaScene.updateWorldMatrices();
 
     this.oroyaScene.root.traverse((oroyaNode) => {
-      const threeObject = this.nodeMap.get(oroyaNode.id);
+      let threeObject = this.nodeMap.get(oroyaNode.id);
+
+      // Dynamically create Three.js objects for nodes added after mount()
+      if (!threeObject) {
+        const newObj = this.createThreeObject(oroyaNode);
+        if (newObj) {
+          threeObject = newObj;
+          this.nodeMap.set(oroyaNode.id, threeObject);
+          this.reverseNodeMap.set(threeObject, oroyaNode);
+
+          const parentThreeObject = oroyaNode.parent
+            ? this.nodeMap.get(oroyaNode.parent.id)
+            : this.scene;
+          (parentThreeObject ?? this.scene).add(threeObject);
+        }
+      }
+
       if (threeObject) {
         threeObject.matrix.fromArray(oroyaNode.transform.worldMatrix);
         threeObject.matrix.decompose(threeObject.position, threeObject.quaternion, threeObject.scale);
@@ -88,6 +108,11 @@ export class ThreeRenderer {
         }
       }
     });
+
+    // Update orbit controls if enabled
+    if (this.orbitControls) {
+      this.orbitControls.update();
+    }
 
     this.renderer.render(this.scene, this.activeCamera);
   }
@@ -124,8 +149,27 @@ export class ThreeRenderer {
     this.canvas.style.cursor = '';
   }
 
+  /**
+   * Enable orbit controls for camera manipulation.
+   * Call after `mount()` to allow mouse/touch camera control.
+   */
+  enableOrbitControls(): void {
+    if (this.orbitControls || !this.activeCamera) return;
+    this.orbitControls = new OrbitControlsWrapper(this.activeCamera, this.canvas);
+  }
+
+  /**
+   * Disable orbit controls and remove event listeners.
+   */
+  disableOrbitControls(): void {
+    if (!this.orbitControls) return;
+    this.orbitControls.dispose();
+    this.orbitControls = null;
+  }
+
   dispose() {
     this.disableInteraction();
+    this.disableOrbitControls();
     this.renderer.dispose();
   }
 
@@ -327,6 +371,20 @@ export class ThreeRenderer {
       case GeometryPrimitive.Sphere:
         const { radius, widthSegments, heightSegments } = definition as SphereGeometryDef;
         return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+      case GeometryPrimitive.Buffer:
+        const bufferDef = definition as BufferGeometryDef;
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(bufferDef.positions, 3));
+        if (bufferDef.normals) {
+          geometry.setAttribute('normal', new THREE.BufferAttribute(bufferDef.normals, 3));
+        }
+        if (bufferDef.uvs) {
+          geometry.setAttribute('uv', new THREE.BufferAttribute(bufferDef.uvs, 2));
+        }
+        if (bufferDef.indices) {
+          geometry.setIndex(new THREE.BufferAttribute(bufferDef.indices, 1));
+        }
+        return geometry;
       default:
         return null;
     }
@@ -346,6 +404,15 @@ export class ThreeRenderer {
       props.opacity = definition.opacity;
       props.transparent = definition.opacity < 1.0;
     }
+    if (definition.metalness !== undefined) {
+      props.metalness = definition.metalness;
+    }
+    if (definition.roughness !== undefined) {
+      props.roughness = definition.roughness;
+    }
+    if (definition.emissive) {
+      props.emissive = new THREE.Color(definition.emissive.r, definition.emissive.g, definition.emissive.b);
+    }
 
     return new THREE.MeshStandardMaterial(props);
   }
@@ -356,6 +423,9 @@ export class ThreeRenderer {
       case 'Perspective':
         const { fov, aspect, near, far } = definition as PerspectiveCameraDef;
         return new THREE.PerspectiveCamera(fov, aspect, near, far);
+      case 'Orthographic':
+        const ortho = definition as OrthographicCameraDef;
+        return new THREE.OrthographicCamera(ortho.left, ortho.right, ortho.top, ortho.bottom, ortho.near, ortho.far);
       default:
         return null;
     }

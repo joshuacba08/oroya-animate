@@ -1,8 +1,8 @@
 import {
   Scene, Node, Material, Camera, CameraType, Interactive,
   createBox, createSphere, createPath2D, createText,
-} from '@oroya/core';
-import type { Path2DCommand } from '@oroya/core';
+} from '@joroya/core';
+import type { Path2DCommand } from '@joroya/core';
 import i18next from 'i18next';
 import type { ControlDef, ParamValues } from '../types';
 
@@ -133,18 +133,18 @@ export function createSvgInteractiveScene(params: ParamValues) {
       node.on('click', () => {
         const count = (clickCounts.get(node.id) ?? 0) + 1;
         clickCounts.set(node.id, count);
-        console.log(`[SVG Interactive] Clicked "${node.name}" (${shapeType}) — count: ${count}`);
+        console.log(`[SVG Interactive] Clicked "${node.name}" (${shapeType})  Ecount: ${count}`);
       });
 
       node.on('pointerenter', () => {
-        console.log(`[SVG Interactive] Hover → "${node.name}"`);
+        console.log(`[SVG Interactive] Hover ↁE"${node.name}"`);
       });
 
       scene.add(node);
     }
   }
 
-  // ── No JS animation — static interactive scene ─────────────────────
+  // ── No JS animation  Estatic interactive scene ─────────────────────
   function animate(_time: number, _p: ParamValues) {
     // No per-frame animation needed. Interactions handled via events.
   }

@@ -1,4 +1,4 @@
-import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@oroya/core';
+import { Scene, Node, createBox, createSphere, Material, Camera, CameraType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const shapeGridControls: ControlDef[] = [
@@ -29,7 +29,7 @@ export function createShapeGridScene(params: ParamValues) {
   const cellSize = 0.8;
   const step = cellSize + gap;
 
-  // Camera — positioned along Z axis, elevated to give a 3D perspective.
+  // Camera  Epositioned along Z axis, elevated to give a 3D perspective.
   // The Oroya camera looks down -Z by default, so we place it on the Z axis
   // and raise it enough to see the grid at the origin.
   const cam = new Node('camera');

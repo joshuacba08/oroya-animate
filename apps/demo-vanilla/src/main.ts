@@ -1,4 +1,4 @@
-import { ThreeRenderer } from '@oroya/renderer-three';
+import { ThreeRenderer } from '@joroya/renderer-three';
 import { DEMO_SCENES } from './scenes';
 import { getDefaultParams } from './types';
 import type { ParamValues } from './types';
