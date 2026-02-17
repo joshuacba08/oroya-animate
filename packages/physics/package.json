@@ -34,6 +34,8 @@
         "@joroya/core": "workspace:*"
     },
     "devDependencies": {
-        "@joroya/core": "workspace:*"
+        "@joroya/core": "workspace:*",
+        "tsup": "^8.1.0",
+        "typescript": "^5.4.5"
     }
 }

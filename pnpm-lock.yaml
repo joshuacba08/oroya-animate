@@ -185,6 +185,22 @@ importers:
         specifier: ^5.4.5
         version: 5.9.3
 
+  packages/physics:
+    dependencies:
+      '@dimforge/rapier3d-compat':
+        specifier: ^0.14.0
+        version: 0.14.0
+    devDependencies:
+      '@joroya/core':
+        specifier: workspace:*
+        version: link:../core
+      tsup:
+        specifier: ^8.1.0
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
   packages/renderer-canvas2d:
     dependencies:
       '@joroya/core':
@@ -375,6 +391,9 @@ packages:
 
   '@chevrotain/utils@11.0.3':
     resolution: {integrity: sha512-YslZMgtJUyuMbZ+aKvfF3x1f5liK4mWNxghFRv7jqRR9C3R3fAOGTTKvxXDa2Y1s9zSbcpuO0cAxDYsc9SrXoQ==}
+
+  '@dimforge/rapier3d-compat@0.14.0':
+    resolution: {integrity: sha512-/uHrUzS+CRQ+NQrrJCEDUkhwHlNsAAexbNXgbN9sHY+GwR+SFFAFrxRr8Llf5/AJZzqiLANdQIfJ63Cw4gJVqw==}
 
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
@@ -3615,6 +3634,8 @@ snapshots:
   '@chevrotain/types@11.0.3': {}
 
   '@chevrotain/utils@11.0.3': {}
+
+  '@dimforge/rapier3d-compat@0.14.0': {}
 
   '@emnapi/runtime@1.8.1':
     dependencies:

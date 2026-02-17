@@ -1,23 +1,23 @@
-# Serialization
+# シリアライゼーション
 
-Oroya Animate includes a JSON serialization system that allows saving and loading complete scenes. It is the foundation for visual editors, collaboration, and scene versioning.
-
----
-
-## Table of contents
-
-- [Serialize a scene](#serialize-a-scene)
-- [Deserialize a scene](#deserialize-a-scene)
-- [JSON format](#json-format)
-- [Supported components](#supported-components)
-- [Use cases](#use-cases)
-- [Limitations](#limitations)
+Oroya Animateには、シーン全体を保存・読み込みできるJSONシリアライゼーションシステムが含まれています。ビジュアルエディター、コラボレーション、シーンのバージョン管理の基盤となります。
 
 ---
 
-## Serialize a scene
+## 目次
 
-The `serialize` function converts the entire scene graph to a formatted JSON string:
+- [シーンをシリアライズする](#シーンをシリアライズする)
+- [シーンをデシリアライズする](#シーンをデシリアライズする)
+- [JSON形式](#json形式)
+- [サポートされているコンポーネント](#サポートされているコンポーネント)
+- [ユースケース](#ユースケース)
+- [制限事項](#制限事項)
+
+---
+
+## シーンをシリアライズする
+
+`serialize`関数は、シーングラフ全体をフォーマットされたJSON文字列に変換します：
 
 ```typescript
 import { Scene, Node, createBox, Material, serialize } from '@joroya/core';
@@ -34,7 +34,7 @@ const json = serialize(scene);
 console.log(json);
 ```
 
-### Serialization flow
+### シリアライゼーションフロー
 
 ```mermaid
 flowchart LR
@@ -47,9 +47,9 @@ flowchart LR
 
 ---
 
-## Deserialize a scene
+## シーンをデシリアライズする
 
-The `deserialize` function reconstructs a functional `Scene` from a JSON string:
+`deserialize`関数は、JSON文字列から機能する`Scene`を再構築します：
 
 ```typescript
 import { deserialize } from '@joroya/core';
@@ -60,7 +60,7 @@ const found = restoredScene.findNodeByName('hero-cube');
 console.log(found?.transform.position); // { x: 3, y: 0, z: -1 }
 ```
 
-The restored scene is fully functional and can be mounted on any renderer:
+復元されたシーンは完全に機能し、任意のレンダラーにマウントできます：
 
 ```typescript
 import { ThreeRenderer } from '@joroya/renderer-three';
@@ -70,7 +70,7 @@ renderer.mount(restoredScene);
 renderer.render();
 ```
 
-### Deserialization flow
+### デシリアライゼーションフロー
 
 ```mermaid
 flowchart LR
@@ -83,9 +83,9 @@ flowchart LR
 
 ---
 
-## JSON format
+## JSON形式
 
-### General structure
+### 一般的な構造
 
 ```mermaid
 graph TD
@@ -98,7 +98,7 @@ graph TD
     COMPS --> SC["{ type: ComponentType, ...data }"]
 ```
 
-### Complete output example
+### 完全な出力例
 
 ```json
 {
@@ -153,69 +153,69 @@ graph TD
 }
 ```
 
-### Internal interfaces
+### 内部インターフェース
 
-| Interface | Fields | Description |
-|-----------|--------|-------------|
-| `SerializableScene` | `root: SerializableNode` | Top-level container |
-| `SerializableNode` | `id`, `name`, `cssClass?`, `cssId?`, `components[]`, `children[]` | Flat representation of a node |
-| `SerializableComponent` | `type: ComponentType`, `+ ...data` | Each component with its type and data |
+| インターフェース | フィールド | 説明 |
+|------------------|------------|------|
+| `SerializableScene` | `root: SerializableNode` | トップレベルコンテナ |
+| `SerializableNode` | `id`, `name`, `cssClass?`, `cssId?`, `components[]`, `children[]` | ノードのフラット表現 |
+| `SerializableComponent` | `type: ComponentType`, `+ ...data` | タイプとデータを持つ各コンポーネント |
 
 ---
 
-## Supported components
+## サポートされているコンポーネント
 
-### In serialization (`serialize`)
+### シリアライズ時（`serialize`）
 
-All components are serialized using spread (`{ ...component }`):
+すべてのコンポーネントはスプレッド（`{ ...component }`）を使用してシリアライズされます：
 
-| Component | Serialized data |
-|-----------|-----------------|
+| コンポーネント | シリアライズされるデータ |
+|----------------|--------------------------|
 | `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | Full `definition` (type + geometry parameters) |
-| `Material` | Full `definition` (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
-| `Camera` | Full `definition` (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
-| `Animation` | `animations[]` — array of `SvgAnimationDef` (animate / animateTransform) |
+| `Geometry` | 完全な`definition`（タイプ + ジオメトリパラメータ） |
+| `Material` | 完全な`definition`（color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask） |
+| `Camera` | 完全な`definition`（Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far） |
+| `Animation` | `animations[]` — `SvgAnimationDef`（animate / animateTransform）の配列 |
 
-### In deserialization (`deserialize`)
+### デシリアライズ時（`deserialize`）
 
-| Component | Restored? | Method |
-|-----------|-----------|--------|
+| コンポーネント | 復元? | メソッド |
+|----------------|-------|---------|
 | `Transform` | ✅ | `Object.assign(new Transform(), data)` |
 | `Geometry` | ✅ | `new Geometry(data.definition)` |
 | `Material` | ✅ | `new Material(data.definition)` |
 | `Camera` | ✅ | `new Camera(data.definition)` |
 | `Animation` | ✅ | `new Animation(data.animations)` |
 
-> **Note:** All components serialize and deserialize correctly, including `Camera` and `Animation`.
+> **注意:** `Camera`と`Animation`を含むすべてのコンポーネントが正しくシリアライズおよびデシリアライズされます。
 
-### Data preservation
+### データの保持
 
-| Data | Preserved? |
-|------|------------|
-| Node UUID | ✅ Exact |
-| Node name | ✅ |
-| Parent-child hierarchy | ✅ |
-| Position | ✅ |
-| Rotation (quaternion) | ✅ |
-| Scale | ✅ |
-| Matrices (local + world) | ✅ |
-| Geometry type | ✅ |
-| Geometry parameters | ✅ |
-| Material color | ✅ |
-| Opacity | ✅ |
-| Fill/Stroke (SVG) | ✅ |
-| Gradients (fill/stroke) | ✅ |
-| Filter / ClipPath / Mask | ✅ |
-| Camera (Perspective + Orthographic) | ✅ |
-| SVG animations | ✅ |
+| データ | 保持? |
+|--------|-------|
+| ノードUUID | ✅ 完全一致 |
+| ノード名 | ✅ |
+| 親子階層 | ✅ |
+| 位置 | ✅ |
+| 回転（クォータニオン） | ✅ |
+| スケール | ✅ |
+| 行列（ローカル + ワールド） | ✅ |
+| ジオメトリタイプ | ✅ |
+| ジオメトリパラメータ | ✅ |
+| マテリアルカラー | ✅ |
+| 不透明度 | ✅ |
+| 塗り/線（SVG） | ✅ |
+| グラデーション（塗り/線） | ✅ |
+| フィルター / ClipPath / Mask | ✅ |
+| カメラ（Perspective + Orthographic） | ✅ |
+| SVGアニメーション | ✅ |
 | `cssClass` / `cssId` | ✅ |
 
 ---
 
-## Use cases
+## ユースケース
 
-### localStorage persistence
+### localStorageでの永続化
 
 ```typescript
 function saveScene(scene: Scene): void {
@@ -230,7 +230,7 @@ function loadScene(): Scene | null {
 }
 ```
 
-### Export as downloadable file
+### ダウンロード可能なファイルとしてエクスポート
 
 ```typescript
 function downloadScene(scene: Scene, filename: string): void {
@@ -249,7 +249,7 @@ function downloadScene(scene: Scene, filename: string): void {
 downloadScene(scene, 'my-scene.json');
 ```
 
-### Import from file
+### ファイルからインポート
 
 ```typescript
 async function importScene(file: File): Promise<Scene> {
@@ -257,7 +257,7 @@ async function importScene(file: File): Promise<Scene> {
   return deserialize(text);
 }
 
-// With input[type=file]
+// input[type=file] の場合
 input.addEventListener('change', async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
@@ -267,10 +267,10 @@ input.addEventListener('change', async (e) => {
 });
 ```
 
-### Server-side rendering
+### サーバーサイドレンダリング
 
 ```typescript
-// Receive serialized scene, render to SVG on server
+// シリアライズされたシーンを受け取り、サーバーでSVGにレンダリング
 import { deserialize } from '@joroya/core';
 import { renderToSVG } from '@joroya/renderer-svg';
 
@@ -280,18 +280,18 @@ function handleRequest(jsonBody: string): string {
 }
 ```
 
-### Git versioning
+### Gitでのバージョン管理
 
-Saving scenes as `.json` allows:
+シーンを`.json`として保存すると、以下が可能になります：
 
 ```
 scenes/
-├── level-01.json    → Versioned with git
+├── level-01.json    → gitでバージョン管理
 ├── level-02.json
 └── hub-world.json
 ```
 
-Git diffs show exactly what changed:
+Gitの差分で変更内容が正確に表示されます：
 
 ```diff
  "name": "hero-cube",
@@ -304,12 +304,12 @@ Git diffs show exactly what changed:
 
 ---
 
-## Limitations
+## 制限事項
 
-| Limitation | Impact | Workaround |
-|------------|--------|------------|
-| UUIDs are preserved | Two scenes from the same JSON will have nodes with identical IDs | Regenerate IDs after deserialization if independent scenes are needed |
-| ~~Scene loses its camera when restored~~ | ✅ **Resolved** — Camera and Animation are deserialized correctly | — |
-| Unknown components | If a custom type is added and not registered in the `switch`, it is ignored | Extend `deserializeNode()` with new types |
-| JSON text format | Large files for scenes with many nodes | Future: binary serialization (MessagePack) |
-| No reference to `component.node` | The circular reference `component → node` is lost | Automatically rebuilt by `addComponent()` |
+| 制限 | 影響 | 回避策 |
+|------|------|--------|
+| UUIDは保持される | 同じJSONから作成した2つのシーンは、同一のIDを持つノードを持つ | 独立したシーンが必要な場合は、デシリアライズ後にIDを再生成する |
+| ~~復元時にシーンがカメラを失う~~ | ✅ **解決済み** — CameraとAnimationは正しくデシリアライズされます | — |
+| 未知のコンポーネント | カスタムタイプが追加され、`switch`に登録されていない場合は無視される | `deserializeNode()`に新しいタイプを追加して拡張する |
+| JSONテキスト形式 | 多数のノードを持つシーンのファイルが大きくなる | 将来: バイナリシリアライゼーション（MessagePack） |
+| `component.node`への参照なし | 循環参照`component → node`は失われる | `addComponent()`によって自動的に再構築される |

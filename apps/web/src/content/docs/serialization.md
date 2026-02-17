@@ -4,26 +4,27 @@ description: "JSON serialization for saving, loading, and sharing scenes"
 order: 5
 category: "concepts"
 ---
-# Serialización
 
-Oroya Animate incluye un sistema de serialización JSON que permite guardar y cargar escenas completas. Es la base para editores visuales, colaboración y versionado de escenas.
+# Serialization
 
----
-
-## Tabla de contenidos
-
-- [Serializar una escena](#serializar-una-escena)
-- [Deserializar una escena](#deserializar-una-escena)
-- [Formato del JSON](#formato-del-json)
-- [Componentes soportados](#componentes-soportados)
-- [Casos de uso](#casos-de-uso)
-- [Limitaciones](#limitaciones)
+Oroya Animate includes a JSON serialization system that allows saving and loading complete scenes. It is the foundation for visual editors, collaboration, and scene versioning.
 
 ---
 
-## Serializar una escena
+## Table of contents
 
-La función `serialize` convierte todo el scene graph a un string JSON formateado:
+- [Serialize a scene](#serialize-a-scene)
+- [Deserialize a scene](#deserialize-a-scene)
+- [JSON format](#json-format)
+- [Supported components](#supported-components)
+- [Use cases](#use-cases)
+- [Limitations](#limitations)
+
+---
+
+## Serialize a scene
+
+The `serialize` function converts the entire scene graph to a formatted JSON string:
 
 ```typescript
 import { Scene, Node, createBox, Material, serialize } from '@joroya/core';
@@ -40,22 +41,22 @@ const json = serialize(scene);
 console.log(json);
 ```
 
-### Flujo de serialización
+### Serialization flow
 
 ```mermaid
 flowchart LR
     S["Scene"] -->|"serialize()"| SR["serializeNode(root)"]
-    SR -->|"recursivo"| SN["Para cada nodo:\nid, name, components, children"]
-    SN -->|"spread"| SC["Cada component:\n{ type, ...data }"]
-    SC --> JSON["JSON.stringify()\ncon indent 2"]
+    SR -->|"recursive"| SN["For each node:\nid, name, components, children"]
+    SN -->|"spread"| SC["Each component:\n{ type, ...data }"]
+    SC --> JSON["JSON.stringify()\nwith indent 2"]
     JSON --> STR["string"]
 ```
 
 ---
 
-## Deserializar una escena
+## Deserialize a scene
 
-La función `deserialize` reconstruye una `Scene` funcional desde un string JSON:
+The `deserialize` function reconstructs a functional `Scene` from a JSON string:
 
 ```typescript
 import { deserialize } from '@joroya/core';
@@ -66,7 +67,7 @@ const found = restoredScene.findNodeByName('hero-cube');
 console.log(found?.transform.position); // { x: 3, y: 0, z: -1 }
 ```
 
-La escena restaurada es completamente funcional  Epuede montarse en cualquier renderer:
+The restored scene is fully functional and can be mounted on any renderer:
 
 ```typescript
 import { ThreeRenderer } from '@joroya/renderer-three';
@@ -76,22 +77,22 @@ renderer.mount(restoredScene);
 renderer.render();
 ```
 
-### Flujo de deserialización
+### Deserialization flow
 
 ```mermaid
 flowchart LR
-    STR["string JSON"] -->|"JSON.parse()"| OBJ["SerializableScene"]
-    OBJ -->|"deserializeNode()"| RN["Reconstruir nodos\nrecursivamente"]
-    RN -->|"switch(type)"| COMP["Recrear componentes:\nTransform, Geometry, Material,\nCamera, Animation"]
+    STR["JSON string"] -->|"JSON.parse()"| OBJ["SerializableScene"]
+    OBJ -->|"deserializeNode()"| RN["Rebuild nodes\nrecursively"]
+    RN -->|"switch(type)"| COMP["Recreate components:\nTransform, Geometry, Material,\nCamera, Animation"]
     COMP --> SCENE["new Scene()"]
     RN -->|"children"| SCENE
 ```
 
 ---
 
-## Formato del JSON
+## JSON format
 
-### Estructura general
+### General structure
 
 ```mermaid
 graph TD
@@ -100,11 +101,11 @@ graph TD
     SN -->|"name"| NAME["string"]
     SN -->|"components"| COMPS["SerializableComponent[]"]
     SN -->|"children"| CHILDREN["SerializableNode[]"]
-    CHILDREN -->|"recursivo"| SN
+    CHILDREN -->|"recursive"| SN
     COMPS --> SC["{ type: ComponentType, ...data }"]
 ```
 
-### Ejemplo completo de output
+### Complete output example
 
 ```json
 {
@@ -159,69 +160,69 @@ graph TD
 }
 ```
 
-### Interfaces internas
+### Internal interfaces
 
-| Interface | Campos | Descripción |
+| Interface | Fields | Description |
 |-----------|--------|-------------|
-| `SerializableScene` | `root: SerializableNode` | Contenedor de nivel superior |
-| `SerializableNode` | `id`, `name`, `cssClass?`, `cssId?`, `components[]`, `children[]` | Representación plana de un nodo |
-| `SerializableComponent` | `type: ComponentType`, `+ ...data` | Cada componente con su tipo y datos |
+| `SerializableScene` | `root: SerializableNode` | Top-level container |
+| `SerializableNode` | `id`, `name`, `cssClass?`, `cssId?`, `components[]`, `children[]` | Flat representation of a node |
+| `SerializableComponent` | `type: ComponentType`, `+ ...data` | Each component with its type and data |
 
 ---
 
-## Componentes soportados
+## Supported components
 
-### En serialización (`serialize`)
+### In serialization (`serialize`)
 
-Todos los componentes se serializan usando spread (`{ ...component }`):
+All components are serialized using spread (`{ ...component }`):
 
-| Componente | Datos serializados |
-|------------|-------------------|
+| Component | Serialized data |
+|-----------|-----------------|
 | `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | `definition` completo (tipo + parámetros de geometría) |
-| `Material` | `definition` completo (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
-| `Camera` | `definition` completo (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
-| `Animation` | `animations[]`  Earray de `SvgAnimationDef` (animate / animateTransform) |
+| `Geometry` | Full `definition` (type + geometry parameters) |
+| `Material` | Full `definition` (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
+| `Camera` | Full `definition` (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
+| `Animation` | `animations[]` — array of `SvgAnimationDef` (animate / animateTransform) |
 
-### En deserialización (`deserialize`)
+### In deserialization (`deserialize`)
 
-| Componente | ¿Se restaura? | Método |
-|------------|----------------|--------|
-| `Transform` | ✁E| `Object.assign(new Transform(), data)` |
-| `Geometry` | ✁E| `new Geometry(data.definition)` |
-| `Material` | ✁E| `new Material(data.definition)` |
-| `Camera` | ✁E| `new Camera(data.definition)` |
-| `Animation` | ✁E| `new Animation(data.animations)` |
+| Component | Restored? | Method |
+|-----------|-----------|--------|
+| `Transform` | ✅ | `Object.assign(new Transform(), data)` |
+| `Geometry` | ✅ | `new Geometry(data.definition)` |
+| `Material` | ✅ | `new Material(data.definition)` |
+| `Camera` | ✅ | `new Camera(data.definition)` |
+| `Animation` | ✅ | `new Animation(data.animations)` |
 
-> **Nota:** Todos los componentes se serializan y deserializan correctamente, incluyendo `Camera` y `Animation`.
+> **Note:** All components serialize and deserialize correctly, including `Camera` and `Animation`.
 
-### Preservación de datos
+### Data preservation
 
-| Dato | ¿Se preserva? |
-|------|----------------|
-| UUID del nodo | ✁EExacto |
-| Nombre del nodo | ✁E|
-| Jerarquía padre-hijo | ✁E|
-| Posición | ✁E|
-| Rotación (quaternion) | ✁E|
-| Escala | ✁E|
-| Matrices (local + world) | ✁E|
-| Tipo de geometría | ✁E|
-| Parámetros de geometría | ✁E|
-| Color del material | ✁E|
-| Opacidad | ✁E|
-| Fill/Stroke (SVG) | ✁E|
-| Gradientes (fill/stroke) | ✁E|
-| Filter / ClipPath / Mask | ✁E|
-| Cámara (Perspective + Orthographic) | ✁E|
-| Animaciones SVG | ✁E|
-| `cssClass` / `cssId` | ✁E|
+| Data | Preserved? |
+|------|------------|
+| Node UUID | ✅ Exact |
+| Node name | ✅ |
+| Parent-child hierarchy | ✅ |
+| Position | ✅ |
+| Rotation (quaternion) | ✅ |
+| Scale | ✅ |
+| Matrices (local + world) | ✅ |
+| Geometry type | ✅ |
+| Geometry parameters | ✅ |
+| Material color | ✅ |
+| Opacity | ✅ |
+| Fill/Stroke (SVG) | ✅ |
+| Gradients (fill/stroke) | ✅ |
+| Filter / ClipPath / Mask | ✅ |
+| Camera (Perspective + Orthographic) | ✅ |
+| SVG animations | ✅ |
+| `cssClass` / `cssId` | ✅ |
 
 ---
 
-## Casos de uso
+## Use cases
 
-### Persistencia en localStorage
+### localStorage persistence
 
 ```typescript
 function saveScene(scene: Scene): void {
@@ -236,7 +237,7 @@ function loadScene(): Scene | null {
 }
 ```
 
-### Exportar como archivo descargable
+### Export as downloadable file
 
 ```typescript
 function downloadScene(scene: Scene, filename: string): void {
@@ -255,7 +256,7 @@ function downloadScene(scene: Scene, filename: string): void {
 downloadScene(scene, 'my-scene.json');
 ```
 
-### Importar desde archivo
+### Import from file
 
 ```typescript
 async function importScene(file: File): Promise<Scene> {
@@ -263,7 +264,7 @@ async function importScene(file: File): Promise<Scene> {
   return deserialize(text);
 }
 
-// Con input[type=file]
+// With input[type=file]
 input.addEventListener('change', async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
@@ -276,7 +277,7 @@ input.addEventListener('change', async (e) => {
 ### Server-side rendering
 
 ```typescript
-// Recibir la escena serializada, renderizar a SVG en el servidor
+// Receive serialized scene, render to SVG on server
 import { deserialize } from '@joroya/core';
 import { renderToSVG } from '@joroya/renderer-svg';
 
@@ -286,18 +287,18 @@ function handleRequest(jsonBody: string): string {
 }
 ```
 
-### Versionado en Git
+### Git versioning
 
-Guardar escenas como `.json` permite:
+Saving scenes as `.json` allows:
 
 ```
 scenes/
-├── level-01.json    ↁEVersionado con git
+├── level-01.json    → Versioned with git
 ├── level-02.json
 └── hub-world.json
 ```
 
-Los diffs de Git muestran exactamente qué cambió:
+Git diffs show exactly what changed:
 
 ```diff
  "name": "hero-cube",
@@ -310,12 +311,12 @@ Los diffs de Git muestran exactamente qué cambió:
 
 ---
 
-## Limitaciones
+## Limitations
 
-| Limitación | Impacto | Workaround |
-|------------|---------|------------|
-| UUIDs se preservan | Dos escenas del mismo JSON tendrán nodos con IDs idénticos | Regenerar IDs post-deserialización si se necesitan escenas independientes |
-| Camera no se deserializa | ~~La escena pierde su cámara al restaurar~~ | ✁E**Resuelto**  ECamera y Animation se deserializan correctamente |
-| Componentes desconocidos | Si se agrega un tipo custom y no se registra en el `switch`, se ignora | Extender `deserializeNode()` con nuevos tipos |
-| xxxxxxxxxx const snapshot = new Map<string, Vec3>();​scene.traverse(node => {  const wm = node.transform.worldMatrix;  snapshot.set(node.id, {    x: wm[12], // posición X del mundo    y: wm[13], // posición Y del mundo    z: wm[14], // posición Z del mundo  });});typescript | Archivos grandes para escenas con muchos nodos | Futuro: serialización binaria (MessagePack) |
-| Sin referencia a `component.node` | La referencia circular `component ↁEnode` se pierde | Se reconstruye automáticamente por `addComponent()` |
+| Limitation | Impact | Workaround |
+|------------|--------|------------|
+| UUIDs are preserved | Two scenes from the same JSON will have nodes with identical IDs | Regenerate IDs after deserialization if independent scenes are needed |
+| ~~Scene loses its camera when restored~~ | ✅ **Resolved** — Camera and Animation are deserialized correctly | — |
+| Unknown components | If a custom type is added and not registered in the `switch`, it is ignored | Extend `deserializeNode()` with new types |
+| JSON text format | Large files for scenes with many nodes | Future: binary serialization (MessagePack) |
+| No reference to `component.node` | The circular reference `component → node` is lost | Automatically rebuilt by `addComponent()` |

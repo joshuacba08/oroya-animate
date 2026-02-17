@@ -12,6 +12,9 @@ export enum ComponentType {
   Animation = 'Animation',
   Light = 'Light',
   Environment = 'Environment',
+  RigidBody = 'RigidBody',
+  Collider = 'Collider',
+  Script = 'Script',
 }
 
 /**
