@@ -1,17 +1,17 @@
 ---
 title: "Renderers"
-description: "Three.js WebGL and SVG renderer implementations in depth"
+description: "Implementaciones en profundidad del renderer Three.js WebGL y SVG"
 order: 4
 category: "concepts"
 ---
 
 # Renderers
 
-Oroya Animate renderers are **translators** that convert the agnostic scene graph into visual output. The core does not know about renderers — each one reads the scene graph and produces its own representation.
+Los renderers de Oroya Animate son **traductores** que convierten el scene graph agnóstico en salida visual. El core no conoce a los renderers — cada uno lee el scene graph y produce su propia representación.
 
 ---
 
-## Overview
+## Visión general
 
 ```mermaid
 graph TD
@@ -27,19 +27,19 @@ graph TD
     RS --> SVG
 ```
 
-| Aspect | `ThreeRenderer` | `renderToSVG` |
+| Aspecto | `ThreeRenderer` | `renderToSVG` |
 |---------|----------------|---------------|
-| **Paradigm** | Stateful instance (class) | Pure function (stateless) |
-| **Output** | Draws to a `<canvas>` | Returns an SVG `string` |
-| **Requires DOM** | ✅ Yes (`HTMLCanvasElement`) | ❌ No (works in Node.js) |
-| **3D** | ✅ Perspective, lights, shadows | ❌ 2D only |
-| **Vector** | ❌ Rasterized | ✅ Infinitely scalable |
+| **Paradigma** | Instancia con estado (class) | Función pura (stateless) |
+| **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
+| **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
+| **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
+| **Vectorial** | ❌ Rasterizado | ✅ Infinitamente escalable |
 
 ---
 
 ## `@joroya/renderer-three` — Three.js (WebGL)
 
-The main renderer for interactive 3D visualization.
+El renderer principal para visualización 3D interactiva.
 
 ### Setup
 
@@ -50,28 +50,28 @@ const renderer = new ThreeRenderer({
   canvas: document.getElementById('canvas') as HTMLCanvasElement,
   width: window.innerWidth,
   height: window.innerHeight,
-  dpr: window.devicePixelRatio,  // optional
+  dpr: window.devicePixelRatio,  // opcional
 });
 ```
 
-### Constructor options
+### Opciones del constructor
 
-| Option | Type | Default | Description |
+| Opción | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
-| `canvas` | `HTMLCanvasElement` | *(required)* | Target canvas element |
-| `width` | `number` | *(required)* | Viewport width |
-| `height` | `number` | *(required)* | Viewport height |
+| `canvas` | `HTMLCanvasElement` | *(requerido)* | Elemento canvas destino |
+| `width` | `number` | *(requerido)* | Ancho del viewport |
+| `height` | `number` | *(requerido)* | Alto del viewport |
 | `dpr` | `number` | `window.devicePixelRatio` | Device pixel ratio (HiDPI) |
 
-### Methods
+### Métodos
 
-| Method | Description |
+| Método | Descripción |
 |--------|-------------|
-| `mount(scene)` | Connects a scene. Rebuilds the Three.js scene, detects the active camera, adds lights |
-| `render()` | Syncs transforms, propagates matrices and draws a frame |
-| `dispose()` | Releases WebGL resources |
+| `mount(scene)` | Conecta una escena. Reconstruye la escena Three.js, detecta la cámara activa, agrega luces |
+| `render()` | Sincroniza transforms, propaga matrices y dibuja un frame |
+| `dispose()` | Libera recursos WebGL |
 
-### Lifecycle
+### Ciclo de vida
 
 ```mermaid
 sequenceDiagram
@@ -79,7 +79,7 @@ sequenceDiagram
     participant TR as ThreeRenderer
     participant TS as THREE.Scene
 
-    Note over U,TS: Mounting
+    Note over U,TS: Montaje
     U->>TR: mount(scene)
     TR->>TS: clear + add lights
     TR->>TR: traverse → create Mesh/Group/Camera per node
@@ -94,37 +94,37 @@ sequenceDiagram
     end
 ```
 
-### Component translation
+### Traducción de componentes
 
-| Oroya Node | Three.js Object |
+| Nodo Oroya | Objeto Three.js |
 |------------|-----------------|
-| Node without Geometry or Camera | `THREE.Group` |
+| Node sin Geometry ni Camera | `THREE.Group` |
 | Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
 | Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
-| Node + `Geometry(Path2D)` | ❌ Ignored |
+| Node + `Geometry(Path2D)` | ❌ Ignorado |
 | Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
-| `Material` with `color` | `MeshStandardMaterial({ color })` |
-| `Material` with `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
-| Without `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
+| `Material` con `color` | `MeshStandardMaterial({ color })` |
+| `Material` con `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
+| Sin `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
 
-### Automatic lighting
+### Iluminación automática
 
-| Type | Config |
+| Tipo | Config |
 |------|--------|
-| `AmbientLight` | White, intensity `0.5` |
-| `DirectionalLight` | White, intensity `1.5`, position `(2, 5, 3)` |
+| `AmbientLight` | Blanco, intensidad `0.5` |
+| `DirectionalLight` | Blanco, intensidad `1.5`, posición `(2, 5, 3)` |
 
-### Camera resolution
+### Resolución de cámaras
 
 ```mermaid
 flowchart TD
     START["mount(scene)"] --> TRAVERSE["Traverse scene graph"]
-    TRAVERSE --> FOUND{"Camera found?"}
-    FOUND -->|"Yes"| USE["Use first as active"]
+    TRAVERSE --> FOUND{"¿Encontró Camera?"}
+    FOUND -->|"Sí"| USE["Usar primera como activa"]
     FOUND -->|"No"| FALLBACK["Fallback: PerspectiveCamera, FOV 75, z=5"]
 ```
 
-### Full example
+### Ejemplo completo
 
 ```typescript
 import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
@@ -164,11 +164,11 @@ requestAnimationFrame(loop);
 
 ## `@joroya/renderer-svg` — SVG (2D)
 
-Lightweight renderer that generates SVG markup. Ideal for generative art, vector export, and server-side rendering.
+Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### `renderToSVG` — Pure string (server-safe)
+### `renderToSVG` — String puro (server-safe)
 
-Pure, stateless function that returns an SVG string. Works in Node.js without DOM.
+Función pura y stateless que retorna un string SVG. Funciona en Node.js sin DOM.
 
 ```typescript
 import { renderToSVG } from '@joroya/renderer-svg';
@@ -176,17 +176,17 @@ import { renderToSVG } from '@joroya/renderer-svg';
 const svg: string = renderToSVG(scene, { width: 400, height: 300 });
 ```
 
-#### Options (`SvgRenderOptions`)
+#### Opciones (`SvgRenderOptions`)
 
-| Option | Type | Default | Description |
+| Opción | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
-| `width` | `number` | *(required)* | SVG width |
-| `height` | `number` | *(required)* | SVG height |
-| `viewBox` | `string` | `"0 0 {width} {height}"` | Custom viewBox |
+| `width` | `number` | *(requerido)* | Ancho del SVG |
+| `height` | `number` | *(requerido)* | Alto del SVG |
+| `viewBox` | `string` | `"0 0 {width} {height}"` | viewBox personalizado |
 
-### `renderToSVGElement` — Interactive DOM
+### `renderToSVGElement` — DOM interactivo
 
-Creates a real `SVGSVGElement` with event delegation. Nodes with the `Interactive` component receive pointer/click/wheel listeners.
+Crea un `SVGSVGElement` real con event delegation. Los nodos con componente `Interactive` reciben listeners de pointer/click/wheel.
 
 ```typescript
 import { renderToSVGElement } from '@joroya/renderer-svg';
@@ -197,28 +197,28 @@ const { svg, dispose } = renderToSVGElement(scene, {
   container: document.getElementById('app')!,
 });
 
-// When no longer needed:
-dispose(); // Cleans listeners and removes SVG from DOM
+// Cuando ya no se necesite:
+dispose(); // Limpia listeners y remueve el SVG del DOM
 ```
 
-#### Options (`SvgElementRenderOptions`)
+#### Opciones (`SvgElementRenderOptions`)
 
-Extends `SvgRenderOptions` with:
+Extiende `SvgRenderOptions` con:
 
-| Option | Type | Description |
+| Opción | Tipo | Descripción |
 |--------|------|-------------|
-| `container` | `HTMLElement` | *(optional)* Parent element where the SVG is automatically attached |
+| `container` | `HTMLElement` | *(opcional)* Elemento padre donde se adjunta el SVG automáticamente |
 
-#### Return
+#### Retorno
 
-| Field | Type | Description |
+| Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `svg` | `SVGSVGElement` | The created SVG element |
-| `dispose` | `() => void` | Cleans event listeners and removes SVG from DOM |
+| `svg` | `SVGSVGElement` | El elemento SVG creado |
+| `dispose` | `() => void` | Limpia event listeners y remueve el SVG del DOM |
 
-#### Supported interactive events
+#### Eventos interactivos soportados
 
-| DOM Event | `InteractionEventType` |
+| Evento DOM | `InteractionEventType` |
 |-----------|------------------------|
 | `click` | `Click` |
 | `pointerdown` | `PointerDown` |
@@ -233,55 +233,55 @@ Extends `SvgRenderOptions` with:
 ```mermaid
 flowchart TD
     START["renderToSVG / renderToSVGElement"] --> UPDATE["scene.updateWorldMatrices()"]
-    UPDATE --> WALK["Traverse tree recursively"]
-    WALK --> GEO{"Geometry?"}
-    GEO -->|"Path2D"| PATH["→ path"]
-    GEO -->|"Box"| RECT["→ rect"]
-    GEO -->|"Sphere"| CIRCLE["→ circle"]
-    GEO -->|"Text"| TEXT["→ text"]
-    GEO -->|"None"| GROUP["Only g if has children"]
-    PATH & RECT & CIRCLE & TEXT --> MAT{"Material?"}
+    UPDATE --> WALK["Recorrer árbol recursivamente"]
+    WALK --> GEO{"¿Geometry?"}
+    GEO -->|"Path2D"| PATH["→path"]
+    GEO -->|"Box"| RECT["→rect"]
+    GEO -->|"Sphere"| CIRCLE["→circle"]
+    GEO -->|"Text"| TEXT["→text"]
+    GEO -->|"Ninguno"| GROUP["Solo g si tiene hijos"]
+    PATH & RECT & CIRCLE & TEXT --> MAT{"¿Material?"}
     MAT -->|"fill/stroke"| STYLE["fill + stroke + opacity"]
     MAT -->|"fillGradient"| GRAD["url(#gradient-id) + defs"]
     MAT -->|"filter/clip/mask"| FILT["url(#filter-id) + defs"]
-    MAT -->|"None"| NONE["fill='none'"]
-    STYLE & GRAD & FILT & NONE --> ANIM{"Animation?"}
-    ANIM -->|"Yes"| ANIMC["animate / animateTransform children"]
-    ANIM -->|"No"| NOANIM["No animation"]
-    ANIMC & NOANIM --> TRANSFORM{"Transform ≠ identity?"}
-    TRANSFORM -->|"Yes"| MATRIX["g transform='matrix(a,b,c,d,e,f)'"]
-    TRANSFORM -->|"No"| DIRECT["Direct element"]
-    MATRIX & DIRECT --> CHILDREN{"Children?"}
-    CHILDREN -->|"Yes"| NEST["Nest in g"]
-    CHILDREN -->|"No"| LEAF["Leaf node"]
+    MAT -->|"Ninguno"| NONE["fill='none'"]
+    STYLE & GRAD & FILT & NONE --> ANIM{"¿Animation?"}
+    ANIM -->|"Sí"| ANIMC["animate / animateTransform hijos"]
+    ANIM -->|"No"| NOANIM["Sin animación"]
+    ANIMC & NOANIM --> TRANSFORM{"¿Transform ≠ identity?"}
+    TRANSFORM -->|"Sí"| MATRIX["g transform='matrix(a,b,c,d,e,f)'"]
+    TRANSFORM -->|"No"| DIRECT["Elemento directo"]
+    MATRIX & DIRECT --> CHILDREN{"¿Hijos?"}
+    CHILDREN -->|"Sí"| NEST["Anidar en g"]
+    CHILDREN -->|"No"| LEAF["Nodo hoja"]
 ```
 
-### Geometry support
+### Soporte de geometrías
 
-| Geometry | Generated SVG Element |
-|----------|----------------------|
+| Geometría | Elemento SVG generado |
+|-----------|----------------------|
 | `Path2D` | `<path d="...">` |
-| `Box` | `<rect>` (width × height, depth ignored) |
-| `Sphere` | `<circle>` (radius) |
-| `Text` | `<text>` with font-size, font-family, font-weight, text-anchor, dominant-baseline |
+| `Box` | `<rect>` (width × height, depth ignorado) |
+| `Sphere` | `<circle>` (radio) |
+| `Text` | `<text>` con font-size, font-family, font-weight, text-anchor, dominant-baseline |
 
-### Material properties for SVG
+### Propiedades del material para SVG
 
-| Field | Type | SVG Effect | If absent |
-|-------|------|-----------|-----------|
+| Campo | Tipo | Efecto SVG | Si ausente |
+|-------|------|-----------|------------|
 | `fill` | `ColorRGB` | `fill="rgb(R,G,B)"` | `fill="none"` |
-| `stroke` | `ColorRGB` | `stroke="rgb(R,G,B)"` | No stroke |
+| `stroke` | `ColorRGB` | `stroke="rgb(R,G,B)"` | Sin stroke |
 | `strokeWidth` | `number` | `stroke-width="N"` | `1` |
-| `opacity` | `number` | `opacity="N"` | No attribute (opaque) |
-| `fillGradient` | `GradientDef` | `fill="url(#id)"` + `<defs>` | Uses normal `fill` |
-| `strokeGradient` | `GradientDef` | `stroke="url(#id)"` + `<defs>` | Uses normal `stroke` |
-| `filter` | `SvgFilterDef` | `filter="url(#id)"` + `<filter>` in `<defs>` | No filter |
-| `clipPath` | `SvgClipPathDef` | `clip-path="url(#id)"` + `<clipPath>` in `<defs>` | No clipping |
-| `mask` | `SvgMaskDef` | `mask="url(#id)"` + `<mask>` in `<defs>` | No mask |
+| `opacity` | `number` | `opacity="N"` | Sin atributo (opaco) |
+| `fillGradient` | `GradientDef` | `fill="url(#id)"` + `<defs>` | Usa `fill` normal |
+| `strokeGradient` | `GradientDef` | `stroke="url(#id)"` + `<defs>` | Usa `stroke` normal |
+| `filter` | `SvgFilterDef` | `filter="url(#id)"` + `<filter>` en `<defs>` | Sin filtro |
+| `clipPath` | `SvgClipPathDef` | `clip-path="url(#id)"` + `<clipPath>` en `<defs>` | Sin recorte |
+| `mask` | `SvgMaskDef` | `mask="url(#id)"` + `<mask>` en `<defs>` | Sin máscara |
 
-### Transforms and hierarchy
+### Transforms y jerarquía
 
-The SVG renderer applies each node's `localMatrix` as a `transform="matrix(a,b,c,d,e,f)"` attribute and generates `<g>` elements to represent the parent-child hierarchy of the scene graph.
+El renderer SVG aplica el `localMatrix` de cada nodo como atributo `transform="matrix(a,b,c,d,e,f)"` y genera `<g>` para representar la jerarquía padre-hijo del scene graph.
 
 ```typescript
 const parent = new Node('group');
@@ -295,14 +295,14 @@ parent.add(child);
 scene.add(parent);
 ```
 
-Generates:
+Genera:
 ```xml
 <g transform="matrix(1,0,0,1,100,50)">
   <rect x="-15" y="-15" width="30" height="30" fill="rgb(255, 0, 0)" />
 </g>
 ```
 
-### Gradients
+### Gradientes
 
 ```typescript
 const circle = new Node('sun');
@@ -319,14 +319,14 @@ circle.addComponent(new Material({
 }));
 ```
 
-Gradient types:
+Tipos de gradiente:
 
-| Type | Definition | SVG Element |
-|------|-----------|-------------|
+| Tipo | Definición | Elemento SVG |
+|------|-----------|--------------|
 | `linear` | `LinearGradientDef` (x1, y1, x2, y2) | `<linearGradient>` |
 | `radial` | `RadialGradientDef` (cx, cy, r, fx, fy) | `<radialGradient>` |
 
-### Text
+### Texto
 
 ```typescript
 const label = new Node('title');
@@ -341,9 +341,9 @@ label.transform.position = { x: 200, y: 30, z: 0 };
 scene.add(label);
 ```
 
-### CSS Classes and Semantic IDs
+### CSS Classes y IDs semánticos
 
-Each node can have a `cssClass` and/or `cssId` that are emitted as `class` and `id` attributes on the generated SVG elements.
+Cada nodo puede tener un `cssClass` y/o `cssId` que se emiten como atributos `class` e `id` en los elementos SVG generados.
 
 ```typescript
 const node = new Node('highlight-box');
@@ -354,23 +354,23 @@ node.cssId = 'main-callout';
 scene.add(node);
 ```
 
-Generates:
+Genera:
 ```xml
 <rect id="main-callout" class="highlight animated" x="-50" y="-30" width="100" height="60" fill="rgb(255, 230, 0)" />
 ```
 
-When the node has children or a transform, the attribute is applied to the container `<g>`:
+Cuando el nodo tiene hijos o transform, el atributo se aplica al `<g>` contenedor:
 ```xml
 <g id="main-callout" class="highlight animated" transform="matrix(1,0,0,1,50,25)">
   <rect x="-50" y="-30" width="100" height="60" fill="rgb(255, 230, 0)" />
 </g>
 ```
 
-> **Serialization:** `cssClass` and `cssId` are preserved in `serialize()` / `deserialize()`.
+> **Serialización:** `cssClass` y `cssId` se preservan en `serialize()` / `deserialize()`.
 
-### Orthographic camera and viewBox
+### Cámara ortográfica y viewBox
 
-If the scene contains a node with `OrthographicCameraDef`, the SVG renderer automatically calculates the `viewBox` from the camera frustum. An explicit `viewBox` in the options takes priority.
+Si la escena contiene un nodo con `OrthographicCameraDef`, el renderer SVG calcula automáticamente el `viewBox` a partir del frustum de la cámara. Un `viewBox` explícito en las opciones tiene prioridad.
 
 ```typescript
 const cam = new Node('ortho-cam');
@@ -382,19 +382,19 @@ cam.addComponent(new Camera({
 }));
 scene.add(cam);
 
-// viewBox is computed as "-400 -300 800 600"
+// viewBox se calcula como "-400 -300 800 600"
 const svg = renderToSVG(scene, { width: 800, height: 600 });
 ```
 
-The camera position is applied as an offset to the viewBox:
+La posición de la cámara se aplica como offset al viewBox:
 ```typescript
 cam.transform.position = { x: 50, y: 25, z: 0 };
-// viewBox is computed as "-350 -275 800 600"
+// viewBox se calcula como "-350 -275 800 600"
 ```
 
-### SVG Filters, Clip Paths and Masks
+### SVG Filters, Clip Paths y Masks
 
-The renderer supports native SVG filters, clip paths, and masks through fields in `MaterialDef`.
+El renderer soporta filtros SVG nativos, clip paths y máscaras a través de campos en `MaterialDef`.
 
 #### Blur
 
@@ -407,7 +407,7 @@ blurred.addComponent(new Material({
 }));
 ```
 
-Generates:
+Genera:
 ```xml
 <defs>
   <filter id="oroya-filter-0">
@@ -465,9 +465,9 @@ new Material({
 });
 ```
 
-### Native SVG Animations
+### SVG Animaciones nativas
 
-The `Animation` component allows adding declarative SVG animations (`<animate>` and `<animateTransform>`) that run in the browser without JavaScript.
+El componente `Animation` permite agregar animaciones SVG declarativas (`<animate>` y `<animateTransform>`) que se ejecutan en el navegador sin JavaScript.
 
 ```typescript
 import { Animation } from '@joroya/core';
@@ -486,14 +486,14 @@ circle.addComponent(new Animation([
 ]));
 ```
 
-Generates:
+Genera:
 ```xml
 <circle cx="0" cy="0" r="30" fill="rgb(255, 0, 0)">
   <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
 </circle>
 ```
 
-Transform animations:
+Animaciones de transformación:
 ```typescript
 new Animation([
   {
@@ -507,17 +507,17 @@ new Animation([
 ]);
 ```
 
-Generates:
+Genera:
 ```xml
 <animateTransform attributeName="transform" type="rotate"
   from="0 50 50" to="360 50 50" dur="4s" repeatCount="indefinite" />
 ```
 
-> **fill="freeze"** keeps the final value after the animation ends, instead of reverting.
+> **fill="freeze"** mantiene el valor final después de que la animación termina, en lugar de revertir.
 
-> **Note:** Native animations only apply to the SVG renderer. The Three.js renderer ignores them.
+> **Nota:** Las animaciones nativas solo aplican al renderer SVG. El renderer Three.js las ignora.
 
-### Full Example
+### Ejemplo completo
 
 ```typescript
 const triangle = new Node('triangle');
@@ -538,33 +538,33 @@ scene.add(triangle);
 const svg = renderToSVG(scene, { width: 400, height: 300 });
 ```
 
-### Use Cases
+### Casos de uso
 
-| Use Case | Advantage |
-|----------|-----------|
-| Export to .svg | Open in Figma, Illustrator, Inkscape |
-| Server-side rendering | Node.js without DOM |
-| Generative art | Procedural patterns as vectors |
-| Printing | Losslessly scalable |
-| SVG Interactivity | `renderToSVGElement` with event delegation |
+| Caso | Ventaja |
+|------|---------|
+| Exportar a .svg | Abrir en Figma, Illustrator, Inkscape |
+| Server-side rendering | Node.js sin DOM |
+| Arte generativo | Patrones procedurales como vectores |
+| Impresión | Escalable sin pérdida |
+| Interactividad SVG | `renderToSVGElement` con event delegation |
 
 ---
 
-## Renderer Comparison
+## Comparación entre renderers
 
-### Geometry Support
+### Soporte de geometrías
 
-| Geometry | Three.js | SVG |
-|----------|----------|-----|
+| Geometría | Three.js | SVG |
+|-----------|----------|-----|
 | `Box` | ✅ | ✅ `<rect>` |
 | `Sphere` | ✅ | ✅ `<circle>` |
 | `Path2D` | ❌ | ✅ `<path>` |
 | `Text` | ❌ | ✅ `<text>` |
 
-### Material Support
+### Soporte de material
 
-| Property | Three.js | SVG |
-|----------|----------|-----|
+| Propiedad | Three.js | SVG |
+|-----------|----------|-----|
 | `color` | ✅ | ❌ |
 | `opacity` | ✅ | ✅ |
 | `fill` | ❌ | ✅ |
@@ -576,30 +576,30 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 | `clipPath` | ❌ | ✅ |
 | `mask` | ❌ | ✅ |
 
-### Transform Support
+### Soporte de transforms
 
 | Feature | Three.js | SVG |
 |---------|----------|-----|
 | Position (translate) | ✅ | ✅ `matrix()` |
 | Rotation | ✅ | ✅ `matrix()` |
 | Scale | ✅ | ✅ `matrix()` |
-| Hierarchy (`<g>`) | ✅ Groups | ✅ `<g>` |
+| Jerarquía (`<g>`) | ✅ Groups | ✅ `<g>` |
 
-### Special Component Support
+### Soporte de componentes especiales
 
 | Feature | Three.js | SVG |
 |---------|----------|-----|
 | `Camera` (Perspective) | ✅ | ❌ |
 | `Camera` (Orthographic) | ❌ | ✅ viewBox |
-| `Interactive` (events) | ✅ Raycaster | ✅ Event delegation |
-| `Animation` (native SVG) | ❌ | ✅ `<animate>` / `<animateTransform>` |
-| `cssClass` / `cssId` | ❌ | ✅ `class` / `id` attributes |
+| `Interactive` (eventos) | ✅ Raycaster | ✅ Event delegation |
+| `Animation` (SVG nativo) | ❌ | ✅ `<animate>` / `<animateTransform>` |
+| `cssClass` / `cssId` | ❌ | ✅ atributos `class` / `id` |
 
 ---
 
-## Creating a Custom Renderer
+## Crear un renderer personalizado
 
-The contract is simple — implement `mount`, `render`, and `dispose`:
+El contrato es simple — implementar `mount`, `render` y `dispose`:
 
 ```typescript
 import { Scene, ComponentType, Geometry, Material, GeometryPrimitive } from '@joroya/core';
@@ -646,11 +646,11 @@ export class Canvas2DRenderer {
 
 ### Checklist
 
-| Step | Description |
+| Paso | Descripción |
 |------|-------------|
-| 1 | Create package in `packages/renderer-xxx/` |
-| 2 | Add `@joroya/core` as dependency |
-| 3 | Implement `mount()` — traverse tree and create objects |
-| 4 | Implement `render()` — sync transforms and draw |
-| 5 | Implement `dispose()` — release resources |
-| 6 | Document supported geometries and materials |
+| 1 | Crear paquete en `packages/renderer-xxx/` |
+| 2 | Agregar `@joroya/core` como dependencia |
+| 3 | Implementar `mount()` — recorrer árbol y crear objetos |
+| 4 | Implementar `render()` — sincronizar transforms y dibujar |
+| 5 | Implementar `dispose()` — liberar recursos |
+| 6 | Documentar geometrías y materiales soportados |

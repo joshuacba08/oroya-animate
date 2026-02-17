@@ -214,13 +214,39 @@ renderer.render();
 - [x] Boolean operations 2D/3D (CSG).
 - [x] Cubic spline interpolation for animations.
 - [x] Proper quaternion SLERP.
+### v0.6.0 — Lighting, Textures & Transform Utilities ✅
+- [x] **Lighting System**: Directional, Point, Ambient lights with intensity control.
+- [x] **Advanced Materials**: PBR workflow (roughness, metalness) + emissive properties.
+- [x] **Texture Support**: Diffuse, normal, and PBR maps.
+- [x] **Environment**: Fog (exponential), background color, and global ambient light.
+- [x] **Extended Geometry**: Cylinder, Cone, Plane, Torus primitives.
+- [x] **Transform Utilities**: `lookAt()`, `rotateOnAxis()`, `setFromMatrix()`.
+- [x] **Math Helpers**: Enhanced `Vector3` and `Quaternion` libraries.
+- [x] **New Examples**: Textures & Environment, LookAt tracking.
+
+### v0.7.0 — Physics & Optimization (Planned)
+- [ ] **Physics Engine**: Integration with Rapier/Cannon (Colliders, RigidBodies).
+- [ ] **Rendering Optimization**: InstancedMesh support for high-performance rendering.
+- [ ] **Culling**: Frustum culling and scene graph optimization.
+
+### v0.8.0 — Advanced Rendering & Effects (Visual Polish)
+- [ ] **Shadow System**: Support for casting and receiving shadows (Directional/Spot).
+- [ ] **Post-Processing**: Bloom, Tone Mapping, FXAA/SMAA chain.
+- [ ] **Particle System**: CPU-based particles for visual effects (fire, smoke).
+- [ ] **Spatial Audio**: Positional 3D audio component implementation.
+
+### v0.9.0 — Ecosystem & Developer Experience (Pre-1.0)
+- [ ] **Inspector / Debug UI**: Visual overlay to inspect scene graph and performance metrics.
+- [ ] **Input Manager**: Abstracted input handling (Gamepad, Touch, Keyboard gestures).
+- [ ] **Asset Manager**: Centralized preloading, caching, and progress tracking.
+- [ ] **Framework Wrappers**: Alpha release of `@joroya/react` and `@joroya/vue`.
 
 ### v1.0.0 — Production Ready (Vision)
-- [ ] WASM high-performance modules.
-- [ ] Visual scene editor.
-- [ ] Framework wrappers (Vue, Angular).
-- [ ] Plugin system for custom components.
-- [ ] Physics integration.
+- [ ] **API Stability**: Finalize public API surface and documentation.
+- [ ] **WASM Modules**: High-performance compute modules (optional).
+- [ ] **Visual Scene Editor**: Web-based editor for scene composition.
+- [ ] **Plugin System**: Architecture for community extensions.
+- [ ] **Full Test Coverage**: Comprehensive E2E and Unit testing suite.
 
 ## 🚀 Publishing & Deployment
 

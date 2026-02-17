@@ -1,0 +1,39 @@
+{
+    "name": "@joroya/physics",
+    "version": "0.1.0",
+    "description": "Physics engine integration for Oroya Animate using Rapier",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "keywords": [
+        "oroya",
+        "physics",
+        "rapier",
+        "3d",
+        "graphics"
+    ],
+    "author": "Oroya AI Collaborator",
+    "license": "MIT",
+    "dependencies": {
+        "@dimforge/rapier3d-compat": "^0.14.0"
+    },
+    "peerDependencies": {
+        "@joroya/core": "workspace:*"
+    },
+    "devDependencies": {
+        "@joroya/core": "workspace:*"
+    }
+}

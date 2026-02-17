@@ -2918,7 +2918,7 @@ function createSvJsGenerative() {
   const baseRotation = 45;
 
   const svg = new SvJs();
-  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize} ` });
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
   svg.rect(svgSize, svgSize, 0, 0).fill("#181818");
 
   for (let i = 0; i < iterations; i++) {
@@ -2930,7 +2930,7 @@ function createSvJsGenerative() {
     hue = hue % 360;
     svg.ellipse(radiusX, radiusY, center, center)
       .fill("none")
-      .stroke(`hsl(${hue} 80 % 80 % / 0.6)`)
+      .stroke(`hsl(${hue} 80% 80% / 0.6)`)
       .rotate(rotation, center, center);
   }
 
