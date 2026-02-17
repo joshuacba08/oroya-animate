@@ -5,7 +5,7 @@
     "tutorials": "チュートリアル"
   },
   "hero": {
-    "badge": "v0.4.0 — SVGインタラクティブ＆ジェネラティブアート",
+    "badge": "v0.5.0 — レンダラー完成＆3Dパイプライン",
     "heading1": "エンジン非依存",
     "heading2": "2D/3Dグラフィックス",
     "heading3": "Web向け",
@@ -27,11 +27,20 @@
     "svgRenderer": "SVGレンダラー",
     "svgRendererDesc": "ジェネラティブアート、データビジュアライゼーション、インタラクティブダイアグラムに最適な軽量2Dベクターグラフィックス。",
     "serialization": "シリアライゼーション",
-    "serializationDesc": "JSON形式でシーン全体を保存・読み込み。エディター、永続化、シーン構成の共有に最適。"
+    "serializationDesc": "JSON形式でシーン全体を保存・読み込み。エディター、永続化、シーン構成の共有に最適。",
+    "canvas2dRenderer": "Canvas2Dレンダラー",
+    "canvas2dRendererDesc": "外部依存ゼロのブラウザネイティブ2Dレンダリング。UIオーバーレイ、HUD、2Dゲームに最適。ハードウェアアクセラレーションによる高速グラフィックス。",
+    "gltfLoader": "glTF/GLBローダー",
+    "gltfLoaderDesc": "Blender、Maya、その他のglTF互換ツールから複雑な3Dモデルをインポート。ジオメトリ、PBRマテリアル、アニメーションを完全サポート。",
+    "csgOperations": "ブーリアン演算（CSG）",
+    "csgOperationsDesc": "構成的立体幾何学で複雑な形状を作成。ジオメトリの和集合、差集合、積集合で精巧な3Dモデルをプログラム的に構築。",
+    "lightSystem": "ライティングシステム",
+    "lightSystemDesc": "Ambient、Directional、Point、Spotの4種類のライトによる完全な照明。リアルな3Dシーン照明のためのシャドウキャスティング対応。",
+    "badgeNew": "NEW"
   },
   "renderers": {
-    "sectionTitle": "1つのシーングラフ、<span>複数のレンダラー</span>",
-    "sectionSubtitle": "シーンロジックを一度だけ記述。Three.jsで没入型3D WebGL体験、またはSVGで軽量でスケーラブルな2Dベクターグラフィックスをレンダリング。",
+    "sectionTitle": "1つのシーングラフ、<span>3つのレンダラー</span>",
+    "sectionSubtitle": "シーンロジックを一度だけ記述。Three.jsで没入型3D WebGL、SVGでスケーラブルなベクター、Canvas2Dで軽量ネイティブ2Dをレンダリング。",
     "threeTitle": "Three.jsレンダラー",
     "threeDesc": "Three.jsとWebGLによる完全な3Dレンダリング。透視投影・正投影カメラ、PBRマテリアル、glTFモデル読み込み、リアルタイムインタラクションイベントをサポート。",
     "svgTitle": "SVGレンダラー",
@@ -49,6 +58,14 @@
       "filters": "フィルター",
       "animations": "アニメーション",
       "interactive": "インタラクティブ"
+    },
+    "canvas2dTitle": "Canvas2Dレンダラー",
+    "canvas2dDesc": "依存関係ゼロのブラウザネイティブ2Dレンダリング。UIオーバーレイ、HUD、プロシージャルパターン、2Dゲームに最適。完全なトランスフォーム階層とハードウェアアクセラレーションCanvas API。",
+    "canvas2dBadges": {
+      "zeroDeps": "依存関係ゼロ",
+      "transforms": "トランスフォーム",
+      "gradients": "グラデーション",
+      "hardwareAccel": "GPUアクセラレーション"
     }
   },
   "capabilities": {
@@ -74,6 +91,20 @@
       "badge": "SvJsエンジン",
       "codeLine1": "const noise = new Noise()",
       "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "csg": {
+      "title": "ブーリアン演算（CSG）",
+      "description": "シンプルなジオメトリを組み合わせて複雑な形状を作成。Unionで形状を結合、Subtractで穴を開け、Intersectで重なる領域のみを保持 — すべて構成的立体幾何学で実現。",
+      "badge": "CSGエンジン",
+      "codeLine1": "createCSG({ op: CSGOperation.Subtract, ... })",
+      "codeLine2": "// Union · Subtract · Intersect"
+    },
+    "lighting": {
+      "title": "ライティングシステム",
+      "description": "4種類のライトで3Dシーンを照明：均一な光のAmbient、太陽光のDirectional、電球のPoint、懐中電灯のSpot。完全なシャドウキャスティング対応。",
+      "badge": "4種類のライト",
+      "codeLine1": "new Light({ type: LightType.Spot, ... })",
+      "codeLine2": "// Ambient · Directional · Point · Spot"
     },
     "tryDemo": "ホバーやクリックをお試しください",
     "learnMore": "ドキュメントを探索"

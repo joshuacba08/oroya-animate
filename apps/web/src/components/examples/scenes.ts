@@ -13,6 +13,8 @@ import {
   Animation,
   AnimationMixer,
   createPath2D,
+  Light,
+  LightType,
   type AnimationClip,
   type KeyframeTrack,
   type Path2DCommand,
@@ -33,6 +35,29 @@ function composeYX(yAngle: number, xAngle: number) {
   return { x: cy * sx, y: sy * cx, z: -sy * sx, w: cy * cx };
 }
 
+/**
+ * Add default lighting (ambient + directional) to a scene.
+ * Call this in every 3D scene so objects using MeshStandardMaterial are visible.
+ */
+function addDefaultLighting(scene: Scene) {
+  const ambient = new Node("default-ambient");
+  ambient.addComponent(new Light({
+    type: LightType.Ambient,
+    color: { r: 0.4, g: 0.4, b: 0.5 },
+    intensity: 0.6,
+  }));
+  scene.add(ambient);
+
+  const sun = new Node("default-sun");
+  sun.addComponent(new Light({
+    type: LightType.Directional,
+    color: { r: 1.0, g: 0.95, b: 0.9 },
+    intensity: 1.0,
+  }));
+  sun.transform.position = { x: 5, y: 8, z: 4 };
+  scene.add(sun);
+}
+
 // ── Hello Cube ─────────────────────────────────────────────────────────
 
 function createHelloCube() {
@@ -50,6 +75,7 @@ function createHelloCube() {
   );
   cam.transform.position = { x: 0, y: 1.8, z: 6 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const ground = new Node("ground");
   ground.addComponent(createBox(14, 0.15, 14));
@@ -127,6 +153,7 @@ function createSolarSystem() {
   );
   cam.transform.position = { x: 0, y: 10, z: 18 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const sun = new Node("sun");
   sun.addComponent(createSphere(1.5, 32, 32));
@@ -221,6 +248,7 @@ function createColorPalette() {
   );
   cam.transform.position = { x: 0, y: 2, z: 10 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const shapes = [
     { geo: "box" as const, color: { r: 0.9, g: 0.1, b: 0.2 }, size: 1.0 },
@@ -286,6 +314,7 @@ function createShapeGrid() {
   const extent = ((gridSize - 1) * step) / 2;
   cam.transform.position = { x: 0, y: extent * 1.5, z: extent * 3 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const cells: { node: Node; gx: number; gz: number }[] = [];
   const offset = ((gridSize - 1) * step) / 2;
@@ -355,6 +384,7 @@ function createProceduralCity() {
   );
   cam.transform.position = { x: 0, y: 18, z: totalSize * 0.8 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const ground = new Node("ground");
   ground.addComponent(createBox(totalSize + 14, 0.15, totalSize + 14));
@@ -1058,6 +1088,7 @@ function createPBRShowcase() {
   );
   cam.transform.position = { x: 0, y: 2, z: 8 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   // Ground plane
   const ground = new Node("ground");
@@ -1162,6 +1193,7 @@ function createOrthoDemo() {
   );
   cam.transform.position = { x: 5, y: 8, z: 5 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   // Ground plane
   const ground = new Node("ground");
@@ -1252,9 +1284,7 @@ function createGLTFDemo() {
   );
   cam.transform.position = { x: 0, y: 1.5, z: 4 };
   scene.add(cam);
-
-  // Lighting (simulated by adding emissive materials or just ambient light in renderer)
-  // Our renderer has default lights, so the model should be visible.
+  addDefaultLighting(scene);
 
   // Load the model asynchronously
   // Note: The factory function is synchronous, but we can load async content into the scene.
@@ -1303,6 +1333,7 @@ function createInteractiveCubes() {
   );
   cam.transform.position = { x: 0, y: 3.5, z: 8 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const ground = new Node("ground");
   ground.addComponent(createBox(14, 0.1, 14));
@@ -1386,6 +1417,7 @@ function createInterpolationComparison() {
   );
   cam.transform.position = { x: 0, y: 2.5, z: 10 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const ground = new Node("ground");
   ground.addComponent(createBox(16, 0.1, 6));
@@ -2035,6 +2067,7 @@ function createInteractiveDemo() {
   cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 60, aspect: 16 / 9, near: 0.1, far: 100 }));
   cam.transform.position = { x: 0, y: 2, z: 8 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const colors = [
     { r: 0.95, g: 0.26, b: 0.21 }, { r: 0.30, g: 0.69, b: 0.31 },
@@ -2092,6 +2125,7 @@ function createHoverShowcase() {
   cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 55, aspect: 16 / 9, near: 0.1, far: 100 }));
   cam.transform.position = { x: 0, y: 1.5, z: 10 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const configs = [
     { shape: "box" as const, baseColor: { r: 0.18, g: 0.53, b: 0.87 }, hoverColor: { r: 0.40, g: 0.73, b: 1.00 } },
@@ -2191,6 +2225,7 @@ function createClickPlayground() {
   cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 55, aspect: 16 / 9, near: 0.1, far: 100 }));
   cam.transform.position = { x: 0, y: 2, z: 12 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const counterNode = new Node("click-counter");
   counterNode.addComponent(createBox(1, 1, 1));
@@ -2315,6 +2350,7 @@ function createWheelAndBubbling() {
   cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 55, aspect: 16 / 9, near: 0.1, far: 100 }));
   cam.transform.position = { x: 0, y: 3, z: 14 };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const wheelConfigs = [
     { x: -4, color: { r: 0.18, g: 0.60, b: 0.95 }, shape: "box" as const },
@@ -2431,6 +2467,7 @@ function createCameraViewpoints() {
   cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 55, aspect: 16 / 9, near: 0.1, far: 200 }));
   cam.transform.position = { x: 0, y: cvCamHeight, z: cvCamDistance };
   scene.add(cam);
+  addDefaultLighting(scene);
 
   const groundBase = new Node("ground-base");
   groundBase.addComponent(createBox(24, 0.2, 24));

@@ -103,6 +103,52 @@ export function computeLocalAABB(def: GeometryDef): AABB {
             };
         }
 
+        case GeometryPrimitive.Cylinder: {
+            const radiusTop = def.radiusTop ?? 1;
+            const radiusBottom = def.radiusBottom ?? 1;
+            const radius = Math.max(radiusTop, radiusBottom);
+            const halfHeight = def.height / 2;
+            return {
+                min: { x: -radius, y: -halfHeight, z: -radius },
+                max: { x: radius, y: halfHeight, z: radius },
+            };
+        }
+
+        case GeometryPrimitive.Plane: {
+            const halfWidth = def.width / 2;
+            const halfHeight = def.height / 2;
+            return {
+                min: { x: -halfWidth, y: -halfHeight, z: 0 },
+                max: { x: halfWidth, y: halfHeight, z: 0 },
+            };
+        }
+
+        case GeometryPrimitive.Cone: {
+            const { radius, height } = def;
+            const halfHeight = height / 2;
+            return {
+                min: { x: -radius, y: -halfHeight, z: -radius },
+                max: { x: radius, y: halfHeight, z: radius },
+            };
+        }
+
+        case GeometryPrimitive.Torus: {
+            const { radius, tube } = def;
+            const outerRadius = radius + tube;
+            return {
+                min: { x: -outerRadius, y: -tube, z: -outerRadius },
+                max: { x: outerRadius, y: tube, z: outerRadius },
+            };
+        }
+
+        case GeometryPrimitive.Circle: {
+            const { radius } = def;
+            return {
+                min: { x: -radius, y: -radius, z: 0 },
+                max: { x: radius, y: radius, z: 0 },
+            };
+        }
+
         case GeometryPrimitive.Text: {
             // Text AABB cannot be accurately computed without font metrics.
             // Return a zero-size box at the origin as a placeholder.

@@ -10,6 +10,8 @@
 
 **[Documentation](https://oroya-animate.vercel.app)** ? **[NPM](https://www.npmjs.com/org/joroya)** ? **[CDN](https://unpkg.com/@joroya/core)** ? **[GitHub](https://github.com/joshuacba08/oroya-animate)**
 
+📖 **Read this in other languages:** [Español](README-ES.md) • [日本語](README-JA.md)
+
 </div>
 
 A professional, engine-agnostic 2D/3D graphics library for the web. Built with TypeScript, designed for scalability and performance.
@@ -205,13 +207,13 @@ renderer.render();
 - [x] **i18n infrastructure**: Translation support for English, Spanish, and Japanese.
 - [x] Feature EPICs: [OA-001](docs/features/OA-001/EPICA.md) to [OA-004](docs/features/OA-004/EPIC.md).
 
-### v0.5.0 — Renderer Completion & 3D Pipeline (Next)
-- [ ] Full glTF/GLB loader (geometry + materials from Blender).
-- [ ] Complete SVG backend (transform support, groups).
-- [ ] Canvas2D renderer.
-- [ ] Boolean operations 2D/3D.
-- [ ] Cubic spline interpolation for animations.
-- [ ] Proper quaternion SLERP.
+### v0.5.0 — Renderer Completion & 3D Pipeline ✅
+- [x] Full glTF/GLB loader (geometry + materials from Blender).
+- [x] Complete SVG backend (transform support, groups).
+- [x] Canvas2D renderer.
+- [x] Boolean operations 2D/3D (CSG).
+- [x] Cubic spline interpolation for animations.
+- [x] Proper quaternion SLERP.
 
 ### v1.0.0 — Production Ready (Vision)
 - [ ] WASM high-performance modules.
@@ -228,6 +230,7 @@ All packages are published to NPM under the `@joroya` scope:
 - [@joroya/core](https://www.npmjs.com/package/@joroya/core)
 - [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
+- [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf)
 
 ### Available on CDN

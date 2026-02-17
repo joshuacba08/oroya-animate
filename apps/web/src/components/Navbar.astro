@@ -4,12 +4,19 @@ import { getLocaleFromUrl, useTranslations, getLocalizedPath } from '../i18n';
 
 const locale = getLocaleFromUrl(Astro.url);
 const t = useTranslations(locale);
+const currentPath = Astro.url.pathname;
 
 const navLinks = [
   { label: t('nav.docs'), href: getLocalizedPath("/docs", locale) },
   { label: t('nav.examples'), href: getLocalizedPath("/examples", locale) },
   { label: t('nav.tutorials'), href: getLocalizedPath("/tutorials", locale) },
+  { label: "Playground", href: "/playground" },
 ];
+
+function isActive(href: string): boolean {
+  if (href === "/") return currentPath === "/";
+  return currentPath === href || currentPath.startsWith(href + "/");
+}
 ---
 
 <header class="navbar fixed top-0 z-50 bg-base-100/70 backdrop-blur-xl border-b border-base-300/50 px-4 lg:px-8">
@@ -26,7 +33,16 @@ const navLinks = [
     <ul class="menu menu-horizontal gap-1 px-1 text-sm">
       {navLinks.map((link) => (
         <li>
-          <a href={link.href} class="rounded-lg hover:bg-base-200/50 transition-colors">
+          <a
+            href={link.href}
+            class:list={[
+              "rounded-lg transition-colors",
+              isActive(link.href)
+                ? "bg-primary/10 text-primary font-semibold"
+                : "hover:bg-base-200/50 text-base-content/70",
+            ]}
+            aria-current={isActive(link.href) ? "page" : undefined}
+          >
             {link.label}
           </a>
         </li>
@@ -42,7 +58,7 @@ const navLinks = [
       rel="noopener"
       class="badge badge-outline badge-sm hidden sm:inline-flex gap-1.5 font-mono"
     >
-      npm v0.4.0
+      npm v0.5.0
     </a>
 
     <!-- Language switcher -->
@@ -97,7 +113,19 @@ const navLinks = [
       </div>
       <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-10 w-52 p-2 shadow-lg mt-2">
         {navLinks.map((link) => (
-          <li><a href={link.href}>{link.label}</a></li>
+          <li>
+            <a
+              href={link.href}
+              class:list={[
+                isActive(link.href)
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "",
+              ]}
+              aria-current={isActive(link.href) ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
         ))}
       </ul>
     </div>

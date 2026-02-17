@@ -1,4 +1,4 @@
-import { Scene, Node, createSphere, Material, Camera, CameraType } from '@joroya/core';
+import { Scene, Node, createSphere, Material, Camera, CameraType, Light, LightType } from '@joroya/core';
 import type { ControlDef, ParamValues } from '../types';
 
 export const solarSystemControls: ControlDef[] = [
@@ -29,6 +29,16 @@ export function createSolarSystemScene(params: ParamValues) {
   }));
   cam.transform.position = { x: 0, y: camH, z: camD };
   scene.add(cam);
+
+  // Default lighting
+  const ambient = new Node('default-ambient');
+  ambient.addComponent(new Light({ type: LightType.Ambient, color: { r: 0.4, g: 0.4, b: 0.5 }, intensity: 0.6 }));
+  scene.add(ambient);
+
+  const sunLight = new Node('default-sun');
+  sunLight.addComponent(new Light({ type: LightType.Directional, color: { r: 1.0, g: 0.95, b: 0.9 }, intensity: 1.0 }));
+  sunLight.transform.position = { x: 5, y: 8, z: 4 };
+  scene.add(sunLight);
 
   // Sun
   const sun = new Node('sun');

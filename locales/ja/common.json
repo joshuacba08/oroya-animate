@@ -2,7 +2,7 @@
   "sidebar": {
     "subtitle": "シーングラフエンジン",
     "comingSoon": "近日公開",
-    "version": "oroya-animate v0.1"
+    "version": "oroya-animate v0.5.0"
   },
   "controls": {
     "title": "コントロール"
@@ -11,5 +11,18 @@
     "en": "English",
     "es": "Español",
     "ja": "日本語"
+  },
+  "roadmap": {
+    "v050": {
+      "title": "v0.5.0 — レンダラー完成と3Dパイプライン",
+      "features": {
+        "gltfLoader": "フルglTF/GLBローダー（Blenderからのジオメトリ+マテリアル）",
+        "svgBackend": "完全なSVGバックエンド（変換サポート、グループ）",
+        "canvas2d": "Canvas2Dレンダラー（ブラウザネイティブ）",
+        "csg": "2D/3Dブーリアン演算（CSG）構成的立体幾何学モデリング用",
+        "spline": "3次スプライン補間（スムーズなアニメーション用）",
+        "slerp": "適切なクォータニオンSLERP（補間回転用）"
+      }
+    }
   }
 }

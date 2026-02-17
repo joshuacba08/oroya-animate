@@ -10,19 +10,25 @@ import {
   createText,
   Geometry,
   GeometryPrimitive,
+  CSGOperation,
   Material,
   Camera,
   CameraType,
+  Light,
+  LightType,
   Interactive,
   Animation,
   AnimationMixer,
   ComponentType,
   type AnimationClip,
   type KeyframeTrack,
+  type InterpolationMode,
   type Path2DCommand,
 } from "@joroya/core";
 import { ThreeRenderer } from "@joroya/renderer-three";
 import { renderToSVG, SvJs, Gen } from "@joroya/renderer-svg";
+import { renderToCanvas, CanvasRenderer } from "@joroya/renderer-canvas2d";
+import { loadGLTF } from "@joroya/loader-gltf";
 
 /** All library symbols available inside user code */
 const SCOPE = {
@@ -34,9 +40,12 @@ const SCOPE = {
   createText,
   Geometry,
   GeometryPrimitive,
+  CSGOperation,
   Material,
   Camera,
   CameraType,
+  Light,
+  LightType,
   Interactive,
   Animation,
   AnimationMixer,
@@ -45,8 +54,12 @@ const SCOPE = {
   renderToSVG,
   SvJs,
   Gen,
+  renderToCanvas,
+  CanvasRenderer,
+  loadGLTF,
   Math,
   console,
+  Float32Array,
   requestAnimationFrame: window.requestAnimationFrame.bind(window),
   cancelAnimationFrame: window.cancelAnimationFrame.bind(window),
   setTimeout: window.setTimeout.bind(window),

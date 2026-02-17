@@ -10,6 +10,8 @@ import {
   Material,
   Camera,
   CameraType,
+  Light,
+  LightType,
 } from "@joroya/core";
 
 function composeYX(yAngle: number, xAngle: number) {
@@ -37,6 +39,39 @@ export function createHelloCubeScene(aspect: number) {
   );
   cameraNode.transform.position = { x: 0, y: 1.8, z: 6 };
   scene.add(cameraNode);
+
+  // Ambient light — base illumination
+  const ambientLight = new Node("ambient-light");
+  ambientLight.addComponent(
+    new Light({ type: LightType.Ambient, intensity: 0.4 })
+  );
+  scene.add(ambientLight);
+
+  // Directional light — main key light (top-right)
+  const dirLight = new Node("dir-light");
+  dirLight.addComponent(
+    new Light({
+      type: LightType.Directional,
+      intensity: 1.0,
+      color: { r: 1, g: 0.95, b: 0.9 },
+      target: { x: 0, y: 0, z: 0 },
+    })
+  );
+  dirLight.transform.position = { x: 5, y: 8, z: 5 };
+  scene.add(dirLight);
+
+  // Point light — accent fill (left side, subtle blue tint)
+  const pointLight = new Node("point-light");
+  pointLight.addComponent(
+    new Light({
+      type: LightType.Point,
+      intensity: 0.6,
+      color: { r: 0.6, g: 0.7, b: 1.0 },
+      distance: 20,
+    })
+  );
+  pointLight.transform.position = { x: -4, y: 3, z: 3 };
+  scene.add(pointLight);
 
   // Ground
   const groundBase = new Node("ground-base");

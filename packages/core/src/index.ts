@@ -3,6 +3,7 @@ export * from './components/Camera';
 export * from './components/Component';
 export * from './components/Geometry';
 export * from './components/Interactive';
+export * from './components/Light';
 export * from './components/Material';
 export * from './components/Transform';
 export * from './events/EventEmitter';

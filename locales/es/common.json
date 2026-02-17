@@ -2,7 +2,7 @@
   "sidebar": {
     "subtitle": "Motor de Grafos de Escena",
     "comingSoon": "Próximamente",
-    "version": "oroya-animate v0.1"
+    "version": "oroya-animate v0.5.0"
   },
   "controls": {
     "title": "Controles"
@@ -11,5 +11,18 @@
     "en": "English",
     "es": "Español",
     "ja": "日本語"
+  },
+  "roadmap": {
+    "v050": {
+      "title": "v0.5.0 — Completitud de Renderizadores y Pipeline 3D",
+      "features": {
+        "gltfLoader": "Cargador glTF/GLB completo (geometría + materiales desde Blender)",
+        "svgBackend": "Backend SVG completo (soporte de transformaciones, grupos)",
+        "canvas2d": "Renderizador Canvas2D nativo del navegador",
+        "csg": "Operaciones booleanas 2D/3D (CSG) para modelado constructivo",
+        "spline": "Interpolación spline cúbica para animaciones suaves",
+        "slerp": "SLERP de cuaterniones apropiado para rotaciones interpoladas"
+      }
+    }
   }
 }

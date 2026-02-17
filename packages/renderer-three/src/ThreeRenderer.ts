@@ -10,6 +10,11 @@ import {
   GeometryPrimitive,
   BoxGeometryDef,
   SphereGeometryDef,
+  CylinderGeometryDef,
+  PlaneGeometryDef,
+  ConeGeometryDef,
+  TorusGeometryDef,
+  CircleGeometryDef,
   BufferGeometryDef,
   PerspectiveCameraDef,
   OrthographicCameraDef,
@@ -19,6 +24,8 @@ import {
   CSGGeometryDef,
   CSGOperation,
   GeometryDef,
+  Light as OroyaLight,
+  LightType,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -317,11 +324,6 @@ export class ThreeRenderer {
     this.reverseNodeMap.clear();
     this.activeCamera = null;
 
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    dirLight.position.set(2, 5, 3);
-    this.scene.add(dirLight);
-
     this.oroyaScene.root.traverse((oroyaNode) => {
       const threeObject = this.createThreeObject(oroyaNode);
       if (threeObject) {
@@ -359,6 +361,9 @@ export class ThreeRenderer {
     } else if (oroyaNode.hasComponent(ComponentType.Camera)) {
       const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
       threeObject = this.createThreeCamera(camComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.Light)) {
+      const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
+      threeObject = this.createThreeLight(lightComponent);
     } else {
       threeObject = new THREE.Group();
     }
@@ -375,9 +380,64 @@ export class ThreeRenderer {
       case GeometryPrimitive.Box:
         const box = definition as BoxGeometryDef;
         return new THREE.BoxGeometry(box.width, box.height, box.depth);
-      case GeometryPrimitive.Sphere:
-        const sphere = definition as SphereGeometryDef;
-        return new THREE.SphereGeometry(sphere.radius, sphere.widthSegments, sphere.heightSegments);
+      case GeometryPrimitive.Sphere: {
+        const { radius, widthSegments, heightSegments } = definition as SphereGeometryDef;
+        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+      }
+
+      case GeometryPrimitive.Cylinder: {
+        const def = definition as CylinderGeometryDef;
+        return new THREE.CylinderGeometry(
+          def.radiusTop ?? 1,
+          def.radiusBottom ?? 1,
+          def.height,
+          def.radialSegments ?? 32,
+          def.heightSegments ?? 1,
+          def.openEnded ?? false
+        );
+      }
+
+      case GeometryPrimitive.Plane: {
+        const def = definition as PlaneGeometryDef;
+        return new THREE.PlaneGeometry(
+          def.width,
+          def.height,
+          def.widthSegments ?? 1,
+          def.heightSegments ?? 1
+        );
+      }
+
+      case GeometryPrimitive.Cone: {
+        const def = definition as ConeGeometryDef;
+        return new THREE.ConeGeometry(
+          def.radius,
+          def.height,
+          def.radialSegments ?? 32,
+          def.heightSegments ?? 1,
+          def.openEnded ?? false
+        );
+      }
+
+      case GeometryPrimitive.Torus: {
+        const def = definition as TorusGeometryDef;
+        return new THREE.TorusGeometry(
+          def.radius,
+          def.tube,
+          def.radialSegments ?? 16,
+          def.tubularSegments ?? 100,
+          def.arc ?? Math.PI * 2
+        );
+      }
+
+      case GeometryPrimitive.Circle: {
+        const def = definition as CircleGeometryDef;
+        return new THREE.CircleGeometry(
+          def.radius,
+          def.segments ?? 32,
+          def.thetaStart ?? 0,
+          def.thetaLength ?? Math.PI * 2
+        );
+      }
       case GeometryPrimitive.Buffer:
         const bufferDef = definition as BufferGeometryDef;
         const geometry = new THREE.BufferGeometry();
@@ -471,6 +531,57 @@ export class ThreeRenderer {
       case 'Orthographic':
         const ortho = definition as OrthographicCameraDef;
         return new THREE.OrthographicCamera(ortho.left, ortho.right, ortho.top, ortho.bottom, ortho.near, ortho.far);
+      default:
+        return null;
+    }
+  }
+
+  private createThreeLight(oroyaLight: OroyaLight): THREE.Light | null {
+    const { definition } = oroyaLight;
+    const color = definition.color ? new THREE.Color(definition.color.r, definition.color.g, definition.color.b) : new THREE.Color(0xffffff);
+    const intensity = definition.intensity ?? 1;
+
+    switch (definition.type) {
+      case LightType.Ambient:
+        return new THREE.AmbientLight(color, intensity);
+
+      case LightType.Directional: {
+        const dirLight = new THREE.DirectionalLight(color, intensity);
+        if (definition.castShadow) {
+          dirLight.castShadow = true;
+        }
+        if (definition.target) {
+          dirLight.target.position.set(definition.target.x, definition.target.y, definition.target.z);
+        }
+        return dirLight;
+      }
+
+      case LightType.Point: {
+        const pointLight = new THREE.PointLight(color, intensity, definition.distance ?? 0, definition.decay ?? 2);
+        if (definition.castShadow) {
+          pointLight.castShadow = true;
+        }
+        return pointLight;
+      }
+
+      case LightType.Spot: {
+        const spotLight = new THREE.SpotLight(
+          color,
+          intensity,
+          definition.distance ?? 0,
+          definition.angle ?? Math.PI / 3,
+          definition.penumbra ?? 0,
+          definition.decay ?? 2
+        );
+        if (definition.castShadow) {
+          spotLight.castShadow = true;
+        }
+        if (definition.target) {
+          spotLight.target.position.set(definition.target.x, definition.target.y, definition.target.z);
+        }
+        return spotLight;
+      }
+
       default:
         return null;
     }

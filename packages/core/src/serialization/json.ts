@@ -1,4 +1,4 @@
-import { Camera, Component, ComponentType, Geometry, Material, Transform } from '../components';
+import { Camera, Component, ComponentType, Geometry, Material, Transform, Light } from '../components';
 import { Animation } from '../components/Animation';
 import { Interactive } from '../components/Interactive';
 import { Node } from '../nodes/Node';
@@ -78,6 +78,9 @@ function deserializeNode(sNode: SerializableNode): Node {
         break;
       case ComponentType.Animation:
         component = new Animation(sComp.animations ?? []);
+        break;
+      case ComponentType.Light:
+        component = new Light(sComp.definition);
         break;
     }
     if (component) {

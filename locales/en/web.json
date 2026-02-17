@@ -5,7 +5,7 @@
     "tutorials": "Tutorials"
   },
   "hero": {
-    "badge": "v0.4.0 — SVG Interactive & Generative Art",
+    "badge": "v0.5.0 — Renderer Completion & 3D Pipeline",
     "heading1": "Engine-Agnostic",
     "heading2": "2D/3D Graphics",
     "heading3": "for the Web",
@@ -27,11 +27,20 @@
     "svgRenderer": "SVG Renderer",
     "svgRendererDesc": "Lightweight 2D vector graphics, perfect for generative art, data visualization, and interactive diagrams.",
     "serialization": "Serialization",
-    "serializationDesc": "Save and load complete scenes in JSON format. Perfect for editors, persistence, and sharing scene configurations."
+    "serializationDesc": "Save and load complete scenes in JSON format. Perfect for editors, persistence, and sharing scene configurations.",
+    "canvas2dRenderer": "Canvas2D Renderer",
+    "canvas2dRendererDesc": "Lightweight browser-native 2D rendering with zero external dependencies. Perfect for UI overlays, HUDs, and 2D games with hardware-accelerated graphics.",
+    "gltfLoader": "glTF/GLB Loader",
+    "gltfLoaderDesc": "Import complex 3D models from Blender, Maya, or any glTF-compatible tool with full support for geometry, PBR materials, and animations.",
+    "csgOperations": "Boolean Operations (CSG)",
+    "csgOperationsDesc": "Constructive Solid Geometry for creating complex shapes. Union, subtract, and intersect geometries to build intricate 3D models programmatically.",
+    "lightSystem": "Lighting System",
+    "lightSystemDesc": "Complete lighting with Ambient, Directional, Point, and Spot lights. Full shadow casting support for realistic 3D scene illumination.",
+    "badgeNew": "NEW"
   },
   "renderers": {
-    "sectionTitle": "One Scene Graph, <span>Multiple Renderers</span>",
-    "sectionSubtitle": "Write your scene logic once. Render with Three.js for immersive 3D WebGL experiences, or SVG for lightweight, scalable 2D vector graphics.",
+    "sectionTitle": "One Scene Graph, <span>Three Renderers</span>",
+    "sectionSubtitle": "Write your scene logic once. Render with Three.js for immersive 3D WebGL, SVG for scalable vector graphics, or Canvas2D for lightweight browser-native 2D.",
     "threeTitle": "Three.js Renderer",
     "threeDesc": "Full 3D rendering powered by Three.js and WebGL. Support for perspective and orthographic cameras, PBR materials, glTF model loading, and real-time interaction events.",
     "svgTitle": "SVG Renderer",
@@ -49,6 +58,14 @@
       "filters": "Filters",
       "animations": "Animations",
       "interactive": "Interactive"
+    },
+    "canvas2dTitle": "Canvas2D Renderer",
+    "canvas2dDesc": "Zero-dependency browser-native 2D rendering. Perfect for UI overlays, HUDs, procedural patterns, and 2D games. Full transform hierarchy and hardware-accelerated Canvas API.",
+    "canvas2dBadges": {
+      "zeroDeps": "Zero Dependencies",
+      "transforms": "Transforms",
+      "gradients": "Gradients",
+      "hardwareAccel": "GPU Accelerated"
     }
   },
   "capabilities": {
@@ -74,6 +91,20 @@
       "badge": "SvJs Engine",
       "codeLine1": "const noise = new Noise()",
       "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "csg": {
+      "title": "Boolean Operations (CSG)",
+      "description": "Create complex shapes by combining simple geometries. Union merges shapes, Subtract carves holes, and Intersect keeps only overlapping regions — all powered by Constructive Solid Geometry.",
+      "badge": "CSG Engine",
+      "codeLine1": "createCSG({ op: CSGOperation.Subtract, ... })",
+      "codeLine2": "// Union · Subtract · Intersect"
+    },
+    "lighting": {
+      "title": "Lighting System",
+      "description": "Illuminate your 3D scenes with four light types: Ambient for uniform glow, Directional for sunlight, Point for light bulbs, and Spot for flashlights. Full shadow casting support.",
+      "badge": "4 Light Types",
+      "codeLine1": "new Light({ type: LightType.Spot, ... })",
+      "codeLine2": "// Ambient · Directional · Point · Spot"
     },
     "tryDemo": "Try hovering and clicking",
     "learnMore": "Explore the docs"

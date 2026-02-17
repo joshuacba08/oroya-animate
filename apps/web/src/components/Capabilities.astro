@@ -24,7 +24,7 @@ const t = useTranslations(locale);
     </div>
 
     <!-- Capability cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
       <!-- ─── Animation System ─── -->
       <div class="capability-card glass-card rounded-2xl overflow-hidden group">
@@ -157,6 +157,88 @@ const t = useTranslations(locale);
           <div class="font-mono text-xs space-y-1 text-base-content/50">
             <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.generative.codeLine1')}</div>
             <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.generative.codeLine2')}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CSG Boolean Operations ─── -->
+      <div class="capability-card glass-card rounded-2xl overflow-hidden group">
+        <!-- Mini demo area -->
+        <div class="capability-demo h-48 relative flex items-center justify-center bg-base-300/20 overflow-hidden">
+          <div class="csg-demo-scene">
+            <div class="csg-operation csg-op-active" id="csg-union">
+              <div class="csg-shape csg-shape-a csg-union-a"></div>
+              <div class="csg-shape csg-shape-b csg-union-b"></div>
+              <span class="csg-label">Union</span>
+            </div>
+            <div class="csg-operation" id="csg-subtract">
+              <div class="csg-shape csg-shape-a csg-subtract-a"></div>
+              <div class="csg-shape csg-shape-b csg-subtract-b"></div>
+              <span class="csg-label">Subtract</span>
+            </div>
+            <div class="csg-operation" id="csg-intersect">
+              <div class="csg-shape csg-shape-a csg-intersect-a"></div>
+              <div class="csg-shape csg-shape-b csg-intersect-b"></div>
+              <span class="csg-label">Intersect</span>
+            </div>
+          </div>
+          <span class="badge badge-warning badge-xs absolute top-3 right-3 font-mono">
+            {t('capabilities.csg.badge')}
+          </span>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-lg font-display font-semibold mb-2 flex items-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning">
+              <circle cx="10" cy="12" r="6"/><circle cx="16" cy="12" r="6"/>
+            </svg>
+            {t('capabilities.csg.title')}
+          </h3>
+          <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+            {t('capabilities.csg.description')}
+          </p>
+          <div class="font-mono text-xs space-y-1 text-base-content/50">
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.csg.codeLine1')}</div>
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.csg.codeLine2')}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Lighting System ─── -->
+      <div class="capability-card glass-card rounded-2xl overflow-hidden group">
+        <!-- Mini demo area -->
+        <div class="capability-demo h-48 relative flex items-center justify-center bg-base-300/20 overflow-hidden">
+          <div class="light-demo-scene">
+            <div class="light-demo-ground"></div>
+            <div class="light-demo-object"></div>
+            <div class="light-demo-shadow"></div>
+            <div class="light-demo-beam light-beam-spot"></div>
+            <div class="light-demo-beam light-beam-point"></div>
+            <div class="light-demo-ambient"></div>
+            <div class="light-type-labels">
+              <span class="light-type-label light-label-ambient">Ambient</span>
+              <span class="light-type-label light-label-spot">Spot</span>
+              <span class="light-type-label light-label-point">Point</span>
+            </div>
+          </div>
+          <span class="badge badge-info badge-xs absolute top-3 right-3 font-mono">
+            {t('capabilities.lighting.badge')}
+          </span>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-lg font-display font-semibold mb-2 flex items-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-info">
+              <path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/>
+            </svg>
+            {t('capabilities.lighting.title')}
+          </h3>
+          <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+            {t('capabilities.lighting.description')}
+          </p>
+          <div class="font-mono text-xs space-y-1 text-base-content/50">
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.lighting.codeLine1')}</div>
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.lighting.codeLine2')}</div>
           </div>
         </div>
       </div>
@@ -299,4 +381,39 @@ const t = useTranslations(locale);
   }
 
   initGenerativeDemo();
+
+  /* ─── CSG demo: cycle through operations ─── */
+  function initCSGDemo() {
+    const operations = document.querySelectorAll<HTMLElement>('.csg-operation');
+    if (operations.length === 0) return;
+    let currentIndex = 0;
+
+    setInterval(() => {
+      operations[currentIndex].classList.remove('csg-op-active');
+      currentIndex = (currentIndex + 1) % operations.length;
+      operations[currentIndex].classList.add('csg-op-active');
+    }, 2000);
+  }
+
+  initCSGDemo();
+
+  /* ─── Lighting demo: rotate beam ─── */
+  function initLightDemo() {
+    const spotBeam = document.querySelector<HTMLElement>('.light-beam-spot');
+    const pointBeam = document.querySelector<HTMLElement>('.light-beam-point');
+    if (!spotBeam || !pointBeam) return;
+
+    let angle = 0;
+    function animate() {
+      angle += 0.015;
+      const spotX = Math.sin(angle) * 12;
+      const pointScale = 0.85 + Math.sin(angle * 1.5) * 0.15;
+      spotBeam.style.transform = `rotate(${spotX}deg)`;
+      pointBeam.style.transform = `scale(${pointScale})`;
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  initLightDemo();
 </script>

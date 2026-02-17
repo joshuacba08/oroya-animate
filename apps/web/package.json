@@ -14,6 +14,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@joroya/core": "workspace:*",
     "@joroya/loader-gltf": "workspace:*",
+    "@joroya/renderer-canvas2d": "workspace:*",
     "@joroya/renderer-svg": "workspace:^",
     "@joroya/renderer-three": "workspace:*",
     "@monaco-editor/react": "^4.7.0",

@@ -11,6 +11,8 @@ import { createHelloCubeScene, helloCubeControls } from './HelloCube';
 import { createHoverShowcaseScene, hoverShowcaseControls } from './HoverShowcase';
 import { createInteractiveDemoScene, interactiveDemoControls } from './InteractiveDemo';
 import { interactiveGalaxyControls, createInteractiveGalaxyScene } from './InteractiveGalaxy';
+import { LightingDemoScene } from './LightingDemo';
+import { ExtendedPrimitivesDemo } from './ExtendedPrimitivesDemo';
 import { portoParetoControls, createPortoParetoScene } from './PortoPareto';
 import { createProceduralCityScene, proceduralCityControls } from './ProceduralCity';
 import { createShapeGridScene, shapeGridControls } from './ShapeGrid';
@@ -209,5 +211,7 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     controls: interactiveGalaxyControls,
     factory: createInteractiveGalaxyScene,
   },
+  LightingDemoScene,
+  ExtendedPrimitivesDemo,
   SvJsGenerativeDemo,
 ];

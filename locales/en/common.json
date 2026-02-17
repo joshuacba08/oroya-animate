@@ -2,7 +2,7 @@
   "sidebar": {
     "subtitle": "Scene Graph Engine",
     "comingSoon": "Coming soon",
-    "version": "oroya-animate v0.1"
+    "version": "oroya-animate v0.5.0"
   },
   "controls": {
     "title": "Controls"
@@ -11,5 +11,18 @@
     "en": "English",
     "es": "Español",
     "ja": "日本語"
+  },
+  "roadmap": {
+    "v050": {
+      "title": "v0.5.0 — Renderer Completion & 3D Pipeline",
+      "features": {
+        "gltfLoader": "Full glTF/GLB loader (geometry + materials from Blender)",
+        "svgBackend": "Complete SVG backend (transform support, groups)",
+        "canvas2d": "Canvas2D renderer (browser native)",
+        "csg": "Boolean operations 2D/3D (CSG) for constructive solid geometry modeling",
+        "spline": "Cubic spline interpolation for smooth animations",
+        "slerp": "Proper quaternion SLERP for interpolated rotations"
+      }
+    }
   }
 }

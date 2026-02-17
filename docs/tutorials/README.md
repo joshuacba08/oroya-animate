@@ -27,6 +27,14 @@ Aprende a usar Oroya Animate paso a paso, desde tu primera escena hasta técnica
 | 9 | [Gradientes, Filtros y Efectos SVG](./09-svg-gradients-filters.md) | Gradientes lineales/radiales, blur, drop-shadow, clip-path y masks |
 | 10 | [Animaciones SVG Nativas](./10-svg-animations.md) | `<animate>` y `<animateTransform>` declarativos sin JavaScript |
 
+## 🟡 Intermedio — 3D Pipeline
+
+| # | Tutorial | Qué aprenderás |
+|---|----------|----------------|
+| 15 | [Canvas2D — Tu primer render 2D](./15-canvas2d-renderer.md) | Renderer Canvas2D sin dependencias, formas 2D y animación |
+| 16 | [Carga modelos 3D con glTF](./16-gltf-loader.md) | Importar modelos glTF/GLB con geometría, materiales y animaciones |
+| 18 | [Iluminación 3D](./18-lighting.md) | Ambient, Directional, Point y Spot lights con sombras |
+
 ## 🔴 Avanzado
 
 | # | Tutorial | Qué aprenderás |
@@ -34,3 +42,5 @@ Aprende a usar Oroya Animate paso a paso, desde tu primera escena hasta técnica
 | 7 | [Ciudad Procedural](./07-procedural-city.md) | Generación algorítmica de escenas complejas |
 | 8 | [Multi-Renderer](./08-multi-renderer.md) | Misma escena renderizada en Three.js y SVG |
 | 11 | [SVG Interactivo](./11-svg-interactive.md) | Event delegation con `renderToSVGElement` e `Interactive` |
+| 17 | [Boolean Operations — CSG](./17-boolean-csg.md) | Crear formas complejas con Union, Subtract e Intersect |
+| 19 | [Animaciones con Cubic Spline](./19-cubic-spline.md) | Interpolación suave con tangentes para movimiento natural |

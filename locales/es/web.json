@@ -5,7 +5,7 @@
     "tutorials": "Tutoriales"
   },
   "hero": {
-    "badge": "v0.4.0 — SVG Interactivo y Arte Generativo",
+    "badge": "v0.5.0 — Completitud de Renderers y Pipeline 3D",
     "heading1": "Agnóstico de Motor",
     "heading2": "Gráficos 2D/3D",
     "heading3": "para la Web",
@@ -27,11 +27,20 @@
     "svgRenderer": "Renderer SVG",
     "svgRendererDesc": "Gráficos vectoriales 2D ligeros, perfectos para arte generativo, visualización de datos y diagramas interactivos.",
     "serialization": "Serialización",
-    "serializationDesc": "Guarda y carga escenas completas en formato JSON. Perfecto para editores, persistencia y compartir configuraciones."
+    "serializationDesc": "Guarda y carga escenas completas en formato JSON. Perfecto para editores, persistencia y compartir configuraciones.",
+    "canvas2dRenderer": "Renderer Canvas2D",
+    "canvas2dRendererDesc": "Renderizado 2D nativo del navegador, ligero y sin dependencias externas. Perfecto para overlays de UI, HUDs y juegos 2D con gráficos acelerados por hardware.",
+    "gltfLoader": "Cargador glTF/GLB",
+    "gltfLoaderDesc": "Importa modelos 3D complejos desde Blender, Maya o cualquier herramienta compatible con glTF, con soporte completo para geometría, materiales PBR y animaciones.",
+    "csgOperations": "Operaciones Booleanas (CSG)",
+    "csgOperationsDesc": "Geometría Sólida Constructiva para crear formas complejas. Unión, sustracción e intersección de geometrías para construir modelos 3D intrincados programáticamente.",
+    "lightSystem": "Sistema de Iluminación",
+    "lightSystemDesc": "Iluminación completa con luces Ambient, Directional, Point y Spot. Soporte completo de proyección de sombras para iluminación realista de escenas 3D.",
+    "badgeNew": "NUEVO"
   },
   "renderers": {
-    "sectionTitle": "Un Grafo de Escena, <span>Múltiples Renderers</span>",
-    "sectionSubtitle": "Escribe tu lógica de escena una vez. Renderiza con Three.js para experiencias 3D WebGL inmersivas, o SVG para gráficos vectoriales 2D ligeros y escalables.",
+    "sectionTitle": "Un Grafo de Escena, <span>Tres Renderers</span>",
+    "sectionSubtitle": "Escribe tu lógica de escena una vez. Renderiza con Three.js para 3D WebGL inmersivo, SVG para gráficos vectoriales escalables, o Canvas2D para 2D nativo y ligero.",
     "threeTitle": "Renderer Three.js",
     "threeDesc": "Renderizado 3D completo con Three.js y WebGL. Soporte para cámaras perspectiva y ortográficas, materiales PBR, carga de modelos glTF y eventos de interacción en tiempo real.",
     "svgTitle": "Renderer SVG",
@@ -49,6 +58,14 @@
       "filters": "Filtros",
       "animations": "Animaciones",
       "interactive": "Interactivo"
+    },
+    "canvas2dTitle": "Renderer Canvas2D",
+    "canvas2dDesc": "Renderizado 2D nativo del navegador sin dependencias. Perfecto para overlays de UI, HUDs, patrones procedurales y juegos 2D. Jerarquía de transformaciones completa y Canvas API acelerado por hardware.",
+    "canvas2dBadges": {
+      "zeroDeps": "Cero Dependencias",
+      "transforms": "Transformaciones",
+      "gradients": "Gradientes",
+      "hardwareAccel": "Aceleración GPU"
     }
   },
   "capabilities": {
@@ -74,6 +91,20 @@
       "badge": "Motor SvJs",
       "codeLine1": "const noise = new Noise()",
       "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "csg": {
+      "title": "Operaciones Booleanas (CSG)",
+      "description": "Crea formas complejas combinando geometrías simples. Union fusiona formas, Subtract crea cavidades, e Intersect conserva solo las regiones superpuestas — todo con Geometría Sólida Constructiva.",
+      "badge": "Motor CSG",
+      "codeLine1": "createCSG({ op: CSGOperation.Subtract, ... })",
+      "codeLine2": "// Union · Subtract · Intersect"
+    },
+    "lighting": {
+      "title": "Sistema de Iluminación",
+      "description": "Ilumina tus escenas 3D con cuatro tipos de luz: Ambient para brillo uniforme, Directional para luz solar, Point para bombillas y Spot para focos. Soporte completo de sombras.",
+      "badge": "4 Tipos de Luz",
+      "codeLine1": "new Light({ type: LightType.Spot, ... })",
+      "codeLine2": "// Ambient · Directional · Point · Spot"
     },
     "tryDemo": "Prueba hover y clic",
     "learnMore": "Explorar la documentación"

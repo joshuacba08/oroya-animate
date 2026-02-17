@@ -7,6 +7,11 @@ import { Matrix4 } from '../math/Matrix4';
 export enum GeometryPrimitive {
   Box = 'Box',
   Sphere = 'Sphere',
+  Cylinder = 'Cylinder',
+  Plane = 'Plane',
+  Cone = 'Cone',
+  Torus = 'Torus',
+  Circle = 'Circle',
   Path2D = 'Path2D',
   Text = 'Text',
   Buffer = 'Buffer',
@@ -31,6 +36,65 @@ export interface SphereGeometryDef {
   radius: number;
   widthSegments: number;
   heightSegments: number;
+}
+
+/**
+ * The definition for a cylinder geometry.
+ */
+export interface CylinderGeometryDef {
+  type: GeometryPrimitive.Cylinder;
+  radiusTop?: number; // Default: 1
+  radiusBottom?: number; // Default: 1
+  height: number;
+  radialSegments?: number; // Default: 32
+  heightSegments?: number; // Default: 1
+  openEnded?: boolean; // Default: false
+}
+
+/**
+ * The definition for a plane geometry.
+ */
+export interface PlaneGeometryDef {
+  type: GeometryPrimitive.Plane;
+  width: number;
+  height: number;
+  widthSegments?: number; // Default: 1
+  heightSegments?: number; // Default: 1
+}
+
+/**
+ * The definition for a cone geometry.
+ */
+export interface ConeGeometryDef {
+  type: GeometryPrimitive.Cone;
+  radius: number;
+  height: number;
+  radialSegments?: number; // Default: 32
+  heightSegments?: number; // Default: 1
+  openEnded?: boolean; // Default: false
+}
+
+/**
+ * The definition for a torus geometry.
+ */
+export interface TorusGeometryDef {
+  type: GeometryPrimitive.Torus;
+  radius: number; // Radius of the entire torus
+  tube: number; // Radius of the tube
+  radialSegments?: number; // Default: 16
+  tubularSegments?: number; // Default: 100
+  arc?: number; // Central angle in radians (default: Math.PI * 2)
+}
+
+/**
+ * The definition for a circle geometry.
+ */
+export interface CircleGeometryDef {
+  type: GeometryPrimitive.Circle;
+  radius: number;
+  segments?: number; // Default: 32
+  thetaStart?: number; // Start angle in radians (default: 0)
+  thetaLength?: number; // Central angle in radians (default: Math.PI * 2)
 }
 
 /**
@@ -111,7 +175,18 @@ export interface CSGGeometryDef {
 /**
  * A union of all possible geometry definitions.
  */
-export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef | BufferGeometryDef | CSGGeometryDef;
+export type GeometryDef =
+  | BoxGeometryDef
+  | SphereGeometryDef
+  | CylinderGeometryDef
+  | PlaneGeometryDef
+  | ConeGeometryDef
+  | TorusGeometryDef
+  | CircleGeometryDef
+  | Path2DGeometryDef
+  | TextGeometryDef
+  | BufferGeometryDef
+  | CSGGeometryDef;
 
 /**
  * A component that defines the geometry of a node.

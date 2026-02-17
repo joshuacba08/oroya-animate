@@ -34,7 +34,7 @@ const t = useTranslations(locale);
     </div>
 
     <!-- Renderer comparison cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <!-- Three.js card -->
       <div class="renderer-card glass-card rounded-2xl overflow-hidden group p-6">
         <div class="flex items-center gap-3 mb-4">
@@ -88,6 +88,35 @@ const t = useTranslations(locale);
           <span class="badge badge-outline badge-xs">{t('renderers.svgBadges.filters')}</span>
           <span class="badge badge-outline badge-xs">{t('renderers.svgBadges.animations')}</span>
           <span class="badge badge-outline badge-xs">{t('renderers.svgBadges.interactive')}</span>
+        </div>
+      </div>
+
+      <!-- Canvas2D card (NEW) -->
+      <div class="renderer-card glass-card rounded-2xl overflow-hidden group p-6 relative">
+        <span class="absolute top-3 right-3 badge badge-primary badge-xs font-mono font-bold">NEW</span>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-emerald-600/20 flex items-center justify-center">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18"/><path d="M9 21V9"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-display font-semibold flex items-center gap-2">
+              {t('renderers.canvas2dTitle')}
+              <span class="badge badge-success badge-xs font-mono">Canvas</span>
+            </h3>
+            <p class="text-xs text-base-content/40">@joroya/renderer-canvas2d</p>
+          </div>
+        </div>
+        <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+          {t('renderers.canvas2dDesc')}
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="badge badge-outline badge-xs">{t('renderers.canvas2dBadges.zeroDeps')}</span>
+          <span class="badge badge-outline badge-xs">{t('renderers.canvas2dBadges.transforms')}</span>
+          <span class="badge badge-outline badge-xs">{t('renderers.canvas2dBadges.gradients')}</span>
+          <span class="badge badge-outline badge-xs">{t('renderers.canvas2dBadges.hardwareAccel')}</span>
         </div>
       </div>
     </div>

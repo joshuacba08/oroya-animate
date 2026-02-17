@@ -5,9 +5,69 @@ const t = useTranslations(locale);
 ---
 
 <section id="hero" class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-  <!-- Extra gradient blobs for hero -->
-  <div class="absolute inset-0 -z-10">
-    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full bg-primary/10 blur-[160px]"></div>
+  <!-- ═══ HERO BACKGROUND LAYERS ═══ -->
+  <div class="absolute inset-0 -z-10 pointer-events-none">
+
+    <!-- Layer 1: Animated gradient orbs -->
+    <div class="hero-orb hero-orb--primary"></div>
+    <div class="hero-orb hero-orb--secondary"></div>
+    <div class="hero-orb hero-orb--accent"></div>
+    <div class="hero-orb hero-orb--cyan"></div>
+
+    <!-- Layer 2: Dot grid pattern -->
+    <div class="hero-dot-grid"></div>
+
+    <!-- Layer 3: Floating wireframe geometries (SVG) -->
+    <svg class="hero-geo hero-geo--1" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="72" height="72" rx="4" stroke="currentColor" stroke-width="1"/>
+      <rect x="20" y="20" width="40" height="40" rx="2" stroke="currentColor" stroke-width="0.75" opacity="0.5"/>
+    </svg>
+    <svg class="hero-geo hero-geo--2" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,4 76,64 4,64" stroke="currentColor" stroke-width="1"/>
+      <polygon points="40,22 62,56 18,56" stroke="currentColor" stroke-width="0.75" opacity="0.5"/>
+    </svg>
+    <svg class="hero-geo hero-geo--3" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="1"/>
+      <circle cx="40" cy="40" r="22" stroke="currentColor" stroke-width="0.75" opacity="0.5"/>
+      <circle cx="40" cy="40" r="8" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+    </svg>
+    <svg class="hero-geo hero-geo--4" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,4 76,24 76,56 40,76 4,56 4,24" stroke="currentColor" stroke-width="1"/>
+      <polygon points="40,18 62,30 62,50 40,62 18,50 18,30" stroke="currentColor" stroke-width="0.75" opacity="0.5"/>
+    </svg>
+    <svg class="hero-geo hero-geo--5" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="4" y1="40" x2="76" y2="40" stroke="currentColor" stroke-width="0.75" opacity="0.4"/>
+      <line x1="40" y1="4" x2="40" y2="76" stroke="currentColor" stroke-width="0.75" opacity="0.4"/>
+      <line x1="10" y1="10" x2="70" y2="70" stroke="currentColor" stroke-width="0.75" opacity="0.3"/>
+      <line x1="70" y1="10" x2="10" y2="70" stroke="currentColor" stroke-width="0.75" opacity="0.3"/>
+      <circle cx="40" cy="40" r="28" stroke="currentColor" stroke-width="1"/>
+    </svg>
+
+    <!-- Layer 4: Constellation / connection lines -->
+    <svg class="hero-constellation" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <line x1="100" y1="120" x2="350" y2="200" stroke="currentColor" stroke-width="0.5" opacity="0.15"/>
+      <line x1="350" y1="200" x2="500" y2="100" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+      <line x1="500" y1="100" x2="800" y2="180" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+      <line x1="800" y1="180" x2="1050" y2="120" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+      <line x1="200" y1="500" x2="450" y2="550" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+      <line x1="450" y1="550" x2="700" y2="480" stroke="currentColor" stroke-width="0.5" opacity="0.12"/>
+      <line x1="700" y1="480" x2="1000" y2="600" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+      <line x1="350" y1="200" x2="200" y2="500" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+      <line x1="800" y1="180" x2="700" y2="480" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+      <!-- Nodes (dots at intersections) -->
+      <circle cx="100" cy="120" r="2" fill="currentColor" opacity="0.2"/>
+      <circle cx="350" cy="200" r="2.5" fill="currentColor" opacity="0.25"/>
+      <circle cx="500" cy="100" r="2" fill="currentColor" opacity="0.2"/>
+      <circle cx="800" cy="180" r="2.5" fill="currentColor" opacity="0.25"/>
+      <circle cx="1050" cy="120" r="2" fill="currentColor" opacity="0.15"/>
+      <circle cx="200" cy="500" r="2" fill="currentColor" opacity="0.2"/>
+      <circle cx="450" cy="550" r="2.5" fill="currentColor" opacity="0.2"/>
+      <circle cx="700" cy="480" r="2" fill="currentColor" opacity="0.2"/>
+      <circle cx="1000" cy="600" r="2" fill="currentColor" opacity="0.15"/>
+    </svg>
+
+    <!-- Layer 5: Radial glow from center -->
+    <div class="hero-radial-glow"></div>
   </div>
 
   <div class="container mx-auto px-6 text-center max-w-5xl">

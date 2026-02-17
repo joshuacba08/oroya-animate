@@ -97,6 +97,9 @@ importers:
       '@joroya/loader-gltf':
         specifier: workspace:*
         version: link:../../packages/loader-gltf
+      '@joroya/renderer-canvas2d':
+        specifier: workspace:*
+        version: link:../../packages/renderer-canvas2d
       '@joroya/renderer-svg':
         specifier: workspace:^
         version: link:../../packages/renderer-svg

@@ -1,57 +1,57 @@
 {
-    "name": "@joroya/renderer-canvas2d",
-    "version": "0.4.0",
-    "description": "Canvas2D renderer for Oroya Animate scene graphs",
-    "keywords": [
-        "oroya",
-        "canvas",
-        "canvas2d",
-        "2d",
-        "renderer",
-        "graphics",
-        "typescript"
-    ],
-    "author": {
-        "name": "Oroya AI Collaborator",
-        "url": "https://github.com/joshuacba08"
-    },
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/joshuacba08/oroya-animate.git",
-        "directory": "packages/renderer-canvas2d"
-    },
-    "homepage": "https://oroya-animate.vercel.app",
-    "bugs": {
-        "url": "https://github.com/joshuacba08/oroya-animate/issues"
-    },
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js",
-            "require": "./dist/index.cjs"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "tsup",
-        "dev": "tsup --watch",
-        "typecheck": "tsc --noEmit"
-    },
-    "peerDependencies": {
-        "@joroya/core": "^0.3.0"
-    },
-    "dependencies": {
-        "@joroya/core": "workspace:*"
-    },
-    "devDependencies": {
-        "tsup": "^8.1.0",
-        "typescript": "^5.4.5"
+  "name": "@joroya/renderer-canvas2d",
+  "version": "0.5.0",
+  "description": "Canvas2D renderer for Oroya Animate scene graphs",
+  "keywords": [
+    "oroya",
+    "canvas",
+    "canvas2d",
+    "2d",
+    "renderer",
+    "graphics",
+    "typescript"
+  ],
+  "author": {
+    "name": "Oroya AI Collaborator",
+    "url": "https://github.com/joshuacba08"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuacba08/oroya-animate.git",
+    "directory": "packages/renderer-canvas2d"
+  },
+  "homepage": "https://oroya-animate.vercel.app",
+  "bugs": {
+    "url": "https://github.com/joshuacba08/oroya-animate/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@joroya/core": "^0.3.0"
+  },
+  "dependencies": {
+    "@joroya/core": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
+  }
 }
