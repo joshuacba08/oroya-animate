@@ -1,5 +1,10 @@
 import { BoxGeometryDef, ConeGeometryDef, CylinderGeometryDef, Geometry, GeometryPrimitive, Path2DGeometryDef, PlaneGeometryDef, SphereGeometryDef, TextGeometryDef } from '../components';
 
+export interface GeometryOptions {
+  castShadow?: boolean;
+  receiveShadow?: boolean;
+}
+
 /**
  * Creates a new box geometry component.
  * @param width The width of the box.
@@ -7,8 +12,8 @@ import { BoxGeometryDef, ConeGeometryDef, CylinderGeometryDef, Geometry, Geometr
  * @param depth The depth of the box.
  * @returns A new Geometry component with a box definition.
  */
-export function createBox(width = 1, height = 1, depth = 1): Geometry {
-  const def: BoxGeometryDef = { type: GeometryPrimitive.Box, width, height, depth };
+export function createBox(width = 1, height = 1, depth = 1, options?: GeometryOptions): Geometry {
+  const def: BoxGeometryDef = { type: GeometryPrimitive.Box, width, height, depth, ...options };
   return new Geometry(def);
 }
 
@@ -19,12 +24,13 @@ export function createBox(width = 1, height = 1, depth = 1): Geometry {
  * @param heightSegments The number of vertical segments.
  * @returns A new Geometry component with a sphere definition.
  */
-export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 16): Geometry {
+export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 16, options?: GeometryOptions): Geometry {
   const def: SphereGeometryDef = {
     type: GeometryPrimitive.Sphere,
     radius,
     widthSegments,
-    heightSegments
+    heightSegments,
+    ...options
   };
   return new Geometry(def);
 }
@@ -34,8 +40,8 @@ export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 
  * @param path An array of path commands.
  * @returns A new Geometry component with a 2D path definition.
  */
-export function createPath2D(path: Path2DGeometryDef['path']): Geometry {
-  const def: Path2DGeometryDef = { type: GeometryPrimitive.Path2D, path };
+export function createPath2D(path: Path2DGeometryDef['path'], options?: GeometryOptions): Geometry {
+  const def: Path2DGeometryDef = { type: GeometryPrimitive.Path2D, path, ...options };
   return new Geometry(def);
 }
 
@@ -69,7 +75,8 @@ export function createCylinder(
   height = 1,
   radialSegments = 32,
   heightSegments = 1,
-  openEnded = false
+  openEnded = false,
+  options?: GeometryOptions
 ): Geometry {
   const def: CylinderGeometryDef = {
     type: GeometryPrimitive.Cylinder,
@@ -79,6 +86,7 @@ export function createCylinder(
     radialSegments,
     heightSegments,
     openEnded,
+    ...options
   };
   return new Geometry(def);
 }
@@ -91,13 +99,14 @@ export function createCylinder(
  * @param heightSegments Number of segments along the height.
  * @returns A new Geometry component with a plane definition.
  */
-export function createPlane(width = 1, height = 1, widthSegments = 1, heightSegments = 1): Geometry {
+export function createPlane(width = 1, height = 1, widthSegments = 1, heightSegments = 1, options?: GeometryOptions): Geometry {
   const def: PlaneGeometryDef = {
     type: GeometryPrimitive.Plane,
     width,
     height,
     widthSegments,
     heightSegments,
+    ...options
   };
   return new Geometry(def);
 }
@@ -116,7 +125,8 @@ export function createCone(
   height = 1,
   radialSegments = 32,
   heightSegments = 1,
-  openEnded = false
+  openEnded = false,
+  options?: GeometryOptions
 ): Geometry {
   const def: ConeGeometryDef = {
     type: GeometryPrimitive.Cone,
@@ -125,6 +135,7 @@ export function createCone(
     radialSegments,
     heightSegments,
     openEnded,
+    ...options
   };
   return new Geometry(def);
 }

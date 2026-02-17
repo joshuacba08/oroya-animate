@@ -26,6 +26,7 @@ import { createTexturesScene } from "../../scenes/textures";
 import { createLookAtScene } from "../../scenes/look-at";
 import { createPhysicsScene } from "../../scenes/physics-demo";
 import { createInstancingScene } from "../../scenes/instancing-demo";
+import { createShadowsScene } from "../../scenes/shadows-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3217,5 +3218,12 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Renders 2000 dynamic cubes using InstancedMesh. Demonstrates high-performance rendering with matrix and color updates.",
     category: "3d",
     factory: createInstancingScene,
+  },
+  {
+    id: "shadows-demo",
+    title: "Lighting: Shadows",
+    description: "Directional light casting shadows from a sphere and cube onto a plane. Demonstrates shadow map support.",
+    category: "3d",
+    factory: createShadowsScene,
   },
 ];

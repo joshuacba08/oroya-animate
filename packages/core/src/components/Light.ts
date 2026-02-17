@@ -36,6 +36,10 @@ export interface DirectionalLightDef {
     castShadow?: boolean;
     /** Target position the light points at. Default: origin */
     target?: { x: number; y: number; z: number };
+    /** Shadow map bias. Default: 0 */
+    shadowBias?: number;
+    /** Shadow map size. Default: 512 */
+    shadowMapSize?: number;
 }
 
 /**
@@ -54,6 +58,10 @@ export interface PointLightDef {
     decay?: number;
     /** Whether this light casts shadows. Default: false */
     castShadow?: boolean;
+    /** Shadow map bias. Default: 0 */
+    shadowBias?: number;
+    /** Shadow map size. Default: 512 */
+    shadowMapSize?: number;
 }
 
 /**
@@ -78,6 +86,10 @@ export interface SpotLightDef {
     castShadow?: boolean;
     /** Target position the light points at. Default: origin */
     target?: { x: number; y: number; z: number };
+    /** Shadow map bias. Default: 0 */
+    shadowBias?: number;
+    /** Shadow map size. Default: 512 */
+    shadowMapSize?: number;
 }
 
 /**

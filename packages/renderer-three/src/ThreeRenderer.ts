@@ -71,6 +71,8 @@ export class ThreeRenderer {
     });
     this.renderer.setSize(options.width, options.height);
     this.renderer.setPixelRatio(options.dpr ?? window.devicePixelRatio);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.scene = new THREE.Scene();
   }
@@ -456,6 +458,9 @@ export class ThreeRenderer {
       const threeMaterial = this.createThreeMaterial(matComponent);
       if (threeGeometry && threeMaterial) {
         threeObject = new THREE.Mesh(threeGeometry, threeMaterial);
+
+        if (geoComponent.definition.castShadow) threeObject.castShadow = true;
+        if (geoComponent.definition.receiveShadow) threeObject.receiveShadow = true;
       }
     } else if (oroyaNode.hasComponent(ComponentType.Camera)) {
       const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
@@ -482,6 +487,9 @@ export class ThreeRenderer {
 
     const mesh = new THREE.InstancedMesh(threeGeo, threeMat, instanced.capacity);
     mesh.count = instanced.count;
+
+    if (geo.definition.castShadow) mesh.castShadow = true;
+    if (geo.definition.receiveShadow) mesh.receiveShadow = true;
 
     mesh.instanceMatrix.set(instanced.instanceMatrix);
     mesh.instanceMatrix.needsUpdate = true;
@@ -738,6 +746,11 @@ export class ThreeRenderer {
         if (definition.target) {
           dirLight.target.position.set(definition.target.x, definition.target.y, definition.target.z);
         }
+        if (definition.shadowBias !== undefined) dirLight.shadow.bias = definition.shadowBias;
+        if (definition.shadowMapSize !== undefined) {
+          dirLight.shadow.mapSize.width = definition.shadowMapSize;
+          dirLight.shadow.mapSize.height = definition.shadowMapSize;
+        }
         return dirLight;
       }
 
@@ -745,6 +758,11 @@ export class ThreeRenderer {
         const pointLight = new THREE.PointLight(color, intensity, definition.distance ?? 0, definition.decay ?? 2);
         if (definition.castShadow) {
           pointLight.castShadow = true;
+          if (definition.shadowBias !== undefined) pointLight.shadow.bias = definition.shadowBias;
+          if (definition.shadowMapSize !== undefined) {
+            pointLight.shadow.mapSize.width = definition.shadowMapSize;
+            pointLight.shadow.mapSize.height = definition.shadowMapSize;
+          }
         }
         return pointLight;
       }
@@ -760,6 +778,11 @@ export class ThreeRenderer {
         );
         if (definition.castShadow) {
           spotLight.castShadow = true;
+          if (definition.shadowBias !== undefined) spotLight.shadow.bias = definition.shadowBias;
+          if (definition.shadowMapSize !== undefined) {
+            spotLight.shadow.mapSize.width = definition.shadowMapSize;
+            spotLight.shadow.mapSize.height = definition.shadowMapSize;
+          }
         }
         if (definition.target) {
           spotLight.target.position.set(definition.target.x, definition.target.y, definition.target.z);

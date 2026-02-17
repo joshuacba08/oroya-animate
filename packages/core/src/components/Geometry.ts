@@ -26,6 +26,8 @@ export interface BoxGeometryDef {
   width: number;
   height: number;
   depth: number;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -36,6 +38,8 @@ export interface SphereGeometryDef {
   radius: number;
   widthSegments: number;
   heightSegments: number;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -49,6 +53,8 @@ export interface CylinderGeometryDef {
   radialSegments?: number; // Default: 32
   heightSegments?: number; // Default: 1
   openEnded?: boolean; // Default: false
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -60,6 +66,8 @@ export interface PlaneGeometryDef {
   height: number;
   widthSegments?: number; // Default: 1
   heightSegments?: number; // Default: 1
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -72,6 +80,8 @@ export interface ConeGeometryDef {
   radialSegments?: number; // Default: 32
   heightSegments?: number; // Default: 1
   openEnded?: boolean; // Default: false
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -84,6 +94,8 @@ export interface TorusGeometryDef {
   radialSegments?: number; // Default: 16
   tubularSegments?: number; // Default: 100
   arc?: number; // Central angle in radians (default: Math.PI * 2)
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -95,6 +107,8 @@ export interface CircleGeometryDef {
   segments?: number; // Default: 32
   thetaStart?: number; // Start angle in radians (default: 0)
   thetaLength?: number; // Central angle in radians (default: Math.PI * 2)
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -111,6 +125,8 @@ export interface Path2DCommand {
 export interface Path2DGeometryDef {
   type: GeometryPrimitive.Path2D;
   path: Path2DCommand[];
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -130,6 +146,8 @@ export interface TextGeometryDef {
   textAnchor?: 'start' | 'middle' | 'end';
   /** Dominant baseline: 'auto', 'middle', 'hanging', etc. Default: 'auto' */
   dominantBaseline?: string;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -146,6 +164,8 @@ export interface BufferGeometryDef {
   uvs?: Float32Array;
   /** Triangle indices (optional, for indexed geometry). */
   indices?: Uint16Array | Uint32Array;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
@@ -170,6 +190,8 @@ export interface CSGGeometryDef {
   modifier: GeometryDef;
   /** Optional transform for the modifier geometry relative to the base. */
   modifierTransform?: Matrix4;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
 }
 
 /**
