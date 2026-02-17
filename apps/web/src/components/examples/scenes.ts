@@ -22,6 +22,8 @@ import {
 import { loadGLTF } from "@joroya/loader-gltf";
 import { SvJs, Gen } from "@joroya/renderer-svg";
 import type { ExampleDef } from "./ExampleCard";
+import { createTexturesScene } from "../../scenes/textures";
+import { createLookAtScene } from "../../scenes/look-at";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -1363,7 +1365,7 @@ function createInteractiveCubes() {
   for (let x = 0; x < gridSize; x++) {
     for (let z = 0; z < gridSize; z++) {
       const idx = x * gridSize + z;
-      const cube = new Node(`cube-${x}-${z}`);
+      const cube = new Node(`cube - ${x} -${z} `);
       cube.addComponent(createBox(1.2, 1.2, 1.2));
       cube.addComponent(
         new Material({ color: colors[idx], metalness: 0.3, roughness: 0.5 })
@@ -1434,7 +1436,7 @@ function createInterpolationComparison() {
   ];
 
   for (const mode of modes) {
-    const pedestal = new Node(`pedestal-${mode.name}`);
+    const pedestal = new Node(`pedestal - ${mode.name} `);
     pedestal.addComponent(createBox(2, 0.15, 2));
     pedestal.addComponent(
       new Material({ color: { r: 0.15, g: 0.15, b: 0.2 }, metalness: 0.3, roughness: 0.7 })
@@ -1442,11 +1444,11 @@ function createInterpolationComparison() {
     pedestal.transform.position = { x: mode.x, y: -1.35, z: 0 };
     scene.add(pedestal);
 
-    const pivot = new Node(`pivot-${mode.name}`);
+    const pivot = new Node(`pivot - ${mode.name} `);
     pivot.transform.position = { x: mode.x, y: 0, z: 0 };
     scene.add(pivot);
 
-    const sphere = new Node(`sphere-${mode.name}`);
+    const sphere = new Node(`sphere - ${mode.name} `);
     sphere.addComponent(createSphere(0.6, 32, 32));
     sphere.addComponent(
       new Material({
@@ -1491,11 +1493,11 @@ function createInterpolationComparison() {
     times,
     values: new Float32Array([
       // KF 0: in-tangent, value, out-tangent
-      0, 0, 0,   0, 0, 0,   0, 5, 0,
+      0, 0, 0, 0, 0, 0, 0, 5, 0,
       // KF 1: in-tangent, value, out-tangent
-      0, 0, 0,   0, 2.5, 0, 0, 0, 0,
+      0, 0, 0, 0, 2.5, 0, 0, 0, 0,
       // KF 2: in-tangent, value, out-tangent
-      0, -5, 0,  0, 0, 0,   0, 0, 0,
+      0, -5, 0, 0, 0, 0, 0, 0, 0,
     ]),
     interpolation: "cubicspline",
   };
@@ -1562,7 +1564,7 @@ function createFilterShowcase() {
 
   const blurValues = [0, 3, 8, 15, 25];
   for (let i = 0; i < blurValues.length; i++) {
-    const circle = new Node(`blur-${i}`);
+    const circle = new Node(`blur - ${i} `);
     circle.addComponent(createSphere(55));
     const matDef = {
       fillGradient: {
@@ -1582,8 +1584,8 @@ function createFilterShowcase() {
     circle.transform.updateLocalMatrix();
     scene.add(circle);
 
-    const valLabel = new Node(`blur-val-${i}`);
-    valLabel.addComponent(createText(blurValues[i] === 0 ? "Original" : `\u03C3 = ${blurValues[i]}`, {
+    const valLabel = new Node(`blur - val - ${i} `);
+    valLabel.addComponent(createText(blurValues[i] === 0 ? "Original" : `\u03C3 = ${blurValues[i]} `, {
       fontSize: 14, fontFamily: "monospace", textAnchor: "middle",
     }));
     valLabel.addComponent(new Material({ fill: { r: 0.45, g: 0.45, b: 0.55 } }));
@@ -1611,7 +1613,7 @@ function createFilterShowcase() {
 
   for (let i = 0; i < shadowConfigs.length; i++) {
     const cfg = shadowConfigs[i];
-    const rect = new Node(`shadow-${i}`);
+    const rect = new Node(`shadow - ${i} `);
     rect.addComponent(createBox(130, 130, 0));
     rect.addComponent(new Material({
       fill: { r: 0.92, g: 0.92, b: 0.95 },
@@ -1630,7 +1632,7 @@ function createFilterShowcase() {
     rect.transform.updateLocalMatrix();
     scene.add(rect);
 
-    const sLabel = new Node(`shadow-lbl-${i}`);
+    const sLabel = new Node(`shadow - lbl - ${i} `);
     sLabel.addComponent(createText(cfg.label, {
       fontSize: 14, fontFamily: "sans-serif", textAnchor: "middle",
     }));
@@ -1672,7 +1674,7 @@ function createFilterShowcase() {
   combo.transform.updateLocalMatrix();
   scene.add(combo);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -1879,7 +1881,7 @@ function createClipMaskDemo() {
   rLabel.transform.updateLocalMatrix();
   scene.add(rLabel);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -2055,7 +2057,7 @@ function createSvgAnimationShowcase() {
   subtitle.transform.updateLocalMatrix();
   scene.add(subtitle);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -2082,7 +2084,7 @@ function createInteractiveDemo() {
 
   const entries: { node: Node; material: Material }[] = [];
   for (let i = 0; i < 5; i++) {
-    const node = new Node(`object-${i}`);
+    const node = new Node(`object - ${i} `);
     if (i % 2 === 0) node.addComponent(createBox(1.2, 1.2, 1.2));
     else node.addComponent(createSphere(0.7, 24, 24));
     const material = new Material({ color: colors[i] });
@@ -2138,7 +2140,7 @@ function createHoverShowcase() {
   const hoverEntries: { node: Node; material: Material; baseColor: { r: number; g: number; b: number }; hoverColor: { r: number; g: number; b: number } }[] = [];
   for (let i = 0; i < configs.length; i++) {
     const cfg = configs[i];
-    const node = new Node(`hover-${i}`);
+    const node = new Node(`hover - ${i} `);
     if (cfg.shape === "box") node.addComponent(createBox(1.2, 1.2, 1.2));
     else node.addComponent(createSphere(0.7, 24, 24));
     const material = new Material({ color: { ...cfg.baseColor } });
@@ -2158,7 +2160,7 @@ function createHoverShowcase() {
   scene.add(hoverFloor);
 
   for (let i = 0; i < configs.length; i++) {
-    const indicator = new Node(`indicator-${i}`);
+    const indicator = new Node(`indicator - ${i} `);
     indicator.addComponent(createBox(1.8, 0.06, 0.06));
     indicator.addComponent(new Material({ color: configs[i].baseColor }));
     indicator.transform.position = { x: (i - 2) * 2.5, y: -1.1, z: 0.5 };
@@ -2272,7 +2274,7 @@ function createClickPlayground() {
   const orbitNodes: { node: Node; angle: number }[] = [];
   for (let j = 0; j < 6; j++) {
     const angle = (j / 6) * Math.PI * 2;
-    const orbiter = new Node(`orbiter-${j}`);
+    const orbiter = new Node(`orbiter - ${j} `);
     orbiter.addComponent(createSphere(0.25, 16, 16));
     orbiter.addComponent(new Material({
       color: {
@@ -2359,7 +2361,7 @@ function createWheelAndBubbling() {
   ];
   const wheelNodes: Node[] = [];
   for (const cfg of wheelConfigs) {
-    const node = new Node(`wheel-obj-${cfg.x}`);
+    const node = new Node(`wheel - obj - ${cfg.x} `);
     if (cfg.shape === "box") node.addComponent(createBox(1.2, 1.2, 1.2));
     else node.addComponent(createSphere(0.7, 24, 24));
     node.addComponent(new Material({ color: { ...cfg.color } }));
@@ -2494,7 +2496,7 @@ function createCameraViewpoints() {
   scene.add(towerMain);
 
   for (let i = 0; i < 3; i++) {
-    const ring = new Node(`tower-ring-${i}`);
+    const ring = new Node(`tower - ring - ${i} `);
     const size = 1.5 - i * 0.15;
     ring.addComponent(createBox(size, 0.12, size));
     ring.addComponent(new Material({ color: { r: 0.95, g: 0.8, b: 0.4 } }));
@@ -2516,17 +2518,17 @@ function createCameraViewpoints() {
   for (let i = 0; i < 4; i++) {
     const pos = pillarPositions[i];
     const height = 2.5 + (i % 2) * 1.0;
-    const base = new Node(`pillar-base-${i}`);
+    const base = new Node(`pillar - base - ${i} `);
     base.addComponent(createBox(1.2, 0.2, 1.2));
     base.addComponent(new Material({ color: { r: 0.18, g: 0.18, b: 0.24 } }));
     base.transform.position = { x: pos.x, y: -0.8, z: pos.z };
     scene.add(base);
-    const pillar = new Node(`pillar-${i}`);
+    const pillar = new Node(`pillar - ${i} `);
     pillar.addComponent(createBox(0.5, height, 0.5));
     pillar.addComponent(new Material({ color: pillarColors[i] }));
     pillar.transform.position = { x: pos.x, y: height / 2 - 0.7, z: pos.z };
     scene.add(pillar);
-    const sphere = new Node(`pillar-sphere-${i}`);
+    const sphere = new Node(`pillar - sphere - ${i} `);
     sphere.addComponent(createSphere(0.4, 20, 20));
     sphere.addComponent(new Material({ color: { r: Math.min(1, pillarColors[i].r + 0.2), g: Math.min(1, pillarColors[i].g + 0.2), b: Math.min(1, pillarColors[i].b + 0.2) } }));
     sphere.transform.position = { x: pos.x, y: height - 0.1, z: pos.z };
@@ -2537,7 +2539,7 @@ function createCameraViewpoints() {
   const ringRadius = 8;
   for (let i = 0; i < ringCount; i++) {
     const angle = (i / ringCount) * Math.PI * 2;
-    const obj = new Node(`ring-${i}`);
+    const obj = new Node(`ring - ${i} `);
     if (i % 3 === 0) obj.addComponent(createBox(0.35, 1.8, 0.35));
     else if (i % 3 === 1) obj.addComponent(createSphere(0.4, 16, 16));
     else obj.addComponent(createBox(0.8, 0.3, 0.8));
@@ -2549,7 +2551,7 @@ function createCameraViewpoints() {
 
   for (let i = 0; i < cvInnerCount; i++) {
     const angle = (i / cvInnerCount) * Math.PI * 2 + 0.3;
-    const s = new Node(`float-${i}`);
+    const s = new Node(`float - ${i} `);
     s.addComponent(createSphere(0.25, 14, 14));
     s.addComponent(new Material({ color: { r: 0.6 + i * 0.06, g: 0.7 - i * 0.05, b: 0.95 } }));
     s.transform.position = { x: Math.cos(angle) * cvInnerRadius, y: 2.5, z: Math.sin(angle) * cvInnerRadius };
@@ -2625,7 +2627,7 @@ function createSvgShowcase() {
   scene.add(gradRect);
 
   function addLbl(text: string, x: number, y: number) {
-    const l = new Node(`lbl-${x}-${y}`);
+    const l = new Node(`lbl - ${x} -${y} `);
     l.addComponent(createText(text, { fontSize: 14, fontFamily: "system-ui, sans-serif", textAnchor: "middle" }));
     l.addComponent(new Material({ fill: { r: 0.6, g: 0.6, b: 0.7 } }));
     l.transform.position = { x, y, z: 0 };
@@ -2678,7 +2680,7 @@ function createSvgShowcase() {
   scene.add(gradLine);
   addLbl("Stroke Gradient", 400, 570);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -2696,7 +2698,7 @@ function svgAnimStarPath(cx: number, cy: number, points: number, outerR: number,
 }
 
 function svgAnimLabel(scene: Scene, text: string, x: number, y: number) {
-  const label = new Node(`lbl-${x}-${y}`);
+  const label = new Node(`lbl - ${x} -${y} `);
   label.addComponent(createText(text, { fontSize: 13, fontFamily: "system-ui, sans-serif", textAnchor: "middle" }));
   label.addComponent(new Material({ fill: { r: 0.55, g: 0.55, b: 0.65 } }));
   label.transform.position = { x, y, z: 0 };
@@ -2783,7 +2785,7 @@ function createSvgAnimations() {
   footer.transform.updateLocalMatrix();
   scene.add(footer);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -2834,7 +2836,7 @@ function createSvgInteractive() {
       const cy = paddingTop + cellH * (r + 0.5);
       const color = SI_PALETTE[idx % SI_PALETTE.length];
       const shapeType = shapes[idx % shapes.length];
-      const node = new Node(`tile-${r}-${c}`);
+      const node = new Node(`tile - ${r} -${c} `);
       switch (shapeType) {
         case "circle": node.addComponent(createSphere(shapeSize * 0.45)); break;
         case "rect": node.addComponent(createBox(shapeSize * 0.85, shapeSize * 0.65, 0)); break;
@@ -2856,7 +2858,7 @@ function createSvgInteractive() {
   statusText.transform.updateLocalMatrix();
   scene.add(statusText);
 
-  function animate() {}
+  function animate() { }
   return { scene, animate };
 }
 
@@ -2882,14 +2884,14 @@ function createNestedTransforms() {
   for (let i = 0; i < ntDepth; i++) {
     const size = 2 - i * 0.3;
     const offset = 3 - i * 0.5;
-    const node = new Node(`level-${i}`);
+    const node = new Node(`level - ${i} `);
     node.addComponent(createBox(size, size, 0.1));
     node.addComponent(new Material({ fill: ntColors[i % ntColors.length], stroke: { r: 0.1, g: 0.1, b: 0.1 }, strokeWidth: 0.1, opacity: 0.8 }));
     node.transform.position = { x: offset, y: 0, z: 0 };
     currentParent.add(node);
     ntNodes.push(node);
     currentParent = node;
-    const pivot = new Node(`pivot-${i}`);
+    const pivot = new Node(`pivot - ${i} `);
     pivot.addComponent(createSphere(0.2, 12, 12));
     pivot.addComponent(new Material({ fill: { r: 0.2, g: 0.2, b: 0.2 }, opacity: 0.9 }));
     node.add(pivot);
@@ -2916,7 +2918,7 @@ function createSvJsGenerative() {
   const baseRotation = 45;
 
   const svg = new SvJs();
-  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize}` });
+  svg.set({ viewBox: `0 0 ${svgSize} ${svgSize} ` });
   svg.rect(svgSize, svgSize, 0, 0).fill("#181818");
 
   for (let i = 0; i < iterations; i++) {
@@ -2928,11 +2930,11 @@ function createSvJsGenerative() {
     hue = hue % 360;
     svg.ellipse(radiusX, radiusY, center, center)
       .fill("none")
-      .stroke(`hsl(${hue} 80% 80% / 0.6)`)
+      .stroke(`hsl(${hue} 80 % 80 % / 0.6)`)
       .rotate(rotation, center, center);
   }
 
-  return { scene: svg, animate: () => {} };
+  return { scene: svg, animate: () => { } };
 }
 
 // ── Export all examples ────────────────────────────────────────────────
@@ -3185,5 +3187,19 @@ export const EXAMPLES: ExampleDef[] = [
       "Arte generativo usando el wrapper nativo SvJs con elipses, control de iteraciones, hue y rotación.",
     category: "svjs",
     factory: createSvJsGenerative,
+  },
+  {
+    id: "textures",
+    title: "Textures & Environment",
+    description: "PBR materials with textures (maps for diffuse, normal, roughness, metalness) and environment settings (fog, background).",
+    category: "3d",
+    factory: createTexturesScene,
+  },
+  {
+    id: "look-at",
+    title: "Transform: LookAt",
+    description: "Demonstrates the lookAt() method. Watcher objects track a moving target in real-time.",
+    category: "3d",
+    factory: createLookAtScene,
   },
 ];

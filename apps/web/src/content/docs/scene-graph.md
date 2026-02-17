@@ -4,81 +4,81 @@ description: "Node hierarchy, transform system, and the ECS component model"
 order: 3
 category: "concepts"
 ---
-# Scene Graph & Transformaciones
+# Scene Graph & Transformations
 
-El Scene Graph es la estructura de datos central de Oroya Animate. Es un árbol jerárquico que gestiona las relaciones espaciales entre todos los objetos de la escena.
-
----
-
-## Tabla de contenidos
-
-- [Estructura del árbol](#estructura-del-árbol)
-- [Jerarquía padre-hijo](#jerarquía-padre-hijo)
-- [Sistema de transformaciones](#sistema-de-transformaciones)
-- [Propagación de matrices](#propagación-de-matrices)
-- [Componentes (ECS)](#componentes-ecs)
-- [Operaciones sobre el árbol](#operaciones-sobre-el-árbol)
-- [Patrones avanzados](#patrones-avanzados)
+The Scene Graph is the central data structure of Oroya Animate. It is a hierarchical tree that manages the spatial relationships between all objects in the scene.
 
 ---
 
-## Estructura del árbol
+## Table of Contents
 
-Toda `Scene` tiene un nodo `root` que es la raíz del árbol. Todos los demás nodos son hijos o descendientes de este root.
+- [Tree Structure](#tree-structure)
+- [Parent-Child Hierarchy](#parent-child-hierarchy)
+- [Transform System](#transform-system)
+- [Matrix Propagation](#matrix-propagation)
+- [Components (ECS)](#components-ecs)
+- [Tree Operations](#tree-operations)
+- [Advanced Patterns](#advanced-patterns)
+
+---
+
+## Tree Structure
+
+Every `Scene` has a `root` node that serves as the tree's root. All other nodes are children or descendants of this root.
 
 ```mermaid
 graph TD
     ROOT["root (Node)"]
     ROOT --> CAM["camera (Node)\nCamera + Transform"]
-    ROOT --> ENV["environment (Node)\n🔲 Transform"]
+    ROOT --> ENV["environment (Node)\nTransform"]
     ENV --> FLOOR["floor (Node)\nGeometry + Material + Transform"]
     ENV --> PLAYER["player (Node)\nGeometry + Material + Transform"]
     PLAYER --> WEAPON["weapon (Node)\nGeometry + Material + Transform"]
-    ROOT --> LIGHT["light (Node)\nLight (futuro) + Transform"]
+    ROOT --> LIGHT["light (Node)\nLight (future) + Transform"]
 ```
 
-### Reglas del árbol
+### Tree Rules
 
-| Regla | Descripción |
-|-------|-------------|
-| **Raíz única** | La escena siempre tiene exactamente un nodo `root` |
-| **Un padre por nodo** | Un nodo solo puede tener un padre a la vez |
-| **Re-parenting automático** | Si un nodo con padre se agrega a otro padre, se remueve del anterior automáticamente |
-| **Transform obligatorio** | Todos los nodos tienen un `Transform` creado automáticamente |
-| **Nodos vacíos permitidos** | Un nodo puede existir sin Geometry ni Material — útil como contenedor/pivote |
+| Rule | Description |
+|------|-------------|
+| **Single root** | The scene always has exactly one `root` node |
+| **One parent per node** | A node can only have one parent at a time |
+| **Automatic re-parenting** | If a node with a parent is added to another parent, it is automatically removed from the previous one |
+| **Mandatory transform** | All nodes have a `Transform` created automatically |
+| **Empty nodes allowed** | A node can exist without Geometry or Material — useful as a container/pivot |
 
 ---
 
-## Jerarquía padre-hijo
+## Parent-Child Hierarchy
 
-### Agregar nodos
+### Adding nodes
 
 ```typescript
 const scene = new Scene();
 
-// Agregar directamente al root
+// Add directly to root
 const parent = new Node('parent');
 scene.add(parent);
 
-// Agregar como hijo de otro nodo
+// Add as a child of another node
 const child = new Node('child');
-scene.add(child, parent);  // Equivalente a: parent.add(child)
+scene.add(child, parent);  // Equivalent to: parent.add(child)
 
-// También funciona directo sobre el nodo
+// Also works directly on the node
 const grandchild = new Node('grandchild');
 child.add(grandchild);
 ```
 
-### Remover nodos
+### Removing nodes
 
 ```typescript
-scene.remove(child);           // Remueve del padre (dondequiera que esté)
-parent.remove(child);          // Remueve solo si es hijo directo
+scene.remove(child);           // Removes from parent (wherever it is)
+parent.remove(child);          // Removes only if it is a direct child
 ```
 
 ### Re-parenting
 
-Cuando agregas un nodo que ya tiene padre a otro padre, se remueve del anterior automáticamente:
+When you add a node that already has a parent to another parent, it is automatically removed from the previous one:
 
 ```typescript
 const groupA = new Node('group-a');
@@ -88,16 +88,16 @@ const box = new Node('box');
 groupA.add(box);
 console.log(box.parent?.name); // 'group-a'
 
-groupB.add(box);  // Se remueve de groupA automáticamente
+groupB.add(box);  // Automatically removed from groupA
 console.log(box.parent?.name); // 'group-b'
 console.log(groupA.children.length); // 0
 ```
 
 ---
 
-## Sistema de transformaciones
+## Transform System
 
-Cada nodo tiene un componente `Transform` con tres propiedades que definen su posición en espacio local:
+Each node has a `Transform` component with three properties that define its position in local space:
 
 ```mermaid
 graph LR
@@ -118,46 +118,46 @@ graph LR
     LM -->|"× parent.worldMatrix"| WM
 ```
 
-### Propiedades del Transform
+### Transform Properties
 
-| Propiedad | Tipo | Default | Descripción |
-|-----------|------|---------|-------------|
-| `position` | `Vec3 {x, y, z}` | `{0, 0, 0}` | Desplazamiento relativo al padre |
-| `rotation` | `Quat {x, y, z, w}` | `{0, 0, 0, 1}` | Rotación como quaternion |
-| `scale` | `Vec3 {x, y, z}` | `{1, 1, 1}` | Factor de escala |
-| `localMatrix` | `Matrix4 (16 números)` | Identidad | Calculada de position + rotation + scale |
-| `worldMatrix` | `Matrix4 (16 números)` | Identidad | Calculada: parent.worldMatrix × localMatrix |
-| `isDirty` | `boolean` | `true` | Flag para optimización de recálculo |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `position` | `Vec3 {x, y, z}` | `{0, 0, 0}` | Offset relative to parent |
+| `rotation` | `Quat {x, y, z, w}` | `{0, 0, 0, 1}` | Rotation as quaternion |
+| `scale` | `Vec3 {x, y, z}` | `{1, 1, 1}` | Scale factor |
+| `localMatrix` | `Matrix4 (16 numbers)` | Identity | Computed from position + rotation + scale |
+| `worldMatrix` | `Matrix4 (16 numbers)` | Identity | Computed: parent.worldMatrix × localMatrix |
+| `isDirty` | `boolean` | `true` | Flag for recalculation optimization |
 
-### Espacio local vs espacio del mundo
+### Local Space vs World Space
 
-| Concepto | Definición | Ejemplo |
-|----------|-----------|---------|
-| **Espacio local** | Coordenadas relativas al padre | `position = {x: 2, y: 0, z: 0}` → 2 unidades a la derecha del padre |
-| **Espacio del mundo** | Coordenadas absolutas en la escena | Si el padre está en `{x: 5, ...}`, la posición mundo del hijo es `{x: 7, ...}` |
+| Concept | Definition | Example |
+|---------|-----------|---------|
+| **Local space** | Coordinates relative to parent | `position = {x: 2, y: 0, z: 0}` → 2 units to the right of parent |
+| **World space** | Absolute coordinates in the scene | If parent is at `{x: 5, ...}`, child's world position is `{x: 7, ...}` |
 
 ```
-Escena:
+Scene:
   root (world: 0,0,0)
   └── car (local: 10,0,0 → world: 10,0,0)
       └── wheel (local: -1,-0.5,0 → world: 9,-0.5,0)
           └── hubcap (local: 0,0,0.1 → world: 9,-0.5,0.1)
 ```
 
-### Actualizar transforms
+### Updating Transforms
 
-Después de modificar `position`, `rotation` o `scale`, **debes** llamar a `updateLocalMatrix()`:
+After modifying `position`, `rotation`, or `scale`, you **must** call `updateLocalMatrix()`:
 
 ```typescript
-// ❌ Incorrecto — la matriz local no refleja el cambio
+// Wrong — local matrix does not reflect the change
 node.transform.position.x = 5;
 
-// ✅ Correcto — recalcula la matriz local
+// Correct — recalculates the local matrix
 node.transform.position.x = 5;
 node.transform.updateLocalMatrix();
 ```
 
-La world matrix se recalcula automáticamente por `renderer.render()` o manualmente con:
+The world matrix is automatically recalculated by `renderer.render()` or manually with:
 
 ```typescript
 scene.updateWorldMatrices();
@@ -165,9 +165,9 @@ scene.updateWorldMatrices();
 
 ---
 
-## Propagación de matrices
+## Matrix Propagation
 
-El algoritmo de propagación recorre el árbol en **DFS pre-order** y calcula la world matrix de cada nodo:
+The propagation algorithm traverses the tree in **DFS pre-order** and computes the world matrix of each node:
 
 ```mermaid
 graph TD
@@ -185,16 +185,16 @@ graph TD
     B --> E
 ```
 
-### Pseudocódigo del algoritmo
+### Algorithm Pseudocode
 
 ```typescript
 function updateWorldMatrix(node: Node, parentWorldMatrix?: Matrix4): void {
-  // 1. Si el transform fue modificado, recalcular la matriz local
+  // 1. If the transform was modified, recalculate the local matrix
   if (node.transform.isDirty) {
     node.transform.updateLocalMatrix();
   }
 
-  // 2. Calcular la world matrix
+  // 2. Compute the world matrix
   if (parentWorldMatrix) {
     node.transform.worldMatrix = multiplyMatrices(parentWorldMatrix, node.transform.localMatrix);
   } else {
@@ -203,33 +203,33 @@ function updateWorldMatrix(node: Node, parentWorldMatrix?: Matrix4): void {
 
   node.transform.isDirty = false;
 
-  // 3. Propagar a todos los hijos
+  // 3. Propagate to all children
   for (const child of node.children) {
     updateWorldMatrix(child, node.transform.worldMatrix);
   }
 }
 ```
 
-### Ejemplo numérico
+### Numerical Example
 
 ```
-Padre: position = {x: 3, y: 0, z: 0}
-Hijo:  position = {x: 2, y: 1, z: 0}
+Parent: position = {x: 3, y: 0, z: 0}
+Child:  position = {x: 2, y: 1, z: 0}
 
-localMatrix(padre)  → traslación (3, 0, 0)
-localMatrix(hijo)   → traslación (2, 1, 0)
+localMatrix(parent) → translation (3, 0, 0)
+localMatrix(child)  → translation (2, 1, 0)
 
-worldMatrix(padre)  = localMatrix(padre)       → (3, 0, 0) en mundo
-worldMatrix(hijo)   = worldMatrix(padre) × localMatrix(hijo)
-                    = traslación(3,0,0) × traslación(2,1,0)
-                    → (5, 1, 0) en mundo  ✅
+worldMatrix(parent) = localMatrix(parent)       → (3, 0, 0) in world
+worldMatrix(child)  = worldMatrix(parent) × localMatrix(child)
+                    = translation(3,0,0) × translation(2,1,0)
+                    → (5, 1, 0) in world
 ```
 
 ---
 
-## Componentes (ECS)
+## Components (ECS)
 
-Los nodos son contenedores vacíos hasta que se les agregan componentes. Esto sigue un patrón **Entity-Component System (ECS) simplificado**.
+Nodes are empty containers until components are added to them. This follows a **simplified Entity-Component System (ECS)** pattern.
 
 ```mermaid
 classDiagram
@@ -273,107 +273,107 @@ classDiagram
     Component <|-- Camera
 ```
 
-### Tipos de componentes
+### Component Types
 
-| Componente | `ComponentType` | Auto-creado | Descripción |
-|------------|-----------------|-------------|-------------|
-| `Transform` | `Transform` | ✅ Sí | Posición, rotación, escala, matrices |
-| `Geometry` | `Geometry` | ❌ No | Forma geométrica (Box, Sphere, Path2D) |
-| `Material` | `Material` | ❌ No | Apariencia visual (color, opacidad, fill, stroke) |
-| `Camera` | `Camera` | ❌ No | Punto de vista (Perspective; Orthographic planned) |
+| Component | `ComponentType` | Auto-created | Description |
+|-----------|-----------------|--------------|-------------|
+| `Transform` | `Transform` | Yes | Position, rotation, scale, matrices |
+| `Geometry` | `Geometry` | No | Geometric shape (Box, Sphere, Path2D) |
+| `Material` | `Material` | No | Visual appearance (color, opacity, fill, stroke) |
+| `Camera` | `Camera` | No | Viewpoint (Perspective; Orthographic planned) |
 
-### Operaciones con componentes
+### Component Operations
 
 ```typescript
 const node = new Node('player');
 
-// Agregar
+// Add
 node.addComponent(createBox(1, 2, 1));
 node.addComponent(new Material({ color: { r: 0, g: 0.8, b: 0.5 } }));
 
-// Consultar
+// Query
 const geo = node.getComponent<Geometry>(ComponentType.Geometry);
 console.log(geo?.definition.type); // 'Box'
 
-// Verificar
+// Check
 if (node.hasComponent(ComponentType.Camera)) {
-  console.log('Es una cámara');
+  console.log('It is a camera');
 }
 
-// Reemplazar (mismo tipo = sobreescribe)
-node.addComponent(createSphere(1, 32, 32)); // Reemplaza el Box por una Sphere
+// Replace (same type = overwrite)
+node.addComponent(createSphere(1, 32, 32)); // Replaces Box with Sphere
 ```
 
-> **Regla:** Máximo **un componente por tipo** por nodo. Agregar un segundo componente del mismo tipo reemplaza al anterior silenciosamente.
+> **Rule:** Maximum **one component per type** per node. Adding a second component of the same type silently replaces the previous one.
 
 ---
 
-## Operaciones sobre el árbol
+## Tree Operations
 
-### Traversal (recorrido)
+### Traversal
 
-Recorre el árbol completo en DFS pre-order:
+Traverses the entire tree in DFS pre-order:
 
 ```typescript
-// Recorrer toda la escena
+// Traverse the entire scene
 scene.traverse(node => {
   console.log(node.name, node.children.length);
 });
 
-// Recorrer solo a partir de un nodo
+// Traverse starting from a specific node
 someNode.traverse(descendant => {
-  // Solo visita someNode y sus descendientes
+  // Only visits someNode and its descendants
 });
 ```
 
-### Búsqueda
+### Search
 
 ```typescript
-// Por UUID (único, garantizado)
+// By UUID (unique, guaranteed)
 const node = scene.findNodeById('550e8400-e29b-41d4-a716-446655440000');
 
-// Por nombre (retorna el primero encontrado)
+// By name (returns the first match)
 const camera = scene.findNodeByName('main-camera');
 ```
 
-### Conteo de nodos
+### Node Count
 
 ```typescript
 let count = 0;
 scene.traverse(() => count++);
-console.log(`La escena tiene ${count} nodos`);
+console.log(`The scene has ${count} nodes`);
 ```
 
 ---
 
-## Patrones avanzados
+## Advanced Patterns
 
-### Nodo pivote (para órbitas)
+### Pivot Node (for orbits)
 
-Un nodo vacío cuya rotación genera una órbita para sus hijos:
+An empty node whose rotation generates an orbit for its children:
 
 ```
-Sol (esfera)
-└── earthPivot (vacío, rota en Y)
-    └── Tierra (esfera, desplazada en X)
-        └── moonPivot (vacío, rota más rápido)
-            └── Luna (esfera, desplazada en X)
+Sun (sphere)
+└── earthPivot (empty, rotates on Y)
+    └── Earth (sphere, offset on X)
+        └── moonPivot (empty, rotates faster)
+            └── Moon (sphere, offset on X)
 ```
 
 ```typescript
-const earthPivot = new Node('earth-pivot'); // Sin geometría
+const earthPivot = new Node('earth-pivot'); // No geometry
 sun.add(earthPivot);
 
 const earth = new Node('earth');
-earth.transform.position = { x: 5, y: 0, z: 0 }; // Distancia orbital
+earth.transform.position = { x: 5, y: 0, z: 0 }; // Orbital distance
 earthPivot.add(earth);
 
-// Al rotar el pivot, la Tierra orbita el Sol
+// Rotating the pivot makes Earth orbit the Sun
 earthPivot.transform.rotation = rotateY(angle);
 earthPivot.transform.updateLocalMatrix();
 ```
 
-### Nodo grupo (para organización)
+### Group Node (for organization)
 
 ```typescript
 const ui = new Node('ui-layer');
@@ -382,18 +382,18 @@ const world = new Node('world-layer');
 scene.add(ui);
 scene.add(world);
 
-// Todos los elementos del mundo bajo un grupo
+// All world elements under one group
 world.add(terrain);
 world.add(buildings);
 world.add(characters);
 
-// Esconder todo el mundo de golpe (futuro: visibility component)
-scene.remove(world); // Todo el grupo desaparece
+// Hide the entire world at once (future: visibility component)
+scene.remove(world); // The entire group disappears
 ```
 
-### Cámara adjunta a un nodo
+### Camera Attached to a Node
 
-La cámara hereda el transform de su padre:
+The camera inherits the transform from its parent:
 
 ```typescript
 const character = new Node('character');
@@ -401,15 +401,15 @@ scene.add(character);
 
 const followCam = new Node('follow-cam');
 followCam.addComponent(new Camera({...}));
-followCam.transform.position = { x: 0, y: 3, z: 8 }; // Offset relativo
+followCam.transform.position = { x: 0, y: 3, z: 8 }; // Relative offset
 character.add(followCam);
 
-// Cuando el personaje se mueve, la cámara lo sigue automáticamente
+// When the character moves, the camera follows automatically
 ```
 
-### Snapshot del estado
+### State Snapshot
 
-Capturar posiciones de todos los nodos:
+Capture world positions of all nodes:
 
 ```typescript
 const snapshot = new Map<string, Vec3>();
@@ -417,9 +417,9 @@ const snapshot = new Map<string, Vec3>();
 scene.traverse(node => {
   const wm = node.transform.worldMatrix;
   snapshot.set(node.id, {
-    x: wm[12], // posición X del mundo
-    y: wm[13], // posición Y del mundo
-    z: wm[14], // posición Z del mundo
+    x: wm[12], // world X position
+    y: wm[13], // world Y position
+    z: wm[14], // world Z position
   });
 });
 ```
