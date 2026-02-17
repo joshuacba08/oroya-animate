@@ -29,6 +29,7 @@ import { createInstancingScene } from "../../scenes/instancing-demo";
 import { createShadowsScene } from "../../scenes/shadows-demo";
 import { createNeonCityScene } from "../../scenes/neon-city-demo";
 import { createFireSmokeScene } from "../../scenes/fire-smoke-demo";
+import { createAudioScene } from "../../scenes/audio-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3241,5 +3242,12 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Particle system demonstration showing cpu-simulated fire and smoke effects.",
     category: "3d",
     factory: createFireSmokeScene,
+  },
+  {
+    id: "audio-demo",
+    title: "Spatial Audio",
+    description: "3D positional audio. Wear headphones! The green cube emits sound as it orbits.",
+    category: "3d",
+    factory: createAudioScene,
   },
 ];

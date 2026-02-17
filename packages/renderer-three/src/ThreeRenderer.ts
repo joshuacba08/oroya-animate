@@ -626,33 +626,32 @@ export class ThreeRenderer {
         if (geoComponent.definition.castShadow) threeObject.castShadow = true;
         if (geoComponent.definition.receiveShadow) threeObject.receiveShadow = true;
       }
-      if (oroyaNode.hasComponent(ComponentType.Camera)) {
-        const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
-        threeObject = this.createThreeCamera(camComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.Camera)) {
+      const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
+      threeObject = this.createThreeCamera(camComponent);
 
-        // If we already have a listener that wasn't attached, attach it now
-        if (this.audioListener && !this.audioListener.parent) {
-          threeObject.add(this.audioListener);
-        }
-      } else if (oroyaNode.hasComponent(ComponentType.Light)) {
-        const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
-        threeObject = this.createThreeLight(lightComponent);
-      } else if (oroyaNode.hasComponent(ComponentType.ParticleSystem)) {
-        const psComponent = oroyaNode.getComponent<ParticleSystem>(ComponentType.ParticleSystem)!;
-        threeObject = this.createThreeParticleSystem(psComponent);
-      } else if (oroyaNode.hasComponent(ComponentType.AudioListener)) {
-        // Usually attached to camera, but can be standalone
-        const alComponent = oroyaNode.getComponent<OroyaAudioListener>(ComponentType.AudioListener)!;
-        threeObject = this.createThreeAudioListener(alComponent);
-      } else if (oroyaNode.hasComponent(ComponentType.AudioSource)) {
-        const asComponent = oroyaNode.getComponent<OroyaAudioSource>(ComponentType.AudioSource)!;
-        threeObject = this.createThreeAudioSource(asComponent);
-      } else {
-        threeObject = new THREE.Group();
+      // If we already have a listener that wasn't attached, attach it now
+      if (threeObject && this.audioListener && !this.audioListener.parent) {
+        threeObject.add(this.audioListener);
       }
-
-      return threeObject;
+    } else if (oroyaNode.hasComponent(ComponentType.Light)) {
+      const lightComponent = oroyaNode.getComponent<OroyaLight>(ComponentType.Light)!;
+      threeObject = this.createThreeLight(lightComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.ParticleSystem)) {
+      const psComponent = oroyaNode.getComponent<ParticleSystem>(ComponentType.ParticleSystem)!;
+      threeObject = this.createThreeParticleSystem(psComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.AudioListener)) {
+      const alComponent = oroyaNode.getComponent<OroyaAudioListener>(ComponentType.AudioListener)!;
+      threeObject = this.createThreeAudioListener(alComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.AudioSource)) {
+      const asComponent = oroyaNode.getComponent<OroyaAudioSource>(ComponentType.AudioSource)!;
+      threeObject = this.createThreeAudioSource(asComponent);
+    } else {
+      threeObject = new THREE.Group();
     }
+
+    return threeObject;
+  }
 
   private createThreeAudioListener(comp: OroyaAudioListener): THREE.AudioListener {
     if (!this.audioListener) {
