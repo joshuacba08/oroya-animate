@@ -25,6 +25,12 @@ export class Node {
   /** Event emitter for interaction events. */
   readonly events = new EventEmitter<InteractionEventMap>();
 
+  /** 
+   * Optional callback to run every frame. 
+   * @param dt Time elapsed since last frame in seconds.
+   */
+  onUpdate?: (dt: number) => void;
+
   constructor(name: string, id: string = uuidv4()) {
     this.id = id;
     this.name = name;
@@ -110,6 +116,29 @@ export class Node {
 
     for (const child of this.children) {
       child.updateWorldMatrix(this.transform.worldMatrix);
+    }
+  }
+
+  /**
+   * Updates the node, its components, and its children.
+   * @param dt Time elapsed since last frame in seconds.
+   */
+  update(dt: number): void {
+    // 1. Run node's custom script
+    if (this.onUpdate) {
+      this.onUpdate(dt);
+    }
+
+    // 2. Update components
+    for (const component of this.components.values()) {
+      if (component.onUpdate) {
+        component.onUpdate(dt);
+      }
+    }
+
+    // 3. Update children
+    for (const child of this.children) {
+      child.update(dt);
     }
   }
 

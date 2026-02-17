@@ -17,6 +17,7 @@ export enum ComponentType {
   Script = 'Script',
   InstancedMesh = 'InstancedMesh',
   PostProcessing = 'PostProcessing',
+  ParticleSystem = 'ParticleSystem',
 }
 
 /**
@@ -33,6 +34,12 @@ export abstract class Component {
    * This is set automatically when the component is added to a node.
    */
   node: Node | null = null;
+
+  /**
+   * Called once per frame to update the component's state.
+   * @param dt The time elapsed since the last frame in seconds.
+   */
+  onUpdate?(dt: number): void;
 }
 
 

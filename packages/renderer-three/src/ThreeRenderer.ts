@@ -1,5 +1,12 @@
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+// @ts-ignore
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+// @ts-ignore
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+// @ts-ignore
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import {
   Scene as OroyaScene,
   Node as OroyaNode,
@@ -30,6 +37,8 @@ import {
   FogType,
   InstancedMeshComponent,
   InstancedMesh,
+  PostProcessing,
+  ToneMapping,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -47,6 +56,9 @@ export class ThreeRenderer {
   private oroyaScene: OroyaScene | null = null;
   private orbitControls: OrbitControlsWrapper | null = null;
   private nodeMap: Map<string, THREE.Object3D> = new Map();
+
+  // Post-Processing
+  private composer: any | null = null;
 
   // ── Interaction state ─────────────────────────────────────
   private readonly reverseNodeMap: Map<THREE.Object3D, OroyaNode> = new Map();
@@ -74,7 +86,10 @@ export class ThreeRenderer {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     this.scene = new THREE.Scene();
+    this.composer = new EffectComposer(this.renderer);
   }
 
   // ── Public API ────────────────────────────────────────────
@@ -218,7 +233,98 @@ export class ThreeRenderer {
       this.orbitControls.update();
     }
 
-    this.renderer.render(this.scene, this.activeCamera);
+    // Check for PostProcessing component on active camera or scene environment
+    // For now, let's check the active camera node
+    let ppDef: any = null;
+    if (this.activeCamera) {
+      const camNode = this.findOroyaNode(this.activeCamera);
+      if (camNode && camNode.hasComponent(ComponentType.PostProcessing)) {
+        ppDef = camNode.getComponent<PostProcessing>(ComponentType.PostProcessing)!.definition;
+      }
+    }
+
+    if (ppDef && this.composer) {
+      this.renderPostFX(ppDef);
+    } else {
+      this.renderer.render(this.scene, this.activeCamera);
+    }
+  }
+
+  private renderPostFX(def: any) {
+    if (!this.composer || !this.activeCamera) return;
+
+    // Check if we need to rebuild passes
+    // For simplicity in this iteration, we reconstruct if needed or update parameters
+    // A robust system would track dirty state.
+    // Let's implement a simple rebuild strategy for now or just update.
+
+    // Check if passes match current config. 
+    // Optimization: Only rebuild if structure changes.
+    // For MVP: Rebuild specific passes if missing, update if present.
+
+    // Ensure RenderPass is first
+    if (this.composer.passes.length === 0 || !(this.composer.passes[0] instanceof RenderPass)) {
+      this.composer.passes = [];
+      const renderPass = new RenderPass(this.scene, this.activeCamera);
+      this.composer.addPass(renderPass);
+    } else {
+      (this.composer.passes[0] as RenderPass).scene = this.scene;
+      (this.composer.passes[0] as RenderPass).camera = this.activeCamera;
+    }
+
+    // Bloom
+    let bloomPass = this.composer.passes.find((p: any) => p instanceof UnrealBloomPass) as UnrealBloomPass;
+    if (def.bloom?.enabled) {
+      if (!bloomPass) {
+        // Create Bloom Pass
+        const size = new THREE.Vector2();
+        this.renderer.getSize(size);
+        bloomPass = new UnrealBloomPass(size, def.bloom.strength, def.bloom.radius, def.bloom.threshold);
+        // Insert before OutputPass or at end
+        const outputIndex = this.composer.passes.findIndex((p: any) => p instanceof OutputPass);
+        if (outputIndex >= 0) {
+          this.composer.insertPass(bloomPass, outputIndex);
+        } else {
+          this.composer.addPass(bloomPass);
+        }
+      }
+
+      bloomPass.strength = def.bloom.strength;
+      bloomPass.radius = def.bloom.radius;
+      bloomPass.threshold = def.bloom.threshold;
+      bloomPass.enabled = true;
+    } else if (bloomPass) {
+      bloomPass.enabled = false;
+    }
+
+    // Output Pass (Tone Mapping / Color Space)
+    let outputPass = this.composer.passes.find((p: any) => p instanceof OutputPass);
+    if (!outputPass) {
+      outputPass = new OutputPass();
+      this.composer.addPass(outputPass);
+    }
+
+    // Tone Mapping settings are global on renderer usually, but OutputPass handles some.
+    // Actually OutputPass handles ToneMapping in recent Three.js versions.
+    // Validating Tone Mapping
+    if (def.toneMapping) {
+      switch (def.toneMapping) {
+        case ToneMapping.Reinhard: this.renderer.toneMapping = THREE.ReinhardToneMapping; break;
+        case ToneMapping.Cineon: this.renderer.toneMapping = THREE.CineonToneMapping; break;
+        case ToneMapping.ACESFilmic: this.renderer.toneMapping = THREE.ACESFilmicToneMapping; break;
+        default: this.renderer.toneMapping = THREE.NoToneMapping; break;
+      }
+    }
+    if (def.exposure !== undefined) {
+      this.renderer.toneMappingExposure = def.exposure;
+    }
+
+    this.composer.render();
+  }
+
+  setSize(width: number, height: number) {
+    this.renderer.setSize(width, height);
+    this.composer?.setSize(width, height);
   }
 
   /**

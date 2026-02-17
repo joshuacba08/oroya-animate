@@ -62,5 +62,13 @@ export class Scene {
   updateWorldMatrices(): void {
     this.root.updateWorldMatrix();
   }
+
+  /**
+   * Updates the scene graph (logic, scripts, physics, particles).
+   * @param dt Time elapsed since last frame in seconds.
+   */
+  update(dt: number): void {
+    this.root.update(dt);
+  }
 }
 

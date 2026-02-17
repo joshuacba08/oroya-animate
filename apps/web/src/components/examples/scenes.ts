@@ -27,6 +27,7 @@ import { createLookAtScene } from "../../scenes/look-at";
 import { createPhysicsScene } from "../../scenes/physics-demo";
 import { createInstancingScene } from "../../scenes/instancing-demo";
 import { createShadowsScene } from "../../scenes/shadows-demo";
+import { createNeonCityScene } from "../../scenes/neon-city-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3225,5 +3226,12 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Directional light casting shadows from a sphere and cube onto a plane. Demonstrates shadow map support.",
     category: "3d",
     factory: createShadowsScene,
+  },
+  {
+    id: "neon-city-demo",
+    title: "Post-FX: Neon City",
+    description: "Cyberpunk-style scene demonstrating Bloom and Tone Mapping post-processing effects on emissive materials.",
+    category: "3d",
+    factory: createNeonCityScene,
   },
 ];
