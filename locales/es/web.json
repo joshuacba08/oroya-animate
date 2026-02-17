@@ -51,6 +51,33 @@
       "interactive": "Interactivo"
     }
   },
+  "capabilities": {
+    "sectionTitle": "Capacidades <span>Principales</span>",
+    "sectionSubtitle": "Oroya Animate va más allá del renderizado. Anima, interactúa y genera — todo desde una API unificada y agnóstica de motor.",
+    "animation": {
+      "title": "Sistema de Animación",
+      "description": "Animaciones basadas en keyframes con AnimationClip, AnimationMixer y múltiples modos de interpolación. Anima cualquier propiedad — posición, rotación, escala, color — con control preciso de timing.",
+      "badge": "AnimationMixer",
+      "codeLine1": "const clip = new AnimationClip('rotate', 2, [track])",
+      "codeLine2": "mixer.clipAction(clip).play()"
+    },
+    "interactivity": {
+      "title": "Interactividad",
+      "description": "Sistema de eventos integrado con raycasting para 3D y delegación de eventos DOM para SVG. Haz clic, hover y arrastra objetos en tu escena con una API unificada entre renderers.",
+      "badge": "Raycasting",
+      "codeLine1": "node.addComponent(new Interactive())",
+      "codeLine2": "node.on('click', (e) => { ... })"
+    },
+    "generative": {
+      "title": "Arte Generativo",
+      "description": "Crea arte algorítmico con el motor SvJs. Ruido Perlin, distribuciones gaussianas y primitivas SVG para construir visuales orgánicos y procedurales directamente en el navegador.",
+      "badge": "Motor SvJs",
+      "codeLine1": "const noise = new Noise()",
+      "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "tryDemo": "Prueba hover y clic",
+    "learnMore": "Explorar la documentación"
+  },
   "code": {
     "sectionTitle": "API Simple y <span>Potente</span>",
     "sectionSubtitle": "Crea escenas con una API intuitiva TypeScript-first. Agrega nodos, acopla componentes y renderiza con el motor de tu elección — todo en pocas líneas de código.",
@@ -155,6 +182,7 @@
     "advancedDesc": "Lleva al límite con generación procedural y patrones multi-renderer.",
     "previous": "Anterior",
     "next": "Siguiente",
+    "liveDemo": "Demo en vivo",
     "badgeEasy": "Fácil",
     "badgeMid": "Medio",
     "badgeHard": "Difícil",

@@ -333,4 +333,6 @@ Has completado todos los tutoriales de SVG. Ahora puedes:
 - Crear dashboards interactivos SVG con event delegation.
 - Usar `renderToSVG` en Node.js para server-side rendering.
 
+→ [Tutorial 12: Animación por Keyframes](./12-keyframe-animation.md) — AnimationMixer, KeyframeTrack e interpolación.
+
 ↁE[Volver al índice de tutoriales](./README.md)

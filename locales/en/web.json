@@ -51,6 +51,33 @@
       "interactive": "Interactive"
     }
   },
+  "capabilities": {
+    "sectionTitle": "Core <span>Capabilities</span>",
+    "sectionSubtitle": "Oroya Animate goes beyond rendering. Animate, interact, and generate — all from a unified, engine-agnostic API.",
+    "animation": {
+      "title": "Animation System",
+      "description": "Keyframe-based animations with AnimationClip, AnimationMixer, and multiple interpolation modes. Animate any property — position, rotation, scale, color — with precise timing control.",
+      "badge": "AnimationMixer",
+      "codeLine1": "const clip = new AnimationClip('rotate', 2, [track])",
+      "codeLine2": "mixer.clipAction(clip).play()"
+    },
+    "interactivity": {
+      "title": "Interactivity",
+      "description": "Built-in event system with raycasting for 3D and DOM event delegation for SVG. Click, hover, and drag objects in your scene with a unified API across renderers.",
+      "badge": "Raycasting",
+      "codeLine1": "node.addComponent(new Interactive())",
+      "codeLine2": "node.on('click', (e) => { ... })"
+    },
+    "generative": {
+      "title": "Generative Art",
+      "description": "Create algorithmic art with the SvJs engine. Perlin noise, gaussian distributions, and SVG primitives for building organic, procedural visuals directly in the browser.",
+      "badge": "SvJs Engine",
+      "codeLine1": "const noise = new Noise()",
+      "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "tryDemo": "Try hovering and clicking",
+    "learnMore": "Explore the docs"
+  },
   "code": {
     "sectionTitle": "Simple, <span>Powerful</span> API",
     "sectionSubtitle": "Create scenes with an intuitive, TypeScript-first API. Add nodes, attach components, and render with your engine of choice — all in a few lines of code.",
@@ -155,6 +182,7 @@
     "advancedDesc": "Push the boundaries with procedural generation and multi-renderer patterns.",
     "previous": "Previous",
     "next": "Next",
+    "liveDemo": "Live Demo",
     "badgeEasy": "Easy",
     "badgeMid": "Mid",
     "badgeHard": "Hard",

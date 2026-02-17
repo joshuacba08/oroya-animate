@@ -39,6 +39,7 @@ const RENDERER_ICONS: Record<RendererType, LucideIcon> = {
   three: Cpu,
   canvas: Pen,
   svg: FileCode2,
+  svjs: LayoutGrid, // Using LayoutGrid or any other available icon
 };
 
 /* ── Styles ───────────────────────────────────────────────────────────── */

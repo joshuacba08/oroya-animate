@@ -1,4 +1,5 @@
 import { Component, ComponentType } from './Component';
+import { Matrix4 } from '../math/Matrix4';
 
 /**
  * An enumeration of the available geometry primitive types.
@@ -9,6 +10,7 @@ export enum GeometryPrimitive {
   Path2D = 'Path2D',
   Text = 'Text',
   Buffer = 'Buffer',
+  CSG = 'CSG',
 }
 
 /**
@@ -83,9 +85,33 @@ export interface BufferGeometryDef {
 }
 
 /**
+ * Operations for Constructive Solid Geometry.
+ */
+export enum CSGOperation {
+  Union = 'Union',
+  Subtract = 'Subtract',
+  Intersect = 'Intersect',
+}
+
+/**
+ * The definition for a CSG geometry, combining two geometries with a boolean operation.
+ */
+export interface CSGGeometryDef {
+  type: GeometryPrimitive.CSG;
+  /** The operation to perform. */
+  operation: CSGOperation;
+  /** The base geometry. */
+  base: GeometryDef;
+  /** The geometry to combine with the base. */
+  modifier: GeometryDef;
+  /** Optional transform for the modifier geometry relative to the base. */
+  modifierTransform?: Matrix4;
+}
+
+/**
  * A union of all possible geometry definitions.
  */
-export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef | BufferGeometryDef;
+export type GeometryDef = BoxGeometryDef | SphereGeometryDef | Path2DGeometryDef | TextGeometryDef | BufferGeometryDef | CSGGeometryDef;
 
 /**
  * A component that defines the geometry of a node.

@@ -1,0 +1,302 @@
+---
+import { getLocaleFromUrl, useTranslations, getLocalizedPath } from '../i18n';
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
+---
+
+<section id="capabilities" class="py-24 px-6 relative overflow-hidden">
+  <!-- Subtle background glow -->
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-primary/5 blur-[140px]"></div>
+    <div class="absolute top-1/3 right-1/4 w-[500px] h-[350px] rounded-full bg-accent/5 blur-[120px]"></div>
+  </div>
+
+  <div class="container mx-auto max-w-6xl">
+    <!-- Section header -->
+    <div class="text-center mb-16">
+      <h2
+        class="text-3xl md:text-4xl font-bold font-display mb-4 tracking-tight"
+        set:html={t('capabilities.sectionTitle')}
+      ></h2>
+      <p class="text-base-content/60 max-w-2xl mx-auto text-lg">
+        {t('capabilities.sectionSubtitle')}
+      </p>
+    </div>
+
+    <!-- Capability cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- ─── Animation System ─── -->
+      <div class="capability-card glass-card rounded-2xl overflow-hidden group">
+        <!-- Mini demo area -->
+        <div class="capability-demo h-48 relative flex items-center justify-center bg-base-300/20 overflow-hidden">
+          <div class="anim-demo-scene">
+            <!-- Animated cube -->
+            <div class="anim-cube">
+              <div class="anim-cube-face anim-cube-front"></div>
+              <div class="anim-cube-face anim-cube-back"></div>
+              <div class="anim-cube-face anim-cube-right"></div>
+              <div class="anim-cube-face anim-cube-left"></div>
+              <div class="anim-cube-face anim-cube-top"></div>
+              <div class="anim-cube-face anim-cube-bottom"></div>
+            </div>
+          </div>
+          <!-- Timeline bar -->
+          <div class="absolute bottom-3 left-4 right-4">
+            <div class="flex items-center gap-2">
+              <div class="w-full h-1 rounded-full bg-base-content/10 overflow-hidden">
+                <div class="anim-timeline-bar h-full rounded-full bg-primary/60"></div>
+              </div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] font-mono text-base-content/30">0.0s</span>
+              <span class="text-[10px] font-mono text-base-content/30">2.0s</span>
+            </div>
+          </div>
+          <span class="badge badge-primary badge-xs absolute top-3 right-3 font-mono">
+            {t('capabilities.animation.badge')}
+          </span>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-lg font-display font-semibold mb-2 flex items-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+              <polygon points="6 3 20 12 6 21 6 3"/>
+            </svg>
+            {t('capabilities.animation.title')}
+          </h3>
+          <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+            {t('capabilities.animation.description')}
+          </p>
+          <div class="font-mono text-xs space-y-1 text-base-content/50">
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.animation.codeLine1')}</div>
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.animation.codeLine2')}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Interactivity ─── -->
+      <div class="capability-card glass-card rounded-2xl overflow-hidden group">
+        <!-- Mini demo area -->
+        <div class="capability-demo h-48 relative flex items-center justify-center bg-base-300/20 overflow-hidden">
+          <div class="interact-demo-scene" id="interact-demo">
+            <div class="interact-object interact-sphere" data-shape="sphere">
+              <div class="interact-ripple"></div>
+            </div>
+            <div class="interact-object interact-box" data-shape="box">
+              <div class="interact-ripple"></div>
+            </div>
+            <div class="interact-object interact-cylinder" data-shape="cylinder">
+              <div class="interact-ripple"></div>
+            </div>
+          </div>
+          <div class="interact-cursor-label absolute bottom-3 left-4 text-[10px] font-mono text-base-content/30 transition-all duration-200">
+            {t('capabilities.tryDemo')}
+          </div>
+          <span class="badge badge-secondary badge-xs absolute top-3 right-3 font-mono">
+            {t('capabilities.interactivity.badge')}
+          </span>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-lg font-display font-semibold mb-2 flex items-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary">
+              <path d="M14 4.1 12 6"/>
+              <path d="m5.1 8-2.9-.8"/>
+              <path d="m6 12-1.9 2"/>
+              <path d="M7.2 2.2 8 5.1"/>
+              <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>
+            </svg>
+            {t('capabilities.interactivity.title')}
+          </h3>
+          <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+            {t('capabilities.interactivity.description')}
+          </p>
+          <div class="font-mono text-xs space-y-1 text-base-content/50">
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.interactivity.codeLine1')}</div>
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.interactivity.codeLine2')}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Generative Art ─── -->
+      <div class="capability-card glass-card rounded-2xl overflow-hidden group">
+        <!-- Mini demo area -->
+        <div class="capability-demo h-48 relative flex items-center justify-center bg-base-300/20 overflow-hidden">
+          <svg class="generative-svg w-full h-full" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="gen-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.6"/>
+                <stop offset="50%" style="stop-color:#60a5fa;stop-opacity:0.4"/>
+                <stop offset="100%" style="stop-color:#22d3ee;stop-opacity:0.6"/>
+              </linearGradient>
+              <filter id="gen-blur">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1"/>
+              </filter>
+            </defs>
+            <!-- Generated pattern will be created with JS -->
+            <g class="gen-dots" filter="url(#gen-blur)"></g>
+            <g class="gen-lines"></g>
+          </svg>
+          <span class="badge badge-accent badge-xs absolute top-3 right-3 font-mono">
+            {t('capabilities.generative.badge')}
+          </span>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-lg font-display font-semibold mb-2 flex items-center gap-2">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            {t('capabilities.generative.title')}
+          </h3>
+          <p class="text-base-content/60 text-sm leading-relaxed mb-4">
+            {t('capabilities.generative.description')}
+          </p>
+          <div class="font-mono text-xs space-y-1 text-base-content/50">
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.generative.codeLine1')}</div>
+            <div class="bg-base-300/30 rounded px-2 py-1">{t('capabilities.generative.codeLine2')}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom CTA pill -->
+    <div class="mt-12 text-center">
+      <a
+        href={getLocalizedPath('/docs/getting-started', locale)}
+        class="inline-flex items-center gap-3 glass-card rounded-full px-6 py-3 hover:scale-105 transition-transform duration-300"
+      >
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+        </svg>
+        <span class="text-sm text-base-content/70 font-medium">
+          {t('capabilities.learnMore')}
+        </span>
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-base-content/40">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* ─── Interactivity demo ─── */
+  const interactObjects = document.querySelectorAll<HTMLElement>('.interact-object');
+  const cursorLabel = document.querySelector<HTMLElement>('.interact-cursor-label');
+
+  interactObjects.forEach((obj) => {
+    obj.addEventListener('mouseenter', () => {
+      obj.classList.add('interact-hovered');
+      if (cursorLabel) {
+        const shape = obj.dataset.shape ?? 'object';
+        cursorLabel.textContent = `onHover → ${shape}`;
+        cursorLabel.classList.add('text-secondary');
+      }
+    });
+
+    obj.addEventListener('mouseleave', () => {
+      obj.classList.remove('interact-hovered');
+      if (cursorLabel) {
+        cursorLabel.textContent = cursorLabel.dataset.original ?? '';
+        cursorLabel.classList.remove('text-secondary');
+      }
+    });
+
+    obj.addEventListener('click', () => {
+      obj.classList.add('interact-clicked');
+      const ripple = obj.querySelector<HTMLElement>('.interact-ripple');
+      if (ripple) {
+        ripple.classList.add('active');
+        setTimeout(() => ripple.classList.remove('active'), 500);
+      }
+      if (cursorLabel) {
+        const shape = obj.dataset.shape ?? 'object';
+        cursorLabel.textContent = `onClick → ${shape}`;
+        cursorLabel.classList.add('text-primary');
+      }
+      setTimeout(() => {
+        obj.classList.remove('interact-clicked');
+        if (cursorLabel) cursorLabel.classList.remove('text-primary');
+      }, 300);
+    });
+  });
+
+  // Store original label
+  if (cursorLabel) {
+    cursorLabel.dataset.original = cursorLabel.textContent ?? '';
+  }
+
+  /* ─── Generative art demo (Perlin-like noise field) ─── */
+  function initGenerativeDemo() {
+    const dotsGroup = document.querySelector('.gen-dots');
+    const linesGroup = document.querySelector('.gen-lines');
+    if (!dotsGroup || !linesGroup) return;
+
+    const cols = 20;
+    const rows = 13;
+    const spacingX = 300 / cols;
+    const spacingY = 200 / rows;
+
+    const points: { x: number; y: number; r: number }[] = [];
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = col * spacingX + spacingX / 2;
+        const y = row * spacingY + spacingY / 2;
+
+        // Pseudo-noise displacement
+        const noise =
+          Math.sin(col * 0.6 + row * 0.4) * 3 +
+          Math.cos(col * 0.3 - row * 0.7) * 2;
+        const px = x + noise;
+        const py = y + Math.sin(col * 0.5 + row * 0.3) * 3;
+        const r = 1.2 + Math.abs(Math.sin(col * 0.4 + row * 0.6)) * 1.8;
+
+        const opacity =
+          0.2 + Math.abs(Math.sin(col * 0.3 + row * 0.5)) * 0.6;
+
+        const circle = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
+        circle.setAttribute('cx', String(px));
+        circle.setAttribute('cy', String(py));
+        circle.setAttribute('r', String(r));
+        circle.setAttribute('fill', 'url(#gen-grad)');
+        circle.setAttribute('opacity', String(opacity));
+        dotsGroup.appendChild(circle);
+
+        points.push({ x: px, y: py, r });
+      }
+    }
+
+    // Connect nearby points with subtle lines
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const dx = points[i].x - points[j].x;
+        const dy = points[i].y - points[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 22 && dist > 8) {
+          const line = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'line'
+          );
+          line.setAttribute('x1', String(points[i].x));
+          line.setAttribute('y1', String(points[i].y));
+          line.setAttribute('x2', String(points[j].x));
+          line.setAttribute('y2', String(points[j].y));
+          line.setAttribute('stroke', 'url(#gen-grad)');
+          line.setAttribute('stroke-width', '0.4');
+          line.setAttribute('opacity', '0.2');
+          linesGroup.appendChild(line);
+        }
+      }
+    }
+  }
+
+  initGenerativeDemo();
+</script>

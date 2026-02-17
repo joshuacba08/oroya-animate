@@ -51,6 +51,33 @@
       "interactive": "インタラクティブ"
     }
   },
+  "capabilities": {
+    "sectionTitle": "コア<span>機能</span>",
+    "sectionSubtitle": "Oroya Animateはレンダリングだけではありません。アニメーション、インタラクション、ジェネレーション — すべて統一されたエンジン非依存APIから。",
+    "animation": {
+      "title": "アニメーションシステム",
+      "description": "AnimationClip、AnimationMixer、複数の補間モードによるキーフレームベースのアニメーション。位置、回転、スケール、色 — あらゆるプロパティを正確なタイミング制御でアニメーション。",
+      "badge": "AnimationMixer",
+      "codeLine1": "const clip = new AnimationClip('rotate', 2, [track])",
+      "codeLine2": "mixer.clipAction(clip).play()"
+    },
+    "interactivity": {
+      "title": "インタラクティビティ",
+      "description": "3Dのレイキャスティングと SVGのDOMイベント委任による組み込みイベントシステム。レンダラー間で統一されたAPIでシーン内のオブジェクトをクリック、ホバー、ドラッグ。",
+      "badge": "レイキャスティング",
+      "codeLine1": "node.addComponent(new Interactive())",
+      "codeLine2": "node.on('click', (e) => { ... })"
+    },
+    "generative": {
+      "title": "ジェネラティブアート",
+      "description": "SvJsエンジンでアルゴリズミックアートを作成。パーリンノイズ、ガウス分布、SVGプリミティブで、ブラウザ上で直接有機的でプロシージャルなビジュアルを構築。",
+      "badge": "SvJsエンジン",
+      "codeLine1": "const noise = new Noise()",
+      "codeLine2": "const value = noise.perlin2(x * 0.02, y * 0.02)"
+    },
+    "tryDemo": "ホバーやクリックをお試しください",
+    "learnMore": "ドキュメントを探索"
+  },
   "code": {
     "sectionTitle": "シンプルで<span>パワフル</span>なAPI",
     "sectionSubtitle": "直感的なTypeScriptファーストAPIでシーンを作成。ノードを追加し、コンポーネントをアタッチし、お好みのエンジンでレンダリング — すべて数行のコードで。",
@@ -155,6 +182,7 @@
     "advancedDesc": "プロシージャル生成とマルチレンダラーパターンで限界に挑戦。",
     "previous": "前へ",
     "next": "次へ",
+    "liveDemo": "ライブデモ",
     "badgeEasy": "簡単",
     "badgeMid": "中間",
     "badgeHard": "難しい",

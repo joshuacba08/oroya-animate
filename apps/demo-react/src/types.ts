@@ -1,4 +1,4 @@
-import type { Scene } from '@joroya/core';
+// import type { Scene } from '@joroya/core';
 
 /* ── Control definitions ─────────────────────────────────────────────── */
 
@@ -54,7 +54,7 @@ export interface DemoSceneDef {
   renderer: RendererType;
   controls: ControlDef[];
   factory: (params: ParamValues) => {
-    scene: Scene;
+    scene: any; // visual scene instance (Scene or SvJs)
     animate: (time: number, params: ParamValues) => void;
   };
 }

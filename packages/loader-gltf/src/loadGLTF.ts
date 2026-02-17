@@ -82,6 +82,7 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
 function translateGeometry(threeGeo: THREE.BufferGeometry): OroyaGeometry | null {
   const positions = threeGeo.getAttribute('position');
   if (!positions) {
+    console.warn('[oroya-gltf] Geometry has no position attribute, skipping.');
     return null;
   }
 
@@ -105,6 +106,9 @@ function translateGeometry(threeGeo: THREE.BufferGeometry): OroyaGeometry | null
  */
 function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMaterial | null {
   // Handle material arrays (use first material)
+  if (Array.isArray(threeMat) && threeMat.length > 1) {
+    console.warn(`[oroya-gltf] Multi-material mesh detected (${threeMat.length} materials). Only the first material will be used.`);
+  }
   const mat = Array.isArray(threeMat) ? threeMat[0] : threeMat;
 
   if (!mat) {
@@ -127,13 +131,24 @@ function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMa
       def.roughness = mat.roughness;
     }
     if (mat.emissive) {
-      def.emissive = { r: mat.emissive.r, g: mat.emissive.g, b: mat.emissive.b };
+      // Scale emissive by intensity for accurate representation
+      const intensity = mat.emissiveIntensity ?? 1;
+      def.emissive = {
+        r: mat.emissive.r * intensity,
+        g: mat.emissive.g * intensity,
+        b: mat.emissive.b * intensity,
+      };
     }
   }
 
-  // Extract opacity
+  // Extract opacity and transparency
   if (mat.opacity !== undefined && mat.opacity < 1.0) {
     def.opacity = mat.opacity;
+  }
+
+  // Extract double-sided rendering
+  if (mat.side === THREE.DoubleSide) {
+    def.doubleSided = true;
   }
 
   return new OroyaMaterial(def);
@@ -161,12 +176,18 @@ function translateAnimation(threeClip: THREE.AnimationClip): AnimationClip {
 
 /**
  * Translate a Three.js KeyframeTrack to an Oroya KeyframeTrack.
+ *
+ * Detects CUBICSPLINE interpolation by comparing the values array length
+ * against the expected per-keyframe component count. glTF CUBICSPLINE stores
+ * 3 values per keyframe (in-tangent, value, out-tangent), so the total
+ * values count is `keyframes * components * 3`.
  */
 function translateTrack(threeTrack: THREE.KeyframeTrack): KeyframeTrack | null {
   // Parse the track name to extract node name and property
   // Format: "nodeName.property" (e.g., "Cube.position", "Armature|Bone.quaternion")
   const parts = threeTrack.name.split('.');
   if (parts.length < 2) {
+    console.warn(`[oroya-gltf] Could not parse track name: "${threeTrack.name}", skipping.`);
     return null;
   }
 
@@ -182,14 +203,27 @@ function translateTrack(threeTrack: THREE.KeyframeTrack): KeyframeTrack | null {
   } else if (propertyName === 'scale') {
     property = 'scale';
   } else {
-    return null; // Unsupported property
+    console.warn(`[oroya-gltf] Unsupported track property: "${propertyName}" in "${threeTrack.name}", skipping.`);
+    return null;
   }
 
-  // Map Three.js interpolation to Oroya interpolation
+  // Detect interpolation mode.
+  // glTF CUBICSPLINE stores 3 values per keyframe (in-tangent, value, out-tangent).
+  // We detect this by checking if the values array is 3x larger than expected
+  // for the number of keyframes and components.
+  const numKeyframes = threeTrack.times.length;
+  const expectedComponents = property === 'rotation' ? 4 : 3;
+  const valuesPerKeyframe = numKeyframes > 0
+    ? threeTrack.values.length / numKeyframes
+    : expectedComponents;
+
   let interpolation: InterpolationMode = 'linear';
-  if (threeTrack.getInterpolation() === THREE.InterpolateDiscrete) {
+  if (valuesPerKeyframe === expectedComponents * 3) {
+    // 3x components → CUBICSPLINE (in-tangent + value + out-tangent)
+    interpolation = 'cubicspline';
+  } else if (threeTrack.getInterpolation() === THREE.InterpolateDiscrete) {
     interpolation = 'step';
-  } else if (threeTrack.getInterpolation() === THREE.InterpolateLinear) {
+  } else {
     interpolation = 'linear';
   }
 

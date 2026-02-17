@@ -6,7 +6,7 @@ interface OroyaSvJsProps {
     onAnimate?: (time: number) => void;
 }
 
-export function OroyaSvJs({ scene, onAnimate }: OroyaSvJsProps) {
+export function OroyaSvJs({ scene, onAnimate: _onAnimate }: OroyaSvJsProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -28,9 +28,7 @@ export function OroyaSvJs({ scene, onAnimate }: OroyaSvJsProps) {
 
         return () => {
             container.innerHTML = '';
-            if (scene.delete) {
-                // Optional cleanup if SvJs has it, though removing from DOM is usually enough
-            }
+
         };
     }, [scene]);
 

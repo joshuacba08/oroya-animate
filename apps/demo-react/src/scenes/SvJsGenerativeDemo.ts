@@ -1,4 +1,4 @@
-import { SvJs, Gen } from '@joroya/renderer-svg';
+import { SvJs } from '@joroya/renderer-svg';
 import type { DemoSceneDef, ParamValues } from '../types';
 
 export const SvJsGenerativeDemo: DemoSceneDef = {
@@ -52,7 +52,7 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
 
         return {
             scene: svg as any, // Cast to any to bypass Scene type check in DemoSceneDef for now
-            animate: (time: number) => {
+            animate: (_time: number) => {
                 // We could animate here if we wanted
             },
         };

@@ -1,5 +1,5 @@
-import type { GeometryDef } from '../components/Geometry';
-import { GeometryPrimitive } from '../components/Geometry';
+import type { CSGGeometryDef, GeometryDef } from '../components/Geometry';
+import { CSGOperation, GeometryPrimitive } from '../components/Geometry';
 import type { Vec3 } from '../components/Transform';
 import type { Matrix4 } from './Matrix4';
 
@@ -110,6 +110,37 @@ export function computeLocalAABB(def: GeometryDef): AABB {
                 min: { x: 0, y: 0, z: 0 },
                 max: { x: 0, y: 0, z: 0 },
             };
+        }
+
+        case GeometryPrimitive.CSG: {
+            const csgDef = def as CSGGeometryDef;
+            const baseAABB = computeLocalAABB(csgDef.base);
+
+            // For Union, we need to merge AABBs.
+            // For Subtract and Intersect, the base AABB is a safe conservative bound.
+            if (csgDef.operation === CSGOperation.Union) {
+                let modAABB = computeLocalAABB(csgDef.modifier);
+
+                // Apply modifier transform if present
+                if (csgDef.modifierTransform) {
+                    modAABB = transformAABB(modAABB, csgDef.modifierTransform);
+                }
+
+                return {
+                    min: {
+                        x: Math.min(baseAABB.min.x, modAABB.min.x),
+                        y: Math.min(baseAABB.min.y, modAABB.min.y),
+                        z: Math.min(baseAABB.min.z, modAABB.min.z),
+                    },
+                    max: {
+                        x: Math.max(baseAABB.max.x, modAABB.max.x),
+                        y: Math.max(baseAABB.max.y, modAABB.max.y),
+                        z: Math.max(baseAABB.max.z, modAABB.max.z),
+                    }
+                };
+            }
+
+            return baseAABB;
         }
     }
 }

@@ -151,6 +151,123 @@
   color: oklch(0.75 0.12 265);
 }
 
+/* ── Capabilities section: Animation demo ── */
+.anim-demo-scene {
+  perspective: 400px;
+  width: 80px;
+  height: 80px;
+}
+
+.anim-cube {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  transform-style: preserve-3d;
+  margin: 10px auto;
+  animation: anim-cube-rotate 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.anim-cube-face {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 1.5px solid oklch(0.6 0.2 265 / 0.5);
+  background: oklch(0.6 0.2 265 / 0.08);
+  backdrop-filter: blur(2px);
+}
+
+.anim-cube-front  { transform: translateZ(30px); }
+.anim-cube-back   { transform: rotateY(180deg) translateZ(30px); }
+.anim-cube-right  { transform: rotateY(90deg) translateZ(30px); }
+.anim-cube-left   { transform: rotateY(-90deg) translateZ(30px); }
+.anim-cube-top    { transform: rotateX(90deg) translateZ(30px); }
+.anim-cube-bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+@keyframes anim-cube-rotate {
+  0%   { transform: rotateX(-20deg) rotateY(0deg); }
+  25%  { transform: rotateX(-20deg) rotateY(90deg) scale(1.1); }
+  50%  { transform: rotateX(20deg)  rotateY(180deg); }
+  75%  { transform: rotateX(20deg)  rotateY(270deg) scale(0.9); }
+  100% { transform: rotateX(-20deg) rotateY(360deg); }
+}
+
+.anim-timeline-bar {
+  width: 0%;
+  animation: anim-timeline 4s linear infinite;
+}
+
+@keyframes anim-timeline {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* ── Capabilities section: Interactivity demo ── */
+.interact-demo-scene {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.interact-object {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.interact-sphere {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, oklch(0.6 0.18 310 / 0.6), oklch(0.5 0.2 285 / 0.4));
+  border: 1.5px solid oklch(0.6 0.18 310 / 0.5);
+}
+
+.interact-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, oklch(0.6 0.2 265 / 0.6), oklch(0.5 0.18 240 / 0.4));
+  border: 1.5px solid oklch(0.6 0.2 265 / 0.5);
+}
+
+.interact-cylinder {
+  width: 36px;
+  height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, oklch(0.6 0.15 180 / 0.6), oklch(0.5 0.18 200 / 0.4));
+  border: 1.5px solid oklch(0.6 0.15 180 / 0.5);
+}
+
+.interact-object.interact-hovered {
+  transform: scale(1.15) translateY(-4px);
+  box-shadow: 0 8px 24px oklch(0.5 0.2 265 / 0.2);
+}
+
+.interact-object.interact-clicked {
+  transform: scale(0.9);
+}
+
+.interact-ripple {
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 2px solid oklch(0.6 0.2 265 / 0);
+  transition: all 0.15s ease;
+  pointer-events: none;
+}
+
+.interact-ripple.active {
+  border-color: oklch(0.6 0.2 265 / 0.5);
+  inset: -16px;
+  opacity: 0;
+  transition: all 0.5s ease-out;
+}
+
+/* ── Capabilities section: Generative art demo ── */
+.generative-svg {
+  opacity: 0.9;
+}
+
 /* Skip to content link (a11y) */
 .skip-to-content {
   position: absolute;
@@ -168,6 +285,175 @@
 
 .skip-to-content:focus {
   left: 0;
+}
+
+/* ── Tutorial Demo Player ── */
+.tutorial-demo-wrapper {
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+[data-theme="light"] .tutorial-demo-wrapper {
+  background: oklch(0.97 0.005 265);
+  border: 1px solid oklch(0.85 0.02 265 / 0.5);
+  box-shadow: 0 2px 16px oklch(0.5 0.05 265 / 0.08);
+}
+
+[data-theme="dark"] .tutorial-demo-wrapper {
+  background: oklch(0.15 0.03 265);
+  border: 1px solid oklch(0.3 0.03 265 / 0.5);
+  box-shadow: 0 2px 16px oklch(0.1 0.04 265 / 0.2);
+}
+
+.tutorial-demo-wrapper:fullscreen {
+  border-radius: 0;
+  border: none;
+}
+
+.tutorial-demo-wrapper:fullscreen .renderer-preview {
+  border-radius: 0;
+}
+
+.tutorial-demo-controls {
+  border-top: 1px solid oklch(0.3 0.03 265 / 0.2);
+}
+
+[data-theme="light"] .tutorial-demo-controls {
+  background: oklch(0.96 0.005 265);
+  border-top-color: oklch(0.85 0.02 265 / 0.5);
+}
+
+[data-theme="dark"] .tutorial-demo-controls {
+  background: oklch(0.13 0.025 265);
+  border-top-color: oklch(0.25 0.03 265 / 0.5);
+}
+
+/* ── Tutorial Step Navigation ── */
+.tutorial-step-nav {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: sticky;
+  top: 80px;
+  z-index: 20;
+  padding: 0.5rem 0;
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.tutorial-step-nav::-webkit-scrollbar {
+  display: none;
+}
+
+[data-theme="light"] .tutorial-step-nav {
+  background: oklch(0.98 0.005 265 / 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid oklch(0.88 0.02 265 / 0.5);
+}
+
+[data-theme="dark"] .tutorial-step-nav {
+  background: oklch(0.14 0.02 270 / 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid oklch(0.25 0.03 265 / 0.3);
+}
+
+.tutorial-step-nav-inner {
+  display: flex;
+  gap: 0.25rem;
+  min-width: min-content;
+}
+
+.tutorial-step-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-display);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .tutorial-step-btn {
+  color: oklch(0.45 0.02 265);
+  background: transparent;
+}
+
+[data-theme="dark"] .tutorial-step-btn {
+  color: oklch(0.65 0.02 265);
+  background: transparent;
+}
+
+.tutorial-step-btn:hover {
+  background: oklch(0.5 0.1 265 / 0.08);
+}
+
+[data-theme="light"] .tutorial-step-btn.active {
+  background: oklch(0.55 0.2 265 / 0.1);
+  border-color: oklch(0.55 0.2 265 / 0.25);
+  color: oklch(0.45 0.2 265);
+}
+
+[data-theme="dark"] .tutorial-step-btn.active {
+  background: oklch(0.55 0.2 265 / 0.15);
+  border-color: oklch(0.55 0.2 265 / 0.3);
+  color: oklch(0.8 0.12 265);
+}
+
+.tutorial-step-btn.completed .tutorial-step-num {
+  background: oklch(0.55 0.18 160);
+  color: white;
+}
+
+.tutorial-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .tutorial-step-num {
+  background: oklch(0.9 0.01 265);
+  color: oklch(0.5 0.02 265);
+}
+
+[data-theme="dark"] .tutorial-step-num {
+  background: oklch(0.25 0.03 265);
+  color: oklch(0.65 0.02 265);
+}
+
+[data-theme="light"] .tutorial-step-btn.active .tutorial-step-num {
+  background: oklch(0.55 0.2 265);
+  color: white;
+}
+
+[data-theme="dark"] .tutorial-step-btn.active .tutorial-step-num {
+  background: oklch(0.6 0.2 265);
+  color: white;
+}
+
+.tutorial-step-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Tutorial Demo Label ── */
+.tutorial-demo-label {
+  opacity: 0.8;
 }
 
 /* Smooth scrolling */

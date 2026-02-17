@@ -1,5 +1,6 @@
 ---
 import DocsLayout from "../../layouts/DocsLayout.astro";
+import TutorialDemo from "../../components/TutorialDemo";
 import { getCollection, render } from "astro:content";
 import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../i18n";
 const locale = getLocaleFromUrl(Astro.url);
@@ -29,24 +30,55 @@ const levelBadge = {
   advanced: { class: "badge-error", label: t('tutorials.advanced') },
 };
 const badge = levelBadge[entry.data.level ?? "beginner"];
+
+// Tutorial progress: current position in the full list
+const totalTutorials = sorted.length;
+const currentNumber = currentIndex + 1;
 ---
 
 <DocsLayout title={entry.data.title} description={entry.data.description}>
-  <!-- Tutorial meta -->
-  <div class="not-prose flex flex-wrap items-center gap-3 mb-6">
-    <span class={`badge ${badge.class} badge-sm`}>{badge.label}</span>
-    {entry.data.duration && (
-      <span class="text-sm text-base-content/50 font-mono flex items-center gap-1.5">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
-        {entry.data.duration}
+  <!-- Tutorial header with meta -->
+  <div class="not-prose mb-8">
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+      <span class={`badge ${badge.class} badge-sm`}>{badge.label}</span>
+      {entry.data.duration && (
+        <span class="text-sm text-base-content/50 font-mono flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          {entry.data.duration}
+        </span>
+      )}
+      <span class="text-xs text-base-content/30 font-mono ml-auto">
+        {currentNumber} / {totalTutorials}
       </span>
-    )}
+    </div>
+
+    <!-- Live Demo Player -->
+    <div class="tutorial-player-section mb-8" id="tutorial-demo">
+      <div class="tutorial-demo-label flex items-center gap-2 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span class="text-sm font-display font-semibold text-base-content/70">{t('tutorials.liveDemo')}</span>
+      </div>
+      <TutorialDemo client:only="react" tutorialId={entry.id} />
+    </div>
+
   </div>
 
-  <Content />
+  <!-- Step Navigation Bar (outside not-prose so sticky works across full scroll) -->
+  <nav class="tutorial-step-nav not-prose" id="step-nav" aria-label="Tutorial steps">
+    <div class="tutorial-step-nav-inner" id="step-nav-inner">
+      <!-- Populated by client-side script from H2 headings -->
+    </div>
+  </nav>
+
+  <!-- Tutorial content -->
+  <div id="tutorial-content">
+    <Content />
+  </div>
 
   <!-- Prev/Next navigation -->
   <div slot="pagination" class="flex justify-between gap-4">
@@ -75,3 +107,94 @@ const badge = levelBadge[entry.data.level ?? "beginner"];
     ) : <div />}
   </div>
 </DocsLayout>
+
+<!-- Step navigation: extract H2 headings and build nav -->
+<script>
+  function initStepNav() {
+    const content = document.getElementById("tutorial-content");
+    const navInner = document.getElementById("step-nav-inner");
+    if (!content || !navInner) return;
+
+    const headings = content.querySelectorAll("h2");
+    if (headings.length === 0) {
+      const nav = document.getElementById("step-nav");
+      if (nav) nav.style.display = "none";
+      return;
+    }
+
+    headings.forEach((h, i) => {
+      if (!h.id) {
+        h.id = `step-${i}`;
+      }
+    });
+
+    navInner.innerHTML = "";
+    headings.forEach((h, i) => {
+      const btn = document.createElement("button");
+      btn.className = "tutorial-step-btn";
+      btn.dataset.index = String(i);
+
+      const num = document.createElement("span");
+      num.className = "tutorial-step-num";
+      num.textContent = String(i + 1);
+
+      const label = document.createElement("span");
+      label.className = "tutorial-step-label";
+      label.textContent = h.textContent?.replace(/^#+\s*/, "") || `Paso ${i + 1}`;
+
+      btn.appendChild(num);
+      btn.appendChild(label);
+      navInner.appendChild(btn);
+
+      btn.addEventListener("click", () => {
+        h.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    let activeIndex = 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = Array.from(headings).indexOf(entry.target as HTMLElement);
+            if (idx !== -1) {
+              activeIndex = idx;
+              updateActiveStep(idx);
+            }
+          }
+        });
+      },
+      {
+        rootMargin: "-80px 0px -60% 0px",
+        threshold: 0,
+      }
+    );
+
+    headings.forEach((h) => observer.observe(h));
+
+    function updateActiveStep(index: number) {
+      const buttons = navInner!.querySelectorAll(".tutorial-step-btn");
+      buttons.forEach((btn, i) => {
+        btn.classList.toggle("active", i === index);
+        btn.classList.toggle("completed", i < index);
+      });
+
+      const activeBtn = buttons[index] as HTMLElement;
+      if (activeBtn) {
+        activeBtn.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+    }
+
+    updateActiveStep(0);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStepNav);
+  } else {
+    initStepNav();
+  }
+</script>

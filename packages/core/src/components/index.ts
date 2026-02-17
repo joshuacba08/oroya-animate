@@ -3,8 +3,8 @@ export type { SvgAnimateDef, SvgAnimateTransformDef, SvgAnimationDef } from './A
 export { Camera, CameraType } from './Camera';
 export type { CameraDef, OrthographicCameraDef, PerspectiveCameraDef } from './Camera';
 export { Component, ComponentType } from './Component';
-export { Geometry, GeometryPrimitive } from './Geometry';
-export type { BoxGeometryDef, GeometryDef, Path2DCommand, Path2DGeometryDef, SphereGeometryDef, TextGeometryDef } from './Geometry';
+export { Geometry, GeometryPrimitive, CSGOperation } from './Geometry';
+export type { BoxGeometryDef, GeometryDef, Path2DCommand, Path2DGeometryDef, SphereGeometryDef, TextGeometryDef, BufferGeometryDef, CSGGeometryDef } from './Geometry';
 export { Material } from './Material';
 export type { ColorRGB, GradientDef, GradientStop, LinearGradientDef, MaterialDef, RadialGradientDef, SvgBlurEffect, SvgClipPathDef, SvgDropShadowEffect, SvgFilterDef, SvgFilterEffect, SvgMaskDef } from './Material';
 export { Transform } from './Transform';

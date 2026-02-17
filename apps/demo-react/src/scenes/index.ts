@@ -21,6 +21,8 @@ import { createSvgShowcaseScene, svgShowcaseControls } from './SvgShowcase';
 import { createWheelAndBubblingScene, wheelAndBubblingControls } from './WheelAndBubbling';
 import { SvJsGenerativeDemo } from './SvJsGenerativeDemo';
 import { createNestedTransformsScene, nestedTransformsControls } from './NestedTransforms';
+import { createCanvasParticlesScene, canvasParticlesControls } from './CanvasParticles';
+import { createCSGDemoScene, csgControls } from './CSGDemo';
 
 export const DEMO_SCENES: DemoSceneDef[] = [
   {
@@ -158,6 +160,22 @@ export const DEMO_SCENES: DemoSceneDef[] = [
     renderer: 'svg',
     controls: nestedTransformsControls,
     factory: createNestedTransformsScene,
+  },
+  {
+    id: 'canvas-particles',
+    label: 'Canvas2D Particles',
+    description: 'Sistema de partículas de alto rendimiento usando el nuevo renderer Canvas2D. Demuestra renderizado eficiente de cientos de objetos.',
+    renderer: 'canvas',
+    controls: canvasParticlesControls,
+    factory: createCanvasParticlesScene,
+  },
+  {
+    id: 'csg-demo',
+    label: 'Boolean Operations (CSG)',
+    description: 'Operaciones booleanas constructivas (Union, Subtract, Intersect) entre primitivas 3D usando three-csg-ts.',
+    renderer: 'three',
+    controls: csgControls,
+    factory: createCSGDemoScene,
   },
   {
     id: 'porto-pareto',

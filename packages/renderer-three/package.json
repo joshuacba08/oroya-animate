@@ -51,7 +51,8 @@
   },
   "dependencies": {
     "@joroya/core": "workspace:*",
-    "three": "^0.165.0"
+    "three": "^0.165.0",
+    "three-csg-ts": "^3.2.0"
   },
   "devDependencies": {
     "@types/three": "^0.165.0",

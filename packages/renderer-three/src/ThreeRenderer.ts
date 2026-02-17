@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSG } from 'three-csg-ts';
 import {
   Scene as OroyaScene,
   Node as OroyaNode,
@@ -15,6 +16,9 @@ import {
   Interactive,
   InteractionEventType,
   createInteractionEvent,
+  CSGGeometryDef,
+  CSGOperation,
+  GeometryDef,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -363,14 +367,17 @@ export class ThreeRenderer {
   }
 
   private createThreeGeometry(oroyaGeo: OroyaGeometry): THREE.BufferGeometry | null {
-    const { definition } = oroyaGeo;
+    return this.buildGeometryFromDef(oroyaGeo.definition);
+  }
+
+  private buildGeometryFromDef(definition: GeometryDef): THREE.BufferGeometry {
     switch (definition.type) {
       case GeometryPrimitive.Box:
-        const { width, height, depth } = definition as BoxGeometryDef;
-        return new THREE.BoxGeometry(width, height, depth);
+        const box = definition as BoxGeometryDef;
+        return new THREE.BoxGeometry(box.width, box.height, box.depth);
       case GeometryPrimitive.Sphere:
-        const { radius, widthSegments, heightSegments } = definition as SphereGeometryDef;
-        return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+        const sphere = definition as SphereGeometryDef;
+        return new THREE.SphereGeometry(sphere.radius, sphere.widthSegments, sphere.heightSegments);
       case GeometryPrimitive.Buffer:
         const bufferDef = definition as BufferGeometryDef;
         const geometry = new THREE.BufferGeometry();
@@ -385,9 +392,47 @@ export class ThreeRenderer {
           geometry.setIndex(new THREE.BufferAttribute(bufferDef.indices, 1));
         }
         return geometry;
+      case GeometryPrimitive.CSG:
+        return this.buildCSGGeometry(definition as CSGGeometryDef);
       default:
-        return null;
+        return new THREE.BufferGeometry();
     }
+  }
+
+  private buildCSGGeometry(def: CSGGeometryDef): THREE.BufferGeometry {
+    // 1. Build base geometry
+    const baseGeo = this.buildGeometryFromDef(def.base);
+    const baseMesh = new THREE.Mesh(baseGeo);
+    baseMesh.updateMatrix();
+
+    // 2. Build modifier geometry
+    const modGeo = this.buildGeometryFromDef(def.modifier);
+    const modMesh = new THREE.Mesh(modGeo);
+
+    // 3. Apply modifier transform if present
+    if (def.modifierTransform) {
+      modMesh.matrix.fromArray(def.modifierTransform);
+      modMesh.matrix.decompose(modMesh.position, modMesh.quaternion, modMesh.scale);
+      modMesh.updateMatrix();
+    }
+
+    // 4. Perform CSG operation
+    let resultMesh: THREE.Mesh;
+    switch (def.operation) {
+      case CSGOperation.Union:
+        resultMesh = CSG.union(baseMesh, modMesh);
+        break;
+      case CSGOperation.Subtract:
+        resultMesh = CSG.subtract(baseMesh, modMesh);
+        break;
+      case CSGOperation.Intersect:
+        resultMesh = CSG.intersect(baseMesh, modMesh);
+        break;
+      default:
+        return baseGeo;
+    }
+
+    return resultMesh.geometry;
   }
 
   private createThreeMaterial(oroyaMat?: OroyaMaterial): THREE.Material {
