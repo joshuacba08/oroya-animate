@@ -1,7 +1,7 @@
 {
     "name": "@joroya/physics",
-    "version": "0.1.0",
-    "description": "Physics engine integration for Oroya Animate using Rapier",
+    "version": "0.5.0",
+    "description": "Physics integration for Oroya Animate using cannon-es",
     "type": "module",
     "main": "./dist/index.cjs",
     "module": "./dist/index.js",
@@ -16,26 +16,13 @@
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
-        "clean": "rimraf dist",
         "typecheck": "tsc --noEmit"
     },
-    "keywords": [
-        "oroya",
-        "physics",
-        "rapier",
-        "3d",
-        "graphics"
-    ],
-    "author": "Oroya AI Collaborator",
-    "license": "MIT",
     "dependencies": {
-        "@dimforge/rapier3d-compat": "^0.14.0"
-    },
-    "peerDependencies": {
-        "@joroya/core": "workspace:*"
+        "@joroya/core": "workspace:*",
+        "cannon-es": "^0.20.0"
     },
     "devDependencies": {
-        "@joroya/core": "workspace:*",
         "tsup": "^8.1.0",
         "typescript": "^5.4.5"
     }

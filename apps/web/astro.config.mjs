@@ -16,6 +16,9 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      external: ["three", "three-csg-ts", "@joroya/renderer-three", "@joroya/renderer-canvas2d", "@joroya/physics", "cannon-es"],
+    },
   },
   markdown: {
     shikiConfig: {

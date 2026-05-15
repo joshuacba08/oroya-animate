@@ -27,7 +27,10 @@ export * from './math/BoundingSphere';
 export * from './math/Frustum';
 export * from './components/PostProcessing';
 export * from './components/ParticleSystem';
+export * from './components/Animator';
 export * from './components/AudioListener';
 export * from './components/AudioSource';
+export * from './components/RigidBody';
+export * from './components/Collider';
 
 

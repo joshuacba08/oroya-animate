@@ -18,6 +18,7 @@ export enum ComponentType {
   InstancedMesh = 'InstancedMesh',
   PostProcessing = 'PostProcessing',
   ParticleSystem = 'ParticleSystem',
+  Animator = 'Animator',
   AudioListener = 'AudioListener',
   AudioSource = 'AudioSource',
 }

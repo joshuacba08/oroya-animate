@@ -80,6 +80,7 @@ export class ThreeRenderer {
   private readonly audioLoader = new THREE.AudioLoader();
   private readonly audioCache = new Map<string, AudioBuffer>();
   private audioListener: THREE.AudioListener | null = null;
+  private mixers: THREE.AnimationMixer[] = [];
 
   constructor(options: ThreeRendererOptions) {
     this.canvas = options.canvas;
@@ -94,7 +95,7 @@ export class ThreeRenderer {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
 
     this.scene = new THREE.Scene();
     this.composer = new EffectComposer(this.renderer);
@@ -242,6 +243,15 @@ export class ThreeRenderer {
     }
 
     this.updateParticleSystems();
+
+    // Update Animation Mixers
+    const dt = 0.016; // Fixed delta for now, or assume we should pass it or track it.
+    // ThreeRenderer.render() doesn't take dt.
+    // We need a clock or pass dt.
+    // For now, let's use a fixed small step or rely on internal clock if we had one.
+    // But usually render() is called in a loop.
+    // Let's use a simple internal clock or just fixed 1/60 for smoothness test.
+    this.mixers.forEach((mixer) => mixer.update(dt));
 
     // Check for PostProcessing component on active camera or scene environment
     // For now, let's check the active camera node
@@ -579,6 +589,7 @@ export class ThreeRenderer {
     this.scene.clear();
     this.nodeMap.clear();
     this.reverseNodeMap.clear();
+    this.mixers = [];
     this.activeCamera = null;
 
     this.oroyaScene.root.traverse((oroyaNode) => {
@@ -630,7 +641,6 @@ export class ThreeRenderer {
       const camComponent = oroyaNode.getComponent<OroyaCamera>(ComponentType.Camera)!;
       threeObject = this.createThreeCamera(camComponent);
 
-      // If we already have a listener that wasn't attached, attach it now
       if (threeObject && this.audioListener && !this.audioListener.parent) {
         threeObject.add(this.audioListener);
       }
@@ -646,8 +656,24 @@ export class ThreeRenderer {
     } else if (oroyaNode.hasComponent(ComponentType.AudioSource)) {
       const asComponent = oroyaNode.getComponent<OroyaAudioSource>(ComponentType.AudioSource)!;
       threeObject = this.createThreeAudioSource(asComponent);
+    } else if (oroyaNode.hasComponent(ComponentType.Animator)) {
+      // Create a Group to hold the content, or if we had a mesh creation logic here it would be better.
+      // Usually Animator is on a Mesh node.
+      // But here createThreeObject returns NEW object.
+      // If the node ALREADY has geometry, it went into the 'Geometry' block?
+      // No, if/else if structure prevents multiple components handling.
+      // FIX: The logic assumes 1 primary component per node for Object creation.
+      // If a node has Geometry AND Animator, it enters Geometry block.
+      // So we must handle Animator in ALL blocks or at the end.
+      threeObject = new THREE.Group();
     } else {
       threeObject = new THREE.Group();
+    }
+
+    // Common post-creation logic
+    if (threeObject && oroyaNode.hasComponent(ComponentType.Animator)) {
+      const mixer = new THREE.AnimationMixer(threeObject);
+      this.mixers.push(mixer);
     }
 
     return threeObject;

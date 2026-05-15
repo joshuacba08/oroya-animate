@@ -30,6 +30,7 @@ import { createShadowsScene } from "../../scenes/shadows-demo";
 import { createNeonCityScene } from "../../scenes/neon-city-demo";
 import { createFireSmokeScene } from "../../scenes/fire-smoke-demo";
 import { createAudioScene } from "../../scenes/audio-demo";
+import { createAnimationScene } from "../../scenes/animation-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -3249,5 +3250,19 @@ export const EXAMPLES: ExampleDef[] = [
     description: "3D positional audio. Wear headphones! The green cube emits sound as it orbits.",
     category: "3d",
     factory: createAudioScene,
+  },
+  {
+    id: "physics-demo",
+    title: "Physics: Falling Cubes",
+    description: "Cannon-es physics integration (RigidBody + Collider).",
+    category: "3d",
+    factory: createPhysicsScene,
+  },
+  {
+    id: "animation-demo",
+    title: "Animation: Bouncing Box",
+    description: "Basic animation demo using Animator component and manual updates.",
+    category: "3d",
+    factory: createAnimationScene,
   },
 ];
