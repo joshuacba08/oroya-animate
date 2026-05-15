@@ -5,6 +5,24 @@ All notable changes to Oroya Animate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-05-15
+
+### Added
+- **Shadow System**: `castShadow` / `receiveShadow` flags on every `GeometryDef` variant; `castShadow`, `shadowBias`, `shadowMapSize` on `DirectionalLightDef`, `PointLightDef`, `SpotLightDef`. Three.js backend enables `PCFSoftShadowMap` by default and applies flags to meshes, instanced meshes and lights.
+- **Post-Processing Pipeline**: Declarative `PostProcessing` component with `bloom`, `toneMapping` (Reinhard / Cineon / ACESFilmic), `exposure` and `antialiasing` (SMAA). The Three.js backend assembles an idempotent `EffectComposer` chain (RenderPass → UnrealBloomPass → SMAAPass → OutputPass) and toggles passes via `.enabled` without reallocating GPU resources.
+- **Particle System**: CPU-simulated `ParticleSystem` component (max count, emission rate, gravity, start/end color, start/end size, optional texture). Three.js backend renders it as `THREE.Points` with vertex colors and additive blending.
+- **Spatial Audio**: `AudioListener` and `AudioSource` components mapped to `THREE.AudioListener` and `THREE.PositionalAudio`. Decoded buffers cached per URL; cone and distance-model attenuation are passed through.
+- **EPIC**: [OA-006 — Advanced Rendering & Effects](docs/features/OA-006/EPIC.md).
+- **Tests**: Vitest coverage for shadow flags, particle emission/decay/gravity, and `PostProcessing` definition serialization.
+
+### Changed
+- `PostProcessingDef.fxaa` (boolean, unused) renamed to `antialiasing` with an SMAA implementation behind it.
+- `AudioSourceDef.url` is now formally documented (chosen over `buffer` to keep the scene graph serializable and let each backend reuse its own loader / cache).
+- `PostProcessing` is officially anchored to the **active Camera node** so multi-camera setups (split-screen, picture-in-picture) carry independent FX chains.
+
+### Fixed
+- Removed `// @ts-ignore` and `any` from the Three.js post-processing path. `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `SMAAPass`, `OutputPass` and `Pass` now resolve through `@types/three`. `composer` is typed as `EffectComposer | null`, `renderPostFX` takes `PostProcessingDef`.
+
 ## [0.5.0] - 2026-02-17
 
 ### Added

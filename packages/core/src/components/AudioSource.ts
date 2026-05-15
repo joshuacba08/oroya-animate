@@ -1,6 +1,19 @@
 import { Component, ComponentType } from './Component';
 
+/**
+ * Declarative description of a spatial audio source.
+ *
+ * Renderers consume this to construct a backend-specific positional audio
+ * node (e.g. `THREE.PositionalAudio`). The fields mirror the Web Audio
+ * `PannerNode` model so distance/cone attenuation translates 1:1.
+ *
+ * **Why `url` instead of `buffer`:** keeping audio data as a URL lets the
+ * scene graph stay serializable (an `AudioBuffer` is not JSON-friendly) and
+ * lets each renderer reuse its own loader/cache (Three.js has `AudioLoader`,
+ * a Web-Audio-only backend would `fetch + decodeAudioData`).
+ */
 export interface AudioSourceDef {
+    /** URL of the audio asset. Fetched and decoded by the active renderer. */
     url: string;
     loop?: boolean;
     volume?: number;
@@ -36,11 +49,14 @@ export class AudioSource extends Component {
         };
     }
 
-    // Runtime control methods (to be hooked up by renderer or script)
-    // Ideally renderer syncs state, but for imperative 'play()' we might need an event or flag.
-    // For now, let's stick to declarative state (autoplay) or expose methods that renderer checks?
-    // A common pattern is having an 'action' queue or flags.
-    // Or simply:
+    /**
+     * Imperative play/stop is expressed as a one-shot flag that the renderer
+     * inspects each frame and clears after acting on it.
+     *
+     * Two flags (instead of a single enum) avoid race conditions when both
+     * `play()` and `stop()` are called in the same tick — the most recent
+     * call wins because each method clears the other's flag.
+     */
     shouldPlay = false;
     shouldStop = false;
 

@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-// @ts-ignore
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-// @ts-ignore
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-// @ts-ignore
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
+import {
+  EffectComposer,
+  OutputPass,
+  Pass,
+  RenderPass,
+  SMAAPass,
+  UnrealBloomPass,
+} from 'three/addons';
 import {
   Scene as OroyaScene,
   Node as OroyaNode,
@@ -38,6 +39,7 @@ import {
   InstancedMeshComponent,
   InstancedMesh,
   PostProcessing,
+  PostProcessingDef,
   ToneMapping,
   ParticleSystem,
   AudioListener as OroyaAudioListener,
@@ -61,7 +63,7 @@ export class ThreeRenderer {
   private nodeMap: Map<string, THREE.Object3D> = new Map();
 
   // Post-Processing
-  private composer: any | null = null;
+  private composer: EffectComposer | null = null;
 
   // ── Interaction state ─────────────────────────────────────
   private readonly reverseNodeMap: Map<THREE.Object3D, OroyaNode> = new Map();
@@ -253,15 +255,10 @@ export class ThreeRenderer {
     // Let's use a simple internal clock or just fixed 1/60 for smoothness test.
     this.mixers.forEach((mixer) => mixer.update(dt));
 
-    // Check for PostProcessing component on active camera or scene environment
-    // For now, let's check the active camera node
-    let ppDef: any = null;
-    if (this.activeCamera) {
-      const camNode = this.findOroyaNode(this.activeCamera);
-      if (camNode && camNode.hasComponent(ComponentType.PostProcessing)) {
-        ppDef = camNode.getComponent<PostProcessing>(ComponentType.PostProcessing)!.definition;
-      }
-    }
+    // PostProcessing is attached to the active Camera node by convention
+    // (see PostProcessing component JSDoc). Each camera carries its own chain
+    // so split-screen / picture-in-picture setups can declare independent FX.
+    const ppDef = this.findActivePostProcessingDef();
 
     if (ppDef && this.composer) {
       this.renderPostFX(ppDef);
@@ -270,45 +267,42 @@ export class ThreeRenderer {
     }
   }
 
-  private renderPostFX(def: any) {
+  private findActivePostProcessingDef(): PostProcessingDef | null {
+    if (!this.activeCamera) return null;
+    const camNode = this.findOroyaNode(this.activeCamera);
+    if (!camNode || !camNode.hasComponent(ComponentType.PostProcessing)) return null;
+    return camNode.getComponent<PostProcessing>(ComponentType.PostProcessing)!.definition;
+  }
+
+  private renderPostFX(def: PostProcessingDef) {
     if (!this.composer || !this.activeCamera) return;
 
-    // Check if we need to rebuild passes
-    // For simplicity in this iteration, we reconstruct if needed or update parameters
-    // A robust system would track dirty state.
-    // Let's implement a simple rebuild strategy for now or just update.
+    // Pass assembly is idempotent: each pass is created lazily the first time
+    // it is needed and toggled via `.enabled` on subsequent frames. This keeps
+    // the chain stable across renders and avoids reallocating GPU resources.
+    //
+    // Order matters — final composition is:
+    //   RenderPass → UnrealBloomPass → SMAAPass → OutputPass
 
-    // Check if passes match current config. 
-    // Optimization: Only rebuild if structure changes.
-    // For MVP: Rebuild specific passes if missing, update if present.
-
-    // Ensure RenderPass is first
-    if (this.composer.passes.length === 0 || !(this.composer.passes[0] instanceof RenderPass)) {
+    // RenderPass (always first; rebind scene/camera in case they changed)
+    const firstPass = this.composer.passes[0];
+    if (!(firstPass instanceof RenderPass)) {
       this.composer.passes = [];
-      const renderPass = new RenderPass(this.scene, this.activeCamera);
-      this.composer.addPass(renderPass);
+      this.composer.addPass(new RenderPass(this.scene, this.activeCamera));
     } else {
-      (this.composer.passes[0] as RenderPass).scene = this.scene;
-      (this.composer.passes[0] as RenderPass).camera = this.activeCamera;
+      firstPass.scene = this.scene;
+      firstPass.camera = this.activeCamera;
     }
 
     // Bloom
-    let bloomPass = this.composer.passes.find((p: any) => p instanceof UnrealBloomPass) as UnrealBloomPass;
+    let bloomPass = this.composer.passes.find((p): p is UnrealBloomPass => p instanceof UnrealBloomPass);
     if (def.bloom?.enabled) {
       if (!bloomPass) {
-        // Create Bloom Pass
         const size = new THREE.Vector2();
         this.renderer.getSize(size);
         bloomPass = new UnrealBloomPass(size, def.bloom.strength, def.bloom.radius, def.bloom.threshold);
-        // Insert before OutputPass or at end
-        const outputIndex = this.composer.passes.findIndex((p: any) => p instanceof OutputPass);
-        if (outputIndex >= 0) {
-          this.composer.insertPass(bloomPass, outputIndex);
-        } else {
-          this.composer.addPass(bloomPass);
-        }
+        this.insertBeforeOutput(bloomPass);
       }
-
       bloomPass.strength = def.bloom.strength;
       bloomPass.radius = def.bloom.radius;
       bloomPass.threshold = def.bloom.threshold;
@@ -317,17 +311,28 @@ export class ThreeRenderer {
       bloomPass.enabled = false;
     }
 
-    // Output Pass (Tone Mapping / Color Space)
-    let outputPass = this.composer.passes.find((p: any) => p instanceof OutputPass);
-    if (!outputPass) {
-      outputPass = new OutputPass();
-      this.composer.addPass(outputPass);
+    // SMAA (anti-aliasing)
+    let smaaPass = this.composer.passes.find((p): p is SMAAPass => p instanceof SMAAPass);
+    if (def.antialiasing) {
+      if (!smaaPass) {
+        const size = new THREE.Vector2();
+        this.renderer.getSize(size);
+        const pixelRatio = this.renderer.getPixelRatio();
+        smaaPass = new SMAAPass(size.x * pixelRatio, size.y * pixelRatio);
+        this.insertBeforeOutput(smaaPass);
+      }
+      smaaPass.enabled = true;
+    } else if (smaaPass) {
+      smaaPass.enabled = false;
     }
 
-    // Tone Mapping settings are global on renderer usually, but OutputPass handles some.
-    // Actually OutputPass handles ToneMapping in recent Three.js versions.
-    // Validating Tone Mapping
-    if (def.toneMapping) {
+    // OutputPass (always last; handles tone-mapping → sRGB conversion)
+    if (!this.composer.passes.some((p) => p instanceof OutputPass)) {
+      this.composer.addPass(new OutputPass());
+    }
+
+    // Tone-mapping is configured on the WebGLRenderer; OutputPass reads it.
+    if (def.toneMapping !== undefined) {
       switch (def.toneMapping) {
         case ToneMapping.Reinhard: this.renderer.toneMapping = THREE.ReinhardToneMapping; break;
         case ToneMapping.Cineon: this.renderer.toneMapping = THREE.CineonToneMapping; break;
@@ -340,6 +345,17 @@ export class ThreeRenderer {
     }
 
     this.composer.render();
+  }
+
+  /** Insert a pass immediately before the OutputPass, or append if none yet. */
+  private insertBeforeOutput(pass: Pass) {
+    if (!this.composer) return;
+    const outputIndex = this.composer.passes.findIndex((p) => p instanceof OutputPass);
+    if (outputIndex >= 0) {
+      this.composer.insertPass(pass, outputIndex);
+    } else {
+      this.composer.addPass(pass);
+    }
   }
 
   private updateParticleSystems() {

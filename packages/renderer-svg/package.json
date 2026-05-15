@@ -1,6 +1,6 @@
 {
   "name": "@joroya/renderer-svg",
-  "version": "0.5.0",
+  "version": "0.8.0",
   "description": "Lightweight SVG renderer for Oroya Animate scene graphs",
   "keywords": [
     "oroya",

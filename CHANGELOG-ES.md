@@ -5,6 +5,24 @@ Todos los cambios notables de Oroya Animate se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.8.0] - 2026-05-15
+
+### Agregado
+- **Sistema de Sombras**: Flags `castShadow` / `receiveShadow` en todas las variantes de `GeometryDef`; `castShadow`, `shadowBias`, `shadowMapSize` en `DirectionalLightDef`, `PointLightDef` y `SpotLightDef`. El backend de Three.js activa `PCFSoftShadowMap` por defecto y aplica los flags a meshes, instanced meshes y luces.
+- **Pipeline de Post-Procesado**: Componente declarativo `PostProcessing` con `bloom`, `toneMapping` (Reinhard / Cineon / ACESFilmic), `exposure` y `antialiasing` (SMAA). El backend ensambla una cadena `EffectComposer` idempotente (RenderPass → UnrealBloomPass → SMAAPass → OutputPass) y activa/desactiva passes mediante `.enabled` sin reasignar recursos de GPU.
+- **Sistema de Partículas**: Componente `ParticleSystem` simulado en CPU (límite, tasa de emisión, gravedad, color inicial/final, tamaño inicial/final, textura opcional). El backend de Three.js lo renderiza como `THREE.Points` con vertex colors y blending aditivo.
+- **Audio Espacial**: Componentes `AudioListener` y `AudioSource` mapeados a `THREE.AudioListener` y `THREE.PositionalAudio`. Buffers decodificados cacheados por URL; atenuación por cono y modelo de distancia pasan tal cual.
+- **EPIC**: [OA-006 — Renderizado y Efectos Avanzados](docs/features/OA-006/EPIC.md).
+- **Tests**: Cobertura Vitest para flags de sombra, emisión/decaimiento/gravedad de partículas y serialización de `PostProcessing`.
+
+### Cambiado
+- `PostProcessingDef.fxaa` (booleano, sin implementación) renombrado a `antialiasing` y respaldado por SMAA.
+- `AudioSourceDef.url` queda documentado oficialmente (elegido sobre `buffer` para mantener el scene graph serializable y permitir que cada backend reutilice su propio loader/cache).
+- `PostProcessing` se ancla oficialmente al **Camera node activo** para que las configuraciones multi-cámara (split-screen, picture-in-picture) tengan cadenas de FX independientes.
+
+### Corregido
+- Eliminados `// @ts-ignore` y `any` del camino de post-procesado en Three.js. `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `SMAAPass`, `OutputPass` y `Pass` ahora se resuelven desde `@types/three`. `composer` tipado como `EffectComposer | null`, `renderPostFX` acepta `PostProcessingDef`.
+
 ## [0.5.0] - 2026-02-17
 
 ### Agregado

@@ -5,6 +5,24 @@ Oroya Animateのすべての注目すべき変更はこのファイルに記録�
 このフォーマットは[Keep a Changelog](https://keepachangelog.com/ja/1.0.0/)に基づいており、
 このプロジェクトは[セマンティックバージョニング](https://semver.org/lang/ja/)に準拠しています。
 
+## [0.8.0] - 2026-05-15
+
+### 追加
+- **シャドウシステム**: すべての `GeometryDef` バリアントに `castShadow` / `receiveShadow` フラグを追加。`DirectionalLightDef`、`PointLightDef`、`SpotLightDef` に `castShadow`、`shadowBias`、`shadowMapSize` を追加。Three.js バックエンドはデフォルトで `PCFSoftShadowMap` を有効化し、フラグをメッシュ、インスタンスメッシュ、ライトに適用します。
+- **ポストプロセシングパイプライン**: 宣言的な `PostProcessing` コンポーネント（`bloom`、`toneMapping`（Reinhard / Cineon / ACESFilmic）、`exposure`、`antialiasing`（SMAA））。Three.js バックエンドは冪等な `EffectComposer` チェーン（RenderPass → UnrealBloomPass → SMAAPass → OutputPass）を組み立て、GPU リソースを再割り当てせずに `.enabled` でパスを切り替えます。
+- **パーティクルシステム**: CPU シミュレーション型 `ParticleSystem` コンポーネント（最大数、発生率、重力、開始/終了色、開始/終了サイズ、オプションのテクスチャ）。Three.js バックエンドは頂点色と加算ブレンディングで `THREE.Points` としてレンダリングします。
+- **空間音響**: `AudioListener` と `AudioSource` コンポーネントを `THREE.AudioListener` と `THREE.PositionalAudio` にマッピング。デコード済みバッファは URL ごとにキャッシュ。コーンと距離モデルによる減衰は透過的に渡されます。
+- **EPIC**: [OA-006 — 高度なレンダリングとエフェクト](docs/features/OA-006/EPIC.md)。
+- **テスト**: シャドウフラグ、パーティクルの発生/減衰/重力、`PostProcessing` 定義のシリアライズに対する Vitest カバレッジ。
+
+### 変更
+- `PostProcessingDef.fxaa`（未実装の boolean）を `antialiasing` に改名し、SMAA 実装で裏付け。
+- `AudioSourceDef.url` を正式にドキュメント化（シーングラフをシリアライズ可能に保ち、各バックエンドが独自のローダー/キャッシュを再利用できるよう `buffer` ではなく `url` を選択）。
+- `PostProcessing` をアクティブな **Camera ノード** に正式に紐付け。マルチカメラ構成（スプリットスクリーン、ピクチャー・イン・ピクチャー）で独立した FX チェーンを持てるように。
+
+### 修正
+- Three.js のポストプロセシング経路から `// @ts-ignore` と `any` を削除。`EffectComposer`、`RenderPass`、`UnrealBloomPass`、`SMAAPass`、`OutputPass`、`Pass` は `@types/three` で解決。`composer` は `EffectComposer | null` 型、`renderPostFX` は `PostProcessingDef` を受け取ります。
+
 ## [0.5.0] - 2026-02-17
 
 ### 追加

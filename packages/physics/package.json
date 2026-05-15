@@ -1,6 +1,6 @@
 {
     "name": "@joroya/physics",
-    "version": "0.5.0",
+    "version": "0.8.0",
     "description": "Physics integration for Oroya Animate using cannon-es",
     "type": "module",
     "main": "./dist/index.cjs",

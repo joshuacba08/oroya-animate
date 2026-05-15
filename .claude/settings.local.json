@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter \"@joroya/core\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/renderer-three\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/core\" build)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm exec *)",
+      "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" build)",
+      "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" typecheck)"
+    ]
+  }
+}
