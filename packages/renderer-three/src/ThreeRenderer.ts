@@ -42,6 +42,7 @@ import {
   PostProcessingDef,
   ToneMapping,
   ParticleSystem,
+  Animator as OroyaAnimator,
   AudioListener as OroyaAudioListener,
   AudioSource as OroyaAudioSource,
 } from '@joroya/core';
@@ -163,8 +164,22 @@ export class ThreeRenderer {
     }
   }
 
-  render() {
+  /**
+   * Render one frame.
+   *
+   * @param dt Time elapsed since the last `render()` call, in seconds.
+   *           Used to drive `scene.update(dt)` (which steps Animators,
+   *           particle systems, and any user `onUpdate`), Three.js skeletal
+   *           mixers, and orbit controls. Defaults to `1/60` if omitted
+   *           (back-compat for synchronous "draw a still" callers).
+   */
+  render(dt: number = 1 / 60) {
     if (!this.oroyaScene || !this.activeCamera) return;
+
+    // Tick scene logic FIRST. This advances Animator components (which mutate
+    // node.transform via the core AnimationMixer) and any user-attached
+    // onUpdate hooks, so the world-matrix pass below sees up-to-date locals.
+    this.oroyaScene.update(dt);
 
     this.applyEnvironment(this.oroyaScene);
     this.oroyaScene.updateWorldMatrices();
@@ -246,13 +261,10 @@ export class ThreeRenderer {
 
     this.updateParticleSystems();
 
-    // Update Animation Mixers
-    const dt = 0.016; // Fixed delta for now, or assume we should pass it or track it.
-    // ThreeRenderer.render() doesn't take dt.
-    // We need a clock or pass dt.
-    // For now, let's use a fixed small step or rely on internal clock if we had one.
-    // But usually render() is called in a loop.
-    // Let's use a simple internal clock or just fixed 1/60 for smoothness test.
+    // THREE.AnimationMixer is reserved for skeletal / morph-target animation
+    // on SkinnedMesh objects (glTF skeletons). Property animation on plain
+    // node transforms is driven by the core `Animator` component via
+    // `scene.update(dt)` above — that path needs no Three.js-specific glue.
     this.mixers.forEach((mixer) => mixer.update(dt));
 
     // PostProcessing is attached to the active Camera node by convention
@@ -672,27 +684,42 @@ export class ThreeRenderer {
     } else if (oroyaNode.hasComponent(ComponentType.AudioSource)) {
       const asComponent = oroyaNode.getComponent<OroyaAudioSource>(ComponentType.AudioSource)!;
       threeObject = this.createThreeAudioSource(asComponent);
-    } else if (oroyaNode.hasComponent(ComponentType.Animator)) {
-      // Create a Group to hold the content, or if we had a mesh creation logic here it would be better.
-      // Usually Animator is on a Mesh node.
-      // But here createThreeObject returns NEW object.
-      // If the node ALREADY has geometry, it went into the 'Geometry' block?
-      // No, if/else if structure prevents multiple components handling.
-      // FIX: The logic assumes 1 primary component per node for Object creation.
-      // If a node has Geometry AND Animator, it enters Geometry block.
-      // So we must handle Animator in ALL blocks or at the end.
-      threeObject = new THREE.Group();
     } else {
+      // Animator-only nodes (no geometry, no mesh, no audio) get an empty
+      // group — the Animator drives transforms on OTHER nodes by name.
       threeObject = new THREE.Group();
     }
 
-    // Common post-creation logic
+    // Animator post-wiring (dual-track):
+    //   - Property tracks (position/rotation/scale) → core AnimationMixer.
+    //     Driven by `scene.update(dt)` automatically; nothing to wire here.
+    //   - Skeleton / morph tracks → THREE.AnimationMixer on the underlying
+    //     SkinnedMesh. Created only when an actual SkinnedMesh is present so
+    //     non-skinned scenes don't pay for an unused mixer.
     if (threeObject && oroyaNode.hasComponent(ComponentType.Animator)) {
-      const mixer = new THREE.AnimationMixer(threeObject);
-      this.mixers.push(mixer);
+      const skinned = this.findSkinnedDescendant(threeObject);
+      if (skinned) {
+        this.mixers.push(new THREE.AnimationMixer(skinned));
+      }
+      // Bind the core Animator to the scene so it can resolve target nodes.
+      if (this.oroyaScene) {
+        oroyaNode
+          .getComponent<OroyaAnimator>(ComponentType.Animator)!
+          .bindToScene(this.oroyaScene);
+      }
     }
 
     return threeObject;
+  }
+
+  private findSkinnedDescendant(obj: THREE.Object3D): THREE.SkinnedMesh | null {
+    let found: THREE.SkinnedMesh | null = null;
+    obj.traverse((child) => {
+      if (!found && child instanceof THREE.SkinnedMesh) {
+        found = child;
+      }
+    });
+    return found;
   }
 
   private createThreeAudioListener(comp: OroyaAudioListener): THREE.AudioListener {

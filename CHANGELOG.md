@@ -5,6 +5,37 @@ All notable changes to Oroya Animate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-05-15
+
+### Added
+- **Physics package (`@joroya/physics`)**: `PhysicsSystem` driving a `cannon-es` world from any `Scene`. Reads `RigidBody` + `Collider` from `@joroya/core`, syncs world-space transforms back to each node every step. World-space initial pose is decomposed from `worldMatrix` so spawn positions match the scene.
+- **Joints / Constraints**: `addHingeConstraint`, `addPointToPointConstraint`, `addDistanceConstraint` (cannon-es-backed). Enables ragdolls, pendulums, ropes, vehicle wheels.
+- **Collision events**: `Node.events` now emits `collide-begin`, `collide`, `collide-end` for solid contacts and `trigger-enter`, `trigger-stay`, `trigger-exit` for sensor colliders. Payload includes the other node, contact point, normal, and impact velocity.
+- **Sensor / trigger colliders**: `Collider.isTrigger` produces collision events without applying contact response (checkpoints, damage zones, proximity sensors).
+- **Collision filtering**: `Collider.collisionGroup` and `collisionMask` bitmasks for layered simulations.
+- **Physics raycast**: `PhysicsSystem.raycast` and `raycastAll` return `{ node, point, normal, distance }` against rigid bodies. Click-to-pick now works against the physics world, not just the visual scene.
+- **Animator component (full)**: `play(name)`, `stop()`, `crossFade(name, duration)`, `addClip(clip)`, plus an `autoplay` option. Drives `node.transform` on target nodes through the engine-agnostic `AnimationMixer` of `@joroya/core`.
+- **Animation blending**: `AnimationMixer` now supports multiple concurrent clips with per-clip weight and crossfade ramps. Quaternion blends use nlerp + hemisphere correction to avoid sign-flip artifacts.
+- **Keyframe events**: `AnimationClip.events: KeyframeEvent[]` fires named events on a per-`Animator.on('keyframe-event', ...)` channel as the play-head crosses each event time. Use for footsteps, attack hit-frames, dialogue cues.
+- **Animation `finished` event**: non-looping clips emit `finished` on the mixer when they reach their duration.
+- **Easing + spring helpers**: `linear`, `easeInQuad`, `easeOutQuad`, `easeInOutQuad`, cubic and sine variants, `easeOutElastic`, plus a critically-dampable `spring(current, target, velocity, stiffness, damping, dt)` integrator for camera follow / UI snap / IK.
+- **`Scene.update(dt)` runs every frame** through `ThreeRenderer.render(dt)`, so `Component.onUpdate` (including `Animator`) is now first-class.
+- **Tests**: `Animator` (play/stop/crossFade/events/finished), `Easing` (8 cases including critical-damping spring), `PhysicsSystem` (gravity/stack/triggers/joints/raycast).
+- **EPIC**: [OA-007 — Physics & Animation](docs/features/OA-007/EPIC.md).
+
+### Changed
+- `ThreeRenderer.render(dt?: number)` takes an optional real `dt`. The hard-coded `0.016` is gone — `Animator`, `PhysicsSystem` (when wired by the app), and `THREE.AnimationMixer` all see real frame time. Default is `1/60` when omitted to keep the still-frame API working.
+- `THREE.AnimationMixer` is now created only when a node has an actual `THREE.SkinnedMesh` descendant. Plain property animation runs entirely through the core `AnimationMixer`, keeping the renderer engine-specific code path narrow.
+- `Collider` definition extended with `isTrigger`, `collisionGroup`, `collisionMask` (default 1 / -1).
+- `Animator.definition.animations` is now typed as `Record<string, AnimationClip>` instead of `Record<string, any>`.
+
+### Removed
+- **`@joroya/physics`'s rapier-based orphan code**: `PhysicsWorld.ts` and duplicate `components/{RigidBody,Collider}.ts` (which imported `@dimforge/rapier3d-compat` without declaring it). The package is now single-backend (`cannon-es`) per the v0.9.0 design decision. The `RigidBody` and `Collider` components live in `@joroya/core` exclusively.
+
+### Fixed
+- `pnpm typecheck` now passes on every workspace package, including `@joroya/physics` (was previously blocked by missing rapier dependency).
+- `packages/physics/tsconfig.json` now extends `tsconfig.base.json` (was a bespoke config bypassing strict mode and unused-checks).
+
 ## [0.8.0] - 2026-05-15
 
 ### Added

@@ -5,6 +5,37 @@ Oroya Animateのすべての注目すべき変更はこのファイルに記録�
 このフォーマットは[Keep a Changelog](https://keepachangelog.com/ja/1.0.0/)に基づいており、
 このプロジェクトは[セマンティックバージョニング](https://semver.org/lang/ja/)に準拠しています。
 
+## [0.9.0] - 2026-05-15
+
+### 追加
+- **物理パッケージ (`@joroya/physics`)**: 任意の `Scene` に対して `cannon-es` のワールドを駆動する `PhysicsSystem`。`@joroya/core` から `RigidBody` + `Collider` を読み取り、各ステップでワールド空間のトランスフォームを各ノードに同期します。
+- **ジョイント / 制約**: `addHingeConstraint`、`addPointToPointConstraint`、`addDistanceConstraint`。ラグドール、振り子、ロープ、車輪などを可能にします。
+- **衝突イベント**: `Node.events` に `collide-begin`、`collide`、`collide-end` を追加し、センサーコライダー用には `trigger-enter`、`trigger-stay`、`trigger-exit` を追加。ペイロードには相手ノード、接触点、法線、衝撃速度が含まれます。
+- **センサー / トリガーコライダー**: `Collider.isTrigger` で接触応答なしの衝突イベントを発生させます。
+- **衝突フィルタ**: `collisionGroup` と `collisionMask` ビットマスク。
+- **物理レイキャスト**: `PhysicsSystem.raycast` と `raycastAll` が rigid body に対して `{ node, point, normal, distance }` を返します。
+- **Animator コンポーネント（完全版）**: `play(name)`、`stop()`、`crossFade(name, duration)`、`addClip(clip)`、`autoplay` オプション。core のエンジン非依存 `AnimationMixer` 経由でノードトランスフォームを駆動します。
+- **アニメーションブレンディング**: `AnimationMixer` が複数の同時クリップをクリップごとの重みとクロスフェード傾斜で対応。
+- **キーフレームイベント**: `AnimationClip.events: KeyframeEvent[]` が再生ヘッドがイベント時刻を横切るときに名前付きイベントを発火。
+- **`finished` イベント**: ループしないクリップが期間に達すると `finished` を発火。
+- **イージング + スプリングヘルパー**: `linear`、`easeInQuad/easeOutQuad/easeInOutQuad`、立方・サイン系のバリエーション、`easeOutElastic`、臨界減衰可能な `spring(...)` 積分器。
+- **`Scene.update(dt)` が毎フレーム実行**（`ThreeRenderer.render(dt)` 経由）。
+- **テスト**: `Animator`、`Easing`、`PhysicsSystem`。
+- **EPIC**: [OA-007 — 物理とアニメーション](docs/features/OA-007/EPIC.md)。
+
+### 変更
+- `ThreeRenderer.render(dt?: number)` が実際の `dt` を受け取れるように。ハードコードされた `0.016` を削除。
+- `THREE.AnimationMixer` は実際の `SkinnedMesh` 子孫を持つノードでのみ作成。
+- `Collider` に `isTrigger`、`collisionGroup`、`collisionMask` を追加。
+- `Animator.definition.animations` の型を `Record<string, AnimationClip>` に（`any` を排除）。
+
+### 削除
+- `@joroya/physics` の rapier ベースの孤立コード（`PhysicsWorld.ts` と RigidBody/Collider の重複）。パッケージは単一バックエンド（`cannon-es`）に。
+
+### 修正
+- `@joroya/physics` を含むすべてのワークスペースパッケージで `pnpm typecheck` が成功するように。
+- `packages/physics/tsconfig.json` が `tsconfig.base.json` を継承するように。
+
 ## [0.8.0] - 2026-05-15
 
 ### 追加

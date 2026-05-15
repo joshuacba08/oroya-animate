@@ -10,19 +10,39 @@ export enum ColliderShape {
 
 export interface ColliderDef {
     shape: ColliderShape;
-    // Box
+    /** Box half-extents. */
     halfExtents?: Vec3;
-    // Sphere
+    /** Sphere radius (also used as base radius for Cylinder). */
     radius?: number;
-    // Cylinder - simplified, cannon-es uses radiusTop, radiusBottom, height, numSegments
+    /** Cylinder height. */
     height?: number;
 
-    // Offset from node center
+    /** Offset from node origin (in local space). */
     center?: Vec3;
 
-    // Material properties
+    /** Material friction coefficient. */
     friction?: number;
+    /** Material restitution (bounciness). */
     restitution?: number;
+
+    /**
+     * Sensor / trigger collider — generates collision events without producing
+     * a contact response. Use for trigger volumes (checkpoints, damage zones,
+     * proximity sensors).
+     */
+    isTrigger?: boolean;
+
+    /**
+     * Collision filter group (bitmask, 1 << N). Only collides with bodies
+     * whose `collisionMask` includes this group. Default `1` = "default".
+     */
+    collisionGroup?: number;
+
+    /**
+     * Collision filter mask (bitmask). The body collides only with groups
+     * that intersect this mask. Default `-1` = "everything".
+     */
+    collisionMask?: number;
 }
 
 export class Collider extends Component {
@@ -39,6 +59,9 @@ export class Collider extends Component {
             center: { x: 0, y: 0, z: 0 },
             friction: 0.3,
             restitution: 0.3,
+            isTrigger: false,
+            collisionGroup: 1,
+            collisionMask: -1,
             ...definition,
         };
     }

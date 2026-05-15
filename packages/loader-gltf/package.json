@@ -1,6 +1,6 @@
 {
   "name": "@joroya/loader-gltf",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "glTF/GLB 3D model loader for Oroya Animate scene graphs",
   "keywords": [
     "oroya",

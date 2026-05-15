@@ -6,152 +6,424 @@ import {
     Collider,
     RigidBodyType,
     ColliderShape,
-    Transform
+    type CollisionEvent,
+    type Vec3,
 } from '@joroya/core';
 import * as CANNON from 'cannon-es';
 
+/**
+ * Options for constructing a `PhysicsSystem`.
+ */
+export interface PhysicsSystemOptions {
+    /** World gravity vector. Default `{ x: 0, y: -9.82, z: 0 }`. */
+    gravity?: Vec3;
+    /** Fixed simulation timestep in seconds. Default `1/60`. */
+    fixedTimeStep?: number;
+    /** Max sub-steps per frame to keep simulation stable on slow frames. Default `3`. */
+    maxSubSteps?: number;
+    /** Default contact friction. Default `0.3`. */
+    defaultFriction?: number;
+    /** Default contact restitution. Default `0.3`. */
+    defaultRestitution?: number;
+}
+
+/**
+ * Result of a single physics raycast hit.
+ */
+export interface PhysicsRaycastHit {
+    /** The node attached to the hit body. */
+    node: Node;
+    /** World-space hit point. */
+    point: Vec3;
+    /** World-space surface normal at the hit point. */
+    normal: Vec3;
+    /** Distance from ray origin to hit point. */
+    distance: number;
+}
+
+/**
+ * Drives a cannon-es world from a `Scene`. Reads `RigidBody` + `Collider`
+ * components from each node, owns the resulting `CANNON.Body`, and writes
+ * the simulated transforms back to `node.transform` each step.
+ *
+ * **World-space convention.** Bodies live in world space. `syncScene`
+ * decomposes each rigid-body node's `worldMatrix` to set the body's initial
+ * pose, and on read-back the system writes world-space pose into
+ * `node.transform.position/rotation`. Nodes parented under non-rigid
+ * groups therefore drift toward world origin (this is intentional —
+ * mixing parent transforms with physics simulation produces nonsense). To
+ * preserve hierarchy, parent the rigid-body node directly under the scene
+ * root.
+ */
 export class PhysicsSystem {
-    world: CANNON.World;
-    private bodyMap = new Map<string, CANNON.Body>();
-    private nodeMap = new Map<string, Node>();
+    readonly world: CANNON.World;
+    private readonly bodyMap = new Map<string, CANNON.Body>();
+    private readonly nodeMap = new Map<string, Node>();
+    /** Inverse map for resolving collision events to nodes. */
+    private readonly bodyToNode = new Map<CANNON.Body, Node>();
+    /** Active contact pairs from the previous step — used to dispatch end events. */
+    private prevContacts = new Set<string>();
 
-    // Materials
-    private defaultMaterial: CANNON.Material;
+    private readonly defaultMaterial: CANNON.Material;
+    private readonly fixedTimeStep: number;
+    private readonly maxSubSteps: number;
 
-    constructor() {
+    constructor(options: PhysicsSystemOptions = {}) {
+        const g = options.gravity ?? { x: 0, y: -9.82, z: 0 };
+        this.fixedTimeStep = options.fixedTimeStep ?? 1 / 60;
+        this.maxSubSteps = options.maxSubSteps ?? 3;
+
         this.world = new CANNON.World();
-        this.world.gravity.set(0, -9.82, 0); // Default gravity
+        this.world.gravity.set(g.x, g.y, g.z);
         this.defaultMaterial = new CANNON.Material('default');
 
-        // Default contact material
         const contactMaterial = new CANNON.ContactMaterial(
             this.defaultMaterial,
             this.defaultMaterial,
-            { friction: 0.3, restitution: 0.3 }
+            {
+                friction: options.defaultFriction ?? 0.3,
+                restitution: options.defaultRestitution ?? 0.3,
+            },
         );
         this.world.addContactMaterial(contactMaterial);
+
+        // World-level contact events cover triggers AND solid contacts uniformly;
+        // body-level `collide` is reserved for continuous-frame contact info
+        // (point/normal/impulse) which sensors do not produce.
+        this.world.addEventListener('beginContact', this.onBeginContact);
+        this.world.addEventListener('endContact', this.onEndContact);
+    }
+
+    get gravity(): Vec3 {
+        return { x: this.world.gravity.x, y: this.world.gravity.y, z: this.world.gravity.z };
+    }
+
+    set gravity(v: Vec3) {
+        this.world.gravity.set(v.x, v.y, v.z);
     }
 
     /**
-     * Steps the physics simulation and synchronizes node transforms.
-     * @param dt Time step in seconds.
-     * @param scene The scene to simulate.
+     * Advance the simulation by `dt` and synchronize node transforms.
      */
-    update(dt: number, scene: Scene) {
-        // 1. Sync bodies (create/update)
+    update(dt: number, scene: Scene): void {
         this.syncScene(scene);
-
-        // 2. Step simulation
-        // Fixed time step is better for stability
-        this.world.step(1 / 60, dt, 3);
-
-        // 3. Sync back to nodes
-        for (const [nodeId, body] of this.bodyMap) {
-            const node = this.nodeMap.get(nodeId);
-            if (node) {
-                if (body.type !== CANNON.Body.STATIC) {
-                    node.transform.position = {
-                        x: body.position.x,
-                        y: body.position.y,
-                        z: body.position.z
-                    };
-                    node.transform.rotation = {
-                        x: body.quaternion.x,
-                        y: body.quaternion.y,
-                        z: body.quaternion.z,
-                        w: body.quaternion.w
-                    };
-                    // Mark transform as dirty is handled by setter usually, but let's be sure
-                    node.transform.updateLocalMatrix();
-                }
-            }
-        }
+        this.world.step(this.fixedTimeStep, dt, this.maxSubSteps);
+        this.dispatchContacts();
+        this.writeBack();
     }
 
-    private syncScene(scene: Scene) {
-        scene.root.traverse(node => {
-            if (node.hasComponent(ComponentType.RigidBody)) {
-                if (!this.bodyMap.has(node.id)) {
-                    this.createBody(node);
-                }
-                // TODO: Handle updates to body properties if they change at runtime
+    /**
+     * Remove the body associated with a node. Call this when removing nodes
+     * from the scene at runtime.
+     */
+    removeNode(node: Node): void {
+        const body = this.bodyMap.get(node.id);
+        if (!body) return;
+        this.world.removeBody(body);
+        this.bodyMap.delete(node.id);
+        this.nodeMap.delete(node.id);
+        this.bodyToNode.delete(body);
+    }
+
+    // ── Constraints / Joints ──────────────────────────────────
+
+    /**
+     * Hinge constraint — bodies rotate around a shared axis.
+     * Use for doors, wheels, pendulums.
+     */
+    addHingeConstraint(
+        a: Node,
+        b: Node,
+        options: { pivotA: Vec3; pivotB: Vec3; axisA?: Vec3; axisB?: Vec3 },
+    ): CANNON.HingeConstraint | null {
+        const bodyA = this.bodyMap.get(a.id);
+        const bodyB = this.bodyMap.get(b.id);
+        if (!bodyA || !bodyB) return null;
+        const c = new CANNON.HingeConstraint(bodyA, bodyB, {
+            pivotA: new CANNON.Vec3(options.pivotA.x, options.pivotA.y, options.pivotA.z),
+            pivotB: new CANNON.Vec3(options.pivotB.x, options.pivotB.y, options.pivotB.z),
+            axisA: options.axisA && new CANNON.Vec3(options.axisA.x, options.axisA.y, options.axisA.z),
+            axisB: options.axisB && new CANNON.Vec3(options.axisB.x, options.axisB.y, options.axisB.z),
+        });
+        this.world.addConstraint(c);
+        return c;
+    }
+
+    /**
+     * Point-to-point constraint — bodies share a single world point.
+     * Use for ball joints, chains, attachment points.
+     */
+    addPointToPointConstraint(
+        a: Node,
+        b: Node,
+        options: { pivotA: Vec3; pivotB: Vec3; maxForce?: number },
+    ): CANNON.PointToPointConstraint | null {
+        const bodyA = this.bodyMap.get(a.id);
+        const bodyB = this.bodyMap.get(b.id);
+        if (!bodyA || !bodyB) return null;
+        const c = new CANNON.PointToPointConstraint(
+            bodyA,
+            new CANNON.Vec3(options.pivotA.x, options.pivotA.y, options.pivotA.z),
+            bodyB,
+            new CANNON.Vec3(options.pivotB.x, options.pivotB.y, options.pivotB.z),
+            options.maxForce,
+        );
+        this.world.addConstraint(c);
+        return c;
+    }
+
+    /**
+     * Distance constraint — bodies maintain a fixed separation.
+     * Use for ropes, springs (with low maxForce), rigid links.
+     */
+    addDistanceConstraint(
+        a: Node,
+        b: Node,
+        distance: number,
+        maxForce?: number,
+    ): CANNON.DistanceConstraint | null {
+        const bodyA = this.bodyMap.get(a.id);
+        const bodyB = this.bodyMap.get(b.id);
+        if (!bodyA || !bodyB) return null;
+        const c = new CANNON.DistanceConstraint(bodyA, bodyB, distance, maxForce);
+        this.world.addConstraint(c);
+        return c;
+    }
+
+    removeConstraint(c: CANNON.Constraint): void {
+        this.world.removeConstraint(c);
+    }
+
+    // ── Raycast ───────────────────────────────────────────────
+
+    /**
+     * Cast a ray and return the closest hit, or `null` if nothing was hit.
+     */
+    raycast(from: Vec3, to: Vec3): PhysicsRaycastHit | null {
+        const result = new CANNON.RaycastResult();
+        const ray = new CANNON.Ray(
+            new CANNON.Vec3(from.x, from.y, from.z),
+            new CANNON.Vec3(to.x, to.y, to.z),
+        );
+        ray.intersectWorld(this.world, {
+            mode: CANNON.Ray.CLOSEST,
+            result,
+            skipBackfaces: true,
+        });
+        if (!result.hasHit || !result.body) return null;
+        const node = this.bodyToNode.get(result.body);
+        if (!node) return null;
+        return {
+            node,
+            point: { x: result.hitPointWorld.x, y: result.hitPointWorld.y, z: result.hitPointWorld.z },
+            normal: { x: result.hitNormalWorld.x, y: result.hitNormalWorld.y, z: result.hitNormalWorld.z },
+            distance: result.distance,
+        };
+    }
+
+    /**
+     * Cast a ray and return every hit along its length.
+     */
+    raycastAll(from: Vec3, to: Vec3): PhysicsRaycastHit[] {
+        const hits: PhysicsRaycastHit[] = [];
+        const ray = new CANNON.Ray(
+            new CANNON.Vec3(from.x, from.y, from.z),
+            new CANNON.Vec3(to.x, to.y, to.z),
+        );
+        ray.intersectWorld(this.world, {
+            mode: CANNON.Ray.ALL,
+            skipBackfaces: true,
+            callback: (result) => {
+                const node = result.body && this.bodyToNode.get(result.body);
+                if (!node) return;
+                hits.push({
+                    node,
+                    point: { x: result.hitPointWorld.x, y: result.hitPointWorld.y, z: result.hitPointWorld.z },
+                    normal: { x: result.hitNormalWorld.x, y: result.hitNormalWorld.y, z: result.hitNormalWorld.z },
+                    distance: result.distance,
+                });
+            },
+        });
+        return hits;
+    }
+
+    // ── Internals ─────────────────────────────────────────────
+
+    private syncScene(scene: Scene): void {
+        scene.root.traverse((node) => {
+            if (node.hasComponent(ComponentType.RigidBody) && !this.bodyMap.has(node.id)) {
+                this.createBody(node);
             }
         });
     }
 
-    private createBody(node: Node) {
+    private createBody(node: Node): void {
         const rb = node.getComponent<RigidBody>(ComponentType.RigidBody)!;
         const collider = node.getComponent<Collider>(ComponentType.Collider);
 
-        const type = rb.definition.type === RigidBodyType.Static ? CANNON.Body.STATIC :
-            rb.definition.type === RigidBodyType.Kinematic ? CANNON.Body.KINEMATIC :
-                CANNON.Body.DYNAMIC;
+        const type =
+            rb.definition.type === RigidBodyType.Static
+                ? CANNON.Body.STATIC
+                : rb.definition.type === RigidBodyType.Kinematic
+                    ? CANNON.Body.KINEMATIC
+                    : CANNON.Body.DYNAMIC;
 
         const body = new CANNON.Body({
             mass: rb.definition.mass,
-            type: type,
+            type,
             material: this.defaultMaterial,
             fixedRotation: rb.definition.fixedRotation,
             linearDamping: rb.definition.linearDamping,
-            angularDamping: rb.definition.angularDamping
+            angularDamping: rb.definition.angularDamping,
+            isTrigger: collider?.definition.isTrigger ?? false,
+            collisionFilterGroup: collider?.definition.collisionGroup ?? 1,
+            collisionFilterMask: collider?.definition.collisionMask ?? -1,
         });
 
-        // Set initial position/rotation
-        // We need absolute world position/rotation
-        // Ideally we use node.transform.worldMatrix to extract world pos/rot
-        // But node.transform.position is local.
-        // For simple scenes without deep hierarchy it might be fine, but correct way is world.
-        // Let's assume for now simulation happens in world space and user sets initial node transform relative to parent?
-        // If parent has transform, physics system needs to handle it.
-        // Simplification: Physics only works well on root children or we assume local=world for physics nodes for now.
-
-        body.position.set(
-            node.transform.position.x,
-            node.transform.position.y,
-            node.transform.position.z
-        );
+        // Initial pose is taken from world matrix so the rigid body spawns
+        // wherever the user placed the node in scene space.
+        const wm = node.transform.worldMatrix;
+        body.position.set(wm[12], wm[13], wm[14]);
         body.quaternion.set(
             node.transform.rotation.x,
             node.transform.rotation.y,
             node.transform.rotation.z,
-            node.transform.rotation.w
+            node.transform.rotation.w,
         );
 
         if (collider) {
             const shape = this.createShape(collider);
             if (shape) {
                 const offset = collider.definition.center;
-                const offsetVec = new CANNON.Vec3(offset?.x ?? 0, offset?.y ?? 0, offset?.z ?? 0);
-                body.addShape(shape, offsetVec);
+                body.addShape(shape, new CANNON.Vec3(offset.x, offset.y, offset.z));
             }
         }
+
+        // Per-body `collide` fires only for solid contacts (not triggers) and
+        // carries the ContactEquation. Use it to enrich continuous `collide`
+        // events with point/normal/impulse data.
+        body.addEventListener('collide', (e: { contact: CANNON.ContactEquation; body: CANNON.Body }) => {
+            this.onBodyCollide(node, body, e);
+        });
 
         this.world.addBody(body);
         this.bodyMap.set(node.id, body);
         this.nodeMap.set(node.id, node);
+        this.bodyToNode.set(body, node);
     }
 
     private createShape(collider: Collider): CANNON.Shape | null {
         const def = collider.definition;
         switch (def.shape) {
             case ColliderShape.Box:
-                const half = def.halfExtents || { x: 0.5, y: 0.5, z: 0.5 };
-                return new CANNON.Box(new CANNON.Vec3(half.x, half.y, half.z));
+                return new CANNON.Box(new CANNON.Vec3(def.halfExtents.x, def.halfExtents.y, def.halfExtents.z));
             case ColliderShape.Sphere:
-                return new CANNON.Sphere(def.radius || 0.5);
+                return new CANNON.Sphere(def.radius);
             case ColliderShape.Plane:
                 return new CANNON.Plane();
             case ColliderShape.Cylinder:
-                // Cannon cylinder is (radiusTop, radiusBottom, height, segments)
-                // We only have radius and height.
-                return new CANNON.Cylinder(
-                    def.radius || 0.5,
-                    def.radius || 0.5,
-                    def.height || 1,
-                    16
-                );
+                return new CANNON.Cylinder(def.radius, def.radius, def.height, 16);
             default:
                 return null;
+        }
+    }
+
+    private writeBack(): void {
+        for (const [nodeId, body] of this.bodyMap) {
+            const node = this.nodeMap.get(nodeId);
+            if (!node || body.type === CANNON.Body.STATIC) continue;
+            node.transform.position = { x: body.position.x, y: body.position.y, z: body.position.z };
+            node.transform.rotation = {
+                x: body.quaternion.x,
+                y: body.quaternion.y,
+                z: body.quaternion.z,
+                w: body.quaternion.w,
+            };
+            node.transform.updateLocalMatrix();
+        }
+    }
+
+    private contactKey(a: CANNON.Body, b: CANNON.Body): string {
+        // Order-independent pair key so the same contact reads the same regardless of A/B order.
+        return a.id < b.id ? `${a.id}|${b.id}` : `${b.id}|${a.id}`;
+    }
+
+    private onBodyCollide(
+        node: Node,
+        body: CANNON.Body,
+        e: { contact: CANNON.ContactEquation; body: CANNON.Body },
+    ): void {
+        const other = this.bodyToNode.get(e.body);
+        if (!other) return;
+        if (body.isTrigger || e.body.isTrigger) return; // triggers handled in onBeginContact
+
+        // cannon-es exposes the relative impact velocity along the contact
+        // normal — closest analogue to "collision strength" without a
+        // dedicated impulse accessor.
+        const ce: CollisionEvent = {
+            other,
+            contactPoint: { x: e.contact.bi.position.x, y: e.contact.bi.position.y, z: e.contact.bi.position.z },
+            contactNormal: { x: e.contact.ni.x, y: e.contact.ni.y, z: e.contact.ni.z },
+            impulse: Math.abs(e.contact.getImpactVelocityAlongNormal()),
+        };
+        const key = this.contactKey(body, e.body);
+        // `beginContact` already emitted the `collide-begin`; this fires the
+        // continuous `collide` for subsequent frames.
+        node.events.emit(this.prevContacts.has(key) ? 'collide' : 'collide-begin', ce);
+        this.prevContacts.add(key);
+    }
+
+    private onBeginContact = (e: { bodyA: CANNON.Body; bodyB: CANNON.Body }): void => {
+        const a = this.bodyToNode.get(e.bodyA);
+        const b = this.bodyToNode.get(e.bodyB);
+        if (!a || !b) return;
+        const isTrigger = e.bodyA.isTrigger || e.bodyB.isTrigger;
+        const key = this.contactKey(e.bodyA, e.bodyB);
+        if (isTrigger) {
+            a.events.emit('trigger-enter', { other: b });
+            b.events.emit('trigger-enter', { other: a });
+            this.prevContacts.add(key);
+        }
+        // For solid contacts, onBodyCollide does the work — it has the
+        // contact equation we need for normal/point/impulse.
+    };
+
+    private onEndContact = (e: { bodyA: CANNON.Body; bodyB: CANNON.Body }): void => {
+        const a = this.bodyToNode.get(e.bodyA);
+        const b = this.bodyToNode.get(e.bodyB);
+        if (!a || !b) return;
+        const isTrigger = e.bodyA.isTrigger || e.bodyB.isTrigger;
+        const key = this.contactKey(e.bodyA, e.bodyB);
+        this.prevContacts.delete(key);
+        if (isTrigger) {
+            a.events.emit('trigger-exit', { other: b });
+            b.events.emit('trigger-exit', { other: a });
+        } else {
+            a.events.emit('collide-end', { other: b });
+            b.events.emit('collide-end', { other: a });
+        }
+    };
+
+    private dispatchContacts(): void {
+        // Emit `trigger-stay` for every trigger pair currently active —
+        // cannon-es doesn't expose a continuous event for sensors, so we
+        // synthesize one from `prevContacts`.
+        for (const key of this.prevContacts) {
+            const [aId, bId] = key.split('|').map(Number);
+            const ba = this.world.bodies.find((b) => b.id === aId);
+            const bb = this.world.bodies.find((b) => b.id === bId);
+            if (!ba || !bb) {
+                this.prevContacts.delete(key);
+                continue;
+            }
+            if (ba.isTrigger || bb.isTrigger) {
+                const na = this.bodyToNode.get(ba);
+                const nb = this.bodyToNode.get(bb);
+                if (na && nb) {
+                    na.events.emit('trigger-stay', { other: nb });
+                    nb.events.emit('trigger-stay', { other: na });
+                }
+            }
         }
     }
 }

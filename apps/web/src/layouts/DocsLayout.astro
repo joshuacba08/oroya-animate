@@ -93,12 +93,13 @@ const ogImageURL = new URL(image, siteUrl);
 
     <title>{fullTitle}</title>
   </head>
-  <body class="min-h-screen bg-base-100 font-sans text-base-content">
+  <body class="min-h-screen bg-base-100 font-sans text-base-content bg-grid">
     <a href="#main-content" class="skip-to-content">Skip to content</a>
     <!-- Subtle background -->
     <div class="fixed inset-0 -z-10 overflow-hidden">
       <div class="absolute top-0 left-[10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[128px]"></div>
-      <div class="absolute bottom-0 right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/5 blur-[128px]"></div>
+      <div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/5 blur-[128px]"></div>
+      <div class="absolute top-[40%] right-[30%] w-[350px] h-[350px] rounded-full bg-accent/4 blur-[128px]"></div>
     </div>
 
     <Navbar />

@@ -1,6 +1,6 @@
 {
   "name": "@joroya/core",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Core scene graph and component system for Oroya Animate - an engine-agnostic 2D/3D graphics library",
   "keywords": [
     "oroya",

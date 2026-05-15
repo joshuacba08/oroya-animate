@@ -5,6 +5,37 @@ Todos los cambios notables de Oroya Animate se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.9.0] - 2026-05-15
+
+### Agregado
+- **Paquete de física (`@joroya/physics`)**: `PhysicsSystem` que opera un mundo de `cannon-es` sobre cualquier `Scene`. Lee `RigidBody` + `Collider` desde `@joroya/core` y sincroniza transforms en espacio mundo cada step.
+- **Joints / Restricciones**: `addHingeConstraint`, `addPointToPointConstraint`, `addDistanceConstraint`. Habilitan ragdolls, péndulos, cuerdas, ruedas.
+- **Eventos de colisión**: `Node.events` ahora emite `collide-begin`, `collide`, `collide-end` para contactos sólidos y `trigger-enter`, `trigger-stay`, `trigger-exit` para sensores. El payload incluye nodo, punto y normal de contacto e impulso.
+- **Colliders sensor/trigger**: `Collider.isTrigger` genera eventos sin respuesta de contacto.
+- **Filtros de colisión**: `collisionGroup` y `collisionMask` por bitmask.
+- **Raycast físico**: `PhysicsSystem.raycast` y `raycastAll` devuelven `{ node, point, normal, distance }` contra bodies.
+- **Componente Animator (completo)**: `play(name)`, `stop()`, `crossFade(name, duration)`, `addClip(clip)` + `autoplay`. Anima nodos mediante el `AnimationMixer` engine-agnóstico de core.
+- **Animation blending**: el `AnimationMixer` soporta múltiples clips concurrentes con peso por clip y rampas de crossfade. Las mezclas de cuaterniones usan nlerp con corrección de hemisferio.
+- **Eventos por keyframe**: `AnimationClip.events: KeyframeEvent[]` emite eventos nombrados a medida que la cabeza de reproducción los cruza.
+- **Evento `finished`**: clips sin loop emiten `finished` al llegar a su duración.
+- **Helpers de easing + spring**: `linear`, `easeInQuad/easeOutQuad/easeInOutQuad`, variantes cúbicas y sinusoidales, `easeOutElastic`, y un integrador `spring(...)` con amortiguación crítica.
+- **`Scene.update(dt)` corre cada frame** a través de `ThreeRenderer.render(dt)`, por lo que `Component.onUpdate` es ahora ciudadano de primera clase.
+- **Tests**: `Animator`, `Easing` y `PhysicsSystem`.
+- **EPIC**: [OA-007 — Física y Animación](docs/features/OA-007/EPIC.md).
+
+### Cambiado
+- `ThreeRenderer.render(dt?: number)` acepta `dt` real. El `0.016` hardcoded desaparece.
+- `THREE.AnimationMixer` solo se crea cuando un nodo tiene un `SkinnedMesh` descendiente real.
+- `Collider` añade `isTrigger`, `collisionGroup`, `collisionMask`.
+- `Animator.definition.animations` ahora tipado como `Record<string, AnimationClip>` (sin `any`).
+
+### Eliminado
+- Código rapier huérfano en `@joroya/physics` (`PhysicsWorld.ts` y duplicados de RigidBody/Collider). El paquete es ahora single-backend (`cannon-es`).
+
+### Corregido
+- `pnpm typecheck` pasa en todos los paquetes, incluyendo `@joroya/physics` (antes bloqueado por dependencia faltante).
+- `packages/physics/tsconfig.json` extiende `tsconfig.base.json`.
+
 ## [0.8.0] - 2026-05-15
 
 ### Agregado

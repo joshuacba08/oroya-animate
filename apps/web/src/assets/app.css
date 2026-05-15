@@ -4,6 +4,35 @@
 }
 @plugin "@tailwindcss/typography";
 
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM DARK THEME — Astro-inspired deep navy + purple accents
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  /* Deep navy backgrounds with subtle blue-purple undertone */
+  --color-base-100: oklch(0.145 0.015 275);
+  --color-base-200: oklch(0.12 0.018 278);
+  --color-base-300: oklch(0.22 0.018 275);
+  /* Soft cool-gray text (not pure white — easier on eyes) */
+  --color-base-content: oklch(0.9 0.008 270);
+  /* Vivid purple primary */
+  --color-primary: oklch(0.65 0.25 280);
+  --color-primary-content: oklch(0.98 0.005 280);
+  /* Magenta-pink secondary */
+  --color-secondary: oklch(0.6 0.2 305);
+  --color-secondary-content: oklch(0.98 0.005 305);
+  /* Cyan-teal accent */
+  --color-accent: oklch(0.75 0.14 195);
+  --color-accent-content: oklch(0.15 0.03 195);
+  /* Neutral surfaces */
+  --color-neutral: oklch(0.19 0.015 275);
+  --color-neutral-content: oklch(0.85 0.01 275);
+  /* Info / Success / Warning / Error */
+  --color-info: oklch(0.7 0.15 240);
+  --color-success: oklch(0.65 0.18 155);
+  --color-warning: oklch(0.75 0.16 75);
+  --color-error: oklch(0.65 0.2 25);
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
@@ -46,15 +75,18 @@
 
 /* ── Glass card: DARK theme ── */
 [data-theme="dark"] .glass-card {
-  background: oklch(0.2 0.03 265 / 0.5);
-  backdrop-filter: blur(12px);
-  border: 1px solid oklch(0.3 0.03 265 / 0.5);
+  background: oklch(0.18 0.02 275 / 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid oklch(0.35 0.04 275 / 0.3);
+  box-shadow: 0 1px 3px oklch(0.1 0.02 275 / 0.2);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 [data-theme="dark"] .glass-card:hover {
-  border-color: oklch(0.6 0.15 265 / 0.4);
-  box-shadow: 0 0 30px oklch(0.5 0.15 265 / 0.1);
+  border-color: oklch(0.55 0.2 280 / 0.4);
+  box-shadow:
+    0 0 24px oklch(0.5 0.2 280 / 0.08),
+    0 4px 16px oklch(0.15 0.03 275 / 0.2);
 }
 
 /* ── Code card: always dark background for syntax highlighting ── */
@@ -75,8 +107,8 @@
 /* ── Grid background: DARK theme ── */
 [data-theme="dark"] .bg-grid {
   background-image:
-    linear-gradient(oklch(0.3 0.02 265 / 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.3 0.02 265 / 0.15) 1px, transparent 1px);
+    linear-gradient(oklch(0.4 0.04 275 / 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.4 0.04 275 / 0.12) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 

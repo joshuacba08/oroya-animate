@@ -1,6 +1,6 @@
 {
   "name": "@joroya/renderer-three",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Three.js (WebGL) renderer for Oroya Animate scene graphs",
   "keywords": [
     "oroya",

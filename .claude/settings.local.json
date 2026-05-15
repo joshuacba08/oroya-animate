@@ -8,7 +8,10 @@
       "Bash(pnpm test *)",
       "Bash(pnpm exec *)",
       "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" build)",
-      "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" typecheck)"
+      "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/physics\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/physics\" build)",
+      "Bash(pnpm --filter \"./packages/**\" build)"
     ]
   }
 }

@@ -59,8 +59,14 @@ export interface InteractionEvent {
 
 /**
  * Maps event type strings to their payload type for generic typing.
+ *
+ * Extends `PhysicsEventMap` so a node's `EventEmitter` can deliver both
+ * pointer interaction events and physics collision events through a single
+ * typed channel.
  */
-export interface InteractionEventMap {
+import type { PhysicsEventMap } from './CollisionEvent';
+
+export interface InteractionEventMap extends PhysicsEventMap {
     click: InteractionEvent;
     pointerdown: InteractionEvent;
     pointerup: InteractionEvent;

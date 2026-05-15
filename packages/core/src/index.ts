@@ -9,6 +9,7 @@ export * from './components/Material';
 export * from './components/Transform';
 export * from './events/EventEmitter';
 export * from './events/InteractionEvent';
+export * from './events/CollisionEvent';
 export * from './geometry/primitives';
 export * from './math/BoundingBox';
 export * from './math/Matrix4';
