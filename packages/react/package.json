@@ -1,0 +1,52 @@
+{
+    "name": "@joroya/react",
+    "version": "1.0.0",
+    "description": "React bindings for Oroya Animate — hooks and components for scene-graph composition (alpha)",
+    "keywords": ["oroya", "react", "scene-graph", "hooks"],
+    "author": {
+        "name": "Oroya AI Collaborator",
+        "url": "https://github.com/joshuacba08"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/joshuacba08/oroya-animate.git",
+        "directory": "packages/react"
+    },
+    "homepage": "https://oroya-animate.vercel.app",
+    "bugs": {
+        "url": "https://github.com/joshuacba08/oroya-animate/issues"
+    },
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": ["dist"],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "typecheck": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "@joroya/core": "^0.10.0",
+        "@joroya/renderer-three": "^0.10.0",
+        "react": "^18.0.0 || ^19.0.0"
+    },
+    "dependencies": {
+        "@joroya/core": "workspace:*",
+        "@joroya/renderer-three": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.0",
+        "react": "^18.3.1",
+        "tsup": "^8.1.0",
+        "typescript": "^5.4.5"
+    }
+}

@@ -3,3 +3,4 @@ export {
     type PhysicsSystemOptions,
     type PhysicsRaycastHit,
 } from './PhysicsSystem';
+export { Vehicle, type WheelOptions } from './Vehicle';

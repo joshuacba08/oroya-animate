@@ -5,6 +5,73 @@ Todos los cambios notables de Oroya Animate se documentarán en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.0.0] - 2026-05-16
+
+> **Primer release de producción.** Motor, ecosistema de desarrollo y herramientas de autoría están todos en su sitio. Todo lo etiquetado `@public` se publica bajo la política de estabilidad en [`docs/api-stability.md`](docs/api-stability.md) — los cambios incompatibles requieren bump mayor con ventana de deprecación de 1 versión mayor.
+
+### Agregado
+- **Sistema de plugins** (`@joroya/core/plugins`): `PluginRegistry`, `Plugin`, `ComponentHandler`. `ThreeRenderer.usePlugin(plugin)` instala handlers con precedencia sobre las ramas built-in. Packages third-party pueden extender el renderer sin forkearlo. 7 tests.
+- **Tags de estabilidad de API** (`docs/api-stability.md`): convención `@public`/`@experimental`/`@internal` con auditoría vía `pnpm api:check`. Tagueada la superficie principal.
+- **Editor visual** (`apps/editor`, alpha): editor de escenas en React con panel de jerarquía, inspector de transform (inputs numéricos por eje), y Save/Load usando la serialización de v0.10. Escena starter pre-cargada, botones Add Cube / Delete.
+- **Hook de aceleración WASM** (`@joroya/core/math/MathBackend`): registro `getMathBackend()`/`registerMathBackend(backend)`. Default JS puro; packages futuros (`@joroya/wasm-math`) lo reemplazan sin cambios en código consumidor. La API está en su sitio para evitar un breaking change posterior. 3 tests.
+- **Test aclarativo de InstancedMesh**: documenta que `InstancedMesh` no se deserializa por diseño (GPU state) mientras los `Float32Array` sí sobreviven el round-trip de v0.10.
+- **EPIC**: [OA-011 — Production Ready (v1.0)](docs/features/OA-011/EPIC.md).
+
+### Cambiado
+- Todos los paquetes del workspace + root saltan de `0.12.0` a `1.0.0`. La forma del API pública no cambia; el bump señala estabilidad, no breakage.
+
+### Compromisos de estabilidad
+- Símbolos `@public` no cambian de forma sin bump mayor y al menos 1 versión mayor de deprecación.
+- Símbolos `@experimental` (React/Vue, `Vehicle`, `solve2BoneIK`, `PluginRegistry`, math backend) pueden evolucionar en minors. Fijá la versión si dependés de ellos.
+
+## [0.12.0] - 2026-05-16
+
+### Agregado
+- **Skinned mesh / animación esquelética glTF**: nuevo componente `Skin` con nombres de huesos + inverse bind matrices. `BufferGeometryDef` extendido con `skinIndices` y `skinWeights`. `loadGLTF` extrae atributos de skinning. `ThreeRenderer` construye `THREE.SkinnedMesh` y resuelve la `THREE.Skeleton` en un post-pass para que las referencias adelantadas a huesos funcionen.
+- **IK analítica de 2 huesos** (`solve2BoneIK`): solución cerrada por ley de cosenos, O(1) por llamada. Vector polo opcional para fijar el plano del codo. 6 tests.
+- **Helper `Vehicle`** (`@joroya/physics`): wrapper sobre `CANNON.RaycastVehicle`. API `drive/steer/brake/syncWheelNodes`. Soporta ruedas con/sin tracción y dirección independientes. 5 tests.
+- **`PhysicsSystem.getBody(node)`**: materialización eager de bodies, usado por `Vehicle` para enlazar el chasis sin esperar al siguiente step.
+- **EPIC**: [OA-010 — Skinned Mesh, IK y Vehículos](docs/features/OA-010/EPIC.md).
+
+### Cambiado
+- `BufferGeometry` en el renderer ahora alambrá los atributos `skinIndex` + `skinWeight` cuando están presentes.
+- `ThreeRenderer.rebuildScene` resuelve bindings de skin post-traverse para soportar referencias adelantadas a huesos.
+
+## [0.11.0] - 2026-05-15
+
+### Agregado
+- **`@joroya/inspector` (paquete nuevo)** — overlay de debug en DOM vanilla para un `Scene`. Jerarquía click-to-select, vista de transform y componentes del nodo seleccionado, métricas rodantes de FPS / tiempo de frame / peor hitch, y stats del scene graph. Framework-agnóstico (sin dep de React/Vue). Refresh DOM con throttling.
+- **`@joroya/input` (paquete nuevo)** — capa unificada de teclado / ratón / gamepad con mapeo declarativo de acciones. `bindAction('jump', [{ key: 'Space' }, { gamepad: 'A' }])` y luego eventos `action-down` / `action` / `action-up`. Standard mapping de Gamepad + ejes analógicos. Auto-limpia estado en window blur.
+- **`@joroya/assets` (paquete nuevo)** — cache centralizada con deduplicación, release ref-counted y eventos de progreso. Loaders integrados (`image`, `audio` → `AudioBuffer`, `json`, `text`, `binary`); extensible vía `registerLoader`. `preload([...])` emite `progress` / `loaded` / `error` por ítem; los fallos individuales no rechazan la promesa global.
+- **`@joroya/react` (paquete nuevo, alpha)** — bindings de React. `<OroyaCanvas>` posee scene + renderer + loop RAF y expone hooks `useFrame(dt)`, `useScene()`, `useParentNode()`. Componentes JSX: `<Group>`, `<Box>`, `<Sphere>`, `<Plane>`, `<PerspectiveCamera>`, `<AmbientLight>`, `<DirectionalLight>`.
+- **`@joroya/vue` (paquete nuevo, alpha)** — composables Vue 3. `useOroyaCanvas(canvasRef)`, `useFrame((dt) => ...)`, `useNode((node) => setup)`. Usa `shallowRef` para que la reactividad no recurra por el scene graph.
+- **22 tests nuevos** en los 3 paquetes framework-agnósticos.
+- **EPIC**: [OA-009 — Ecosistema (Inspector, Input, Assets, Framework Wrappers)](docs/features/OA-009/EPIC.md).
+
+### Cambiado
+- El glob de `pnpm lint` ahora incluye `.tsx` para cubrir el JSX del wrapper de React.
+- Roadmap del README: v0.11.0 promovido de "Planned" a "Shipped".
+
+## [0.10.0] - 2026-05-15
+
+### Agregado
+- **Serialización completa de typed arrays**: `Float32Array`, `Uint8Array`, `Uint16Array` y `Uint32Array` sobreviven a JSON vía base64 (formato compatible con glTF). Esto desbloquea save/load de `AnimationClip`, `BufferGeometryDef` y matrices de `InstancedMesh` — prerrequisitos del editor visual v1.0.
+- **Deserialización para cada componente publicado**: `RigidBody`, `Collider`, `Animator`, `PostProcessing`, `ParticleSystem`, `AudioListener`, `AudioSource`, `Environment`. 9 nuevos tests de round-trip.
+- **Paridad de backends para `Animator`**: `renderToSVG`, `renderToSVGElement` y `Canvas2DRenderer.render` ahora ejecutan `Scene.update(dt)` antes del pase de matrices, aceptando `options.dt` (default `1/60`). El Animator funciona en los tres backends.
+- **ESLint con flat config**: `no-explicit-any`, `no @ts-ignore` y unused-vars. Script `pnpm lint` + gate en CI.
+- **EPIC**: [OA-008 — Serialización, Paridad de Backends y Endurecimiento](docs/features/OA-008/EPIC.md).
+
+### Cambiado
+- `pnpm test` ahora ejecuta `vitest run` (sin watch) para que CI no cuelgue. `pnpm test:watch` cubre el modo interactivo anterior.
+- `apps/web/src/scenes/animation-demo.ts` reescrito con la API real de `Animator` (clips idle/walk/spin + `crossFadeTo` + eventos `footstep`).
+- `packages/core/src/components/index.ts` ahora es un barrel completo.
+- Roadmap del README sincronizado con la realidad.
+
+### Corregido
+- **Bug: `deserialize` perdía la mitad de los nodos root**. `forEach` mutaba el array fuente al reparentar. Sustituido por snapshot + for-loop.
+- `EventEmitter` ya no usa `any` en su Set interno.
+- `loadGLTF.ts`, `InstancedMeshComponent.getMatrixAt` y `Gen.random` ya no usan `any`.
+
 ## [0.9.0] - 2026-05-15
 
 ### Agregado

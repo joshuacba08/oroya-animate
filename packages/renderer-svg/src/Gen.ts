@@ -109,7 +109,7 @@ export const Gen = {
      * @param float - Set to true to return a floating point number.
      * @returns The randomised number or array item.
      */
-    random(min: number | any[] = 0, max: number = 1, float: boolean = false): any {
+    random<T>(min: number | T[] = 0, max: number = 1, float: boolean = false): number | T {
         if (Array.isArray(min)) {
             const arr = min;
             return arr[Math.round(Math.random() * (arr.length - 1))];

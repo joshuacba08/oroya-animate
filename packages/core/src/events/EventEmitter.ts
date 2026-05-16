@@ -20,8 +20,17 @@
 
 type EventHandler<T> = (event: T) => void;
 
+// `Record<string, any>` is the standard bound for typed event-emitter event
+// maps (rxjs, mitt, etc.) — it accepts both interfaces with specific keys
+// and index-signature maps. `unknown` would force consumers to widen every
+// payload to `unknown`, defeating the purpose of typed events.
+//
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class EventEmitter<EventMap extends Record<string, any>> {
-    private listeners = new Map<keyof EventMap, Set<EventHandler<any>>>();
+    // Internally the handler set is heterogeneous: each key in `EventMap`
+    // can carry a differently-typed payload. We erase the payload type for
+    // storage and re-narrow on `on()` / `emit()` via the generic `K`.
+    private listeners = new Map<keyof EventMap, Set<EventHandler<unknown>>>();
 
     /**
      * Register a handler for the given event type.
@@ -33,7 +42,10 @@ export class EventEmitter<EventMap extends Record<string, any>> {
             set = new Set();
             this.listeners.set(type, set);
         }
-        set.add(handler);
+        // Function-param contravariance prevents direct assignment of a
+        // narrow handler into a `Set<EventHandler<unknown>>`. The cast is
+        // safe because the same generic K guards both add and emit paths.
+        set.add(handler as EventHandler<unknown>);
     }
 
     /**
@@ -42,7 +54,7 @@ export class EventEmitter<EventMap extends Record<string, any>> {
     off<K extends keyof EventMap>(type: K, handler: EventHandler<EventMap[K]>): void {
         const set = this.listeners.get(type);
         if (set) {
-            set.delete(handler);
+            set.delete(handler as EventHandler<unknown>);
             if (set.size === 0) {
                 this.listeners.delete(type);
             }
@@ -57,7 +69,7 @@ export class EventEmitter<EventMap extends Record<string, any>> {
         const set = this.listeners.get(type);
         if (set) {
             for (const handler of set) {
-                handler(event);
+                (handler as EventHandler<EventMap[K]>)(event);
             }
         }
     }

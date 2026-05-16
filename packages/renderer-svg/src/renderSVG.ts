@@ -39,6 +39,11 @@ interface SvgRenderOptions {
   width: number;
   height: number;
   viewBox?: string;
+  /**
+   * Time delta in seconds since the previous render. Drives `Scene.update(dt)`
+   * — Animator, ParticleSystem, and user `onUpdate` hooks. Default `1/60`.
+   */
+  dt?: number;
 }
 
 function toCssColor(color: ColorRGB | undefined, defaultColor: string): string {
@@ -683,6 +688,10 @@ function renderNodeToString(node: Node, indent: string, gradients: GradientColle
 }
 
 export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
+  // Advance scene logic first (Animator, custom onUpdate hooks). The SVG
+  // backend is pure render so `dt` defaults to a single 60Hz tick — callers
+  // driving their own loop should pass `options.dt` for accurate motion.
+  scene.update(options.dt ?? 1 / 60);
   // Ensure all matrices are up-to-date before rendering.
   scene.updateWorldMatrices();
 
@@ -954,11 +963,14 @@ function renderNodeToDom(
  *
  * @returns An object containing the SVG element and a `dispose()` function to clean up listeners.
  */
+// `renderToSVGElement` mirrors `renderToSVG` but emits a live DOM element;
+// it shares the same `scene.update(dt)` semantics.
 export function renderToSVGElement(
   scene: Scene,
   options: SvgElementRenderOptions,
 ): { svg: SVGSVGElement; dispose: () => void } {
-  // Ensure all matrices are up-to-date before rendering.
+  // See `renderToSVG` for the rationale behind running scene logic first.
+  scene.update(options.dt ?? 1 / 60);
   scene.updateWorldMatrices();
 
   const NS = 'http://www.w3.org/2000/svg';

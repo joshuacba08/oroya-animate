@@ -33,5 +33,7 @@ export * from './components/AudioListener';
 export * from './components/AudioSource';
 export * from './components/RigidBody';
 export * from './components/Collider';
+export * from './components/Skin';
+export * from './plugins';
 
 

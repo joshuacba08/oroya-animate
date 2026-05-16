@@ -5,6 +5,80 @@ All notable changes to Oroya Animate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-05-16
+
+> **First production release.** The engine, the developer ecosystem, and the
+> content tooling are all in place. Everything tagged `@public` in the
+> source ships under the stability policy in [`docs/api-stability.md`](docs/api-stability.md) —
+> breaking changes require a major version bump and a 1-major deprecation
+> window.
+
+### Added
+- **Plugin system** (`@joroya/core/plugins`): new `PluginRegistry`, `Plugin`, and `ComponentHandler` types. `ThreeRenderer.usePlugin(plugin)` installs handlers that take precedence over built-in component branches — third-party packages can now extend the renderer without forking. Plugin handlers fire `create` / `update(dt)` / `dispose` hooks; per-frame plugin updates run between scene update and the world-matrix sync pass. 7 unit tests.
+- **API stability tags** (`docs/api-stability.md`): `@public`, `@experimental`, `@internal` JSDoc convention enforced via the new `pnpm api:check` script. v1.0 surface is tagged across the main classes — `Scene`, `Node`, `ThreeRenderer`, `OrbitControlsWrapper`, `Inspector`, `FrameMetrics`, `InputManager`, `AssetManager`, `PhysicsSystem` are `@public`; `Vehicle`, `solve2BoneIK`, `PluginRegistry`, React/Vue bindings are `@experimental`.
+- **Visual editor** (`apps/editor`, alpha): React-based scene editor with hierarchy panel, transform inspector (per-axis number inputs for position / rotation quaternion / scale), and Save / Load via the v0.10.0 serialization round-trip. Pre-populates with a hero cube / ball / lit ground starter scene. Includes "Add Cube" for incremental composition and "Delete" for the selected node.
+- **WASM acceleration hook** (`@joroya/core/math/MathBackend`): `getMathBackend()` / `registerMathBackend(backend)` registry. Default backend is pure JS; companion packages (e.g. future `@joroya/wasm-math`) drop in a WASM implementation without changes to consumer code. The hook is in place even though no production WASM ships in v1.0 — this avoids a breaking change later. 3 unit tests.
+- **`InstancedMesh` serialization clarification** test: documents that `InstancedMesh` is intentionally not deserialized (GPU runtime state is owned by app code) while the underlying `Float32Array` data round-trips through the v0.10 typed-array layer when persisted manually.
+- **EPIC**: [OA-011 — Production Ready (v1.0)](docs/features/OA-011/EPIC.md).
+
+### Changed
+- Every workspace package + the root jump from `0.12.0` to `1.0.0`. The shape of the public API does not change from v0.12.x — the bump signals stability, not breakage.
+- README roadmap: v1.0.0 row promoted to Shipped; post-1.0 items (multi-bone IK, gizmos, full Playwright E2E, production WASM) documented as future work.
+
+### Stability commitments
+- `@public` symbols listed in `docs/api-stability.md` will not change shape without a major bump and a deprecation window of at least one major version.
+- `@experimental` symbols (currently: `@joroya/react`, `@joroya/vue`, `Vehicle`, `solve2BoneIK`, `PluginRegistry`, math backend hooks) may evolve in minor releases. Pin the version if you depend on them.
+- Pre-1.0 CHANGELOG entries (v0.1.0 – v0.12.0) are preserved as historical record. Migrations between those versions did not have deprecation windows; from v1.0.0 forward they do.
+
+## [0.12.0] - 2026-05-16
+
+### Added
+- **Skinned mesh / glTF skeletal animation** (`@joroya/core`, `@joroya/loader-gltf`, `@joroya/renderer-three`): new `Skin` component holds bone names + inverse bind matrices. `BufferGeometryDef` extended with optional `skinIndices: Uint16Array` and `skinWeights: Float32Array` (per-vertex bone refs + weights, 4 per vertex). `loadGLTF` extracts skin attributes from `THREE.SkinnedMesh` and produces matching `Skin` components. `ThreeRenderer` builds a `THREE.SkinnedMesh` instead of `Mesh` when both are present and resolves the `THREE.Skeleton` in a post-pass after every Oroya node has its Three.js peer. Bone Nodes animate normally through the core `Animator` → `AnimationMixer` → `node.transform` path; the SkinnedMesh follows automatically (no separate `THREE.AnimationMixer` needed for property tracks).
+- **2-bone analytical IK** (`@joroya/core/math/IK`): `solve2BoneIK(rootPos, midPos, endPos, target, pole?)` returns `{ rootRotation, midRotation, reached }` using the law-of-cosines closed-form. Optional pole vector picks the bend plane (elbow direction); a sensible default is chosen when omitted. O(1) per solve — no iteration. Apply to arms / legs / antennas. 6 tests cover reachability, degenerate (target=root), full-extension (target too far), pole-flip determinism, end-effector placement.
+- **Vehicle helper** (`@joroya/physics/Vehicle`): high-level wrapper over `CANNON.RaycastVehicle`. Construct against an existing chassis node; `addWheel({ chassisPosition, radius, isDriving, isSteering, node })` registers wheels with optional Oroya node mirrors. `drive(force)` / `steer(angle)` / `brake(force)` act on all matching wheels; `syncWheelNodes()` writes simulated wheel poses back to their nodes each step. 5 tests covering construction, wheel tagging, transform sync, dispose.
+- **`PhysicsSystem.getBody(node)`** — public eager body materialization. `Vehicle` uses it to bind the chassis without waiting for the next `update()` tick.
+- **`Skin` deserialization** added to the `json.ts` switch. `Skin` exported from the components barrel + the root `@joroya/core` index.
+- **EPIC**: [OA-010 — Skinned Mesh, IK & Vehicles](docs/features/OA-010/EPIC.md).
+
+### Changed
+- The `BufferGeometry` case in `ThreeRenderer.buildGeometryFromDef` now wires `skinIndex` + `skinWeight` Three.js buffer attributes when the corresponding fields are present on `BufferGeometryDef`.
+- `ThreeRenderer.rebuildScene` clears a new `pendingSkinBindings` queue and runs `resolveSkinBindings()` after the traversal, so skinned meshes whose bones haven't been visited yet still bind correctly.
+
+## [0.11.0] - 2026-05-15
+
+### Added
+- **`@joroya/inspector` (new package)** — vanilla-DOM debug overlay for an Oroya `Scene`. Click-to-select hierarchy, transform / components view for the selected node, rolling FPS / frame-time / max-hitch metrics, and scene-graph stats (node + component counts by type). Framework-agnostic (no React/Vue dep). Throttled DOM refresh keeps overhead bounded.
+- **`@joroya/input` (new package)** — unified keyboard / mouse / gamepad layer with declarative action mapping. `bindAction('jump', [{ key: 'Space' }, { gamepad: 'A' }])` then react to `action-down` / `action` / `action-up` events. Gamepad Standard mapping (A/B/X/Y, DPad, sticks, triggers) plus analog axis reads. Auto-clears state on window blur so keys don't "stick".
+- **`@joroya/assets` (new package)** — centralized asset cache with deduplication, ref-counted release, and progress events. Built-in loaders for `image`, `audio` (decoded `AudioBuffer`), `json`, `text`, `binary`; pluggable via `registerLoader` for app-specific types (glTF, FBX, etc.). `preload([...])` emits per-item `progress` / `loaded` / `error`; failed items don't reject the overall promise.
+- **`@joroya/react` (new package, alpha)** — React bindings. `<OroyaCanvas>` owns the scene + renderer + RAF loop and exposes `useFrame(dt)`, `useScene()`, `useParentNode()` hooks. JSX components: `<Group>`, `<Box>`, `<Sphere>`, `<Plane>`, `<PerspectiveCamera>`, `<AmbientLight>`, `<DirectionalLight>`. Children attach to the Oroya scene graph through React context — no manual `scene.add()`.
+- **`@joroya/vue` (new package, alpha)** — Vue 3 composables. `useOroyaCanvas(canvasRef)` mounts the renderer, `useFrame((dt) => ...)`, `useNode((node) => setup)` build the scene graph from `<script setup>`. Uses `shallowRef` so Vue reactivity doesn't recurse into the scene graph.
+- **22 new tests** across the 3 framework-agnostic packages (FrameMetrics + SceneStats + AssetManager dedup/refcount/progress + InputManager keyboard/mouse/blur/bindings/actions).
+- **EPIC**: [OA-009 — Ecosystem (Inspector, Input, Assets, Framework Wrappers)](docs/features/OA-009/EPIC.md).
+
+### Changed
+- `pnpm lint` glob now matches both `.ts` and `.tsx` so the React wrapper's JSX is linted in CI.
+- README roadmap entry for v0.11.0 promoted from "Planned" to "Shipped".
+
+## [0.10.0] - 2026-05-15
+
+### Added
+- **Full serialization round-trip for typed arrays**: `Float32Array`, `Uint8Array`, `Uint16Array` and `Uint32Array` survive JSON via base64 encoding (glTF-compatible format). This unblocks save/load of `AnimationClip` (times/values), `BufferGeometryDef` (positions/normals/uvs/indices), and `InstancedMeshComponent` matrices — the prerequisites for the v1.0 visual editor.
+- **Deserialization for every shipped component**: `RigidBody`, `Collider`, `Animator`, `PostProcessing`, `ParticleSystem`, `AudioListener`, `AudioSource`, `Environment` (in addition to the pre-existing Transform / Geometry / Material / Camera / Light / Animation / Interactive). 9 new round-trip tests covering each.
+- **Backend parity for `Animator`**: `renderToSVG`, `renderToSVGElement` and `Canvas2DRenderer.render` now run `Scene.update(dt)` before their world-matrix pass, accepting an `options.dt` parameter (default `1/60`). Animator-driven property animation now works on all three backends, not just Three.js.
+- **ESLint with flat config**: `eslint.config.js` enforces `no-explicit-any`, `no @ts-ignore`, and unused-vars rules (`docs/programming-principles.md` §3.2 + §4.1, codified). `pnpm lint` script + CI gate added before typecheck.
+- **EPIC**: [OA-008 — Serialization, Backend Parity & Hardening](docs/features/OA-008/EPIC.md).
+
+### Changed
+- `pnpm test` now invokes `vitest run` (no-watch mode) so CI doesn't hang. `pnpm test:watch` covers the previous interactive behavior.
+- `apps/web/src/scenes/animation-demo.ts` rewritten to use the real `Animator` API (idle / walk / spin clip library + `crossFadeTo` controller + `footstep` keyframe events). The old manual `animate(time)` loop is gone.
+- `packages/core/src/components/index.ts` is now a complete barrel (`Animator`, `AudioListener`, `AudioSource`, `Collider`, `InstancedMeshComponent`, `Interactive`, `ParticleSystem`, `PostProcessing`, `RigidBody` — previously missing).
+- README roadmap synced to reality: v0.6 / v0.7 / v0.8 / v0.9 marked shipped, v0.10 / v0.11 / v0.12 / v1.0 milestones declared.
+
+### Fixed
+- **Bug: `deserialize` lost half of root-level nodes**. `rootNode.children.forEach((c) => scene.add(c))` mutated the source array mid-iteration (`scene.add` reparents the child, which removes it from `rootNode`), skipping every other entry. Replaced with a snapshot + for-loop. Round-trip tests guard against regression.
+- `EventEmitter` no longer types its internal handler set as `any`; only the public `EventMap` bound retains `Record<string, any>` (standard pattern, documented with an inline eslint-disable + rationale).
+- `loadGLTF.ts`, `InstancedMeshComponent.getMatrixAt`, and `Gen.random` no longer use `any` for their working types.
+
 ## [0.9.0] - 2026-05-15
 
 ### Added

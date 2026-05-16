@@ -8,6 +8,8 @@ import { Matrix4, multiplyMatrices } from '../math/Matrix4';
  * A Node represents an element in a scene graph.
  * It can have a parent and children, forming a tree structure.
  * Each node has a Transform component by default.
+ *
+ * @public
  */
 export class Node {
   readonly id: string;

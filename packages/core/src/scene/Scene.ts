@@ -2,6 +2,8 @@ import { Node } from '../nodes/Node';
 
 /**
  * Represents the scene, which contains a hierarchy of nodes.
+ *
+ * @public
  */
 export class Scene {
   readonly root: Node;

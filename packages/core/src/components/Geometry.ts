@@ -164,6 +164,17 @@ export interface BufferGeometryDef {
   uvs?: Float32Array;
   /** Triangle indices (optional, for indexed geometry). */
   indices?: Uint16Array | Uint32Array;
+  /**
+   * Per-vertex bone indices (4 per vertex). Indexes into the bone list of
+   * the node's `Skin` component. Required for skinned meshes; absent for
+   * static meshes.
+   */
+  skinIndices?: Uint16Array;
+  /**
+   * Per-vertex bone weights (4 per vertex). Must sum to 1 across the four
+   * weights for each vertex. glTF stores these in the `WEIGHTS_0` attribute.
+   */
+  skinWeights?: Float32Array;
   castShadow?: boolean;
   receiveShadow?: boolean;
 }

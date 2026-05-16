@@ -29,6 +29,12 @@ export interface Canvas2DRenderOptions {
     backgroundColor?: ColorRGB;
     /** Enable anti-aliasing (default: true) */
     antialias?: boolean;
+    /**
+     * Time delta in seconds since the previous render. Drives
+     * `Scene.update(dt)` so `Animator` and `Component.onUpdate` run on this
+     * backend the same way they do on the Three.js renderer. Default `1/60`.
+     */
+    dt?: number;
 }
 
 /**
@@ -335,7 +341,9 @@ export function renderToCanvas(
         ctx.clearRect(0, 0, options.width, options.height);
     }
 
-    // Update world matrices
+    // Advance scene logic (Animator, ParticleSystem, user onUpdate) before
+    // computing world matrices, so the rendered frame reflects this tick.
+    scene.update(options.dt ?? 1 / 60);
     scene.updateWorldMatrices();
 
     // Apply camera transform

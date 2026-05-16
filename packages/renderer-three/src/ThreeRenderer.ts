@@ -45,6 +45,9 @@ import {
   Animator as OroyaAnimator,
   AudioListener as OroyaAudioListener,
   AudioSource as OroyaAudioSource,
+  Skin as OroyaSkin,
+  PluginRegistry,
+  type Plugin,
 } from '@joroya/core';
 import { OrbitControlsWrapper } from './OrbitControlsWrapper';
 
@@ -55,6 +58,11 @@ interface ThreeRendererOptions {
   dpr?: number;
 }
 
+/**
+ * Three.js WebGL renderer for Oroya scene graphs.
+ *
+ * @public
+ */
 export class ThreeRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene: THREE.Scene;
@@ -85,6 +93,19 @@ export class ThreeRenderer {
   private audioListener: THREE.AudioListener | null = null;
   private mixers: THREE.AnimationMixer[] = [];
 
+  // Skinned-mesh bindings queued during the create-objects pass, resolved
+  // after every Oroya node has a corresponding `THREE.Object3D` so the
+  // skeleton's bone lookups can find them.
+  private pendingSkinBindings: Array<{ mesh: THREE.SkinnedMesh; skin: OroyaSkin }> = [];
+
+  // ── Plugin system ──────────────────────────────────────────
+  // Plugins extend the renderer with custom component handlers. Lookup is
+  // O(1); per-frame iteration is O(plugin-count) which is always small.
+  private readonly plugins = new PluginRegistry();
+  // Plugin-managed backend objects keyed by node id so we can call
+  // `handler.update(node, obj, dt)` per frame and `dispose` on rebuild.
+  private readonly pluginObjects = new Map<string, { handler: import('@joroya/core').ComponentHandler<THREE.Object3D>; obj: THREE.Object3D }>();
+
   constructor(options: ThreeRendererOptions) {
     this.canvas = options.canvas;
 
@@ -109,6 +130,25 @@ export class ThreeRenderer {
   mount(oroyaScene: OroyaScene) {
     this.oroyaScene = oroyaScene;
     this.rebuildScene();
+  }
+
+  /**
+   * Install a plugin that extends the renderer with custom component
+   * handlers and / or per-frame hooks. Plugins are queried *before* the
+   * built-in component branches in `createThreeObject` — a plugin handler
+   * for `ComponentType.Geometry` takes precedence over the default mesh
+   * builder.
+   *
+   * If the plugin is installed after `mount()`, call `rebuildScene()` to
+   * make existing nodes pick it up.
+   */
+  usePlugin(plugin: Plugin): void {
+    this.plugins.register(plugin);
+  }
+
+  /** Remove a previously installed plugin. */
+  removePlugin(plugin: Plugin): void {
+    this.plugins.unregister(plugin);
   }
 
   /**
@@ -266,6 +306,16 @@ export class ThreeRenderer {
     // node transforms is driven by the core `Animator` component via
     // `scene.update(dt)` above — that path needs no Three.js-specific glue.
     this.mixers.forEach((mixer) => mixer.update(dt));
+
+    // Plugin per-frame hooks: registry-level (general) and per-object
+    // (handler-bound). Plugin objects are also driven by the standard
+    // world-matrix sync pass above — this is for plugin-internal logic.
+    this.plugins.update(dt, this.oroyaScene);
+    for (const [nodeId, entry] of this.pluginObjects) {
+      if (!entry.handler.update) continue;
+      const node = this.oroyaScene.findNodeById(nodeId);
+      if (node) entry.handler.update(node, entry.obj, dt);
+    }
 
     // PostProcessing is attached to the active Camera node by convention
     // (see PostProcessing component JSDoc). Each camera carries its own chain
@@ -614,10 +664,20 @@ export class ThreeRenderer {
   private rebuildScene() {
     if (!this.oroyaScene) return;
 
+    // Tear down any plugin-managed objects from a previous mount before
+    // we wipe the scene tree — plugins may own GPU resources that need
+    // explicit disposal.
+    for (const [nodeId, entry] of this.pluginObjects) {
+      const node = this.oroyaScene?.findNodeById(nodeId);
+      if (node && entry.handler.dispose) entry.handler.dispose(node, entry.obj);
+    }
+    this.pluginObjects.clear();
+
     this.scene.clear();
     this.nodeMap.clear();
     this.reverseNodeMap.clear();
     this.mixers = [];
+    this.pendingSkinBindings = [];
     this.activeCamera = null;
 
     this.oroyaScene.root.traverse((oroyaNode) => {
@@ -635,6 +695,10 @@ export class ThreeRenderer {
       }
     });
 
+    // Skinned meshes can only bind once every bone Object3D exists in
+    // `nodeMap` — defer the bind here so forward references work.
+    this.resolveSkinBindings();
+
     if (!this.activeCamera) {
       const defaultCamera = new THREE.PerspectiveCamera(75, this.renderer.domElement.width / this.renderer.domElement.height, 0.1, 1000);
       defaultCamera.position.z = 5;
@@ -645,6 +709,22 @@ export class ThreeRenderer {
 
   private createThreeObject(oroyaNode: OroyaNode): THREE.Object3D | null {
     let threeObject: THREE.Object3D | null = null;
+
+    // Plugin-supplied handlers take precedence over built-in branches.
+    // A handler that returns `null` falls through to the default chain,
+    // which lets plugins augment rather than fully replace.
+    for (const type of oroyaNode.components.keys()) {
+      const handler = this.plugins.getHandler(type) as
+        | import('@joroya/core').ComponentHandler<THREE.Object3D>
+        | null;
+      if (handler) {
+        const obj = handler.create(oroyaNode);
+        if (obj) {
+          this.pluginObjects.set(oroyaNode.id, { handler, obj });
+          return obj;
+        }
+      }
+    }
 
     if (oroyaNode.hasComponent(ComponentType.InstancedMesh)) {
       const instancedComponent = oroyaNode.getComponent<InstancedMeshComponent>(ComponentType.InstancedMesh)!;
@@ -660,7 +740,17 @@ export class ThreeRenderer {
       const threeGeometry = this.createThreeGeometry(geoComponent);
       const threeMaterial = this.createThreeMaterial(matComponent);
       if (threeGeometry && threeMaterial) {
-        threeObject = new THREE.Mesh(threeGeometry, threeMaterial);
+        // SkinnedMesh path: when a Skin component is present and the geometry
+        // carries skin attributes, build a `THREE.SkinnedMesh` instead of a
+        // plain mesh. The skeleton is bound in a separate post-pass after all
+        // nodes (and therefore all bones) exist in nodeMap.
+        const skin = oroyaNode.getComponent<OroyaSkin>(ComponentType.Skin);
+        if (skin) {
+          threeObject = new THREE.SkinnedMesh(threeGeometry, threeMaterial);
+          this.pendingSkinBindings.push({ mesh: threeObject as THREE.SkinnedMesh, skin });
+        } else {
+          threeObject = new THREE.Mesh(threeGeometry, threeMaterial);
+        }
 
         if (geoComponent.definition.castShadow) threeObject.castShadow = true;
         if (geoComponent.definition.receiveShadow) threeObject.receiveShadow = true;
@@ -720,6 +810,50 @@ export class ThreeRenderer {
       }
     });
     return found;
+  }
+
+  /**
+   * Resolve queued skin bindings — look up each bone Object3D by name in
+   * `nodeMap` and build a `THREE.Skeleton`, then call `mesh.bind` so the
+   * mesh follows the bones every frame.
+   *
+   * Bones are matched by their **Oroya node name** (which the glTF loader
+   * preserves from `gltf.scene` bone names). A missing bone is logged and
+   * skipped; we'd rather render a slightly-broken skin than crash.
+   */
+  private resolveSkinBindings(): void {
+    if (this.pendingSkinBindings.length === 0 || !this.oroyaScene) return;
+
+    // Build name → Three.Object3D index for fast bone lookup.
+    const nodesByName = new Map<string, THREE.Object3D>();
+    this.oroyaScene.root.traverse((oroyaNode) => {
+      const obj = this.nodeMap.get(oroyaNode.id);
+      if (obj) nodesByName.set(oroyaNode.name, obj);
+    });
+
+    for (const { mesh, skin } of this.pendingSkinBindings) {
+      const bones: THREE.Bone[] = [];
+      const boneInverses: THREE.Matrix4[] = [];
+      for (let i = 0; i < skin.definition.boneNames.length; i++) {
+        const name = skin.definition.boneNames[i];
+        const obj = nodesByName.get(name);
+        if (!obj) {
+          console.warn(`[oroya-three] Skin references unknown bone "${name}", skipping.`);
+          continue;
+        }
+        // Three's Bone is an Object3D subclass — but plain Object3Ds work
+        // for skinning purposes (we only need world matrices). Re-typing as
+        // Bone keeps the Skeleton constructor happy.
+        bones.push(obj as THREE.Bone);
+        const im = new THREE.Matrix4();
+        im.fromArray(skin.definition.inverseBindMatrices, i * 16);
+        boneInverses.push(im);
+      }
+      const skeleton = new THREE.Skeleton(bones, boneInverses);
+      mesh.bind(skeleton);
+    }
+
+    this.pendingSkinBindings = [];
   }
 
   private createThreeAudioListener(comp: OroyaAudioListener): THREE.AudioListener {
@@ -912,7 +1046,7 @@ export class ThreeRenderer {
           def.thetaLength ?? Math.PI * 2
         );
       }
-      case GeometryPrimitive.Buffer:
+      case GeometryPrimitive.Buffer: {
         const bufferDef = definition as BufferGeometryDef;
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(bufferDef.positions, 3));
@@ -925,7 +1059,17 @@ export class ThreeRenderer {
         if (bufferDef.indices) {
           geometry.setIndex(new THREE.BufferAttribute(bufferDef.indices, 1));
         }
+        // glTF skinning attributes: `skinIndex` is 4 uint16 per vertex
+        // (which bones influence this vertex), `skinWeight` is 4 floats
+        // (how much each bone contributes — should sum to 1).
+        if (bufferDef.skinIndices) {
+          geometry.setAttribute('skinIndex', new THREE.BufferAttribute(bufferDef.skinIndices, 4));
+        }
+        if (bufferDef.skinWeights) {
+          geometry.setAttribute('skinWeight', new THREE.BufferAttribute(bufferDef.skinWeights, 4));
+        }
         return geometry;
+      }
       case GeometryPrimitive.CSG:
         return this.buildCSGGeometry(definition as CSGGeometryDef);
       default:

@@ -1,0 +1,51 @@
+{
+    "name": "@joroya/vue",
+    "version": "1.0.0",
+    "description": "Vue 3 bindings for Oroya Animate — composables and components for scene-graph composition (alpha)",
+    "keywords": ["oroya", "vue", "scene-graph", "composables"],
+    "author": {
+        "name": "Oroya AI Collaborator",
+        "url": "https://github.com/joshuacba08"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/joshuacba08/oroya-animate.git",
+        "directory": "packages/vue"
+    },
+    "homepage": "https://oroya-animate.vercel.app",
+    "bugs": {
+        "url": "https://github.com/joshuacba08/oroya-animate/issues"
+    },
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": ["dist"],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "typecheck": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "@joroya/core": "^0.10.0",
+        "@joroya/renderer-three": "^0.10.0",
+        "vue": "^3.4.0"
+    },
+    "dependencies": {
+        "@joroya/core": "workspace:*",
+        "@joroya/renderer-three": "workspace:*"
+    },
+    "devDependencies": {
+        "tsup": "^8.1.0",
+        "typescript": "^5.4.5",
+        "vue": "^3.4.0"
+    }
+}

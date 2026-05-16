@@ -4,6 +4,8 @@ import * as THREE from 'three';
 /**
  * Wrapper around Three.js OrbitControls for camera manipulation.
  * Provides mouse/touch controls for orbiting, panning, and zooming the camera.
+ *
+ * @public
  */
 export class OrbitControlsWrapper {
     private controls: OrbitControls;

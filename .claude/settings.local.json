@@ -11,7 +11,19 @@
       "Bash(pnpm --filter \"./packages/**\" --filter \"!@joroya/physics\" typecheck)",
       "Bash(pnpm --filter \"@joroya/physics\" typecheck)",
       "Bash(pnpm --filter \"@joroya/physics\" build)",
-      "Bash(pnpm --filter \"./packages/**\" build)"
+      "Bash(pnpm --filter \"./packages/**\" build)",
+      "Bash(pnpm --filter \"@joroya/renderer-svg\" --filter \"@joroya/renderer-canvas2d\" typecheck)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm --filter \"@joroya/inspector\" --filter \"@joroya/input\" --filter \"@joroya/assets\" --filter \"@joroya/react\" --filter \"@joroya/vue\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/vue\" typecheck)",
+      "Bash(pnpm --filter \"@joroya/inspector\" --filter \"@joroya/input\" --filter \"@joroya/assets\" --filter \"@joroya/react\" --filter \"@joroya/vue\" build)",
+      "Bash(pnpm --filter \"@joroya/loader-gltf\" typecheck)",
+      "Bash([ -f \"$d/package.json\" ])",
+      "Bash(sed -i 's/\"version\": \"0.11.0\"/\"version\": \"0.12.0\"/' __TRACKED_VAR__/package.json)",
+      "Bash(pnpm api:check)",
+      "Bash(pnpm --filter \"editor\" exec tsc --noEmit)",
+      "Bash(pnpm --filter \"editor\" build)"
     ]
   }
 }

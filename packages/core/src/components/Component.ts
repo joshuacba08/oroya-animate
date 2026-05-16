@@ -21,6 +21,7 @@ export enum ComponentType {
   Animator = 'Animator',
   AudioListener = 'AudioListener',
   AudioSource = 'AudioSource',
+  Skin = 'Skin',
 }
 
 /**

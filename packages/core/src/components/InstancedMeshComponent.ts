@@ -74,7 +74,10 @@ export class InstancedMeshComponent extends Component {
      */
     getMatrixAt(index: number, target?: Matrix4): Matrix4 {
         const offset = index * 16;
-        const out = target || (new Array(16) as any as Matrix4); // Hacky cast for array
+        // `Matrix4` is a fixed-length 16-tuple. `Array(16)` produces an array
+        // of the right length; the cast through `unknown` tells TypeScript to
+        // trust the runtime guarantee (no tuple-from-length inference).
+        const out = target || (new Array(16) as unknown as Matrix4);
         for (let i = 0; i < 16; i++) {
             out[i] = this.instanceMatrix[offset + i];
         }

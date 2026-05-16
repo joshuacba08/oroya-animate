@@ -55,6 +55,11 @@ export interface PhysicsRaycastHit {
  * preserve hierarchy, parent the rigid-body node directly under the scene
  * root.
  */
+/**
+ * cannon-es-backed physics simulation driven from an Oroya `Scene`.
+ *
+ * @public
+ */
 export class PhysicsSystem {
     readonly world: CANNON.World;
     private readonly bodyMap = new Map<string, CANNON.Body>();
@@ -110,6 +115,24 @@ export class PhysicsSystem {
         this.world.step(this.fixedTimeStep, dt, this.maxSubSteps);
         this.dispatchContacts();
         this.writeBack();
+    }
+
+    /**
+     * Eagerly materialize and return the cannon-es body for a node.
+     *
+     * Bodies are normally created lazily on the next `update()` call when
+     * the system traverses the scene. Callers that need the body
+     * *immediately* (e.g. the `Vehicle` wrapper attaching to its chassis)
+     * use this to bypass the lazy path.
+     *
+     * Returns `null` if the node has no `RigidBody` component.
+     */
+    getBody(node: Node): CANNON.Body | null {
+        const existing = this.bodyMap.get(node.id);
+        if (existing) return existing;
+        if (!node.hasComponent(ComponentType.RigidBody)) return null;
+        this.createBody(node);
+        return this.bodyMap.get(node.id) ?? null;
     }
 
     /**

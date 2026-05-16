@@ -1,0 +1,27 @@
+{
+    "name": "editor",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Visual scene editor for Oroya Animate (alpha)",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@joroya/core": "workspace:*",
+        "@joroya/inspector": "workspace:*",
+        "@joroya/react": "workspace:*",
+        "@joroya/renderer-three": "workspace:*",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.0",
+        "@types/react-dom": "^18.3.0",
+        "@vitejs/plugin-react": "^4.3.0",
+        "typescript": "^5.4.5",
+        "vite": "^5.2.13"
+    }
+}

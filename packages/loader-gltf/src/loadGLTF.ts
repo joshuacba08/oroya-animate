@@ -8,6 +8,8 @@ import {
   AnimationClip,
   KeyframeTrack,
   InterpolationMode,
+  Skin as OroyaSkin,
+  type SkinDef,
 } from '@joroya/core';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
@@ -55,9 +57,12 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
   oroyaNode.transform.rotation = { x: threeNode.quaternion.x, y: threeNode.quaternion.y, z: threeNode.quaternion.z, w: threeNode.quaternion.w };
   oroyaNode.transform.scale = { x: threeNode.scale.x, y: threeNode.scale.y, z: threeNode.scale.z };
 
-  // 2. Translate Geometry & Material
+  // 2. Translate Geometry & Material. SkinnedMesh is a Mesh subclass so the
+  //    same path covers static and skinned meshes; the skin component is
+  //    attached only when there's actual skinning data.
   if (threeNode instanceof THREE.Mesh) {
-    const geometry = translateGeometry(threeNode.geometry);
+    const isSkinned = threeNode instanceof THREE.SkinnedMesh;
+    const geometry = translateGeometry(threeNode.geometry, isSkinned);
     if (geometry) {
       oroyaNode.addComponent(geometry);
     }
@@ -65,6 +70,13 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
     const material = translateMaterial(threeNode.material);
     if (material) {
       oroyaNode.addComponent(material);
+    }
+
+    if (isSkinned && threeNode.skeleton) {
+      const skin = translateSkin(threeNode);
+      if (skin) {
+        oroyaNode.addComponent(skin);
+      }
     }
   }
 
@@ -78,8 +90,13 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
 
 /**
  * Translate a Three.js BufferGeometry to an Oroya Geometry component.
+ *
+ * @param isSkinned When `true`, also extract `skinIndex` and `skinWeight`
+ *                  attributes (`SKIN_INDEX_0` / `WEIGHTS_0` in glTF). These
+ *                  are per-vertex bone refs needed by the renderer to build
+ *                  a `THREE.SkinnedMesh`.
  */
-function translateGeometry(threeGeo: THREE.BufferGeometry): OroyaGeometry | null {
+function translateGeometry(threeGeo: THREE.BufferGeometry, isSkinned = false): OroyaGeometry | null {
   const positions = threeGeo.getAttribute('position');
   if (!positions) {
     console.warn('[oroya-gltf] Geometry has no position attribute, skipping.');
@@ -95,10 +112,46 @@ function translateGeometry(threeGeo: THREE.BufferGeometry): OroyaGeometry | null
     positions: new Float32Array(positions.array),
     normals: normals ? new Float32Array(normals.array) : undefined,
     uvs: uvs ? new Float32Array(uvs.array) : undefined,
-    indices: indices ? (indices.array instanceof Uint16Array ? new Uint16Array(indices.array) : new Uint32Array(indices.array)) : undefined,
+    indices: indices
+      ? (indices.array instanceof Uint16Array
+          ? new Uint16Array(indices.array)
+          : new Uint32Array(indices.array))
+      : undefined,
   };
 
+  if (isSkinned) {
+    const skinIdx = threeGeo.getAttribute('skinIndex');
+    const skinWeight = threeGeo.getAttribute('skinWeight');
+    if (skinIdx) def.skinIndices = new Uint16Array(skinIdx.array);
+    if (skinWeight) def.skinWeights = new Float32Array(skinWeight.array);
+  }
+
   return new OroyaGeometry(def);
+}
+
+/**
+ * Translate a Three.js SkinnedMesh's skeleton into an Oroya `Skin` component.
+ *
+ * Bones are referenced by name — assumes bone names are unique within the
+ * scene, which is the glTF convention. `inverseBindMatrices` is flattened
+ * into a single `Float32Array` of length `boneCount * 16`.
+ */
+function translateSkin(mesh: THREE.SkinnedMesh): OroyaSkin | null {
+  const skeleton = mesh.skeleton;
+  if (!skeleton || skeleton.bones.length === 0) return null;
+
+  const boneNames = skeleton.bones.map((b) => b.name);
+  const ibmFlat = new Float32Array(skeleton.bones.length * 16);
+  for (let i = 0; i < skeleton.bones.length; i++) {
+    const m = skeleton.boneInverses[i];
+    if (m) ibmFlat.set(m.elements, i * 16);
+  }
+
+  const def: SkinDef = {
+    boneNames,
+    inverseBindMatrices: ibmFlat,
+  };
+  return new OroyaSkin(def);
 }
 
 /**
@@ -115,7 +168,16 @@ function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMa
     return null;
   }
 
-  const def: any = {};
+  // Built incrementally from Three's heterogeneous material types.
+  // Each `if` block narrows once a Three subclass is detected.
+  const def: Partial<{
+    color: { r: number; g: number; b: number };
+    metalness: number;
+    roughness: number;
+    emissive: { r: number; g: number; b: number };
+    emissiveIntensity: number;
+    opacity: number;
+  }> & Record<string, unknown> = {};
 
   // Extract color
   if ('color' in mat && mat.color instanceof THREE.Color) {

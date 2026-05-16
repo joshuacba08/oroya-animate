@@ -224,29 +224,67 @@ renderer.render();
 - [x] **Math Helpers**: Enhanced `Vector3` and `Quaternion` libraries.
 - [x] **New Examples**: Textures & Environment, LookAt tracking.
 
-### v0.7.0 — Physics & Optimization (Planned)
-- [ ] **Physics Engine**: Integration with Rapier/Cannon (Colliders, RigidBodies).
-- [ ] **Rendering Optimization**: InstancedMesh support for high-performance rendering.
-- [ ] **Culling**: Frustum culling and scene graph optimization.
+### v0.7.0 — Rendering Optimization ✅
+- [x] **InstancedMesh**: High-performance rendering of repeated geometry.
+- [x] **Frustum Culling**: Skip nodes outside the camera frustum.
+- [x] **Scene Graph Optimization**: Dirty-flag-driven world-matrix updates.
 
-### v0.8.0 — Advanced Rendering & Effects (Visual Polish)
-- [ ] **Shadow System**: Support for casting and receiving shadows (Directional/Spot).
-- [ ] **Post-Processing**: Bloom, Tone Mapping, FXAA/SMAA chain.
-- [ ] **Particle System**: CPU-based particles for visual effects (fire, smoke).
-- [ ] **Spatial Audio**: Positional 3D audio component implementation.
+### v0.8.0 — Advanced Rendering & Effects ✅
+- [x] **Shadow System**: Cast/receive flags on every geometry variant; directional/point/spot lights with `shadowMapSize` / `shadowBias`.
+- [x] **Post-Processing**: Declarative `PostProcessing` component (Bloom + Reinhard/Cineon/ACESFilmic tone-mapping + SMAA antialiasing) anchored to the active camera.
+- [x] **Particle System**: CPU-simulated `ParticleSystem` with gravity, start/end color/size, emission rate.
+- [x] **Spatial Audio**: `AudioListener` + `AudioSource` mapped to `THREE.PositionalAudio`.
+- [x] [OA-006 EPIC](docs/features/OA-006/EPIC.md).
 
-### v0.9.0 — Ecosystem & Developer Experience (Pre-1.0)
-- [ ] **Inspector / Debug UI**: Visual overlay to inspect scene graph and performance metrics.
-- [ ] **Input Manager**: Abstracted input handling (Gamepad, Touch, Keyboard gestures).
-- [ ] **Asset Manager**: Centralized preloading, caching, and progress tracking.
-- [ ] **Framework Wrappers**: Alpha release of `@joroya/react` and `@joroya/vue`.
+### v0.9.0 — Physics & Animation ✅
+- [x] **Physics Engine** (`@joroya/physics`, cannon-es): `PhysicsSystem` with world-space sync.
+- [x] **Joints**: Hinge, Point-to-Point, Distance constraints.
+- [x] **Collision Events**: `collide-begin`/`collide`/`collide-end` + `trigger-enter`/`trigger-stay`/`trigger-exit`.
+- [x] **Sensor Colliders + Collision Filtering** (group/mask bitmasks).
+- [x] **Physics Raycast**: `raycast` and `raycastAll` against rigid bodies.
+- [x] **Animator Component**: `play`, `stop`, `crossFade`, `addClip`, `autoplay`.
+- [x] **Animation Blending**: Multi-clip weighted blending with quaternion nlerp + hemisphere correction.
+- [x] **Keyframe Events**: `AnimationClip.events` fires named events on time crossings.
+- [x] **Easing + Spring helpers**: 9 easing functions + critically-dampable spring integrator.
+- [x] `ThreeRenderer.render(dt?)` propagates real frame time; `Scene.update(dt)` is first-class.
+- [x] [OA-007 EPIC](docs/features/OA-007/EPIC.md).
 
-### v1.0.0 — Production Ready (Vision)
-- [ ] **API Stability**: Finalize public API surface and documentation.
-- [ ] **WASM Modules**: High-performance compute modules (optional).
-- [ ] **Visual Scene Editor**: Web-based editor for scene composition.
-- [ ] **Plugin System**: Architecture for community extensions.
-- [ ] **Full Test Coverage**: Comprehensive E2E and Unit testing suite.
+### v0.10.0 — Serialization, Backend Parity & Hardening ✅
+- [x] **Full serialization**: TypedArray (Float32/Uint8/Uint16/Uint32) round-trip via base64 — `AnimationClip`, `BufferGeometry`, `InstancedMesh` matrices now save/load.
+- [x] **Component deserialization gap closed**: RigidBody, Collider, Animator, PostProcessing, ParticleSystem, AudioListener, AudioSource, Environment.
+- [x] **Backend parity**: SVG and Canvas2D renderers run `scene.update(dt)` — `Animator` works on all backends, not just Three.js.
+- [x] **Demos audited**: `animation-demo` uses the real Animator API (idle/walk/spin clips + crossFade + keyframe events).
+- [x] **ESLint**: `eslint-plugin-import` + no-unused + no-explicit-any rules in CI.
+- [x] [OA-008 EPIC](docs/features/OA-008/EPIC.md).
+
+### v0.11.0 — Pre-1.0 Ecosystem ✅
+- [x] **Inspector / Debug UI** (`@joroya/inspector`): Vanilla-DOM overlay — hierarchy, transform inspection, FPS / frame-time / max-hitch, scene-graph stats.
+- [x] **Input Manager** (`@joroya/input`): Unified keyboard / mouse / gamepad layer with declarative action mapping and analog gamepad axes.
+- [x] **Asset Manager** (`@joroya/assets`): Centralized cache with deduplication, ref-counted release, progress events, pluggable loaders.
+- [x] **Framework Wrappers (alpha)**: `@joroya/react` (`<OroyaCanvas>` + `useFrame` / `useScene` + JSX primitives) and `@joroya/vue` (`useOroyaCanvas` / `useFrame` / `useNode` composables).
+- [x] [OA-009 EPIC](docs/features/OA-009/EPIC.md).
+
+### v0.12.0 — Skinned Mesh, IK & Vehicles ✅
+- [x] **glTF skinned-mesh pipeline**: `Skin` component + `skinIndices`/`skinWeights` on `BufferGeometryDef`; `loadGLTF` extracts skin attributes; `ThreeRenderer` builds `THREE.SkinnedMesh` and binds the skeleton in a post-pass.
+- [x] **2-bone analytical IK**: `solve2BoneIK(root, mid, end, target, pole?)` law-of-cosines solver — O(1), no iteration, pole-vector support.
+- [x] **Vehicle helper**: `Vehicle` wrapper over `CANNON.RaycastVehicle` with `drive` / `steer` / `brake` / `syncWheelNodes` API.
+- [x] [OA-010 EPIC](docs/features/OA-010/EPIC.md).
+
+### v1.0.0 — Production Ready ✅
+- [x] **API Stability**: `@public` / `@experimental` / `@internal` JSDoc tags + auditable via `pnpm api:check`. Public surface frozen — breaking changes require a major bump with a 1-major-version deprecation window. See [`docs/api-stability.md`](docs/api-stability.md).
+- [x] **Plugin System**: `PluginRegistry` + `ComponentHandler` in `@joroya/core/plugins`; `ThreeRenderer.usePlugin(plugin)` for renderer-level extensibility.
+- [x] **Visual Scene Editor** (`apps/editor`, alpha): hierarchy panel + transform inspector + Save / Load (uses v0.10.0 serialization). Gizmo handles are post-1.0.
+- [x] **WASM Acceleration Hook**: `getMathBackend()` / `registerMathBackend(backend)` registry. Default backend is pure JS; a future `@joroya/wasm-math` package can drop in WASM without consumer code changes.
+- [x] **170 tests** across 11 packages + an `api:check` script + an ESLint gate forbidding `any` and `@ts-ignore` in source.
+- [x] [OA-011 EPIC](docs/features/OA-011/EPIC.md).
+
+### Post-1.0 (future)
+- [ ] **Production WASM modules**: a real `@joroya/wasm-math` shipping the integration point from v1.0.
+- [ ] **Visual editor — gizmos**: translate / rotate / scale handles in 3D.
+- [ ] **Multi-bone IK** (CCD / FABRIK) — `solve2BoneIK` ships in v1.0 but covers 2-bone chains only.
+- [ ] **Playwright E2E suite** for the editor and demo apps.
+- [ ] **Animation timeline editor** integrated into the visual editor.
+- [ ] **Touch gestures** (pinch / swipe / rotate) on top of the v0.11 input manager.
 
 ## 🚀 Publishing & Deployment
 
