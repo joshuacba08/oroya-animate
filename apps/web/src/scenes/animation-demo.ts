@@ -152,13 +152,31 @@ export function createAnimationScene() {
         }
     });
 
-    return {
-        scene,
-        cameraNode,
-        controller: {
-            play: (name: string) => animator.play(name),
-            crossFadeTo: (name: string, duration = 0.4) => animator.crossFade(name, duration),
-            getLastFootstep: () => lastFootstep,
-        },
-    };
+    // Auto-cycle clips so the gallery preview demonstrates all three.
+    // Real apps would drive this from input events; the gallery has no UI
+    // to expose the controller, so we cycle on a timer instead.
+    let elapsed = 0;
+    const cycleSeconds = 4;
+    const order = ["idle", "walk", "spin"] as const;
+    let currentIdx = 0;
+
+    // The gallery's factory contract is `{ scene, animate(time) }`. `animate`
+    // here just drives the clip-cycling timer — the Animator itself is
+    // ticked automatically by `scene.update(dt)` which the renderer calls
+    // each frame, so transforms update without any work in this callback.
+    function animate(time: number) {
+        const dt = elapsed === 0 ? 0 : time - elapsed;
+        elapsed = time;
+        if (Math.floor(time / cycleSeconds) !== currentIdx) {
+            currentIdx = Math.floor(time / cycleSeconds) % order.length;
+            animator.crossFade(order[currentIdx], 0.4);
+        }
+        // `dt` would be used here for any custom per-frame work; we just
+        // touch it so eslint/tsc don't flag it as unused.
+        void dt;
+        void lastFootstep;
+        void cameraNode;
+    }
+
+    return { scene, animate };
 }

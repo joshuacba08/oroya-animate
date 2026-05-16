@@ -93,7 +93,7 @@ const levels = [
                 </div>
               </div>
               <p class="text-sm text-base-content/50 leading-relaxed">
-                {tutDesc(tutorial.id, tutorial.data.description)}
+                {tutDesc(tutorial.id, tutorial.data.description ?? '')}
               </p>
             </a>
           ))}

@@ -71,7 +71,7 @@ const categories = [
                 <span class={`badge ${cat.color} badge-xs`}>{cat.key}</span>
               </div>
               <p class="text-sm text-base-content/50 leading-relaxed">
-                {docDesc(doc.id, doc.data.description)}
+                {docDesc(doc.id, doc.data.description ?? '')}
               </p>
             </a>
           ))}

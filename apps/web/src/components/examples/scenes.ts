@@ -31,6 +31,9 @@ import { createNeonCityScene } from "../../scenes/neon-city-demo";
 import { createFireSmokeScene } from "../../scenes/fire-smoke-demo";
 import { createAudioScene } from "../../scenes/audio-demo";
 import { createAnimationScene } from "../../scenes/animation-demo";
+import { createTriggerVolumesScene } from "../../scenes/trigger-volumes-demo";
+import { createAnimatorCrossfadeScene } from "../../scenes/animator-crossfade-demo";
+import { createJointsChainScene } from "../../scenes/joints-chain-demo";
 
 function rotateY(angle: number) {
   return { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
@@ -1516,7 +1519,8 @@ function createInterpolationComparison() {
   };
 
   const mixer = new AnimationMixer(scene);
-  mixer.play(clip, true);
+  // v0.9 signature: `play(clip, { loop, speed })` — the boolean form is gone.
+  mixer.play(clip, { loop: true });
 
   let lastTime = -1;
   function animate(time: number) {
@@ -3264,5 +3268,26 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Basic animation demo using Animator component and manual updates.",
     category: "3d",
     factory: createAnimationScene,
+  },
+  {
+    id: "trigger-volumes",
+    title: "Physics: Trigger Volumes",
+    description: "Sensor colliders fire trigger-enter / trigger-exit when bodies overlap them — without contact response. The zone glows when occupied.",
+    category: "3d",
+    factory: createTriggerVolumesScene,
+  },
+  {
+    id: "animator-crossfade",
+    title: "Animator: Cross-fade between three clips",
+    description: "Hero cube cycles between idle / walk / spin clips using Animator.crossFade. Quaternion blending with nlerp + hemisphere correction.",
+    category: "3d",
+    factory: createAnimatorCrossfadeScene,
+  },
+  {
+    id: "joints-chain",
+    title: "Physics: Chain of joints",
+    description: "Five spheres on point-to-point constraints — Newton's-cradle-style swing with elastic collisions.",
+    category: "3d",
+    factory: createJointsChainScene,
   },
 ];

@@ -156,7 +156,7 @@ const currentNumber = currentIndex + 1;
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const idx = Array.from(headings).indexOf(entry.target as HTMLElement);
+            const idx = Array.from(headings).indexOf(entry.target as HTMLHeadingElement);
             if (idx !== -1) {
               activeIndex = idx;
               updateActiveStep(idx);

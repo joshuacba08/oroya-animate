@@ -24,7 +24,10 @@
       "Bash(pnpm api:check)",
       "Bash(pnpm --filter \"editor\" exec tsc --noEmit)",
       "Bash(pnpm --filter \"editor\" build)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(pnpm --filter \"web\" exec astro check)",
+      "Bash(pnpm --filter \"web\" build)",
+      "Bash(pnpm --filter \"@joroya/renderer-svg\" build)"
     ]
   }
 }

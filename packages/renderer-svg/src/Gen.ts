@@ -1,4 +1,25 @@
 /**
+ * `Gen.random` overload signature: numeric args return `number`; an array
+ * argument returns the element type `T`. Declared outside the object
+ * literal because TypeScript doesn't allow function overloads inside
+ * method shorthand.
+ */
+interface RandomFn {
+    (min?: number, max?: number, float?: boolean): number;
+    <T>(arr: T[]): T;
+}
+
+const randomImpl = ((min: unknown = 0, max: number = 1, float: boolean = false) => {
+    if (Array.isArray(min)) {
+        const arr = min;
+        return arr[Math.round(Math.random() * (arr.length - 1))];
+    }
+    const m = min as number;
+    const r = Math.random() * (max - m) + m;
+    return (float || max - m <= 1) ? r : Math.round(r);
+}) as RandomFn;
+
+/**
  * A collection of useful functions for generative art.
  */
 export const Gen = {
@@ -102,20 +123,13 @@ export const Gen = {
     },
 
     /**
-     * Gets a random number between a minimum and maximum value, or picks a random item from an array.
+     * Gets a random number between a minimum and maximum value, or picks
+     * a random item from an array.
      *
-     * @param min - Result is equal to or higher than this. If array, an item is randomly chosen.
-     * @param max - Result is equal to or lower than this.
-     * @param float - Set to true to return a floating point number.
-     * @returns The randomised number or array item.
+     * Numeric overload returns `number`; array overload returns the
+     * element type. Implementation lives in `randomImpl` so the overload
+     * signatures sit at the file scope (object-literal methods can't
+     * carry overload signatures).
      */
-    random<T>(min: number | T[] = 0, max: number = 1, float: boolean = false): number | T {
-        if (Array.isArray(min)) {
-            const arr = min;
-            return arr[Math.round(Math.random() * (arr.length - 1))];
-        } else {
-            const randomVal = Math.random() * (max - (min as number)) + (min as number);
-            return (float || max - (min as number) <= 1) ? randomVal : Math.round(randomVal);
-        }
-    }
+    random: randomImpl,
 };

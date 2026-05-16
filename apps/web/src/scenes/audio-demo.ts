@@ -70,12 +70,14 @@ export function createAudioScene() {
 
     // 3. Ground with Grid
     const floor = new Node("floor");
-    floor.addComponent(createPlane(20, 20, 20, 20)); // Segments for wireframe look if we had it
+    floor.addComponent(createPlane(20, 20, 20, 20));
     floor.addComponent(
         new Material({
+            // `wireframe` is not part of MaterialDef — the v1 material is
+            // PBR-only. For a wireframe look, use line geometry or a
+            // dedicated wireframe overlay mesh.
             color: { r: 0.3, g: 0.3, b: 0.3 },
             roughness: 0.8,
-            wireframe: true,
         })
     );
     floor.transform.rotation = { x: -0.7071, y: 0, z: 0, w: 0.7071 };

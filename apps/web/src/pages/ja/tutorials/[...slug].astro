@@ -5,14 +5,18 @@ import { getCollection, render } from "astro:content";
 import { getLocaleFromUrl, useTranslations, getLocalizedPath } from "../../../i18n";
 
 export async function getStaticPaths() {
+  // Build paths from the default tutorials collection so every tutorial
+  // has a Japanese route, then prefer a translated body if it exists.
   const tutorials = await getCollection("tutorials");
+  const localized = await getCollection("tutorials-ja");
+  const localizedById = new Map(localized.map((e) => [e.id, e]));
   return tutorials.map((entry) => ({
     params: { slug: entry.id },
-    props: { entry },
+    props: { entry: localizedById.get(entry.id) ?? entry, isFallback: !localizedById.has(entry.id) },
   }));
 }
 
-const { entry } = Astro.props;
+const { entry, isFallback } = Astro.props;
 const { Content } = await render(entry);
 
 const locale = getLocaleFromUrl(Astro.url);
@@ -36,7 +40,7 @@ const currentNumber = currentIndex + 1;
 ---
 
 <DocsLayout title={entry.data.title} description={entry.data.description}>
-  {locale !== 'en' && (
+  {isFallback && (
     <div class="alert alert-info mb-8">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span>{t('i18n.translationPending')}</span>
@@ -146,7 +150,7 @@ const currentNumber = currentIndex + 1;
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const idx = Array.from(headings).indexOf(entry.target as HTMLElement);
+            const idx = Array.from(headings).indexOf(entry.target as HTMLHeadingElement);
             if (idx !== -1) updateActiveStep(idx);
           }
         });

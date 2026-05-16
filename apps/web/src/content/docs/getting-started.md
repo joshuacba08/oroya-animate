@@ -4,7 +4,7 @@ description: "Quick start guide for setting up Oroya Animate and creating your f
 order: 1
 category: "guide"
 ---
-E¿# Getting Started with Oroya Animate
+ï¿½Eï¿½# Getting Started with Oroya Animate
 
 Welcome! This guide will help you get your first 3D scene up and running using **Oroya Animate**, a renderer-agnostic scene graph engine for the web.
 
@@ -27,16 +27,39 @@ yarn add @joroya/core @joroya/renderer-three
 pnpm add @joroya/core @joroya/renderer-three
 ```
 
-### Available packages
+### Available packages (v1.0.0)
+
+The library ships as 11 small, focused packages. Install only what you need.
+
+**Core engine**
 
 | Package | Description |
 |---|---|
-| `@joroya/core` | Scene graph, nodes, components, serialization, math utilities |
-| `@joroya/renderer-three` | WebGL renderer powered by Three.js |
-| `@joroya/renderer-svg` | SVG renderer for 2D path-based graphics |
-| `@joroya/loader-gltf` | Load glTF models into an Oroya scene |
+| `@joroya/core` | Scene graph, nodes, components, animation, math, plugins, serialization |
+| `@joroya/renderer-three` | WebGL renderer powered by Three.js (full PBR, shadows, post-FX, audio, skinned meshes) |
+| `@joroya/renderer-svg` | SVG renderer for 2D vector graphics |
+| `@joroya/renderer-canvas2d` | Lightweight Canvas2D renderer |
+| `@joroya/loader-gltf` | glTF / GLB model loader with skinned-mesh support |
+| `@joroya/physics` | `cannon-es`-backed physics: rigid bodies, joints, sensors, raycast, vehicles |
 
-> **Note:** `@joroya/renderer-three` and `@joroya/loader-gltf` have `three` as a peer dependency. Make sure it is installed in your project: `npm install three`.
+**Developer ecosystem**
+
+| Package | Description |
+|---|---|
+| `@joroya/inspector` | Vanilla-DOM debug overlay: hierarchy, transform inspector, FPS / frame-time metrics |
+| `@joroya/input` | Keyboard / mouse / gamepad layer with declarative action mapping |
+| `@joroya/assets` | Asset cache with deduplication, ref-counting, progress events |
+
+**Framework wrappers** (`@experimental`)
+
+| Package | Description |
+|---|---|
+| `@joroya/react` | React bindings: `<OroyaCanvas>`, `useFrame`, `useScene`, JSX primitives |
+| `@joroya/vue` | Vue 3 composables: `useOroyaCanvas`, `useFrame`, `useNode` |
+
+> **Peer dependencies:** `@joroya/renderer-three` and `@joroya/loader-gltf` need `three` (`npm install three`). `@joroya/physics` needs `cannon-es` (auto-installed). `@joroya/react` needs `react` + `react-dom`. `@joroya/vue` needs `vue`.
+
+> **Stability:** every export is tagged `@public` or `@experimental` â€” see [`docs/api-stability.md`](https://github.com/joshuacba08/oroya-animate/blob/main/docs/api-stability.md). Breaking changes to `@public` symbols require a major version bump with a one-major-version deprecation window.
 
 ---
 

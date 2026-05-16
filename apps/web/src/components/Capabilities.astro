@@ -399,9 +399,14 @@ const t = useTranslations(locale);
 
   /* ─── Lighting demo: rotate beam ─── */
   function initLightDemo() {
-    const spotBeam = document.querySelector<HTMLElement>('.light-beam-spot');
-    const pointBeam = document.querySelector<HTMLElement>('.light-beam-point');
-    if (!spotBeam || !pointBeam) return;
+    const spotBeamQ = document.querySelector<HTMLElement>('.light-beam-spot');
+    const pointBeamQ = document.querySelector<HTMLElement>('.light-beam-point');
+    if (!spotBeamQ || !pointBeamQ) return;
+    // Re-bind to non-nullable consts so the inner closure sees the
+    // narrowed type — TS doesn't propagate the early-return narrowing
+    // across the function boundary.
+    const spotBeam = spotBeamQ;
+    const pointBeam = pointBeamQ;
 
     let angle = 0;
     function animate() {
