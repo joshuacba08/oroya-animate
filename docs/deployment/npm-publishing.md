@@ -1,280 +1,170 @@
 # NPM Publishing Guide
 
-This guide explains how to publish Oroya Animate packages to NPM.
+This guide explains how to publish the Oroya Animate 1.x package set to NPM.
 
-## 📦 Publishable Packages
+## Publishable Packages
 
-The monorepo contains 4 publishable packages:
+The monorepo currently publishes 11 workspace packages:
 
-- `@joroya/core` - Core scene graph and components
-- `@joroya/renderer-three` - Three.js (WebGL) renderer
-- `@joroya/renderer-svg` - SVG renderer
-- `@joroya/loader-gltf` - glTF model loader
+- `@joroya/core` - Core scene graph, ECS components, math, serialization, plugins
+- `@joroya/renderer-three` - Three.js/WebGL renderer
+- `@joroya/renderer-svg` - SVG renderer and SVG utilities
+- `@joroya/renderer-canvas2d` - Canvas2D renderer
+- `@joroya/loader-gltf` - glTF/GLB loader
+- `@joroya/physics` - cannon-es physics integration
+- `@joroya/assets` - Asset loading/cache helpers
+- `@joroya/input` - Keyboard, mouse, and gamepad input manager
+- `@joroya/inspector` - Debug/inspection overlay
+- `@joroya/react` - React bindings
+- `@joroya/vue` - Vue bindings
 
-## 🔧 Prerequisites
+## Prerequisites
 
-### 1. NPM Account & Authentication
+Create an NPM account, create or join the `@joroya` organization, then authenticate locally:
 
-Create an NPM account at [npmjs.com](https://www.npmjs.com/) if you don't have one.
-
-Login to NPM:
 ```bash
 npm login
+npm whoami
 ```
 
-### 2. NPM Organization (Recommended)
+For GitHub Actions publishing, create a read/write NPM token and save it as `NPM_TOKEN` in repository secrets.
 
-Create an organization `@joroya` on NPM:
-- Go to https://www.npmjs.com/org/create
-- Create organization named `joroya`
-- This allows scoped packages like `@joroya/core`
-
-### 3. Package Configuration
-
-All packages are already configured with:
-- ✁ECorrect `name` field with `@joroya/` scope
-- ✁E`version` field (currently 0.3.0)
-- ✁E`license` field (MIT)
-- ✁E`main`, `module`, `types` exports
-- ✁E`files` array specifying dist folder
-- ✁EProper `exports` field for dual ESM/CJS support
-
-## 🚀 Publishing Process
-
-### Option 1: Manual Publishing (Development)
-
-#### Step 1: Build All Packages
-```bash
-pnpm build
-```
-
-#### Step 2: Test Before Publishing
-```bash
-# Run tests
-pnpm test
-
-# Typecheck
-pnpm typecheck
-
-# Test in demo apps
-pnpm dev:react
-pnpm dev:vanilla
-```
-
-#### Step 3: Update Version
-```bash
-# From root, update all package versions
-pnpm --filter "./packages/**" exec npm version patch
-# or: minor, major, prepatch, preminor, premajor
-
-# Manual: Edit package.json in each package
-```
-
-#### Step 4: Publish Each Package
-```bash
-# Publish all packages
-pnpm --filter "./packages/**" publish --access public
-
-# Or publish individually
-cd packages/core
-pnpm publish --access public
-
-cd ../renderer-three
-pnpm publish --access public
-
-cd ../renderer-svg
-pnpm publish --access public
-
-cd ../loader-gltf
-pnpm publish --access public
-```
-
-> **Note:** `--access public` is required for scoped packages to be publicly available.
-
-### Option 2: Automated Publishing (Recommended)
-
-Use GitHub Actions to automate publishing (see `.github/workflows/publish.yml`).
-
-#### Trigger Publishing:
-```bash
-# Create and push a version tag
-git tag v0.3.0
-git push origin v0.3.0
-```
-
-The GitHub Action will:
-1. ✁ERun tests
-2. ✁EBuild packages
-3. ✁EPublish to NPM
-4. ✁ECreate GitHub Release
-
-## 📝 Pre-Publishing Checklist
-
-Before publishing, ensure:
-
-- [ ] All tests pass (`pnpm test`)
-- [ ] Build succeeds (`pnpm build`)
-- [ ] Version numbers updated in all packages
-- [ ] CHANGELOG.md updated (if exists)
-- [ ] README.md is up to date
-- [ ] All demos work correctly
-- [ ] Git working directory is clean
-- [ ] You're on the `main` branch
-
-## 🔐 NPM Token for CI/CD
-
-To enable automated publishing via GitHub Actions:
-
-### 1. Generate NPM Token
 ```bash
 npm token create --read-write
 ```
 
-### 2. Add to GitHub Secrets
-1. Go to GitHub repository ↁESettings ↁESecrets and variables ↁEActions
-2. Click "New repository secret"
-3. Name: `NPM_TOKEN`
-4. Value: Paste the token from step 1
-5. Save
+## Package Configuration
 
-## 📋 Version Management
+Each package should keep:
 
-### Semantic Versioning
+- `version` aligned across all `packages/*/package.json` files
+- `license`, `author`, `repository`, `homepage`, and `bugs`
+- `main`, `module`, `types`, and an `exports` map with `types` first
+- `files: ["dist"]`
+- package-local `peerDependencies` and `devDependencies`
 
-Oroya Animate follows [Semantic Versioning (SemVer)](https://semver.org/):
+Peer dependencies on Oroya packages should point to the current stable major, for example:
 
-- **MAJOR** (1.0.0): Breaking changes
-- **MINOR** (0.1.0): New features, backward compatible
-- **PATCH** (0.0.1): Bug fixes, backward compatible
-
-### Version Update Commands
-
-```bash
-# Patch (0.3.0 ↁE0.3.1)
-pnpm --filter "./packages/**" exec npm version patch
-
-# Minor (0.3.0 ↁE0.4.0)
-pnpm --filter "./packages/**" exec npm version minor
-
-# Major (0.3.0 ↁE1.0.0)
-pnpm --filter "./packages/**" exec npm version major
-
-# Pre-release (0.3.0 ↁE0.3.1-beta.0)
-pnpm --filter "./packages/**" exec npm version prerelease --preid=beta
-```
-
-### Keeping Versions in Sync
-
-All packages should share the same version number. Use this script:
-
-```bash
-# Update all package.json files to version 0.4.0
-node scripts/sync-versions.js 0.4.0
-```
-
-Create `scripts/sync-versions.js`:
-```javascript
-import { readFileSync, writeFileSync } from 'fs';
-import { glob } from 'glob';
-
-const newVersion = process.argv[2];
-if (!newVersion) {
-  console.error('Usage: node sync-versions.js <version>');
-  process.exit(1);
+```json
+{
+  "peerDependencies": {
+    "@joroya/core": "^1.0.0"
+  }
 }
-
-const packagePaths = glob.sync('./packages/*/package.json');
-packagePaths.forEach(path => {
-  const pkg = JSON.parse(readFileSync(path, 'utf-8'));
-  pkg.version = newVersion;
-  writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
-  console.log(`✁EUpdated ${path} to ${newVersion}`);
-});
 ```
 
-## 🏷�E�EPublishing Beta/Alpha Versions
+## Release Workflow
 
-For pre-release versions:
+Use the root scripts from the repository root.
 
 ```bash
-# Set version to beta
-pnpm --filter "./packages/**" exec npm version 0.4.0-beta.0
+# 1. Sync all package versions.
+node scripts/sync-versions.js 1.0.1
 
-# Publish with beta tag
-pnpm --filter "./packages/**" publish --access public --tag beta
+# 2. Run the same gates CI runs before publish.
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+
+# 3. Commit and tag the release.
+git add .
+git commit -m "Release v1.0.1"
+git tag v1.0.1
+
+# 4. Push. The publish workflow runs on v*.*.* tags.
+git push origin main
+git push origin v1.0.1
 ```
 
-Install beta versions:
+The publish workflow runs lint, typecheck, tests, build, `publint`, and `@arethetypeswrong/cli` before publishing every package with provenance.
+
+## Manual Publishing
+
+Manual publishing is mostly for dry runs or emergency releases. Prefer the tag-based GitHub Action for normal releases.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm --filter "./packages/**" publish --access public --no-git-checks
+```
+
+Use `--access public` because the packages are scoped.
+
+## Pre-release Channels
+
+For beta, next, or canary builds, sync a prerelease version and publish with a matching dist-tag.
+
+```bash
+node scripts/sync-versions.js 1.1.0-beta.0
+pnpm build
+pnpm --filter "./packages/**" publish --access public --tag beta --no-git-checks
+```
+
+Consumers install prereleases by tag:
+
 ```bash
 npm install @joroya/core@beta
 ```
 
-## 📊 Post-Publishing Verification
+## Post-publish Verification
 
-After publishing, verify:
+After the workflow finishes:
 
-### 1. Check NPM Registry
-Visit:
-- https://www.npmjs.com/package/@joroya/core
-- https://www.npmjs.com/package/@joroya/renderer-three
-- https://www.npmjs.com/package/@joroya/renderer-svg
-- https://www.npmjs.com/package/@joroya/loader-gltf
-
-### 2. Test Installation
 ```bash
-# Create a test project
-mkdir test-oroya && cd test-oroya
-npm init -y
-npm install @joroya/core @joroya/renderer-three
-
-# Test import
-node -e "import('@joroya/core').then(m => console.log(Object.keys(m)))"
+npm view @joroya/core version
+npm view @joroya/renderer-three version
+npm view @joroya/renderer-svg version
+npm view @joroya/renderer-canvas2d version
+npm view @joroya/loader-gltf version
 ```
 
-### 3. Test CDN Links
+Test installation in a clean project:
+
+```bash
+mkdir test-oroya
+cd test-oroya
+npm init -y
+npm install @joroya/core @joroya/renderer-three three
+node -e "import('@joroya/core').then(m => console.log(Object.keys(m).length))"
+```
+
+Test CDN resolution:
+
 ```html
-<!-- Test on unpkg.com -->
 <script type="module">
-  import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { Scene } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
   console.log(Scene);
 </script>
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
-### Error: 403 Forbidden
-- Ensure you're logged in: `npm whoami`
-- Check organization access
-- Verify `--access public` flag
+### 403 Forbidden
 
-### Error: Version Already Published
-- NPM doesn't allow re-publishing same version
-- Bump version and try again
+- Confirm `npm whoami` locally or that `NPM_TOKEN` exists in GitHub Secrets.
+- Confirm the token has publish rights for the `@joroya` organization.
+- Keep `--access public` for scoped packages.
 
-### Error: Package Not Found (workspace:*)
-- Build packages first: `pnpm build`
-- Dependencies with `workspace:*` are resolved during publish
+### Version Already Published
 
-### TypeScript Errors After Publishing
-- Ensure `types` field points to correct `.d.ts` file
-- Check that declaration files are in `dist/` folder
-- Verify `files` array includes `dist`
+NPM does not allow re-publishing the same version. Sync a new patch, prerelease, or next version and publish again.
 
-## 🎯 Recommended Workflow
+### Workspace Dependencies
 
-1. Develop and test locally
-2. Update version in all packages
-3. Build: `pnpm build`
-4. Test: `pnpm test`
-5. Commit changes: `git commit -m "Release v0.4.0"`
-6. Create tag: `git tag v0.4.0`
-7. Push: `git push && git push --tags`
-8. GitHub Actions automatically publishes to NPM
-9. Verify on npmjs.com
-10. Announce release on GitHub
+Workspace dependencies are resolved during publish. Always run `pnpm build` before publishing so `dist/` and `.d.ts` files exist.
 
-## 📚 Related Documentation
+### Type Resolution Issues
 
-- [CDN Setup](./cdn-setup.md) - Using packages via CDN
-- [Vercel Deployment](./vercel-deployment.md) - Deploy documentation website
-- [GitHub Actions](./.github/workflows/publish.yml) - CI/CD configuration
+Check package `exports` maps, `types` fields, and the contents of `dist/`. The CI workflow runs `publint` and `@arethetypeswrong/cli` to catch this before publishing.
+
+## Related Documentation
+
+- [CDN Setup](./cdn-setup.md)
+- [Package Metadata](./package-metadata.md)
+- [Deployment Checklist](./CHECKLIST.md)
+- [Vercel Deployment](./vercel-deployment.md)

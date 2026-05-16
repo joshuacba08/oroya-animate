@@ -2,7 +2,7 @@
 
 Use this checklist to ensure all steps are completed for successful deployment and publishing.
 
-## ✁EPre-Publishing Checklist
+## Pre-Publishing Checklist
 
 ### 1. Code Quality
 - [ ] All tests passing: `pnpm test`
@@ -71,7 +71,14 @@ Use this checklist to ensure all steps are completed for successful deployment a
   - [ ] `@joroya/core`
   - [ ] `@joroya/renderer-three`
   - [ ] `@joroya/renderer-svg`
+  - [ ] `@joroya/renderer-canvas2d`
   - [ ] `@joroya/loader-gltf`
+  - [ ] `@joroya/physics`
+  - [ ] `@joroya/assets`
+  - [ ] `@joroya/input`
+  - [ ] `@joroya/inspector`
+  - [ ] `@joroya/react`
+  - [ ] `@joroya/vue`
 
 ## 🌐 CDN Verification
 
@@ -161,13 +168,13 @@ npm init -y
 npm install @joroya/core@X.Y.Z @joroya/renderer-three@X.Y.Z
 
 # Test import
-node --input-type=module -e "import('@joroya/core').then(m => console.log('✁ECore:', Object.keys(m).length, 'exports'))"
+node --input-type=module -e "import('@joroya/core').then(m => console.log('Core:', Object.keys(m).length, 'exports'))"
 
-node --input-type=module -e "import('@joroya/renderer-three').then(m => console.log('✁EThree:', Object.keys(m).length, 'exports'))"
+node --input-type=module -e "import('@joroya/renderer-three').then(m => console.log('Three:', Object.keys(m).length, 'exports'))"
 
 # Test TypeScript types
 echo "import { Scene } from '@joroya/core';" > test.ts
-npx tsc --noEmit test.ts && echo "✁ETypeScript types OK"
+npx tsc --noEmit test.ts && echo "TypeScript types OK"
 
 # Cleanup
 cd ..

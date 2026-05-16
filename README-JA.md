@@ -30,7 +30,8 @@ Oroya Animateは、シーンロジックをレンダリング実装から分離�
 - **🖱️ インタラクティビティ:** レイキャスティング（3D）とDOMイベント（SVG）を備えた組み込みイベントシステム。
 - **🌐 オービットコントロール:** 3Dシーン用のマウス/タッチカメラコントロール。
 - **🎨 ジェネラティブアート:** ノイズ、分布、SVGプリミティブを備えたSvJsエンジン。
-- **⚛️ React対応:** モダンフロントエンドフレームワーク向けの最適化されたラッパー。
+- **⚛️ フレームワーク対応:** React と Vue 向けのアルファ版ラッパー。
+- **🧰 開発ツール:** Inspector、Input Manager、Asset Manager、プラグイン、参照用ビジュアルエディタ。
 
 ## 📦 プロジェクト構造
 
@@ -42,11 +43,18 @@ Oroya Animateは、シーンロジックをレンダリング実装から分離�
 - [`@joroya/renderer-svg`](packages/renderer-svg): SVG用の軽量2Dレンダリングバックエンド。
 - [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d): ブラウザネイティブのCanvas2Dレンダリングバックエンド。
 - [`@joroya/loader-gltf`](packages/loader-gltf): Oroyaエコシステムへの3Dモデルインポート用ユーティリティ。
+- [`@joroya/physics`](packages/physics): cannon-es による剛体、ジョイント、センサー、レイキャスト、車両サポート。
+- [`@joroya/assets`](packages/assets): プリロード、進捗イベント、参照カウント付きのアセットキャッシュ。
+- [`@joroya/input`](packages/input): キーボード、マウス、ゲームパッドのアクションマッピング。
+- [`@joroya/inspector`](packages/inspector): 階層、Transform、フレームメトリクス用デバッグオーバーレイ。
+- [`@joroya/react`](packages/react): 実験的な React bindings。
+- [`@joroya/vue`](packages/vue): 実験的な Vue 3 composables。
 
 ### アプリケーション
 - [`demo-react`](apps/demo-react): OroyaAnimateとReact、Three.jsの連携デモ。
 - [`demo-vanilla`](apps/demo-vanilla): バニラJavaScriptを使用した最小限の例。
 - [`web`](apps/web): Astroによるドキュメントウェブサイト（Vercelにデプロイ）。
+- [`editor`](apps/editor): アルファ版ビジュアルシーンエディタとシリアライズ参照アプリ。
 
 ## 📚 ドキュメント
 
@@ -90,8 +98,8 @@ yarn add @joroya/core @joroya/renderer-three
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
   // あなたのコードをここに...
 </script>
 ```
@@ -184,12 +192,13 @@ renderer.render();
 - [x] **3次スプライン補間**スムーズなアニメーション用。
 - [x] **適切なクォータニオンSLERP**補間回転用。
 
-### v1.0.0 — プロダクション対応（ビジョン）
-- [ ] 高性能WASMモジュール。
-- [ ] ビジュアルシーンエディター。
-- [ ] フレームワークラッパー（Vue、Angular）。
-- [ ] カスタムコンポーネント用プラグインシステム。
-- [ ] 物理統合。
+### v1.0.0 — プロダクション対応 ✅
+- [x] `@public`、`@experimental`、`@internal` による API 安定性ポリシー。
+- [x] `PluginRegistry` / `ComponentHandler` と `ThreeRenderer.usePlugin(plugin)` によるプラグインシステム。
+- [x] `apps/editor` アルファ版: 階層パネル、Transform Inspector、安定した v1.0 シリアライズでの Save / Load。
+- [x] `@joroya/physics`: cannon-es ベースの剛体、ジョイント、センサー、レイキャスト、車両。
+- [x] 開発エコシステム: `@joroya/inspector`、`@joroya/input`、`@joroya/assets`、`@joroya/react`、`@joroya/vue`。
+- [x] 将来の高速 math パッケージ向け WASM hook (`registerMathBackend`)。
 
 ## 🚀 公開とデプロイ
 
@@ -201,6 +210,12 @@ renderer.render();
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
 - [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf)
+- [@joroya/physics](https://www.npmjs.com/package/@joroya/physics)
+- [@joroya/assets](https://www.npmjs.com/package/@joroya/assets)
+- [@joroya/input](https://www.npmjs.com/package/@joroya/input)
+- [@joroya/inspector](https://www.npmjs.com/package/@joroya/inspector)
+- [@joroya/react](https://www.npmjs.com/package/@joroya/react)
+- [@joroya/vue](https://www.npmjs.com/package/@joroya/vue)
 
 ### CDN利用可能
 

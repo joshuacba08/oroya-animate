@@ -10,7 +10,7 @@ duration: "10 min"
 
 > **Nivel:** Principiante
 > **Tiempo:** 10 minutos
-> **Aprenderás:** qué hace `apps/editor`, cómo usa la capa de serialización de v0.10, y cómo extenderlo para tu propio workflow.
+> **Aprenderás:** qué hace `apps/editor`, cómo usa el contrato estable de serialización de v1.0, y cómo extenderlo para tu propio workflow.
 
 > **Estado:** alpha. Layout y features evolucionan durante 1.x. El formato de archivo que escribe (`.json` vía `serialize()`) es `@public` y estable en la serie 1.x.
 
@@ -46,7 +46,7 @@ Toolbar: **+ Cube** (spawn random), **Save** (descarga `scene.json`), **Load** (
 
 1. **`OroyaCanvas`** *no* se usa aquí — el editor monta `ThreeRenderer` directo porque el layout 3-pane quiere control total.
 2. **Las mutaciones de escena bumpean un `revision` counter** para forzar re-renders.
-3. **Save / Load usa `serialize()` / `deserialize()`** de `@joroya/core` — la capa v0.10 maneja `Float32Array` vía base64.
+3. **Save / Load usa `serialize()` / `deserialize()`** de `@joroya/core`; en v1.0 este contrato público maneja `Float32Array` vía base64.
 4. **Edits de transform** escriben directo a `node.transform` y llaman `updateLocalMatrix()`.
 
 Código fuente en [`apps/editor/src/`](https://github.com/joshuacba08/oroya-animate/tree/main/apps/editor/src).

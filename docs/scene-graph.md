@@ -274,7 +274,7 @@ classDiagram
 | `Transform` | `Transform` | Yes | Position, rotation, scale, matrices |
 | `Geometry` | `Geometry` | No | Geometric shape (Box, Sphere, Path2D) |
 | `Material` | `Material` | No | Visual appearance (color, opacity, fill, stroke) |
-| `Camera` | `Camera` | No | Viewpoint (Perspective; Orthographic planned) |
+| `Camera` | `Camera` | No | Viewpoint (Perspective and Orthographic) |
 
 ### Component Operations
 

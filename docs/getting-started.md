@@ -2,7 +2,7 @@
 
 Welcome! This guide will help you get your first 3D scene up and running using **Oroya Animate**, a renderer-agnostic scene graph engine for the web.
 
-Oroya Animate separates your scene definition from the rendering backend. You describe your world once using `@joroya/core` and then choose how to render it - WebGL via Three.js, SVG for static graphics, or any future backend.
+Oroya Animate separates your scene definition from the rendering backend. You describe your world once using `@joroya/core` and then choose how to render it: WebGL via Three.js, SVG for vector output, or Canvas2D for lightweight 2D drawing.
 
 ---
 
@@ -21,16 +21,27 @@ yarn add @joroya/core @joroya/renderer-three
 pnpm add @joroya/core @joroya/renderer-three
 ```
 
-### Available packages
+### Available packages (v1.0.0)
+
+The library ships as focused packages. Install only what you need.
 
 | Package | Description |
 |---|---|
-| `@joroya/core` | Scene graph, nodes, components, serialization, math utilities |
-| `@joroya/renderer-three` | WebGL renderer powered by Three.js |
-| `@joroya/renderer-svg` | SVG renderer for 2D path-based graphics |
-| `@joroya/loader-gltf` | Load glTF models into an Oroya scene |
+| `@joroya/core` | Scene graph, nodes, components, animation, math, plugins, and serialization |
+| `@joroya/renderer-three` | WebGL renderer powered by Three.js: PBR materials, lights, shadows, post-FX, audio, instancing, and skinned meshes |
+| `@joroya/renderer-svg` | SVG renderer for 2D vector graphics and server-safe SVG string output |
+| `@joroya/renderer-canvas2d` | Lightweight Canvas2D renderer |
+| `@joroya/loader-gltf` | glTF / GLB model loader with animation and skinned-mesh support |
+| `@joroya/physics` | cannon-es-backed physics: rigid bodies, joints, sensors, raycasts, and vehicles |
+| `@joroya/inspector` | Vanilla-DOM debug overlay: hierarchy, transform inspector, FPS and frame-time metrics |
+| `@joroya/input` | Keyboard, mouse, and gamepad layer with declarative action mapping |
+| `@joroya/assets` | Asset cache with deduplication, ref-counting, and progress events |
+| `@joroya/react` | Experimental React bindings: `<OroyaCanvas>`, `useFrame`, `useScene`, JSX primitives |
+| `@joroya/vue` | Experimental Vue 3 composables: `useOroyaCanvas`, `useFrame`, `useNode` |
 
-> **Note:** `@joroya/renderer-three` and `@joroya/loader-gltf` have `three` as a peer dependency. Make sure it is installed in your project: `npm install three`.
+> **Peer dependencies:** `@joroya/renderer-three` and `@joroya/loader-gltf` need `three` (`npm install three`). `@joroya/react` needs `react`, `react-dom`, and the Three renderer stack. `@joroya/vue` needs `vue` and the Three renderer stack.
+
+> **Stability:** v1.0.0 uses the [`@public` / `@experimental` / `@internal` API stability policy](api-stability.md). Breaking changes to `@public` exports require a major version bump.
 
 ---
 
@@ -153,7 +164,10 @@ Components attach data or behavior to nodes. Every node gets a `Transform` compo
 | **Transform** | Position (`Vec3`), rotation (`Quat`), and scale (`Vec3`). Call `updateLocalMatrix()` after mutating values. |
 | **Geometry** | Defines the shape of a node. Created via factory functions. |
 | **Material** | Defines appearance - color, opacity, fill/stroke (for SVG). |
-| **Camera** | Defines a viewpoint - Perspective (Orthographic planned). |
+| **Camera** | Defines a viewpoint - Perspective and Orthographic cameras. |
+| **Light** | Ambient, directional, point, and spot lights for Three.js scenes. |
+| **Animator** | Runtime clip playback, cross-fades, easing, and keyframe events. |
+| **RigidBody / Collider** | Physics data consumed by `@joroya/physics`. |
 
 ```typescript
 // Adding components
@@ -195,13 +209,15 @@ node.addComponent(sphere);
 import { createPath2D } from '@joroya/core';
 
 const triangle = createPath2D([
-  { command: 'moveTo', args: [50, 0] },
-  { command: 'lineTo', args: [100, 100] },
-  { command: 'lineTo', args: [0, 100] },
-  { command: 'closePath', args: [] },
+  { command: 'M', args: [50, 0] },
+  { command: 'L', args: [100, 100] },
+  { command: 'L', args: [0, 100] },
+  { command: 'Z', args: [] },
 ]);
 node.addComponent(triangle);
 ```
+
+Other built-in geometry helpers include `createCylinder`, `createPlane`, `createCone`, and `createText`. Torus, circle, buffer, and CSG definitions are available through the `Geometry` component types directly.
 
 ---
 
@@ -285,7 +301,7 @@ requestAnimationFrame(loop);
 renderer.dispose();
 ```
 
-The renderer automatically adds ambient and directional lights to the Three.js scene so geometry is visible out of the box.
+Add `Light` components to the scene for lit Three.js materials. If no camera exists, `ThreeRenderer` creates a default perspective camera at `z = 5`.
 
 ### SVG
 
@@ -303,7 +319,21 @@ const svgString = renderToSVG(scene, {
 document.getElementById('svg-container')!.innerHTML = svgString;
 ```
 
-> SVG rendering only supports `Path2D` geometries. Use `createPath2D()` to define shapes.
+SVG supports `Path2D`, `Box`, `Sphere`, `Circle`, `Plane`, `Cylinder`, `Cone`, `Torus`, and `Text` geometries, with 3D-only dimensions flattened where appropriate.
+
+### Canvas2D
+
+Use `@joroya/renderer-canvas2d` for lightweight 2D canvas output:
+
+```typescript
+import { renderToCanvas } from '@joroya/renderer-canvas2d';
+
+renderToCanvas(scene, document.getElementById('canvas') as HTMLCanvasElement, {
+  width: 800,
+  height: 600,
+  backgroundColor: { r: 0.05, g: 0.07, b: 0.09 },
+});
+```
 
 ---
 
@@ -404,64 +434,23 @@ renderer.mount(restored);
 
 ## React Integration
 
-Wrap Oroya in a React component to integrate it into your UI:
+For React apps, install the experimental `@joroya/react` package:
 
 ```tsx
-import { useEffect, useRef } from 'react';
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
-import { ThreeRenderer } from '@joroya/renderer-three';
+import { OroyaCanvas, AmbientLight, DirectionalLight, Box } from '@joroya/react';
 
-function OroyaCanvas({ scene }: { scene: Scene }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const renderer = new ThreeRenderer({
-      canvas,
-      width: canvas.clientWidth,
-      height: canvas.clientHeight,
-    });
-    renderer.mount(scene);
-
-    let frameId: number;
-    const animate = (time: number) => {
-      time *= 0.001;
-      renderer.render();
-      frameId = requestAnimationFrame(animate);
-    };
-    frameId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      renderer.dispose();
-    };
-  }, [scene]);
-
-  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />;
-}
-
-// Usage
 function App() {
-  const scene = new Scene();
-
-  const cam = new Node('cam');
-  cam.addComponent(new Camera({
-    type: CameraType.Perspective, fov: 75,
-    aspect: 16 / 9, near: 0.1, far: 1000,
-  }));
-  cam.transform.position.z = 5;
-  scene.add(cam);
-
-  const cube = new Node('cube');
-  cube.addComponent(createBox(1, 1, 1));
-  cube.addComponent(new Material({ color: { r: 0.1, g: 0.6, b: 0.9 } }));
-  scene.add(cube);
-
-  return <OroyaCanvas scene={scene} />;
+  return (
+    <OroyaCanvas width="100vw" height="100vh">
+      <AmbientLight intensity={0.5} />
+      <DirectionalLight position={{ x: 3, y: 5, z: 4 }} intensity={1.2} />
+      <Box color={{ r: 0.1, g: 0.6, b: 0.9 }} />
+    </OroyaCanvas>
+  );
 }
 ```
+
+You can still mount `ThreeRenderer` manually if you need full control over the render loop or canvas lifecycle.
 
 ---
 

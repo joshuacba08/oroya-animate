@@ -1,317 +1,122 @@
-# 🚀 Documentación de Publicación y Despliegue - Resumen Ejecutivo
+# Documentacion de Publicacion y Despliegue - Resumen Ejecutivo
 
-## ✁ETrabajo Completado
+Este resumen refleja el estado de Oroya Animate 1.0.0 y la familia actual de paquetes `@joroya/*`.
 
-Se ha creado toda la documentación y configuración necesaria para publicar el proyecto Oroya Animate en NPM, CDN, y desplegar el sitio web en Vercel.
+## Estado Actual
 
-## 📂 Archivos Creados
+La configuracion de publicacion cubre NPM, CDNs publicos y el sitio de documentacion en Vercel. El proyecto publica 11 paquetes:
 
-### Documentación (8 archivos)
+- `@joroya/core`
+- `@joroya/renderer-three`
+- `@joroya/renderer-svg`
+- `@joroya/renderer-canvas2d`
+- `@joroya/loader-gltf`
+- `@joroya/physics`
+- `@joroya/assets`
+- `@joroya/input`
+- `@joroya/inspector`
+- `@joroya/react`
+- `@joroya/vue`
 
-1. **`docs/deployment/npm-publishing.md`**
-   - Guía completa de publicación en NPM
-   - Opciones manuales y automatizadas
-   - Gestión de versiones semánticas
-   - Troubleshooting y best practices
+## Documentacion Disponible
 
-2. **`docs/deployment/cdn-setup.md`**
-   - Uso de paquetes vía CDN (unpkg, jsDelivr, esm.sh)
-   - Ejemplos completos de código
-   - Estrategias de versionado
-   - Optimización de performance
+- `docs/deployment/npm-publishing.md` - Publicacion en NPM
+- `docs/deployment/cdn-setup.md` - Uso via CDN
+- `docs/deployment/vercel-deployment.md` - Despliegue del sitio Astro
+- `docs/deployment/package-metadata.md` - Metadatos y discoverability
+- `docs/deployment/CHECKLIST.md` - Checklist de release
+- `docs/deployment/README.md` - Guia rapida del flujo completo
 
-3. **`docs/deployment/vercel-deployment.md`**
-   - Despliegue del sitio Astro en Vercel
-   - Configuración de monorepo
-   - Variables de entorno
-   - Dominios personalizados
+## Workflows
 
-4. **`docs/deployment/package-metadata.md`**
-   - Optimización de metadatos para NPM
-   - Keywords y descripciones SEO
-   - Configuración de organización
+- `.github/workflows/ci.yml` ejecuta lint, typecheck, tests y build.
+- `.github/workflows/publish.yml` publica en NPM cuando se pushea un tag `v*.*.*`.
+- `.github/workflows/deploy-web.yml` despliega el sitio web.
 
-5. **`docs/deployment/CHECKLIST.md`**
-   - Checklist completo de verificación pre-release
-   - Pasos post-publicación
-   - Scripts de verificación
-   - Plan de rollback
+## Configuracion Requerida
 
-6. **`docs/deployment/README.md`**
-   - Resumen de toda la documentación
-   - Quick start guides
-   - Flujo de trabajo completo
-
-7-10. **READMEs de paquetes**
-   - `packages/core/README.md`
-   - `packages/renderer-three/README.md`
-   - `packages/renderer-svg/README.md`
-   - `packages/loader-gltf/README.md`
-
-### Workflows de GitHub Actions (3 archivos)
-
-1. **`.github/workflows/ci.yml`**
-   - Tests automáticos en push y PR
-   - Múltiples versiones de Node.js (18.x, 20.x)
-   - Type checking y builds
-
-2. **`.github/workflows/publish.yml`**
-   - Publicación automática a NPM cuando se crea un tag
-   - Creación automática de GitHub Releases
-   - Incluye enlaces a paquetes y CDN
-
-3. **`.github/workflows/deploy-web.yml`**
-   - Despliegue automático a Vercel en push a main
-   - Preview deployments para PRs
-
-### Archivos de Configuración (3 archivos)
-
-1. **`.npmrc`**
-   - Configuración de workspace de pnpm
-   - Registry de NPM
-   - Access público para paquetes
-
-2. **`vercel.json`**
-   - Configuración de build para monorepo
-   - Headers de cache y seguridad
-   - Redirects y rewrites
-
-3. **`scripts/sync-versions.js`**
-   - Script para sincronizar versiones de todos los paquetes
-   - Validación de formato semver
-   - Mensajes de next steps
-
-### Actualizaciones de Archivos Existentes
-
-1. **`README.md` (root)**
-   - Badges de NPM, CI, TypeScript
-   - Sección de instalación mejorada (NPM + CDN)
-   - Links a documentación de deployment
-   - Sección de publicación y CDN
-   - Footer profesional con links
-
-2. **`package.json` (root)**
-   - Nuevos scripts: `build:web`, `dev:web`, `sync-versions`, `publish:packages`, `deploy:web`
-   - Dependencia `glob` añadida
-
-3. **Todos los `package.json` de los paquetes (4 archivos)**
-   - Keywords optimizados para búsqueda
-   - Metadata completo: author, repository, homepage, bugs
-   - Peer dependencies configurados
-   - Descripciones mejoradas y SEO-friendly
-
-## 🎯 Configuración Requerida (Primera Vez)
-
-### 1. NPM (Publicación de Paquetes)
+### NPM
 
 ```bash
-# Crear cuenta en npmjs.com
-# Crear organización @joroya
-
-# Generar token
+npm login
 npm token create --read-write
-
-# Agregar token a GitHub Secrets
-# Repositorio ↁESettings ↁESecrets ↁEActions ↁENew secret
-# Name: NPM_TOKEN
-# Value: [tu token]
 ```
 
-### 2. Vercel (Despliegue del Sitio Web)
+Agregar el token como `NPM_TOKEN` en GitHub Secrets.
+
+### Vercel
 
 ```bash
-# Instalar CLI
 npm install -g vercel
-
-# Login
 vercel login
-
-# Link project (desde el root del proyecto)
 vercel link
-
-# Ver credenciales
-cat .vercel/project.json
-
-# Agregar a GitHub Secrets:
-# - VERCEL_TOKEN
-# - VERCEL_ORG_ID
-# - VERCEL_PROJECT_ID
 ```
 
-## 🚀 Flujo de Trabajo Normal
+Agregar estos secrets en GitHub:
 
-### Publicar Nueva Versión
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+## Flujo Normal De Release
 
 ```bash
-# 1. Actualizar versiones
-node scripts/sync-versions.js 0.4.0
+# 1. Actualizar todas las versiones de paquetes
+node scripts/sync-versions.js 1.0.1
 
-# 2. Verificar
-pnpm build
-pnpm test
+# 2. Validar localmente
+pnpm install --frozen-lockfile
+pnpm lint
 pnpm typecheck
+pnpm test
+pnpm build
 
 # 3. Commit y tag
 git add .
-git commit -m "Release v0.4.0"
-git tag v0.4.0
+git commit -m "Release v1.0.1"
+git tag v1.0.1
 
-# 4. Push (activa GitHub Actions)
+# 4. Push
 git push origin main
-git push origin v0.4.0
-
-# 5. Esperar y verificar
-# - GitHub Actions publicará en NPM
-# - Creará GitHub Release
-# - Desplegará en Vercel
+git push origin v1.0.1
 ```
 
-### Verificar Publicación
+El workflow de publicacion se encarga de publicar todos los paquetes en NPM con `--access public` y provenance.
+
+## Verificacion Post-publicacion
 
 ```bash
-# NPM
 npm view @joroya/core version
-
-# CDN
-curl https://unpkg.com/@joroya/core@0.4.0/package.json
-
-# Website
+npm view @joroya/renderer-three version
+npm view @joroya/renderer-svg version
+npm view @joroya/renderer-canvas2d version
+npm view @joroya/loader-gltf version
+curl https://unpkg.com/@joroya/core@1.0.0/package.json
 curl https://oroya-animate.vercel.app
 ```
 
-## 📊 Flujo Automatizado
+## URLs Principales
 
-```
-1. Developer crea tag vX.Y.Z
-   ↁE
-2. GitHub Actions:
-   - Ejecuta tests
-   - Build de paquetes
-   - Publica en NPM
-   - Crea GitHub Release
-   ↁE
-3. Disponible en:
-   - NPM Registry
-   - unpkg.com
-   - jsDelivr
-   - esm.sh
-   ↁE
-4. Push a main:
-   - Build del sitio web
-   - Deploy a Vercel
-```
+- NPM Org: https://www.npmjs.com/org/joroya
+- Documentacion: https://oroya-animate.vercel.app
+- GitHub: https://github.com/joshuacba08/oroya-animate
+- CDN base: `https://unpkg.com/@joroya/core@1.0.0/dist/index.js`
 
-## 📋 Checklist Inicial
-
-### Antes de la Primera Publicación
+## Checklist Inicial
 
 - [ ] Cuenta NPM creada
-- [ ] Organización `@joroya` creada en NPM
-- [ ] NPM_TOKEN agregado a GitHub Secrets
-- [ ] Tests pasando: `pnpm test`
-- [ ] Build exitoso: `pnpm build`
-- [ ] Cuenta Vercel creada
-- [ ] Vercel CLI instalado
-- [ ] Proyecto linkado con Vercel
+- [ ] Organizacion `@joroya` creada en NPM
+- [ ] `NPM_TOKEN` agregado a GitHub Secrets
 - [ ] Secrets de Vercel agregados a GitHub
-- [ ] README principal con badges actualizado
-- [ ] Todos los package.json con metadata
+- [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test` y `pnpm build` pasando
+- [ ] Tag de release creado con formato `vX.Y.Z`
+- [ ] Version verificada en NPM y CDN
 
-### Primera Publicación (Test)
+## Soporte
 
-```bash
-# Crear tag de prueba
-git tag v0.3.1
-git push origin v0.3.1
+Si algo falla, revisar:
 
-# Verificar que GitHub Actions:
-# 1. Ejecuta tests ✁E
-# 2. Publica en NPM ✁E
-# 3. Crea release ✁E
-
-# Verificar manualmente:
-npm install @joroya/core@0.3.1
-```
-
-## 🎨 URLs Finales
-
-Después de configurar todo:
-
-- **NPM Org**: https://www.npmjs.com/org/joroya
-- **Packages**:
-  - https://www.npmjs.com/package/@joroya/core
-  - https://www.npmjs.com/package/@joroya/renderer-three
-  - https://www.npmjs.com/package/@joroya/renderer-svg
-  - https://www.npmjs.com/package/@joroya/loader-gltf
-- **CDN**: https://unpkg.com/@joroya/core
-- **Website**: https://oroya-animate.vercel.app (o tu dominio custom)
-- **GitHub**: https://github.com/joshuacba08/oroya-animate
-
-## 📚 Documentación Disponible
-
-Todo está documentado en `docs/deployment/`:
-
-1. **npm-publishing.md** - Guía de NPM (15+ secciones)
-2. **cdn-setup.md** - Guía de CDN con ejemplos
-3. **vercel-deployment.md** - Guía de Vercel
-4. **package-metadata.md** - Optimización SEO
-5. **CHECKLIST.md** - Checklist exhaustivo
-6. **README.md** - Resumen y quick start
-
-## �E Soporte
-
-Si encuentras problemas:
-
-1. Revisa la sección de Troubleshooting en cada guía
-2. Consulta el CHECKLIST.md
-3. Revisa los logs de GitHub Actions
-4. Abre un issue en GitHub
-
-## ✨ Ventajas del Setup
-
-✁E**Automatización Completa**
-- Publish en NPM automático con tags
-- Deploy en Vercel automático en main
-- Preview deployments en PRs
-
-✁E**Múltiples Opciones de Distribución**
-- NPM para desarrollo profesional
-- CDN para prototipos rápidos
-- Website para documentación
-
-✁E**Best Practices**
-- Semantic versioning
-- CI/CD con GitHub Actions
-- Metadata completo para discoverability
-- TypeScript types incluidos
-
-✁E**Developer Experience**
-- Scripts convenientes en package.json
-- Sincronización de versiones automatizada
-- Documentación completa
-- Ejemplos de código
-
-## 🎯 Próximos Pasos Recomendados
-
-1. **Configurar secrets** en GitHub (30 min)
-2. **Hacer test release** con tag v0.3.1 (15 min)
-3. **Verificar publicación** en NPM y CDN (5 min)
-4. **Probar despliegue** en Vercel (10 min)
-5. **Documentar en CHANGELOG.md** (opcional)
-6. **Anunciar lanzamiento** en README o redes
-
-## 📈 Métricas a Monitorear
-
-Después del lanzamiento:
-
-- Downloads en NPM (npmjs.com/package/@joroya/core)
-- Stars en GitHub
-- Issues y pull requests
-- Visitas al website (Vercel Analytics)
-- Requests de CDN
-
----
-
-**¡Todo está listo para publicar!** 🎉
-
-Solo necesitas configurar los secrets y hacer push del primer tag.
+- Logs de GitHub Actions
+- `docs/deployment/CHECKLIST.md`
+- Secciones de troubleshooting en las guias de NPM, CDN y Vercel
+- Issues del repositorio: https://github.com/joshuacba08/oroya-animate/issues

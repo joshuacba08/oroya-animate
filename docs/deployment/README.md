@@ -17,15 +17,15 @@ This directory contains comprehensive guides for deploying and publishing Oroya 
 
 ```bash
 # 1. Update versions
-node scripts/sync-versions.js 0.4.0
+node scripts/sync-versions.js 1.0.1
 
 # 2. Build and test
 pnpm build
 pnpm test
 
 # 3. Commit and tag
-git commit -am "Release v0.4.0"
-git tag v0.4.0
+git commit -am "Release v1.0.1"
+git tag v1.0.1
 
 # 4. Push (GitHub Actions will auto-publish)
 git push && git push --tags
@@ -55,7 +55,7 @@ All configuration files are ready to use:
 
 ## 📦 Package Updates
 
-All 4 packages now include:
+All publishable packages now include:
 - ✅ Complete metadata (keywords, author, repository, homepage)
 - ✅ README.md with examples and badges
 - ✅ Peer dependencies configuration
@@ -65,7 +65,14 @@ Updated packages:
 - `packages/core/package.json` + README.md
 - `packages/renderer-three/package.json` + README.md
 - `packages/renderer-svg/package.json` + README.md
+- `packages/renderer-canvas2d/package.json`
 - `packages/loader-gltf/package.json` + README.md
+- `packages/physics/package.json`
+- `packages/assets/package.json`
+- `packages/input/package.json`
+- `packages/inspector/package.json`
+- `packages/react/package.json`
+- `packages/vue/package.json`
 
 ## 🔐 Required Secrets
 

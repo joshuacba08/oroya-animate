@@ -187,10 +187,10 @@ scene.add(parent);
 scene.add(child, parent); // child es hijo de parent, no del root
 
 scene.traverse(node => console.log(node.name));
-// ↁE'root', 'group', 'child'
+// 'root', 'group', 'child'
 
 const found = scene.findNodeByName('child');
-console.log(found?.parent?.name); // ↁE'group'
+console.log(found?.parent?.name); // 'group'
 ```
 
 ---
@@ -486,12 +486,18 @@ graph TD
 
 #### Compatibilidad con renderers
 
-| GeometryDef | Three.js | SVG |
-|------------|----------|-----|
-| `BoxGeometryDef` | ✁EↁE`THREE.BoxGeometry` | ✁EↁE`<rect>` |
-| `SphereGeometryDef` | ✁EↁE`THREE.SphereGeometry` | ✁EↁE`<circle>` |
-| `Path2DGeometryDef` | ❁Eignorado | ✁EↁE`<path d="...">` |
-| `TextGeometryDef` | ❁Eignorado | ✁EↁE`<text>` |
+| GeometryDef | Three.js | SVG | Canvas2D |
+|------------|----------|-----|----------|
+| `BoxGeometryDef` | `THREE.BoxGeometry` | `<rect>` | `fillRect` / `strokeRect` |
+| `SphereGeometryDef` | `THREE.SphereGeometry` | `<circle>` | `arc()` |
+| `CylinderGeometryDef` | `THREE.CylinderGeometry` | proyeccion 2D aproximada | no |
+| `PlaneGeometryDef` | `THREE.PlaneGeometry` | `<rect>` | no |
+| `ConeGeometryDef` | `THREE.ConeGeometry` | proyeccion 2D aproximada | no |
+| `TorusGeometryDef` | `THREE.TorusGeometry` | anillo 2D | no |
+| `CircleGeometryDef` | `THREE.CircleGeometry` | `<circle>` | no |
+| `BufferGeometryDef` | `THREE.BufferGeometry` | no | no |
+| `Path2DGeometryDef` | no | `<path d="...">` | `Path2D` |
+| `TextGeometryDef` | no | `<text>` | `fillText` / `strokeText` |
 
 ---
 
@@ -515,7 +521,7 @@ new Material(definition?: MaterialDef)  // default: {}
 | `g` | `number` | 0.0  E1.0 | Componente verde |
 | `b` | `number` | 0.0  E1.0 | Componente azul |
 
-> **Conversión:** Para convertir de hex `#3399ff` a RGB normalizado: `{ r: 0x33/255, g: 0x99/255, b: 0xff/255 }` ↁE`{ r: 0.2, g: 0.6, b: 1.0 }`
+> **Conversión:** Para convertir de hex `#3399ff` a RGB normalizado: `{ r: 0x33/255, g: 0x99/255, b: 0xff/255 }` -> `{ r: 0.2, g: 0.6, b: 1.0 }`
 
 #### `MaterialDef`
 
@@ -694,8 +700,8 @@ new Camera(definition: CameraDef)
 
 | Valor | String | Estado |
 |-------|--------|--------|
-| `Perspective` | `'Perspective'` | ✁EImplementado |
-| `Orthographic` | `'Orthographic'` | ✁EImplementado |
+| `Perspective` | `'Perspective'` | Implementado |
+| `Orthographic` | `'Orthographic'` | Implementado |
 
 #### `PerspectiveCameraDef`
 
@@ -1164,11 +1170,14 @@ Convierte todo el scene graph a una cadena JSON formateada con indentación de 2
 
 | Componente | ¿Se serializa? | Datos incluidos |
 |------------|----------------|-----------------|
-| `Transform` | ✁E| `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | ✁E| `definition` completo (tipo + parámetros) |
-| `Material` | ✁E| `definition` completo (color, opacity, fill, stroke, etc.) |
-| `Camera` | ✁E| `definition` completo (type, fov/aspect/near/far para Perspective; left/right/top/bottom/near/far para Orthographic) |
-| `Animation` | ✁E| Array de `SvgAnimationDef` (animate y animateTransform) |
+| `Transform` | si | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
+| `Geometry` | si | `definition` completo, incluidos typed arrays de `BufferGeometry` |
+| `Material` | si | `definition` completo (color, PBR, opacity, fill, stroke, gradients, etc.) |
+| `Camera` | si | `definition` completo para Perspective y Orthographic |
+| `Light` | si | tipo, color, intensidad, sombras y parametros especificos |
+| `Animation` / `Animator` | si | animaciones SVG y clips/runtime animator serializables |
+| `RigidBody` / `Collider` | si | cuerpos fisicos, colliders y filtros de colision |
+| `Environment`, `PostProcessing`, `ParticleSystem`, `AudioListener`, `AudioSource`, `Skin` | si | definiciones completas |
 
 #### `deserialize`
 
@@ -1501,9 +1510,9 @@ dispose();
 
 #### Comportamiento
 
-1. Llama a `scene.updateWorldMatrices()` para sincronizar transforms.
+1. Llama a `scene.update(dt)` y luego `scene.updateWorldMatrices()` para sincronizar estado y transforms.
 2. Recorre recursivamente el árbol de nodos generando `<g>` para la jerarquía.
-3. Geometrías soportadas: `Path2D` ↁE`<path>`, `Box` ↁE`<rect>`, `Sphere` ↁE`<circle>`, `Text` ↁE`<text>`.
+3. Geometrías soportadas: `Path2D` -> `<path>`, `Box` -> `<rect>`, `Sphere` -> `<circle>`, `Text` -> `<text>`, y proyecciones 2D para varias primitivas 3D.
 4. Si el nodo tiene un `Material`, aplica `fill`, `stroke`, `stroke-width`, `opacity`, `fillGradient` y `strokeGradient`.
 5. Los gradientes generan un bloque `<defs>` al inicio del SVG con `<linearGradient>` / `<radialGradient>`.
 6. El `localMatrix` de cada nodo se aplica como `transform="matrix(a,b,c,d,e,f)"`.
@@ -1541,22 +1550,29 @@ Carga un archivo glTF/GLB y lo traduce al scene graph de Oroya.
 **Archivo fuente:** [loadGLTF.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/loader-gltf/src/loadGLTF.ts)
 
 ```typescript
-async function loadGLTF(url: string): Promise<Scene>
+async function loadGLTF(url: string): Promise<GLTFLoadResult>
+
+interface GLTFLoadResult {
+  scene: Scene;
+  animations: AnimationClip[];
+}
 ```
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
 | `url` | `string` | URL del archivo .gltf o .glb |
 
-#### Traducción (simplificada  Ev0.3)
+#### Traducción
 
 | glTF Element | Oroya Node |
 |-------------|------------|
 | `THREE.Object3D` (cualquiera) | `Node` con posición/rotación/escala del objeto |
-| `THREE.Mesh` | `Node` + `createBox(1,1,1)` (placeholder) + `Material` con color si disponible |
+| `THREE.Mesh` | `Node` + `GeometryPrimitive.Buffer` con posiciones/normales/UVs/indices + `Material` |
+| `THREE.SkinnedMesh` | `Node` + `GeometryPrimitive.Buffer` con skin indices/weights + `Skin` |
+| `THREE.AnimationClip` | `AnimationClip` con tracks de posición, rotación y escala |
 | Hijos del objeto | Nodos hijos recursivos |
 
-> **⚠�E�ELimitaciones actuales:** La geometría real del glTF no se traduce  Ese usa un box placeholder. Los materiales solo extraen el color base. Las animaciones no se importan. Esto se mejorará en v0.4.
+> **Nota:** El loader devuelve una `Scene` independiente. Para mezclar el modelo con otra escena, mueve o clona los hijos de `result.scene.root` hacia tu escena principal.
 
 ---
 

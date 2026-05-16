@@ -18,22 +18,26 @@ graph TD
     SG["Scene Graph\n(@joroya/core)"]
     R3["ThreeRenderer\n(@joroya/renderer-three)"]
     RS["renderToSVG\n(@joroya/renderer-svg)"]
+    RC["renderToCanvas / CanvasRenderer\n(@joroya/renderer-canvas2d)"]
     WEBGL["WebGL Canvas (3D)"]
     SVG["SVG String (2D)"]
+    CANVAS["Canvas2D Canvas (2D)"]
 
     SG -->|"mount + render"| R3
     SG -->|"function call"| RS
+    SG -->|"function call / class"| RC
     R3 --> WEBGL
     RS --> SVG
+    RC --> CANVAS
 ```
 
-| Aspect | `ThreeRenderer` | `renderToSVG` |
-|---------|----------------|---------------|
-| **Paradigm** | Stateful instance (class) | Pure function (stateless) |
-| **Output** | Draws to a `<canvas>` | Returns an SVG `string` |
-| **Requires DOM** | ✅ Yes (`HTMLCanvasElement`) | ❌ No (works in Node.js) |
-| **3D** | ✅ Perspective, lights, shadows | ❌ 2D only |
-| **Vector** | ❌ Rasterized | ✅ Infinitely scalable |
+| Aspect | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` | `renderToCanvas` / `CanvasRenderer` |
+|---------|----------------|--------------------------------------|----------------------------------------|
+| **Paradigm** | Stateful instance (class) | Pure string function or DOM element helper | One-shot function or persistent class |
+| **Output** | Draws to a WebGL `<canvas>` | Returns an SVG `string` or `SVGSVGElement` | Draws to a Canvas2D `<canvas>` |
+| **Requires DOM** | Yes (`HTMLCanvasElement`) | String mode: no; DOM mode: yes | Yes (`HTMLCanvasElement`) |
+| **3D** | Perspective/orthographic, lights, shadows | 2D projection only | 2D projection only |
+| **Vector** | Rasterized | Infinitely scalable | Rasterized |
 
 ---
 
@@ -67,8 +71,8 @@ const renderer = new ThreeRenderer({
 
 | Method | Description |
 |--------|-------------|
-| `mount(scene)` | Connects a scene. Rebuilds the Three.js scene, detects the active camera, adds lights |
-| `render()` | Syncs transforms, propagates matrices and draws a frame |
+| `mount(scene)` | Connects a scene, rebuilds the Three.js scene, and detects the active camera |
+| `render(dt?)` | Runs `scene.update(dt)`, syncs transforms, updates renderer-managed systems, and draws a frame |
 | `dispose()` | Releases WebGL resources |
 
 ### Lifecycle
@@ -81,13 +85,14 @@ sequenceDiagram
 
     Note over U,TS: Mounting
     U->>TR: mount(scene)
-    TR->>TS: clear + add lights
-    TR->>TR: traverse → create Mesh/Group/Camera per node
+    TR->>TS: clear scene
+    TR->>TR: traverse → create Mesh/Group/Camera/Light/etc. per node
     TR->>TR: Set first Camera as activeCamera
 
     Note over U,TS: Render loop
     loop requestAnimationFrame
-        U->>TR: render()
+        U->>TR: render(dt)
+        TR->>TR: scene.update(dt)
         TR->>TR: updateWorldMatrices()
         TR->>TS: sync worldMatrix → Three.js objects
         TR->>TR: webglRenderer.render()
@@ -99,20 +104,30 @@ sequenceDiagram
 | Oroya Node | Three.js Object |
 |------------|-----------------|
 | Node without Geometry or Camera | `THREE.Group` |
-| Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
-| Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
-| Node + `Geometry(Path2D)` | ❌ Ignored |
+| Node + supported mesh `Geometry` | `THREE.Mesh` with Box/Sphere/Cylinder/Plane/Cone/Torus/Circle/Buffer/CSG geometry |
+| Node + `Geometry` + `Skin` | `THREE.SkinnedMesh` with skeleton binding after mount |
+| Node + `InstancedMesh` | `THREE.InstancedMesh` |
+| Node + `Geometry(Path2D)` / `Geometry(Text)` | Ignored by the Three.js backend |
 | Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
+| Node + `Camera(Orthographic)` | `THREE.OrthographicCamera` |
+| Node + `Light` | `THREE.Light` subclass |
+| Node + `ParticleSystem` | `THREE.Points` |
+| Node + `AudioListener` / `AudioSource` | `THREE.AudioListener` / `THREE.PositionalAudio` |
 | `Material` with `color` | `MeshStandardMaterial({ color })` |
 | `Material` with `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
-| Without `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
+| PBR and texture fields | `MeshStandardMaterial` roughness/metalness/emissive/maps |
+| Without `Material` | Default `MeshStandardMaterial` |
 
-### Automatic lighting
+### Lighting
 
-| Type | Config |
-|------|--------|
-| `AmbientLight` | White, intensity `0.5` |
-| `DirectionalLight` | White, intensity `1.5`, position `(2, 5, 3)` |
+`ThreeRenderer` translates explicit `Light` components from the scene graph. Add ambient, directional, point, or spot lights to control illumination; no implicit default lights are injected.
+
+| Oroya light | Three.js object |
+|-------------|-----------------|
+| `LightType.Ambient` | `THREE.AmbientLight` |
+| `LightType.Directional` | `THREE.DirectionalLight` with optional shadows and target |
+| `LightType.Point` | `THREE.PointLight` with optional shadows |
+| `LightType.Spot` | `THREE.SpotLight` with optional shadows, target, angle, and penumbra |
 
 ### Camera resolution
 
@@ -232,15 +247,17 @@ Extends `SvgRenderOptions` with:
 
 ```mermaid
 flowchart TD
-    START["renderToSVG / renderToSVGElement"] --> UPDATE["scene.updateWorldMatrices()"]
+    START["renderToSVG / renderToSVGElement"] --> TICK["scene.update(dt)"]
+    TICK --> UPDATE["scene.updateWorldMatrices()"]
     UPDATE --> WALK["Traverse tree recursively"]
     WALK --> GEO{"Geometry?"}
     GEO -->|"Path2D"| PATH["→ path"]
     GEO -->|"Box"| RECT["→ rect"]
     GEO -->|"Sphere"| CIRCLE["→ circle"]
     GEO -->|"Text"| TEXT["→ text"]
+    GEO -->|"Circle / Plane / Cylinder / Cone / Torus"| MORE["→ flattened SVG primitive/path"]
     GEO -->|"None"| GROUP["Only g if has children"]
-    PATH & RECT & CIRCLE & TEXT --> MAT{"Material?"}
+    PATH & RECT & CIRCLE & TEXT & MORE --> MAT{"Material?"}
     MAT -->|"fill/stroke"| STYLE["fill + stroke + opacity"]
     MAT -->|"fillGradient"| GRAD["url(#gradient-id) + defs"]
     MAT -->|"filter/clip/mask"| FILT["url(#filter-id) + defs"]
@@ -550,50 +567,98 @@ const svg = renderToSVG(scene, { width: 400, height: 300 });
 
 ---
 
+## `@joroya/renderer-canvas2d` — Canvas2D
+
+Canvas2D is the lightweight browser-native 2D backend. It is useful for dense 2D scenes, HUDs, particles, and simple game-like views where vector export is not required.
+
+```typescript
+import { renderToCanvas } from '@joroya/renderer-canvas2d';
+
+renderToCanvas(scene, document.getElementById('canvas') as HTMLCanvasElement, {
+  width: 800,
+  height: 600,
+  backgroundColor: { r: 0.05, g: 0.07, b: 0.09 },
+  dt: 1 / 60,
+});
+```
+
+For a persistent renderer, use `CanvasRenderer`:
+
+```typescript
+import { CanvasRenderer } from '@joroya/renderer-canvas2d';
+
+const renderer = new CanvasRenderer();
+const canvas = renderer.mount(document.getElementById('app')!, {
+  width: 800,
+  height: 600,
+});
+
+renderer.startLoop(() => {
+  renderer.render(scene, { width: 800, height: 600 });
+});
+```
+
+---
+
 ## Renderer Comparison
 
 ### Geometry Support
 
-| Geometry | Three.js | SVG |
-|----------|----------|-----|
-| `Box` | ✅ | ✅ `<rect>` |
-| `Sphere` | ✅ | ✅ `<circle>` |
-| `Path2D` | ❌ | ✅ `<path>` |
-| `Text` | ❌ | ✅ `<text>` |
+| Geometry | Three.js | SVG | Canvas2D |
+|----------|----------|-----|----------|
+| `Box` | Yes | `<rect>` | `fillRect` / `strokeRect` |
+| `Sphere` | Yes | `<circle>` | `arc` |
+| `Cylinder` | Yes | Flattened shape | No |
+| `Plane` | Yes | `<rect>` | No |
+| `Cone` | Yes | Flattened path | No |
+| `Torus` | Yes | Ring path | No |
+| `Circle` | Yes | `<circle>` | No |
+| `Path2D` | No | `<path>` | Canvas path |
+| `Text` | No | `<text>` | `fillText` / `strokeText` |
+| `Buffer` | Yes | No | No |
+| `CSG` | Yes | No | No |
 
 ### Material Support
 
-| Property | Three.js | SVG |
-|----------|----------|-----|
-| `color` | ✅ | ❌ |
-| `opacity` | ✅ | ✅ |
-| `fill` | ❌ | ✅ |
-| `stroke` | ❌ | ✅ |
-| `strokeWidth` | ❌ | ✅ |
-| `fillGradient` | ❌ | ✅ |
-| `strokeGradient` | ❌ | ✅ |
-| `filter` | ❌ | ✅ |
-| `clipPath` | ❌ | ✅ |
-| `mask` | ❌ | ✅ |
+| Property | Three.js | SVG | Canvas2D |
+|----------|----------|-----|----------|
+| `color` | Yes | No | No |
+| `opacity` | Yes | Yes | Yes |
+| `metalness` / `roughness` | Yes | No | No |
+| texture maps | Yes | No | No |
+| `fill` | No | Yes | Yes |
+| `stroke` | No | Yes | Yes |
+| `strokeWidth` | No | Yes | Yes |
+| `fillGradient` | No | Yes | Yes |
+| `strokeGradient` | No | Yes | Yes |
+| `filter` | No | Yes | No |
+| `clipPath` | No | Yes | No |
+| `mask` | No | Yes | No |
 
 ### Transform Support
 
-| Feature | Three.js | SVG |
-|---------|----------|-----|
-| Position (translate) | ✅ | ✅ `matrix()` |
-| Rotation | ✅ | ✅ `matrix()` |
-| Scale | ✅ | ✅ `matrix()` |
-| Hierarchy (`<g>`) | ✅ Groups | ✅ `<g>` |
+| Feature | Three.js | SVG | Canvas2D |
+|---------|----------|-----|----------|
+| Position (translate) | Yes | `matrix()` | `ctx.transform()` |
+| Rotation | Yes | `matrix()` | `ctx.transform()` |
+| Scale | Yes | `matrix()` | `ctx.transform()` |
+| Hierarchy | Groups | `<g>` | Recursive canvas state stack |
 
 ### Special Component Support
 
-| Feature | Three.js | SVG |
-|---------|----------|-----|
-| `Camera` (Perspective) | ✅ | ❌ |
-| `Camera` (Orthographic) | ❌ | ✅ viewBox |
-| `Interactive` (events) | ✅ Raycaster | ✅ Event delegation |
-| `Animation` (native SVG) | ❌ | ✅ `<animate>` / `<animateTransform>` |
-| `cssClass` / `cssId` | ❌ | ✅ `class` / `id` attributes |
+| Feature | Three.js | SVG | Canvas2D |
+|---------|----------|-----|----------|
+| `Camera` (Perspective) | Yes | No | Centered fallback |
+| `Camera` (Orthographic) | Yes | viewBox | 2D view transform |
+| `Light` | Yes | No | No |
+| `PostProcessing` | Yes | No | No |
+| `ParticleSystem` | Yes | No | No |
+| `AudioListener` / `AudioSource` | Yes | No | No |
+| `InstancedMesh` | Yes | No | No |
+| `Interactive` | Raycaster | Event delegation | No |
+| `Animation` (native SVG) | No | `<animate>` / `<animateTransform>` | No |
+| `Animator` / `scene.update(dt)` | Yes | Yes | Yes |
+| `cssClass` / `cssId` | No | `class` / `id` attributes | No |
 
 ---
 

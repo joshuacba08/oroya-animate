@@ -9,12 +9,12 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 
 ## Features
 
-- 逃 **glTF/GLB Support** - Load industry-standard 3D models
-- 女・・**Scene Graph Conversion** - Automatically converts to Oroya nodes
-- 耳 **Material Import** - Preserves materials and textures
-- ｦｴ **Mesh Support** - Handles complex geometry
-- 売 **Blender Compatible** - Export from Blender and import seamlessly
-- 笞｡ **Async Loading** - Non-blocking model loading
+- glTF/GLB support - Load industry-standard 3D models
+- Scene graph conversion - Automatically converts to Oroya nodes
+- Material import - Preserves color, PBR material fields, opacity, and double-sided hints where available
+- Mesh support - Handles static meshes, skinned meshes, geometry buffers, and skeleton metadata
+- Blender compatible - Export from Blender and import seamlessly
+- Async loading - Non-blocking model loading
 
 ## Installation
 
@@ -25,20 +25,12 @@ npm install @joroya/core @joroya/loader-gltf three
 ## Quick Example
 
 ```typescript
-import { Scene } from '@joroya/core';
 import { loadGLTF } from '@joroya/loader-gltf';
 
-const scene = new Scene();
-
 // Load a glTF model
-const model = await loadGLTF('/models/spaceship.glb');
+const { scene, animations } = await loadGLTF('/models/spaceship.glb');
 
-// Add to scene
-scene.add(model);
-
-// Position and scale
-model.transform.position.y = 2;
-model.transform.scale.set(0.5, 0.5, 0.5);
+console.log(scene.root.children.length, animations.length);
 ```
 
 ## API
@@ -46,19 +38,19 @@ model.transform.scale.set(0.5, 0.5, 0.5);
 ### loadGLTF
 
 ```typescript
-loadGLTF(url: string): Promise<Node>
+loadGLTF(url: string): Promise<{ scene: Scene; animations: AnimationClip[] }>
 ```
 
-Loads a glTF or GLB file and returns a Node containing the entire scene hierarchy.
+Loads a glTF or GLB file and returns an Oroya `Scene` plus translated animation clips.
 
 ## Supported Features
 
-- 笨・Meshes and geometry
-- 笨・Materials (basic)
-- 笨・Node hierarchy
-- 笨・Transformations
-- 圦 Animations (coming soon)
-- 圦 Skinning/rigging (planned)
+- Meshes and buffer geometry
+- Materials (color, PBR fields, opacity, double-sided)
+- Node hierarchy
+- Transformations
+- Animation clips for position, rotation, and scale tracks
+- Skinned meshes via `Skin` + skin indices/weights
 - 圦 Morph targets (planned)
 
 ## Usage Example
@@ -83,9 +75,11 @@ async function main() {
   camera.transform.position.z = 10;
   scene.add(camera);
   
-  // Load model
-  const model = await loadGLTF('/models/robot.glb');
-  scene.add(model);
+  // Load model and attach its root children under this scene
+  const result = await loadGLTF('/models/robot.glb');
+  for (const child of [...result.scene.root.children]) {
+    scene.add(child);
+  }
   
   // Render
   const renderer = new ThreeRenderer({
@@ -94,9 +88,10 @@ async function main() {
     height: window.innerHeight
   });
   
+  renderer.mount(scene);
+
   function animate() {
-    model.transform.rotation.y += 0.01;
-    renderer.render(scene, camera);
+    renderer.render();
     requestAnimationFrame(animate);
   }
   animate();
@@ -109,8 +104,10 @@ main();
 
 ```typescript
 try {
-  const model = await loadGLTF('/models/scene.glb');
-  scene.add(model);
+  const result = await loadGLTF('/models/scene.glb');
+  for (const child of [...result.scene.root.children]) {
+    scene.add(child);
+  }
 } catch (error) {
   console.error('Failed to load model:', error);
 }
@@ -133,12 +130,14 @@ try {
 
 ```html
 <script type="module">
-  import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@0.3.0/dist/index.js';
+  import { Scene } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@1.0.0/dist/index.js';
   
   const scene = new Scene();
-  const model = await loadGLTF('/model.glb');
-  scene.add(model);
+  const result = await loadGLTF('/model.glb');
+  for (const child of [...result.scene.root.children]) {
+    scene.add(child);
+  }
 </script>
 ```
 

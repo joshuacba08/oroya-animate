@@ -149,7 +149,7 @@ Or place in `apps/web/` directory:
 
 ### Important Notes
 
-笞・・**Vercel needs access to workspace packages:**
+**Vercel needs access to workspace packages:**
 - Build must run from monorepo root or include pnpm install at root
 - Packages must be built before building the web app
 - `workspace:*` dependencies must be resolved
@@ -202,7 +202,7 @@ Update root `package.json` to add deployment script:
 
 ### Environment Variables (Optional)
 
-Add in Vercel Dashboard 竊・Settings 竊・Environment Variables:
+Add in Vercel Dashboard -> Settings -> Environment Variables:
 
 ```bash
 # Example variables
@@ -220,7 +220,7 @@ const siteUrl = import.meta.env.PUBLIC_SITE_URL;
 
 ### 1. Add Domain in Vercel
 
-1. Go to Project Settings 竊・Domains
+1. Go to Project Settings -> Domains
 2. Add your domain (e.g., `oroya-animate.com`)
 3. Follow DNS configuration instructions
 
@@ -257,8 +257,8 @@ export default defineConfig({
 
 Vercel automatically deploys:
 
-- **Production:** Commits to `main` branch 竊・`oroya-animate.vercel.app`
-- **Preview:** Pull requests 竊・Unique preview URL per PR
+- **Production:** Commits to `main` branch -> `oroya-animate.vercel.app`
+- **Preview:** Pull requests -> unique preview URL per PR
 
 ### Manual Deployment
 
@@ -278,8 +278,8 @@ vercel --prod --scope your-team
 ### Automatic Checks on PRs
 
 Vercel adds build status to PRs:
-- 笨・Build successful 竊・"Visit Preview"
-- 笶・Build failed 竊・See logs
+- Build successful -> "Visit Preview"
+- Build failed -> see logs
 
 ### Deployment Comments
 
@@ -290,7 +290,7 @@ Vercel bot comments on PRs with:
 
 ### Configure in GitHub
 
-Repository Settings 竊・Integrations 竊・Vercel:
+Repository Settings -> Integrations -> Vercel:
 - Enable status checks
 - Enable preview comments
 - Require build success before merge
@@ -313,7 +313,7 @@ For staging environments:
 
 ### Authentication
 
-Configure in Vercel Dashboard 竊・Settings 竊・Deployment Protection.
+Configure in Vercel Dashboard -> Settings -> Deployment Protection.
 
 ## 嶋 Analytics & Monitoring
 

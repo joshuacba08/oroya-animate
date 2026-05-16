@@ -10,14 +10,14 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 
 ## Features
 
-- 識 **Engine-Agnostic Scene Graph** - Define your scene once, render anywhere
-- 女・・**Component System** - Modular architecture with reusable components
-- 売 **Transform Hierarchy** - Full parent-child transform propagation
-- 逃 **Geometry Primitives** - Box, Sphere, Circle, Path2D, and more
-- 耳 **Material System** - Color, stroke, fill properties
-- 磁 **Camera Component** - Perspective and orthographic cameras
-- 統 **Serialization** - Save and load scenes as JSON
-- 孱・・**TypeScript First** - Fully typed API
+- Engine-agnostic scene graph - Define your scene once, render anywhere
+- Component system - Modular architecture with reusable components
+- Transform hierarchy - Full parent-child transform propagation
+- Geometry primitives - Box, sphere, cylinder, plane, cone, text, Path2D, buffer, and CSG definitions
+- Material system - Color, stroke, fill properties
+- Camera component - Perspective and orthographic cameras
+- Serialization - Save and load scenes as JSON
+- TypeScript first - Fully typed API
 
 ## Installation
 
@@ -66,26 +66,27 @@ Basic building block with transform, components, and children.
 
 ```typescript
 const node = new Node('my-node');
-node.transform.position.set(1, 2, 3);
+node.transform.position = { x: 1, y: 2, z: 3 };
 node.addComponent(geometry);
 node.addComponent(material);
-node.addChild(childNode);
+node.add(childNode);
 ```
 
 ### Transform
 Position, rotation, and scale in 3D space with matrix operations.
 
 ```typescript
-node.transform.position.set(x, y, z);
-node.transform.rotation.set(rx, ry, rz);
-node.transform.scale.set(sx, sy, sz);
+node.transform.position = { x, y, z };
+node.transform.rotation = { x: qx, y: qy, z: qz, w: qw };
+node.transform.scale = { x: sx, y: sy, z: sz };
+node.transform.updateLocalMatrix();
 ```
 
 ### Components
 
 Add behavior and appearance to nodes:
 
-- **Geometry**: `createBox()`, `createSphere()`, `createCircle()`, `createPath2D()`
+- **Geometry**: `createBox()`, `createSphere()`, `createCylinder()`, `createPlane()`, `createCone()`, `createText()`, `createPath2D()`
 - **Material**: Colors and rendering properties
 - **Camera**: Perspective and orthographic projection
 
@@ -103,6 +104,7 @@ node.addComponent(material);
 
 - **[@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)** - WebGL via Three.js
 - **[@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)** - Lightweight SVG
+- **[@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)** - Browser-native Canvas2D
 - Or create your own renderer!
 
 ```typescript
@@ -114,7 +116,8 @@ const renderer = new ThreeRenderer({
   height: 600
 });
 
-renderer.render(scene, cameraNode);
+renderer.mount(scene);
+renderer.render();
 ```
 
 ## Documentation
@@ -128,7 +131,7 @@ renderer.render(scene, cameraNode);
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
   
   const scene = new Scene();
   const node = new Node('test');

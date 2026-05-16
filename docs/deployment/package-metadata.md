@@ -9,7 +9,7 @@ Each package should have these fields in `package.json`:
 ```json
 {
   "name": "@joroya/package-name",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Clear, concise description of what this package does",
   "keywords": [
     "graphics",
@@ -83,7 +83,7 @@ Each package should have these fields in `package.json`:
     "typescript"
   ],
   "peerDependencies": {
-    "@joroya/core": "^0.3.0",
+    "@joroya/core": "^1.0.0",
     "three": "^0.165.0"
   }
 }
@@ -105,7 +105,7 @@ Each package should have these fields in `package.json`:
     "generative-art"
   ],
   "peerDependencies": {
-    "@joroya/core": "^0.3.0"
+    "@joroya/core": "^1.0.0"
   }
 }
 ```
@@ -127,10 +127,47 @@ Each package should have these fields in `package.json`:
     "typescript"
   ],
   "peerDependencies": {
-    "@joroya/core": "^0.3.0",
+    "@joroya/core": "^1.0.0",
     "three": "^0.165.0"
   }
 }
+```
+
+### Additional 1.0 Packages
+
+The 1.0 package set also includes:
+
+```json
+[
+  {
+    "name": "@joroya/renderer-canvas2d",
+    "description": "Canvas2D renderer for Oroya Animate scene graphs"
+  },
+  {
+    "name": "@joroya/physics",
+    "description": "cannon-es physics integration for Oroya Animate"
+  },
+  {
+    "name": "@joroya/assets",
+    "description": "Asset loading, caching, progress, and release helpers for Oroya Animate"
+  },
+  {
+    "name": "@joroya/input",
+    "description": "Keyboard, mouse, and gamepad input manager for Oroya Animate"
+  },
+  {
+    "name": "@joroya/inspector",
+    "description": "Debug inspector overlay for Oroya Animate scenes"
+  },
+  {
+    "name": "@joroya/react",
+    "description": "React bindings for Oroya Animate"
+  },
+  {
+    "name": "@joroya/vue",
+    "description": "Vue 3 bindings for Oroya Animate"
+  }
+]
 ```
 
 ## 統 README.md for Each Package
@@ -209,10 +246,10 @@ Make it:
 - **Concise:** Max 140 characters (shows fully on NPM)
 - **Searchable:** Include relevant keywords naturally
 
-**Good Examples:**
-- 笨・"Core scene graph and component system for building 2D/3D graphics with any rendering backend"
-- 笶・"A package for Oroya" (too vague)
-- 笶・"This is a really amazing super cool graphics library that does everything you could ever want" (too long, fluff)
+**Good and bad examples:**
+- Good: "Core scene graph and component system for building 2D/3D graphics with any rendering backend"
+- Too vague: "A package for Oroya"
+- Too long: "This is a really amazing super cool graphics library that does everything you could ever want"
 
 ### 2. Keywords
 
@@ -232,10 +269,10 @@ Choose 5-12 keywords that:
 ### 3. Links
 
 Ensure all links work:
-- Homepage 竊・Documentation site
-- Repository 竊・GitHub repo
-- Issues 竊・GitHub issues
-- Funding 竊・(Optional) GitHub Sponsors or other
+- Homepage -> documentation site
+- Repository -> GitHub repo
+- Issues -> GitHub issues
+- Funding -> optional GitHub Sponsors or other
 
 ## 投 NPM Profile Optimization
 
@@ -267,7 +304,14 @@ Professional, engine-agnostic 2D/3D graphics library for the web.
 - [@joroya/core](https://www.npmjs.com/package/@joroya/core) - Core scene graph
 - [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three) - Three.js renderer
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg) - SVG renderer
+- [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d) - Canvas2D renderer
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf) - glTF loader
+- [@joroya/physics](https://www.npmjs.com/package/@joroya/physics) - Physics integration
+- [@joroya/assets](https://www.npmjs.com/package/@joroya/assets) - Asset manager
+- [@joroya/input](https://www.npmjs.com/package/@joroya/input) - Input manager
+- [@joroya/inspector](https://www.npmjs.com/package/@joroya/inspector) - Scene inspector
+- [@joroya/react](https://www.npmjs.com/package/@joroya/react) - React bindings
+- [@joroya/vue](https://www.npmjs.com/package/@joroya/vue) - Vue bindings
 
 ## Resources
 
@@ -276,7 +320,7 @@ Professional, engine-agnostic 2D/3D graphics library for the web.
 - [Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
 ```
 
-## 捷・・Version Tags
+## Version Tags
 
 Use NPM tags for different release channels:
 
@@ -391,7 +435,7 @@ packages.forEach(path => {
   Object.assign(pkg, commonMetadata);
   
   writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
-  console.log(`笨・Updated ${pkg.name}`);
+  console.log(`Updated ${pkg.name}`);
 });
 ```
 

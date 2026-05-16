@@ -33,31 +33,31 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
 
 <!-- ESM - Specific Version -->
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
 </script>
 
-<!-- CommonJS -->
-<script src="https://unpkg.com/@joroya/core@0.3.0/dist/index.cjs"></script>
+<!-- CommonJS artifact URL (for Node/bundler interop, not a browser global script) -->
+https://unpkg.com/@joroya/core@1.0.0/dist/index.cjs
 ```
 
 ### Three.js Renderer
 ```html
 <script type="module">
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
 </script>
 ```
 
 ### SVG Renderer
 ```html
 <script type="module">
-  import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
+  import { renderToSVG } from 'https://unpkg.com/@joroya/renderer-svg@1.0.0/dist/index.js';
 </script>
 ```
 
 ### glTF Loader
 ```html
 <script type="module">
-  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@0.3.0/dist/index.js';
+  import { loadGLTF } from 'https://unpkg.com/@joroya/loader-gltf@1.0.0/dist/index.js';
 </script>
 ```
 
@@ -87,10 +87,11 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
       Camera, 
       CameraType, 
       createBox, 
-      Material 
-    } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+      Material,
+      ComponentType
+    } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
     
-    import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+    import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
 
     // Create scene
     const scene = new Scene();
@@ -122,20 +123,25 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
       height: window.innerHeight
     });
 
+    renderer.mount(scene);
+
     // Animation loop
     function animate() {
       cube.transform.rotation.x += 0.01;
       cube.transform.rotation.y += 0.01;
-      renderer.render(scene, cameraNode);
+      cube.transform.updateLocalMatrix();
+      renderer.render();
       requestAnimationFrame(animate);
     }
     animate();
 
     // Handle resize
     window.addEventListener('resize', () => {
-      renderer.resize(window.innerWidth, window.innerHeight);
-      const camera = cameraNode.getComponent(Camera);
-      camera.aspect = window.innerWidth / window.innerHeight;
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      const camera = cameraNode.getComponent(ComponentType.Camera);
+      if (camera?.definition.type === CameraType.Perspective) {
+        camera.definition.aspect = window.innerWidth / window.innerHeight;
+      }
     });
   </script>
 </body>
@@ -165,35 +171,35 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
   <div id="svg-container"></div>
 
   <script type="module">
-    import { 
-      Scene, 
-      Node, 
-      createCircle, 
-      Material 
-    } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+    import {
+      Scene,
+      Node,
+      createSphere,
+      Material
+    } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
     
-    import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
+    import { renderToSVG } from 'https://unpkg.com/@joroya/renderer-svg@1.0.0/dist/index.js';
 
     // Create scene
     const scene = new Scene();
 
     // Add circle
     const circle = new Node('circle');
-    circle.addComponent(createCircle(50));
-    circle.addComponent(new Material({ 
-      color: { r: 0.2, g: 0.6, b: 1 } 
+    circle.addComponent(createSphere(50, 32, 32));
+    circle.addComponent(new Material({
+      fill: { r: 0.2, g: 0.6, b: 1 }
     }));
     circle.transform.position.x = 200;
     circle.transform.position.y = 200;
     scene.add(circle);
 
     // Render to SVG
-    const svgElement = renderSVG(scene, { 
-      width: 400, 
-      height: 400 
+    const svgElement = renderToSVG(scene, {
+      width: 400,
+      height: 400
     });
     
-    document.getElementById('svg-container').appendChild(svgElement);
+    document.getElementById('svg-container').innerHTML = svgElement;
 
     // Animate
     let angle = 0;
@@ -203,17 +209,17 @@ Oroya Animate packages are automatically available on multiple CDNs once publish
       circle.transform.position.y = 200 + Math.sin(angle) * 50;
       
       // Re-render
-      const newSvg = renderSVG(scene, { width: 400, height: 400 });
+      circle.transform.updateLocalMatrix();
+      const newSvg = renderToSVG(scene, { width: 400, height: 400 });
       const container = document.getElementById('svg-container');
-      container.innerHTML = '';
-      container.appendChild(newSvg);
+      container.innerHTML = newSvg;
     }, 50);
   </script>
 </body>
 </html>
 ```
 
-## 笞呻ｸ・Version Pinning Strategies
+## Version Pinning Strategies
 
 ### Latest Version (Auto-update)
 ```javascript
@@ -223,20 +229,20 @@ import { Scene } from 'https://unpkg.com/@joroya/core/dist/index.js';
 
 ### Latest Minor Version
 ```javascript
-// Latest patch within 0.3.x
-import { Scene } from 'https://unpkg.com/@joroya/core@0.3/dist/index.js';
+// Latest patch within 1.0.x
+import { Scene } from 'https://unpkg.com/@joroya/core@1.0/dist/index.js';
 ```
 
 ### Exact Version (Recommended)
 ```javascript
 // Exact version - most stable
-import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
+import { Scene } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
 ```
 
 ### SHA Hash (Maximum Stability)
 ```javascript
 // Immutable by commit hash
-import { Scene } from 'https://unpkg.com/@joroya/core@0.3.0?hash=abc123';
+import { Scene } from 'https://unpkg.com/@joroya/core@1.0.0?hash=abc123';
 ```
 
 ## 耳 Import Maps (Better DX)
@@ -250,9 +256,9 @@ Use import maps for cleaner imports:
   <script type="importmap">
     {
       "imports": {
-        "@joroya/core": "https://unpkg.com/@joroya/core@0.3.0/dist/index.js",
-        "@joroya/renderer-three": "https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js",
-        "@joroya/renderer-svg": "https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js",
+        "@joroya/core": "https://unpkg.com/@joroya/core@1.0.0/dist/index.js",
+        "@joroya/renderer-three": "https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js",
+        "@joroya/renderer-svg": "https://unpkg.com/@joroya/renderer-svg@1.0.0/dist/index.js",
         "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
       }
     }
@@ -275,7 +281,7 @@ Use import maps for cleaner imports:
 Use esm.sh for built-in TypeScript support:
 
 ```typescript
-import { Scene, Node } from 'https://esm.sh/@joroya/core@0.3.0';
+import { Scene, Node } from 'https://esm.sh/@joroya/core@1.0.0';
 
 const scene: Scene = new Scene();
 const node: Node = new Node('test');
@@ -285,24 +291,24 @@ const node: Node = new Node('test');
 
 ### View All Files
 ```
-https://unpkg.com/@joroya/core@0.3.0/
+https://unpkg.com/@joroya/core@1.0.0/
 ```
 
 ### View package.json
 ```
-https://unpkg.com/@joroya/core@0.3.0/package.json
+https://unpkg.com/@joroya/core@1.0.0/package.json
 ```
 
 ### View Type Definitions
 ```
-https://unpkg.com/@joroya/core@0.3.0/dist/index.d.ts
+https://unpkg.com/@joroya/core@1.0.0/dist/index.d.ts
 ```
 
 ## 笞｡ Performance Optimization
 
 ### 1. Use HTTP/2 Server Push
 ```html
-<link rel="modulepreload" href="https://unpkg.com/@joroya/core@0.3.0/dist/index.js">
+<link rel="modulepreload" href="https://unpkg.com/@joroya/core@1.0.0/dist/index.js">
 ```
 
 ### 2. Bundle for Production
@@ -319,8 +325,8 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('oroya-v1').then((cache) => {
       return cache.addAll([
-        'https://unpkg.com/@joroya/core@0.3.0/dist/index.js',
-        'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js'
+        'https://unpkg.com/@joroya/core@1.0.0/dist/index.js',
+        'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js'
       ]);
     })
   );
@@ -333,9 +339,9 @@ self.addEventListener('install', (event) => {
 <script type="module">
   async function loadOroya() {
     const cdns = [
-      'https://unpkg.com/@joroya/core@0.3.0/dist/index.js',
-      'https://cdn.jsdelivr.net/npm/@joroya/core@0.3.0/dist/index.js',
-      'https://esm.sh/@joroya/core@0.3.0'
+      'https://unpkg.com/@joroya/core@1.0.0/dist/index.js',
+      'https://cdn.jsdelivr.net/npm/@joroya/core@1.0.0/dist/index.js',
+      'https://esm.sh/@joroya/core@1.0.0'
     ];
     
     for (const cdn of cdns) {
@@ -363,12 +369,12 @@ View stats: `https://www.jsdelivr.com/package/npm/@joroya/core`
 
 ## 圷 Limitations & Considerations
 
-### 笞・・Not Recommended For:
+### Not Recommended For:
 - Large production applications (use npm + bundler)
 - Applications requiring tree-shaking
 - Projects with complex dependency management
 
-### 笨・Perfect For:
+### Perfect For:
 - Quick prototypes and experiments
 - CodePen, JSFiddle, CodeSandbox
 - Educational content and tutorials
@@ -387,8 +393,8 @@ body { margin: 0; }
 canvas { display: block; }
 
 <!-- JS -->
-import { Scene, Node, Camera, CameraType, createBox, Material } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+import { Scene, Node, Camera, CameraType, createBox, Material } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
 
 // Your code here
 ```

@@ -37,12 +37,14 @@ graph TD
     subgraph "Output Layer"
         R3["@joroya/renderer-three"]
         RS["@joroya/renderer-svg"]
-        R_FUTURE["Future: Canvas2D, WebGPU..."]
+        RC["@joroya/renderer-canvas2d"]
+        R_FUTURE["Future: WebGPU..."]
     end
 
     subgraph "Result"
         WEBGL["WebGL Canvas (pixels)"]
         SVG["SVG String (vectors)"]
+        CANVAS["Canvas2D Canvas (pixels)"]
     end
 
     UC -->|"builds"| SG
@@ -59,10 +61,12 @@ graph TD
 
     SG -->|"mount + render"| R3
     SG -->|"renderToSVG()"| RS
+    SG -->|"renderToCanvas()"| RC
     SG -.->|"future"| R_FUTURE
 
     R3 --> WEBGL
     RS --> SVG
+    RC --> CANVAS
 ```
 
 ---
@@ -74,7 +78,11 @@ graph TD
 | **Core** | `@joroya/core` | Scene graph, components, transforms, serialization, math | `uuid` (only dependency) |
 | **3D Renderer** | `@joroya/renderer-three` | Translation to Three.js WebGL | `@joroya/core`, `three` |
 | **SVG Renderer** | `@joroya/renderer-svg` | Pure SVG generation | `@joroya/core` |
+| **Canvas2D Renderer** | `@joroya/renderer-canvas2d` | Browser-native Canvas2D drawing | `@joroya/core` |
 | **glTF Loader** | `@joroya/loader-gltf` | 3D model importing | `@joroya/core`, `three` |
+| **Physics** | `@joroya/physics` | cannon-es rigid bodies, joints, sensors, raycasts, vehicles | `@joroya/core`, `cannon-es` |
+| **Tooling** | `@joroya/inspector`, `@joroya/input`, `@joroya/assets` | Debug overlay, input mapping, asset cache | `@joroya/core` |
+| **Frameworks** | `@joroya/react`, `@joroya/vue` | Experimental UI bindings | `@joroya/core`, `@joroya/renderer-three`, framework peer |
 
 ### Dependency Graph
 
@@ -83,8 +91,13 @@ graph BT
     CORE["@joroya/core"]
     R3["@joroya/renderer-three"]
     RS["@joroya/renderer-svg"]
+    RC["@joroya/renderer-canvas2d"]
     LG["@joroya/loader-gltf"]
+    PHYS["@joroya/physics"]
+    TOOLS["@joroya/inspector/input/assets"]
+    FW["@joroya/react/vue"]
     THREE["three (npm)"]
+    CANNON["cannon-es (npm)"]
     UUID["uuid (npm)"]
     DEMO["apps/demo-react"]
 
@@ -92,8 +105,14 @@ graph BT
     R3 -->|"depends on"| CORE
     R3 -->|"depends on"| THREE
     RS -->|"depends on"| CORE
+    RC -->|"depends on"| CORE
     LG -->|"depends on"| CORE
     LG -->|"depends on"| THREE
+    PHYS -->|"depends on"| CORE
+    PHYS -->|"depends on"| CANNON
+    TOOLS -->|"depends on"| CORE
+    FW -->|"depends on"| CORE
+    FW -->|"depends on"| R3
     DEMO -->|"depends on"| CORE
     DEMO -->|"depends on"| R3
 ```
@@ -110,7 +129,8 @@ Renderers work like **compilers**: they translate an intermediate representation
 flowchart LR
     IR["Scene Graph\n(Intermediate representation)"] -->|"ThreeRenderer"| OUT1["THREE.Scene\nTHREE.Mesh\nTHREE.Camera"]
     IR -->|"renderToSVG()"| OUT2["<svg>\n  <path/>\n</svg>"]
-    IR -.->|"Future: WebGPU"| OUT3["GPUBuffer\nGPURenderPipeline"]
+    IR -->|"renderToCanvas()"| OUT3["CanvasRenderingContext2D"]
+    IR -.->|"Future: WebGPU"| OUT4["GPUBuffer\nGPURenderPipeline"]
 ```
 
 | Concept | Classic Compiler | Oroya Animate |

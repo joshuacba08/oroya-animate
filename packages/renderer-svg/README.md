@@ -9,12 +9,12 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 
 ## Features
 
-- 🎨 **Vector Graphics** - Resolution-independent SVG output
-- 🪶 **Lightweight** - No heavy dependencies
-- 🎭 **Filters & Gradients** - Advanced SVG features support
-- 🔄 **Server-Side Rendering** - Works in Node.js
-- 📦 **2D Primitives** - Circle, rectangle, path, and more
-- 🖼�E�E**Export** - Save as SVG files or DOM elements
+- Vector graphics - Resolution-independent SVG output
+- Lightweight - No heavy dependencies
+- Filters and gradients - Advanced SVG features support
+- Server-side rendering - Works in Node.js
+- 2D primitives - Box/rect, sphere/circle, path, text, and flattened geometry shapes
+- Export - Save as SVG files or DOM elements
 
 ## Installation
 
@@ -25,57 +25,58 @@ npm install @joroya/core @joroya/renderer-svg
 ## Quick Example
 
 ```typescript
-import { Scene, Node, createCircle, Material } from '@joroya/core';
-import { renderSVG } from '@joroya/renderer-svg';
+import { Scene, Node, createSphere, Material } from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 // Create scene
 const scene = new Scene();
 
 // Add circle
 const circle = new Node('circle');
-circle.addComponent(createCircle(50));
+circle.addComponent(createSphere(50, 32, 32));
 circle.addComponent(new Material({ 
-  color: { r: 0.2, g: 0.6, b: 1 },
+  fill: { r: 0.2, g: 0.6, b: 1 },
   stroke: { r: 0, g: 0, b: 0 },
   strokeWidth: 2
 }));
-circle.transform.position.set(200, 200, 0);
+circle.transform.position = { x: 200, y: 200, z: 0 };
+circle.transform.updateLocalMatrix();
 scene.add(circle);
 
 // Render to SVG
-const svgElement = renderSVG(scene, { 
-  width: 400, 
-  height: 400 
+const svgString = renderToSVG(scene, {
+  width: 400,
+  height: 400
 });
 
-document.body.appendChild(svgElement);
+document.body.innerHTML = svgString;
 ```
 
 ## API
 
-### renderSVG
+### renderToSVG
 
 ```typescript
-renderSVG(
+renderToSVG(
   scene: Scene,
   options: {
     width: number;
     height: number;
-    background?: string;
+    dt?: number;
     viewBox?: string;
   }
-): SVGElement
+): string
 ```
 
-Returns a native SVG DOM element that can be appended to the document or exported.
+Returns an SVG string. For interactive DOM output, use `renderToSVGElement(scene, options)`.
 
 ## Generative Art
 
 Perfect for creating generative art and data visualizations:
 
 ```typescript
-import { Scene, Node, createPath2D, Material } from '@joroya/core';
-import { renderSVG } from '@joroya/renderer-svg';
+import { Scene, Node, createSphere, Material } from '@joroya/core';
+import { renderToSVG } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 
@@ -85,33 +86,34 @@ for (let i = 0; i < 100; i++) {
   const radius = i * 2;
   
   const circle = new Node(`circle-${i}`);
-  circle.addComponent(createCircle(5));
+  circle.addComponent(createSphere(5, 16, 16));
   circle.addComponent(new Material({
-    color: {
+    fill: {
       r: Math.sin(angle) * 0.5 + 0.5,
       g: Math.cos(angle) * 0.5 + 0.5,
       b: 0.5
     }
   }));
   
-  circle.transform.position.set(
-    Math.cos(angle) * radius + 200,
-    Math.sin(angle) * radius + 200,
-    0
-  );
+  circle.transform.position = {
+    x: Math.cos(angle) * radius + 200,
+    y: Math.sin(angle) * radius + 200,
+    z: 0,
+  };
+  circle.transform.updateLocalMatrix();
   
   scene.add(circle);
 }
 
-const svg = renderSVG(scene, { width: 400, height: 400 });
-document.body.appendChild(svg);
+const svg = renderToSVG(scene, { width: 400, height: 400 });
+document.body.innerHTML = svg;
 ```
 
 ## Export SVG
 
 ```typescript
 // Get SVG as string
-const svgString = svgElement.outerHTML;
+const svgString = renderToSVG(scene, { width: 400, height: 400 });
 
 // Download as file
 const blob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -132,8 +134,8 @@ link.click();
 
 ```html
 <script type="module">
-  import { Scene, Node, createCircle } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { renderSVG } from 'https://unpkg.com/@joroya/renderer-svg@0.3.0/dist/index.js';
+  import { Scene, Node, createSphere } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { renderToSVG } from 'https://unpkg.com/@joroya/renderer-svg@1.0.0/dist/index.js';
   
   // Your code here
 </script>

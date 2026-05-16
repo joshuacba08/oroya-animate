@@ -496,11 +496,11 @@ animate();
 
 ## ¿Qué sigue?
 
-Has completado los tutoriales de v0.5.0. Ahora puedes:
+Has completado el tutorial de cubic spline y ya estás usando APIs disponibles en v1.0. Ahora puedes:
 
 - Combinar **luces** (Tutorial 18) con **modelos glTF** (Tutorial 16) para escenas realistas.
 - Usar **CSG** (Tutorial 17) con animaciones cubic spline para efectos avanzados.
 - Renderizar en **Canvas2D** (Tutorial 15) para experiencias 2D de alto rendimiento.
-- Exportar escenas animadas con `sceneToJSON` para persistencia.
+- Exportar escenas animadas con `serialize(scene)` para persistencia.
 
 ⬅️ [Volver al índice de tutoriales](./README.md)

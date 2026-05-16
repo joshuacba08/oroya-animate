@@ -10,7 +10,7 @@ duration: "10 min"
 
 > **レベル:** 初級
 > **時間:** 10 分
-> **学ぶこと:** `apps/editor` が何をするか、v0.10 のシリアライズレイヤーをどう使うか、自分のワークフロー用にどう拡張するか。
+> **学ぶこと:** `apps/editor` が何をするか、安定した v1.0 シリアライズ契約をどう使うか、自分のワークフロー用にどう拡張するか。
 
 > **ステータス:** アルファ版。レイアウトと機能セットは 1.x で進化します。書き込むファイル形式（`serialize()` 経由の `.json`）は `@public` で 1.x シリーズ全体で安定。
 
@@ -46,7 +46,7 @@ pnpm --filter editor dev   # http://localhost:5173
 
 1. **`OroyaCanvas`** は使われていません — エディタは 3 ペイン グリッドが完全な制御を望むため `ThreeRenderer` を直接マウント。
 2. **シーン変更は `revision` カウンタをバンプ** して React の再レンダリングを強制。
-3. **Save / Load は `serialize()` / `deserialize()`** — v0.10 レイヤーが `Float32Array` を base64 経由で処理。
+3. **Save / Load は `serialize()` / `deserialize()`** — v1.0 の公開シリアライズ契約が `Float32Array` を base64 経由で処理。
 4. **Transform 編集**は `node.transform` に直接書き込み、`updateLocalMatrix()` を呼ぶ。
 
 ソースは [`apps/editor/src/`](https://github.com/joshuacba08/oroya-animate/tree/main/apps/editor/src)。

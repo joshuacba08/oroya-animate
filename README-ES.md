@@ -30,7 +30,8 @@ Oroya Animate es una biblioteca de gráficos de alto nivel que desacopla la lóg
 - **🖱️ Interactividad:** Sistema de eventos integrado con raycasting (3D) y eventos DOM (SVG).
 - **🌐 Controles de Órbita:** Controles de cámara con mouse/táctiles para escenas 3D.
 - **🎨 Arte Generativo:** Motor SvJs con ruido, distribuciones y primitivas SVG.
-- **⚛️ Compatible con React:** Wrappers optimizados para frameworks frontend modernos.
+- **⚛️ Compatible con Frameworks:** Wrappers alfa para React y Vue.
+- **🧰 Herramientas de Desarrollo:** Inspector, gestor de input, caché de assets, plugins y editor visual de referencia.
 
 ## 📦 Estructura del Proyecto
 
@@ -42,11 +43,18 @@ Este proyecto se gestiona como un monorepo usando espacios de trabajo de `pnpm`:
 - [`@joroya/renderer-svg`](packages/renderer-svg): Backend de renderizado 2D ligero para SVG.
 - [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d): Backend de renderizado Canvas2D nativo del navegador.
 - [`@joroya/loader-gltf`](packages/loader-gltf): Utilidades para importar modelos 3D al ecosistema Oroya.
+- [`@joroya/physics`](packages/physics): Integración con cannon-es para rigid bodies, joints, sensores, raycasts y vehículos.
+- [`@joroya/assets`](packages/assets): Caché de assets con precarga, progreso y conteo de referencias.
+- [`@joroya/input`](packages/input): Mapeo de acciones para teclado, mouse y gamepad.
+- [`@joroya/inspector`](packages/inspector): Overlay de debug para jerarquía, transforms y métricas de frame.
+- [`@joroya/react`](packages/react): Bindings experimentales para React.
+- [`@joroya/vue`](packages/vue): Composables experimentales para Vue 3.
 
 ### Aplicaciones
 - [`demo-react`](apps/demo-react): Demostración de Oroya Animate trabajando con React y Three.js.
 - [`demo-vanilla`](apps/demo-vanilla): Ejemplos mínimos usando JavaScript vanilla.
 - [`web`](apps/web): Sitio web de documentación impulsado por Astro (desplegado en Vercel).
+- [`editor`](apps/editor): Editor visual alfa y app de referencia para serialización.
 
 ## 📚 Documentación
 
@@ -90,8 +98,8 @@ yarn add @joroya/core @joroya/renderer-three
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
   // Tu código aquí...
 </script>
 ```
@@ -184,12 +192,13 @@ renderer.render();
 - [x] **Interpolación spline cúbica** para animaciones suaves.
 - [x] **SLERP de cuaterniones apropiado** para rotaciones interpoladas.
 
-### v1.0.0 — Listo para Producción (Visión)
-- [ ] Módulos WASM de alto rendimiento.
-- [ ] Editor visual de escenas.
-- [ ] Wrappers de frameworks (Vue, Angular).
-- [ ] Sistema de plugins para componentes personalizados.
-- [ ] Integración de física.
+### v1.0.0 — Listo para Producción ✅
+- [x] Política de estabilidad API con etiquetas `@public`, `@experimental` y `@internal`.
+- [x] Sistema de plugins (`PluginRegistry` + `ComponentHandler`) y `ThreeRenderer.usePlugin(plugin)`.
+- [x] Editor visual de escenas (`apps/editor`, alfa) con jerarquía, inspector de transforms y Save / Load vía serialización estable v1.0.
+- [x] Física con `@joroya/physics` sobre cannon-es: rigid bodies, joints, sensores, raycasts y vehículos.
+- [x] Ecosistema de desarrollo: `@joroya/inspector`, `@joroya/input`, `@joroya/assets`, `@joroya/react` y `@joroya/vue`.
+- [x] Hook de aceleración WASM (`registerMathBackend`) listo para futuros paquetes de math acelerada.
 
 ## 🚀 Publicación y Despliegue
 
@@ -201,6 +210,12 @@ Todos los paquetes están publicados en NPM bajo el scope `@joroya`:
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
 - [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf)
+- [@joroya/physics](https://www.npmjs.com/package/@joroya/physics)
+- [@joroya/assets](https://www.npmjs.com/package/@joroya/assets)
+- [@joroya/input](https://www.npmjs.com/package/@joroya/input)
+- [@joroya/inspector](https://www.npmjs.com/package/@joroya/inspector)
+- [@joroya/react](https://www.npmjs.com/package/@joroya/react)
+- [@joroya/vue](https://www.npmjs.com/package/@joroya/vue)
 
 ### Disponible en CDN
 

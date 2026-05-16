@@ -11,10 +11,10 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 
 - 🎮 **WebGL Rendering** - High-performance 3D graphics via Three.js
 - 🎥 **Camera Support** - Perspective and orthographic cameras
-- 💡 **Lighting** - Ambient, directional, point, and spot lights (coming soon)
+- 💡 **Lighting** - Ambient, directional, point, and spot lights with optional shadows
 - 🎨 **Material Support** - PBR materials and basic colors
 - 📦 **Geometry Primitives** - Box, sphere, cylinder, and custom meshes
-- 🔄 **Animation Loop** - Built-in render loop support
+- 🔄 **Per-frame Updates** - `render(dt?)` advances scene logic, animations, particles, controls, and backend sync
 
 ## Installation
 
@@ -55,11 +55,13 @@ const renderer = new ThreeRenderer({
   width: window.innerWidth,
   height: window.innerHeight
 });
+renderer.mount(scene);
 
 // Animation loop
 function animate() {
   cube.transform.rotation.y += 0.01;
-  renderer.render(scene, camera);
+  cube.transform.updateLocalMatrix();
+  renderer.render();
   requestAnimationFrame(animate);
 }
 animate();
@@ -74,16 +76,17 @@ const renderer = new ThreeRenderer({
   canvas: HTMLCanvasElement,
   width: number,
   height: number,
-  antialias?: boolean,
-  alpha?: boolean
+  dpr?: number
 });
 ```
 
 ### Methods
 
 ```typescript
-renderer.render(scene: Scene, cameraNode: Node): void
-renderer.resize(width: number, height: number): void
+renderer.mount(scene: Scene): void
+renderer.render(dt?: number): void
+renderer.setSize(width: number, height: number): void
+renderer.enableInteraction(): void
 renderer.dispose(): void
 ```
 
@@ -97,8 +100,8 @@ renderer.dispose(): void
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.3.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.3.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
   
   // Your code here
 </script>

@@ -10,7 +10,7 @@ duration: "10 min"
 
 > **Level:** Beginner
 > **Time:** 10 minutes
-> **You'll learn:** what `apps/editor` does, how it uses the v0.10 serialization layer, and how to extend it for your own workflow.
+> **You'll learn:** what `apps/editor` does, how it uses the stable v1.0 serialization contract, and how to extend it for your own workflow.
 
 > **Status:** alpha. Layout and feature set will evolve through 1.x. The file format it writes (`.json` via `serialize()`) is `@public` and stable across the 1.x series.
 
@@ -48,7 +48,7 @@ The editor is intentionally small — about 400 lines of React. The key pieces:
 
 1. **`OroyaCanvas`** is *not* used here. The editor mounts a `ThreeRenderer` directly because the host layout (3-pane grid) wants full control over canvas sizing and the React Strict Mode lifecycle.
 2. **Scene mutations bump a `revision` counter.** React doesn't observe the Oroya tree natively (the tree is plain mutable objects). The editor keeps a `useState` counter that increments on every structural change (add node, delete, load); the panels include the counter as a hidden span so React re-renders them.
-3. **Save / Load round-trip uses `serialize()` / `deserialize()`** from `@joroya/core`. The serialization layer (v0.10.0) handles `Float32Array`-backed animation tracks, buffer geometries, and instanced mesh matrices via base64-encoded typed arrays.
+3. **Save / Load round-trip uses `serialize()` / `deserialize()`** from `@joroya/core`. In v1.0 this public serialization contract handles `Float32Array`-backed animation tracks, buffer geometries, and instanced mesh matrices via base64-encoded typed arrays.
 4. **Transform edits write directly to `node.transform`** then call `updateLocalMatrix()`. The next frame's `updateWorldMatrices()` propagates the change to the rendered object.
 
 Read the source under [`apps/editor/src/`](https://github.com/joshuacba08/oroya-animate/tree/main/apps/editor/src):

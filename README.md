@@ -25,14 +25,15 @@ Oroya Animate is a high-level graphics library that decouples scene logic from r
 - **🦺 TypeScript First:** Fully typed API for a robust development experience.
 - **🧩 Modular Architecture:** Monorepo structure for clear separation of concerns.
 - **🔌 Engine Agnostic:** Define your scene once, render it anywhere.
-- **🎨 Multiple Backends:** Official support for Three.js (3D) and SVG (2D).
+- **🎨 Multiple Backends:** Official support for Three.js (3D), SVG (2D), and Canvas2D.
 - **📦 glTF Support:** Load complex 3D models directly into the agnostic scene graph.
 - **🎥 Scene-Graph Camera:** Perspective & Orthographic cameras as scene graph nodes.
 - **🎬 Animation System:** Keyframe-based animation with `AnimationMixer` and interpolation.
 - **🖱️ Interactivity:** Built-in event system with raycasting (3D) and DOM events (SVG).
 - **🌐 Orbit Controls:** Mouse/touch camera controls for 3D scenes.
 - **🎨 Generative Art:** SvJs engine with noise, distributions, and SVG primitives.
-- **⚛️ React Friendly:** Optimized wrappers for modern frontend frameworks.
+- **⚛️ Framework Friendly:** Alpha React and Vue wrappers for modern frontend apps.
+- **🧰 Developer Tooling:** Inspector, input manager, asset cache, plugins, and a reference visual editor.
 
 ##  Project Structure
 
@@ -42,12 +43,20 @@ This project is managed as a monorepo using `pnpm` workspaces:
 - [`@joroya/core`](packages/core): The heart of the library. Contains the Scene Graph, Node system, and base Components.
 - [`@joroya/renderer-three`](packages/renderer-three): WebGL rendering backend powered by Three.js.
 - [`@joroya/renderer-svg`](packages/renderer-svg): Lightweight 2D rendering backend for SVG.
+- [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d): Browser-native Canvas2D backend.
 - [`@joroya/loader-gltf`](packages/loader-gltf): Utilities for importing 3D models into the Oroya ecosystem.
+- [`@joroya/physics`](packages/physics): cannon-es integration for rigid bodies, joints, sensors, raycasts, and vehicles.
+- [`@joroya/assets`](packages/assets): Asset cache with preloading, progress events, and reference counting.
+- [`@joroya/input`](packages/input): Keyboard, mouse, and gamepad action mapping.
+- [`@joroya/inspector`](packages/inspector): Debug overlay for scene hierarchy, transforms, and frame metrics.
+- [`@joroya/react`](packages/react): Experimental React bindings.
+- [`@joroya/vue`](packages/vue): Experimental Vue 3 composables.
 
 ### Apps
 - [`demo-react`](apps/demo-react): Showcase of Oroya Animate working with React and Three.js.
 - [`demo-vanilla`](apps/demo-vanilla): Minimal examples using vanilla JavaScript.
 - [`web`](apps/web): Documentation website powered by Astro (deployed to Vercel).
+- [`editor`](apps/editor): Alpha visual scene editor and serialization reference app.
 
 ## ?? Documentation
 
@@ -58,7 +67,7 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 - [**Getting Started**](docs/getting-started.md): Your first scene in 5 minutes.
 - [**Scene Graph & Transformations**](docs/scene-graph.md): Deep dive into nodes and components.
 - [**API Reference**](docs/api-reference.md): Complete reference of classes, interfaces and functions.
-- [**Renderers**](docs/renderers.md): Three.js and SVG backends documentation.
+- [**Renderers**](docs/renderers.md): Three.js, SVG, and Canvas2D backend documentation.
 - [**Serialization**](docs/serialization.md): Save and load scenes as JSON.
 
 ### Deployment & Publishing
@@ -95,8 +104,8 @@ yarn add @joroya/core @joroya/renderer-three
 
 ```html
 <script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@0.4.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@0.4.0/dist/index.js';
+  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
+  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
   
   // Your code here
 </script>
@@ -161,16 +170,16 @@ renderer.mount(scene);
 renderer.render();
 ```
 
-## ??? Roadmap
+## Roadmap
 
-### v0.1.0 ? Architecture & Setup ?
+### v0.1.0 - Architecture & Setup
 - [x] Monorepo with pnpm workspaces.
 - [x] TypeScript + tsup build pipeline.
 - [x] Base packages: `@joroya/core`, `@joroya/renderer-three`, `@joroya/renderer-svg`, `@joroya/loader-gltf`.
 - [x] Initial Scene Graph interfaces and base classes.
 - [x] Demo apps (Vanilla JS + React).
 
-### v0.2.0 ? First Functional Release ?
+### v0.2.0 - First Functional Release
 - [x] Functional Scene Graph API (`Scene`, `Node`, `Transform` with matrix math).
 - [x] Component system (`Geometry`, `Material`, `Camera`).
 - [x] Geometry primitives: `createBox`, `createSphere`, `createPath2D`.
@@ -181,7 +190,7 @@ renderer.render();
 - [x] TSDoc on all public API surfaces.
 - [x] Comprehensive documentation (see [`docs/`](docs/)).
 
-### v0.3.0 ? Build Stabilization & Project Hardening ?
+### v0.3.0 - Build Stabilization & Project Hardening
 - [x] Fixed build pipeline: all 4 packages compile successfully (CJS + ESM + DTS).
 - [x] Correct `package.json` exports (file extensions, `types`-first condition order).
 - [x] TypeScript `composite: false` override for tsup DTS compatibility.
@@ -273,7 +282,7 @@ renderer.render();
 ### v1.0.0 — Production Ready ✅
 - [x] **API Stability**: `@public` / `@experimental` / `@internal` JSDoc tags + auditable via `pnpm api:check`. Public surface frozen — breaking changes require a major bump with a 1-major-version deprecation window. See [`docs/api-stability.md`](docs/api-stability.md).
 - [x] **Plugin System**: `PluginRegistry` + `ComponentHandler` in `@joroya/core/plugins`; `ThreeRenderer.usePlugin(plugin)` for renderer-level extensibility.
-- [x] **Visual Scene Editor** (`apps/editor`, alpha): hierarchy panel + transform inspector + Save / Load (uses v0.10.0 serialization). Gizmo handles are post-1.0.
+- [x] **Visual Scene Editor** (`apps/editor`, alpha): hierarchy panel + transform inspector + Save / Load using the stable v1.0 serialization contract. Gizmo handles are post-1.0.
 - [x] **WASM Acceleration Hook**: `getMathBackend()` / `registerMathBackend(backend)` registry. Default backend is pure JS; a future `@joroya/wasm-math` package can drop in WASM without consumer code changes.
 - [x] **170 tests** across 11 packages + an `api:check` script + an ESLint gate forbidding `any` and `@ts-ignore` in source.
 - [x] [OA-011 EPIC](docs/features/OA-011/EPIC.md).
@@ -284,7 +293,7 @@ renderer.render();
 - [ ] **Multi-bone IK** (CCD / FABRIK) — `solve2BoneIK` ships in v1.0 but covers 2-bone chains only.
 - [ ] **Playwright E2E suite** for the editor and demo apps.
 - [ ] **Animation timeline editor** integrated into the visual editor.
-- [ ] **Touch gestures** (pinch / swipe / rotate) on top of the v0.11 input manager.
+- [ ] **Touch gestures** (pinch / swipe / rotate) on top of the input manager.
 
 ## 🚀 Publishing & Deployment
 
@@ -296,6 +305,12 @@ All packages are published to NPM under the `@joroya` scope:
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
 - [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf)
+- [@joroya/physics](https://www.npmjs.com/package/@joroya/physics)
+- [@joroya/assets](https://www.npmjs.com/package/@joroya/assets)
+- [@joroya/input](https://www.npmjs.com/package/@joroya/input)
+- [@joroya/inspector](https://www.npmjs.com/package/@joroya/inspector)
+- [@joroya/react](https://www.npmjs.com/package/@joroya/react)
+- [@joroya/vue](https://www.npmjs.com/package/@joroya/vue)
 
 ### Available on CDN
 
