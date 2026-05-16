@@ -7,18 +7,51 @@ import type { SvJs } from "@joroya/renderer-svg";
 import { EXAMPLES } from "./examples/scenes";
 import type { ExampleDef } from "./examples/ExampleCard";
 
+/**
+ * Map tutorial slug → preview scene id. Each tutorial slug points at a
+ * scene defined in `examples/scenes.ts` (or one of the locally-imported
+ * demo scenes registered there). Tutorials whose subject doesn't lend
+ * itself to a self-contained inline preview (e.g. plugin authoring,
+ * external editor app) are intentionally omitted — those render a "Demo
+ * no disponible" placeholder which is the honest answer.
+ */
 const TUTORIAL_SCENE_MAP: Record<string, string> = {
   "01-hello-cube": "hello-cube",
   "02-color-palette": "color-palette",
+  // 03 (save/load) reuses hello-cube — the preview shows the scene shape
+  // that gets serialized; the tutorial body covers the save/load round-trip.
+  "03-save-load-scenes": "hello-cube",
   "04-solar-system": "solar-system",
   "05-svg-generative-art": "svjs-generative",
   "06-cameras-viewpoints": "camera-viewpoints",
   "07-procedural-city": "procedural-city",
+  // 08 (multi-renderer) uses the SVG showcase — the tutorial walks the
+  // same scene rendered by Three.js and SVG; preview shows the SVG path.
+  "08-multi-renderer": "svg-showcase",
   "09-svg-gradients-filters": "svg-showcase",
   "10-svg-animations": "svg-animations",
   "11-svg-interactive": "svg-interactive",
   "12-keyframe-animation": "interpolation-comparison",
   "13-3d-interactivity": "interactive-cubes",
+  // 14 (orbit controls) uses interactive-cubes — same drag/wheel surface
+  // the tutorial discusses, just without the explicit OrbitControlsWrapper.
+  "14-orbit-controls": "interactive-cubes",
+  // v1.0 tutorials — each maps to a demo introduced in OA-011/scenes.
+  "15-physics-basics": "joints-chain",
+  "16-animator-clips": "animator-crossfade",
+  // 17 (React) renders a regular Three.js canvas under the hood — the
+  // hello-cube preview shows the equivalent end state. The wrapper code
+  // lives in the tutorial body itself.
+  "17-react-bindings": "hello-cube",
+  // 18 (plugin authoring) renders procedural-city as a stand-in for "a
+  // visualization that could equally be plugin-supplied" — the tutorial
+  // walks the registration mechanics.
+  "18-plugins-and-extensibility": "procedural-city",
+  // 19 (dev tools) uses solar-system — rich hierarchy + transforms make
+  // a good target for the Inspector / Input panel screenshots in-body.
+  "19-developer-tools": "solar-system",
+  // 20 (visual editor) intentionally omitted — the tutorial directs
+  // readers to the standalone editor app where the real preview lives.
 };
 
 interface Props {
