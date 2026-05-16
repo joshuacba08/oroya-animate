@@ -47,6 +47,9 @@ const docsSections: SidebarSection[] = [
   },
 ];
 
+// Tutorial sections mirror the `level` field in each markdown's frontmatter
+// (`beginner` | `intermediate` | `advanced`). Order within a section follows
+// the tutorial number so new entries slot in naturally.
 const tutorialSections: SidebarSection[] = [
   {
     title: t('tutorials.beginner'),
@@ -55,6 +58,7 @@ const tutorialSections: SidebarSection[] = [
       { slug: "01-hello-cube", label: t('tutorials.items.helloCube') },
       { slug: "02-color-palette", label: t('tutorials.items.colorPalette') },
       { slug: "03-save-load-scenes", label: t('tutorials.items.saveLoadScenes') },
+      { slug: "20-visual-editor", label: t('tutorials.items.visualEditor') },
     ],
   },
   {
@@ -66,6 +70,12 @@ const tutorialSections: SidebarSection[] = [
       { slug: "06-cameras-viewpoints", label: t('tutorials.items.camerasViewpoints') },
       { slug: "09-svg-gradients-filters", label: t('tutorials.items.svgGradientsFilters') },
       { slug: "10-svg-animations", label: t('tutorials.items.svgAnimations') },
+      { slug: "12-keyframe-animation", label: t('tutorials.items.keyframeAnimation') },
+      { slug: "14-orbit-controls", label: t('tutorials.items.orbitControls') },
+      { slug: "15-physics-basics", label: t('tutorials.items.physicsBasics') },
+      { slug: "16-animator-clips", label: t('tutorials.items.animatorClips') },
+      { slug: "17-react-bindings", label: t('tutorials.items.reactBindings') },
+      { slug: "19-developer-tools", label: t('tutorials.items.developerTools') },
     ],
   },
   {
@@ -75,6 +85,8 @@ const tutorialSections: SidebarSection[] = [
       { slug: "07-procedural-city", label: t('tutorials.items.proceduralCity') },
       { slug: "08-multi-renderer", label: t('tutorials.items.multiRenderer') },
       { slug: "11-svg-interactive", label: t('tutorials.items.svgInteractive') },
+      { slug: "13-3d-interactivity", label: t('tutorials.items.threeDInteractivity') },
+      { slug: "18-plugins-and-extensibility", label: t('tutorials.items.pluginsExtensibility') },
     ],
   },
 ];
@@ -85,9 +97,6 @@ function isActive(slug: string, basePath?: string): boolean {
   return currentPath === `${localizedPrefix}/${slug}` || currentPath === `${localizedPrefix}/${slug}/`;
 }
 
-function renderSections(sections: SidebarSection[], defaultBasePath: string) {
-  return sections;
-}
 ---
 
 <aside class="w-72 shrink-0 min-h-full bg-base-100 lg:bg-transparent lg:fixed lg:top-20 lg:bottom-0 lg:left-0 lg:w-72">

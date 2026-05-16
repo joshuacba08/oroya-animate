@@ -221,7 +221,16 @@
       "svgAnimations": "SVGアニメーション",
       "proceduralCity": "プロシージャルシティ",
       "multiRenderer": "マルチレンダラー",
-      "svgInteractive": "SVGインタラクティブ"
+      "svgInteractive": "SVGインタラクティブ",
+      "keyframeAnimation": "キーフレームアニメーション",
+      "threeDInteractivity": "3Dインタラクティビティ",
+      "orbitControls": "オービットコントロール",
+      "physicsBasics": "物理: 基礎",
+      "animatorClips": "Animator: クリップ",
+      "reactBindings": "React バインディング",
+      "pluginsExtensibility": "プラグインと拡張性",
+      "developerTools": "開発者ツール",
+      "visualEditor": "ビジュアルエディタ"
     },
     "entries": {
       "01-hello-cube": {

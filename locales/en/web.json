@@ -221,7 +221,16 @@
       "svgAnimations": "SVG Animations",
       "proceduralCity": "Procedural City",
       "multiRenderer": "Multi-Renderer",
-      "svgInteractive": "SVG Interactive"
+      "svgInteractive": "SVG Interactive",
+      "keyframeAnimation": "Keyframe Animation",
+      "threeDInteractivity": "3D Interactivity",
+      "orbitControls": "Orbit Controls",
+      "physicsBasics": "Physics Basics",
+      "animatorClips": "Animator Clips",
+      "reactBindings": "React Bindings",
+      "pluginsExtensibility": "Plugins & Extensibility",
+      "developerTools": "Developer Tools",
+      "visualEditor": "Visual Editor"
     },
     "entries": {
       "01-hello-cube": {
