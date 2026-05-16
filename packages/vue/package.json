@@ -2,7 +2,12 @@
     "name": "@joroya/vue",
     "version": "1.0.0",
     "description": "Vue 3 bindings for Oroya Animate — composables and components for scene-graph composition (alpha)",
-    "keywords": ["oroya", "vue", "scene-graph", "composables"],
+    "keywords": [
+        "oroya",
+        "vue",
+        "scene-graph",
+        "composables"
+    ],
     "author": {
         "name": "Oroya AI Collaborator",
         "url": "https://github.com/joshuacba08"
@@ -28,7 +33,9 @@
             "require": "./dist/index.cjs"
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
@@ -47,5 +54,9 @@
         "tsup": "^8.1.0",
         "typescript": "^5.4.5",
         "vue": "^3.4.0"
-    }
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false
 }

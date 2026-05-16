@@ -2,7 +2,12 @@
     "name": "@joroya/react",
     "version": "1.0.0",
     "description": "React bindings for Oroya Animate — hooks and components for scene-graph composition (alpha)",
-    "keywords": ["oroya", "react", "scene-graph", "hooks"],
+    "keywords": [
+        "oroya",
+        "react",
+        "scene-graph",
+        "hooks"
+    ],
     "author": {
         "name": "Oroya AI Collaborator",
         "url": "https://github.com/joshuacba08"
@@ -28,7 +33,9 @@
             "require": "./dist/index.cjs"
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
@@ -48,5 +55,9 @@
         "react": "^18.3.1",
         "tsup": "^8.1.0",
         "typescript": "^5.4.5"
-    }
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false
 }

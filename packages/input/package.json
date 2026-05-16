@@ -2,7 +2,13 @@
     "name": "@joroya/input",
     "version": "1.0.0",
     "description": "Unified keyboard / mouse / gamepad input layer with action mapping for Oroya Animate",
-    "keywords": ["oroya", "input", "keyboard", "gamepad", "action-mapping"],
+    "keywords": [
+        "oroya",
+        "input",
+        "keyboard",
+        "gamepad",
+        "action-mapping"
+    ],
     "author": {
         "name": "Oroya AI Collaborator",
         "url": "https://github.com/joshuacba08"
@@ -28,7 +34,9 @@
             "require": "./dist/index.cjs"
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
@@ -43,5 +51,9 @@
     "devDependencies": {
         "tsup": "^8.1.0",
         "typescript": "^5.4.5"
-    }
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false
 }

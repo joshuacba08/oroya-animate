@@ -56,5 +56,9 @@
   },
   "dependencies": {
     "uuid": "^9.0.1"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false
 }

@@ -2,7 +2,13 @@
     "name": "@joroya/inspector",
     "version": "1.0.0",
     "description": "Debug overlay for Oroya Animate scene graphs — hierarchy, selection, transform inspection, frame metrics",
-    "keywords": ["oroya", "inspector", "debug", "scene-graph", "developer-tools"],
+    "keywords": [
+        "oroya",
+        "inspector",
+        "debug",
+        "scene-graph",
+        "developer-tools"
+    ],
     "author": {
         "name": "Oroya AI Collaborator",
         "url": "https://github.com/joshuacba08"
@@ -28,7 +34,9 @@
             "require": "./dist/index.cjs"
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
@@ -43,5 +51,9 @@
     "devDependencies": {
         "tsup": "^8.1.0",
         "typescript": "^5.4.5"
-    }
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false
 }

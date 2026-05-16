@@ -1,0 +1,43 @@
+name: ✨ Feature request
+description: Suggest a capability for Oroya Animate
+labels: [enhancement, triage]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for proposing a feature. Big features ship as EPICs
+              (see `docs/features/OA-*`). Small ones are issues like this.
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problem statement
+          description: What can't you do today that you wish you could?
+      validations:
+          required: true
+    - type: textarea
+      id: proposal
+      attributes:
+          label: Proposed API
+          description: |
+              Sketch the API surface — even a one-line shape helps the
+              maintainers reason about scope and back-compat.
+          placeholder: |
+              ```ts
+              scene.attach(plugin);
+              ```
+    - type: dropdown
+      id: scope
+      attributes:
+          label: Stability tier you'd target
+          options:
+              - '@public — breaking changes need major bumps'
+              - '@experimental — fast iteration, no stability promise'
+              - 'unsure'
+    - type: checkboxes
+      id: alternatives
+      attributes:
+          label: Alternatives considered
+          options:
+              - label: I could do this in user-land
+              - label: There's an existing plugin or workaround
+              - label: I checked the roadmap (`ROADMAP.md`) — not already there

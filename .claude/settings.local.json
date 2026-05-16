@@ -23,7 +23,8 @@
       "Bash(sed -i 's/\"version\": \"0.11.0\"/\"version\": \"0.12.0\"/' __TRACKED_VAR__/package.json)",
       "Bash(pnpm api:check)",
       "Bash(pnpm --filter \"editor\" exec tsc --noEmit)",
-      "Bash(pnpm --filter \"editor\" build)"
+      "Bash(pnpm --filter \"editor\" build)",
+      "Bash(node -e ' *)"
     ]
   }
 }
