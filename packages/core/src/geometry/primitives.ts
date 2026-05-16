@@ -1,4 +1,4 @@
-import { BoxGeometryDef, ConeGeometryDef, CylinderGeometryDef, Geometry, GeometryPrimitive, Path2DGeometryDef, PlaneGeometryDef, SphereGeometryDef, TextGeometryDef } from '../components';
+import { BoxGeometryDef, CircleGeometryDef, ConeGeometryDef, CylinderGeometryDef, Geometry, GeometryPrimitive, Path2DGeometryDef, PlaneGeometryDef, SphereGeometryDef, TextGeometryDef, TorusGeometryDef } from '../components';
 
 export interface GeometryOptions {
   castShadow?: boolean;
@@ -136,6 +136,61 @@ export function createCone(
     heightSegments,
     openEnded,
     ...options
+  };
+  return new Geometry(def);
+}
+
+/**
+ * Creates a new torus geometry component.
+ * @param radius Radius of the torus, from the center of the torus to the center of the tube.
+ * @param tube Radius of the tube.
+ * @param radialSegments Number of segments around the tube.
+ * @param tubularSegments Number of segments around the torus.
+ * @param arc Central angle in radians (default `Math.PI * 2` — a full torus).
+ * @returns A new Geometry component with a torus definition.
+ */
+export function createTorus(
+  radius = 1,
+  tube = 0.4,
+  radialSegments = 16,
+  tubularSegments = 100,
+  arc: number = Math.PI * 2,
+  options?: GeometryOptions,
+): Geometry {
+  const def: TorusGeometryDef = {
+    type: GeometryPrimitive.Torus,
+    radius,
+    tube,
+    radialSegments,
+    tubularSegments,
+    arc,
+    ...options,
+  };
+  return new Geometry(def);
+}
+
+/**
+ * Creates a new circle geometry component (flat disc).
+ * @param radius Radius of the circle.
+ * @param segments Number of segments (triangles).
+ * @param thetaStart Start angle in radians.
+ * @param thetaLength Central angle in radians (default `Math.PI * 2` — full circle).
+ * @returns A new Geometry component with a circle definition.
+ */
+export function createCircle(
+  radius = 1,
+  segments = 32,
+  thetaStart = 0,
+  thetaLength: number = Math.PI * 2,
+  options?: GeometryOptions,
+): Geometry {
+  const def: CircleGeometryDef = {
+    type: GeometryPrimitive.Circle,
+    radius,
+    segments,
+    thetaStart,
+    thetaLength,
+    ...options,
   };
   return new Geometry(def);
 }

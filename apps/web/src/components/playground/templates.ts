@@ -1455,4 +1455,686 @@ function loop(time) {
 requestAnimationFrame(loop);
 `,
   },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // v1.0 templates — physics, animator, particles, post-FX, instancing,
+  // springs, IK. Each one is a self-contained example: copy, run, tweak.
+  // ─────────────────────────────────────────────────────────────────────
+
+  {
+    id: "physics-stack",
+    title: "Physics: Falling Stack",
+    category: "3d",
+    description: "Stack de 6 cubos cayendo sobre un piso estático con cannon-es",
+    code: `// Physics Stack — bodies dinámicos cayendo sobre un piso estático.
+// PhysicsSystem es un wrapper sobre cannon-es que step + sync transforms.
+
+const scene = new Scene();
+const physics = new PhysicsSystem({ gravity: { x: 0, y: -9.82, z: 0 } });
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 100,
+}));
+cam.transform.position = { x: 6, y: 6, z: 10 };
+cam.transform.lookAt({ x: 0, y: 1, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.45 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 5, y: 10, z: 5 };
+sun.addComponent(new Light({
+  type: LightType.Directional, intensity: 1.1,
+  castShadow: true, shadowMapSize: 1024,
+}));
+scene.add(sun);
+
+// Floor — static body
+const floor = new Node("floor");
+floor.addComponent(createPlane(20, 20, 1, 1, { receiveShadow: true }));
+floor.addComponent(new Material({ color: { r: 0.22, g: 0.24, b: 0.28 } }));
+floor.transform.rotation = { x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 };
+floor.addComponent(new RigidBody({ type: RigidBodyType.Static }));
+floor.addComponent(new Collider({
+  shape: ColliderShape.Box, halfExtents: { x: 10, y: 0.1, z: 10 },
+}));
+scene.add(floor);
+
+// 6 dynamic cubes — random colors, staggered fall.
+for (let i = 0; i < 6; i++) {
+  const cube = new Node("cube-" + i);
+  cube.addComponent(createBox(0.8, 0.8, 0.8, { castShadow: true }));
+  cube.addComponent(new Material({
+    color: { r: Math.random(), g: Math.random(), b: Math.random() },
+    roughness: 0.4,
+  }));
+  cube.transform.position = {
+    x: (Math.random() - 0.5) * 1.5,
+    y: 3 + i * 1.2,
+    z: (Math.random() - 0.5) * 1.5,
+  };
+  cube.transform.updateLocalMatrix();
+  cube.addComponent(new RigidBody({ type: RigidBodyType.Dynamic, mass: 1 }));
+  cube.addComponent(new Collider({
+    shape: ColliderShape.Box, halfExtents: { x: 0.4, y: 0.4, z: 0.4 },
+    restitution: 0.3,
+  }));
+  scene.add(cube);
+}
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.1);
+  last = now;
+  physics.update(dt, scene);
+  renderer.render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "physics-trigger",
+    title: "Physics: Trigger Volume",
+    category: "3d",
+    description: "Sensor collider que emite trigger-enter / trigger-exit sin contacto físico",
+    code: `// Trigger volume — Collider con isTrigger: true. Los bodies lo atraviesan
+// pero el nodo dispara eventos trigger-enter / trigger-stay / trigger-exit.
+
+const scene = new Scene();
+const physics = new PhysicsSystem();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 50, aspect: canvas.width / canvas.height, near: 0.1, far: 100,
+}));
+cam.transform.position = { x: 4, y: 5, z: 9 };
+cam.transform.lookAt({ x: 0, y: 1, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.45 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 5, y: 10, z: 5 };
+sun.addComponent(new Light({
+  type: LightType.Directional, intensity: 1.0, castShadow: true,
+}));
+scene.add(sun);
+
+const floor = new Node("floor");
+floor.addComponent(createPlane(20, 20, 1, 1, { receiveShadow: true }));
+floor.addComponent(new Material({ color: { r: 0.22, g: 0.24, b: 0.28 } }));
+floor.transform.rotation = { x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 };
+floor.addComponent(new RigidBody({ type: RigidBodyType.Static }));
+floor.addComponent(new Collider({
+  shape: ColliderShape.Box, halfExtents: { x: 10, y: 0.1, z: 10 },
+}));
+scene.add(floor);
+
+// Trigger zone — visible but pass-through.
+const triggerMat = new Material({ color: { r: 0.2, g: 0.8, b: 0.4 }, opacity: 0.3 });
+const trigger = new Node("trigger");
+trigger.transform.position = { x: 0, y: 1.5, z: 0 };
+trigger.transform.updateLocalMatrix();
+trigger.addComponent(createBox(3, 1, 3));
+trigger.addComponent(triggerMat);
+trigger.addComponent(new RigidBody({ type: RigidBodyType.Static }));
+trigger.addComponent(new Collider({
+  shape: ColliderShape.Box, halfExtents: { x: 1.5, y: 0.5, z: 1.5 },
+  isTrigger: true,
+}));
+scene.add(trigger);
+
+trigger.events.on("trigger-enter", (e) => {
+  console.log("entered:", e.other.name);
+  triggerMat.definition.color = { r: 1.0, g: 0.85, b: 0.2 };
+});
+trigger.events.on("trigger-exit", (e) => {
+  console.log("exited:", e.other.name);
+  triggerMat.definition.color = { r: 0.2, g: 0.8, b: 0.4 };
+});
+
+for (let i = 0; i < 3; i++) {
+  const ball = new Node("ball-" + i);
+  ball.transform.position = { x: (i - 1) * 0.6, y: 6 + i * 1.2, z: 0 };
+  ball.transform.updateLocalMatrix();
+  ball.addComponent(createSphere(0.4, 16, 16, { castShadow: true }));
+  ball.addComponent(new Material({ color: { r: 1, g: 0.5, b: 0.2 }, roughness: 0.4 }));
+  ball.addComponent(new RigidBody({ type: RigidBodyType.Dynamic, mass: 1 }));
+  ball.addComponent(new Collider({
+    shape: ColliderShape.Sphere, radius: 0.4, restitution: 0.6,
+  }));
+  scene.add(ball);
+}
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.1);
+  last = now;
+  physics.update(dt, scene);
+  renderer.render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "animator-crossfade",
+    title: "Animator: Cross-fade Clips",
+    category: "3d",
+    description: "Animator con clips idle/walk/spin y crossFade automático cada 4s",
+    code: `// Animator con 3 clips — alterna entre ellos cada 4 segundos via crossFade.
+// scene.update(dt) corre el mixer automáticamente.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 100,
+}));
+cam.transform.position = { x: 0, y: 4, z: 8 };
+cam.transform.lookAt({ x: 0, y: 1, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.45 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 5, y: 8, z: 5 };
+sun.addComponent(new Light({
+  type: LightType.Directional, intensity: 1.1, castShadow: true,
+}));
+scene.add(sun);
+
+const ground = new Node("ground");
+ground.addComponent(createPlane(20, 20, 1, 1, { receiveShadow: true }));
+ground.addComponent(new Material({ color: { r: 0.18, g: 0.2, b: 0.24 } }));
+ground.transform.rotation = { x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 };
+scene.add(ground);
+
+const hero = new Node("hero");
+hero.addComponent(createBox(1, 1, 1, { castShadow: true }));
+hero.addComponent(new Material({ color: { r: 1, g: 0.55, b: 0.2 }, roughness: 0.4 }));
+hero.transform.position = { x: 0, y: 1, z: 0 };
+scene.add(hero);
+
+const idle = {
+  name: "idle", duration: 2.0,
+  tracks: [{
+    targetNodeName: "hero", property: "position",
+    times: new Float32Array([0, 0.5, 1.0, 1.5, 2.0]),
+    values: new Float32Array([
+      0, 1.00, 0,  0, 1.15, 0,  0, 1.00, 0,  0, 0.85, 0,  0, 1.00, 0,
+    ]),
+    interpolation: "linear",
+  }],
+};
+
+const walk = {
+  name: "walk", duration: 2.4,
+  tracks: [{
+    targetNodeName: "hero", property: "position",
+    times: new Float32Array([0, 0.6, 1.2, 1.8, 2.4]),
+    values: new Float32Array([
+      -2, 1.0, 0,  0, 1.2, 0,  2, 1.0, 0,  0, 1.2, 0,  -2, 1.0, 0,
+    ]),
+    interpolation: "linear",
+  }],
+  events: [{ time: 0.6, name: "footstep" }, { time: 1.8, name: "footstep" }],
+};
+
+const spin = {
+  name: "spin", duration: 2.0,
+  tracks: [{
+    targetNodeName: "hero", property: "rotation",
+    times: new Float32Array([0, 0.5, 1.0, 1.5, 2.0]),
+    values: new Float32Array([
+      0, 0, 0, 1,
+      0, Math.SQRT1_2, 0, Math.SQRT1_2,
+      0, 1, 0, 0,
+      0, Math.SQRT1_2, 0, -Math.SQRT1_2,
+      0, 0, 0, 1,
+    ]),
+    interpolation: "linear",
+  }],
+};
+
+const animator = new Animator({
+  animations: { idle, walk, spin },
+  autoplay: "idle",
+});
+hero.addComponent(animator);
+animator.bindToScene(scene);
+animator.on("keyframe-event", (e) => console.log("event:", e.event.name));
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+const order = ["idle", "walk", "spin"];
+let currentIdx = 0;
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.1);
+  last = now;
+  const elapsed = now / 1000;
+  const idx = Math.floor(elapsed / 4) % order.length;
+  if (idx !== currentIdx) {
+    currentIdx = idx;
+    animator.crossFade(order[currentIdx], 0.4);
+  }
+  renderer.render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "particle-fountain",
+    title: "Particles: Fountain",
+    category: "3d",
+    description: "ParticleSystem con emisión continua, gravedad e interpolación de color",
+    code: `// Fountain particles — CPU-simulated ParticleSystem.
+// THREE.Points por debajo; gravity + start/end color interpolation.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 200,
+}));
+cam.transform.position = { x: 0, y: 4, z: 12 };
+cam.transform.lookAt({ x: 0, y: 2, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(amb);
+
+const env = new Node("env");
+env.addComponent(new Environment({ background: { r: 0.02, g: 0.02, b: 0.05 } }));
+scene.add(env);
+
+const emitter = new Node("emitter");
+emitter.addComponent(new ParticleSystem({
+  maxParticles: 800,
+  emissionRate: 200,
+  speed: 6,
+  gravity: { x: 0, y: -9.82, z: 0 },
+  startColor: { r: 1, g: 0.8, b: 0.2 },
+  endColor:   { r: 1, g: 0.2, b: 0.05 },
+  startSize: 0.3,
+  endSize: 0.05,
+}));
+scene.add(emitter);
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.1);
+  last = now;
+  renderer.render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "post-bloom",
+    title: "Post-FX: Bloom + ACES",
+    category: "3d",
+    description: "PostProcessing en cámara: bloom + tone mapping ACESFilmic + SMAA",
+    code: `// PostProcessing component — bloom + tone mapping + SMAA.
+// El renderer detecta automáticamente el componente en la cámara activa.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 100,
+}));
+cam.transform.position = { x: 0, y: 2, z: 7 };
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+cam.addComponent(new PostProcessing({
+  bloom: { enabled: true, threshold: 0.6, strength: 1.5, radius: 0.4 },
+  toneMapping: ToneMapping.ACESFilmic,
+  exposure: 1.0,
+  antialiasing: true,
+}));
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.2 }));
+scene.add(amb);
+
+const colors = [
+  { r: 1, g: 0.3, b: 0.3 },
+  { r: 0.3, g: 1, b: 0.6 },
+  { r: 0.4, g: 0.6, b: 1 },
+];
+
+for (let i = 0; i < 3; i++) {
+  const ball = new Node("ball-" + i);
+  ball.transform.position = { x: (i - 1) * 2, y: 0, z: 0 };
+  ball.addComponent(createSphere(0.7, 32, 32));
+  ball.addComponent(new Material({
+    color: colors[i],
+    emissive: colors[i],
+    emissiveIntensity: 2.5,
+  }));
+  scene.add(ball);
+}
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let t = 0;
+function loop() {
+  t += 0.01;
+  scene.root.children.forEach((node, i) => {
+    if (node.name.startsWith("ball-")) {
+      node.transform.position.y = Math.sin(t + i) * 0.6;
+      node.transform.updateLocalMatrix();
+    }
+  });
+  renderer.render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "instanced-cubes",
+    title: "InstancedMesh: 1000 Cubes",
+    category: "3d",
+    description: "Renderizado masivo: 1000 cubos en un draw call con InstancedMesh",
+    code: `// InstancedMesh — un draw call para 1000 cubos. Per-instance matrix + color.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 60, aspect: canvas.width / canvas.height, near: 0.1, far: 500,
+}));
+cam.transform.position = { x: 0, y: 15, z: 35 };
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.5 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 10, y: 20, z: 10 };
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 0.9 }));
+scene.add(sun);
+
+const count = 1000;
+// InstancedMesh constructor: (geometry, material, count, useColors).
+// The class already attaches its own Geometry + Material components, so
+// the user should NOT call addComponent for them.
+const instanced = new InstancedMesh(
+  { type: GeometryPrimitive.Box, width: 0.4, height: 0.4, depth: 0.4 },
+  { roughness: 0.4, metalness: 0.3 },
+  count,
+  true,    // per-instance colors
+);
+
+const grid = Math.ceil(Math.sqrt(count));
+const spacing = 1.2;
+
+function setMatrix(i, gx, gz, y) {
+  // Column-major 4×4: identity + translation in the last column.
+  const m = [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    gx * spacing, y, gz * spacing, 1,
+  ];
+  instanced.setMatrixAt(i, m);
+}
+
+for (let i = 0; i < count; i++) {
+  const gx = (i % grid) - grid / 2;
+  const gz = Math.floor(i / grid) - grid / 2;
+  setMatrix(i, gx, gz, 0);
+  instanced.setColorAt(i, {
+    r: 0.3 + Math.random() * 0.7,
+    g: 0.3 + Math.random() * 0.7,
+    b: 0.3 + Math.random() * 0.7,
+  });
+}
+scene.add(instanced);
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let t = 0;
+function loop() {
+  t += 0.01;
+  for (let i = 0; i < count; i++) {
+    const gx = (i % grid) - grid / 2;
+    const gz = Math.floor(i / grid) - grid / 2;
+    const y = Math.sin(gx * 0.3 + t) * Math.cos(gz * 0.3 + t) * 1.5;
+    setMatrix(i, gx, gz, y);
+  }
+  renderer.render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "spring-camera",
+    title: "Spring Camera Follow",
+    category: "3d",
+    description: "Cámara que sigue un objetivo con spring() integrator — sin overshoot",
+    code: `// spring() — integrador de segundo orden. Cámara que sigue al target
+// críticamente amortiguada: alcanza el target sin oscilar ni overshoot.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 200,
+}));
+cam.transform.position = { x: 0, y: 3, z: 7 };
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.5 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 4, y: 8, z: 4 };
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.0 }));
+scene.add(sun);
+
+const ground = new Node("ground");
+ground.addComponent(createPlane(40, 40));
+ground.addComponent(new Material({ color: { r: 0.2, g: 0.22, b: 0.26 } }));
+ground.transform.rotation = { x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 };
+scene.add(ground);
+
+const target = new Node("target");
+target.transform.position = { x: 0, y: 0.5, z: 0 };
+target.addComponent(createSphere(0.4, 16, 16));
+target.addComponent(new Material({ color: { r: 1, g: 0.6, b: 0.2 } }));
+scene.add(target);
+
+// Spring state — uno por eje a interpolar.
+let camX = { value: 0, velocity: 0 };
+let camZ = { value: 7, velocity: 0 };
+const stiffness = 80;
+const damping = 2 * Math.sqrt(stiffness);   // crítico
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let t = 0;
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min((now - last) / 1000, 0.1);
+  last = now;
+  t += dt;
+
+  // Target deambula.
+  target.transform.position.x = Math.sin(t * 0.7) * 5;
+  target.transform.position.z = Math.cos(t * 0.5) * 5;
+  target.transform.updateLocalMatrix();
+
+  // Spring → toward (target.x, target.z + 5) detrás del target.
+  camX = spring(camX.value, target.transform.position.x, camX.velocity, stiffness, damping, dt);
+  camZ = spring(camZ.value, target.transform.position.z + 5, camZ.velocity, stiffness, damping, dt);
+  cam.transform.position.x = camX.value;
+  cam.transform.position.z = camZ.value;
+  cam.transform.lookAt(target.transform.position);
+
+  renderer.render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
+
+  {
+    id: "ik-arm",
+    title: "2-Bone IK: Reaching Arm",
+    category: "3d",
+    description: "solve2BoneIK posiciona un brazo de 2 huesos para alcanzar un objetivo móvil",
+    code: `// solve2BoneIK — closed-form, law-of-cosines. El "brazo" son dos segmentos
+// renderizados como cajas; el solver calcula las rotaciones que hacen que
+// la punta alcance un target que se mueve.
+
+const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 55, aspect: canvas.width / canvas.height, near: 0.1, far: 100,
+}));
+cam.transform.position = { x: 0, y: 4, z: 10 };
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+scene.add(cam);
+
+const amb = new Node("amb");
+amb.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(amb);
+
+const sun = new Node("sun");
+sun.transform.position = { x: 4, y: 8, z: 4 };
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 0.9 }));
+scene.add(sun);
+
+// Bone positions en world space.
+const rootPos = { x: 0, y: 0, z: 0 };
+const l1 = 2, l2 = 2;
+const midPos = { x: l1, y: 0, z: 0 };
+const endPos = { x: l1 + l2, y: 0, z: 0 };
+
+const rootBall = new Node("root");
+rootBall.transform.position = rootPos;
+rootBall.addComponent(createSphere(0.25, 12, 12));
+rootBall.addComponent(new Material({ color: { r: 0.5, g: 0.5, b: 0.5 } }));
+scene.add(rootBall);
+
+const upperArm = new Node("upper");
+upperArm.addComponent(createBox(l1, 0.2, 0.2));
+upperArm.addComponent(new Material({ color: { r: 0.8, g: 0.4, b: 0.2 } }));
+scene.add(upperArm);
+
+const elbow = new Node("elbow");
+elbow.addComponent(createSphere(0.2, 12, 12));
+elbow.addComponent(new Material({ color: { r: 0.3, g: 0.3, b: 0.3 } }));
+scene.add(elbow);
+
+const forearm = new Node("fore");
+forearm.addComponent(createBox(l2, 0.2, 0.2));
+forearm.addComponent(new Material({ color: { r: 0.9, g: 0.6, b: 0.3 } }));
+scene.add(forearm);
+
+const target = new Node("target");
+target.addComponent(createSphere(0.3, 16, 16));
+target.addComponent(new Material({ color: { r: 0.2, g: 1, b: 0.4 } }));
+scene.add(target);
+
+const renderer = new ThreeRenderer({ canvas, width: canvas.width, height: canvas.height });
+renderer.mount(scene);
+
+let t = 0;
+function loop() {
+  t += 0.015;
+
+  // Target dentro del alcance del brazo.
+  const targetPos = {
+    x: Math.cos(t) * 2.5 + 1,
+    y: Math.sin(t * 1.3) * 2,
+    z: 0,
+  };
+  target.transform.position = targetPos;
+  target.transform.updateLocalMatrix();
+
+  // Solve IK.
+  const result = solve2BoneIK(rootPos, midPos, endPos, targetPos);
+
+  // Aplicar la rotación de root al primer hueso para obtener newMid.
+  const q = result.rootRotation;
+  const newMid = {
+    x: rootPos.x + (1 - 2 * (q.y * q.y + q.z * q.z)) * l1,
+    y: rootPos.y + 2 * (q.x * q.y + q.w * q.z) * l1,
+    z: rootPos.z + 2 * (q.x * q.z - q.w * q.y) * l1,
+  };
+
+  upperArm.transform.position = {
+    x: (rootPos.x + newMid.x) / 2,
+    y: (rootPos.y + newMid.y) / 2,
+    z: (rootPos.z + newMid.z) / 2,
+  };
+  upperArm.transform.rotation = result.rootRotation;
+  upperArm.transform.updateLocalMatrix();
+
+  elbow.transform.position = newMid;
+  elbow.transform.updateLocalMatrix();
+
+  forearm.transform.position = {
+    x: (newMid.x + targetPos.x) / 2,
+    y: (newMid.y + targetPos.y) / 2,
+    z: (newMid.z + targetPos.z) / 2,
+  };
+  forearm.transform.lookAt(targetPos);
+  forearm.transform.updateLocalMatrix();
+
+  renderer.render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+`,
+  },
 ];
