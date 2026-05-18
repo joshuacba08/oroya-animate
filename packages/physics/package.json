@@ -1,33 +1,33 @@
 {
-    "name": "@joroya/physics",
-    "version": "1.0.0",
-    "description": "Physics integration for Oroya Animate using cannon-es",
-    "type": "module",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js",
-            "require": "./dist/index.cjs"
-        }
-    },
-    "scripts": {
-        "build": "tsup",
-        "dev": "tsup --watch",
-        "typecheck": "tsc --noEmit"
-    },
-    "dependencies": {
-        "@joroya/core": "workspace:*",
-        "cannon-es": "^0.20.0"
-    },
-    "devDependencies": {
-        "tsup": "^8.1.0",
-        "typescript": "^5.4.5"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "sideEffects": false
+  "name": "@joroya/physics",
+  "version": "1.0.2",
+  "description": "Physics integration for Oroya Animate using cannon-es",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@joroya/core": "workspace:*",
+    "cannon-es": "^0.20.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false
 }
