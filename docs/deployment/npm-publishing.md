@@ -27,11 +27,26 @@ npm login
 npm whoami
 ```
 
-For GitHub Actions publishing, create a read/write NPM token and save it as `NPM_TOKEN` in repository secrets.
+For GitHub Actions publishing, create an NPM automation token and save it as `NPM_TOKEN` in repository secrets.
 
-```bash
-npm token create --read-write
-```
+Create the token from the NPM website:
+
+1. Go to <https://www.npmjs.com/>.
+2. Open your account menu, then **Access Tokens**.
+3. Click **Generate New Token**.
+4. Choose **Automation** for CI publishing.
+5. Name it something like `oroya-animate-github-actions`.
+6. Copy the token immediately.
+
+Then add it to the GitHub repository:
+
+1. Open the GitHub repository.
+2. Go to **Settings** -> **Secrets and variables** -> **Actions**.
+3. Click **New repository secret**.
+4. Name: `NPM_TOKEN`
+5. Secret: paste the NPM token.
+
+Avoid committing the token or saving it in `.npmrc`. GitHub Actions reads it from `${{ secrets.NPM_TOKEN }}` during the publish workflow.
 
 ## Package Configuration
 

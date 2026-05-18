@@ -2,7 +2,8 @@
   "nav": {
     "docs": "Documentación",
     "examples": "Ejemplos",
-    "tutorials": "Tutoriales"
+    "tutorials": "Tutoriales",
+    "learn": "Aprender"
   },
   "hero": {
     "badge": "v1.0.0 — Listo para Producción",
@@ -286,6 +287,10 @@
     "ctaText": "¿Quieres ver más ejemplos o crear el tuyo propio?",
     "getStarted": "Comenzar",
     "viewOnGitHub": "Ver en GitHub"
+  },
+  "learn": {
+    "title": "Aprender",
+    "description": "Lecciones interactivas de fisica con formulas, controles y visualizaciones para Oroya Animate."
   },
   "i18n": {
     "translationPending": "Este contenido aún no está disponible en tu idioma. Mostrando la versión en inglés.",

@@ -2,7 +2,8 @@
   "nav": {
     "docs": "Docs",
     "examples": "Examples",
-    "tutorials": "Tutorials"
+    "tutorials": "Tutorials",
+    "learn": "Learn"
   },
   "hero": {
     "badge": "v1.0.0 — Production Ready",
@@ -286,6 +287,10 @@
     "ctaText": "Want to see more examples or create your own?",
     "getStarted": "Get Started",
     "viewOnGitHub": "View on GitHub"
+  },
+  "learn": {
+    "title": "Learn",
+    "description": "Interactive physics lessons with live formulas, controls, and visualizations built for Oroya Animate."
   },
   "i18n": {
     "translationPending": "This content is not yet available in your language. Showing the English version.",

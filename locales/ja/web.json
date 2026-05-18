@@ -2,7 +2,8 @@
   "nav": {
     "docs": "ドキュメント",
     "examples": "サンプル",
-    "tutorials": "チュートリアル"
+    "tutorials": "チュートリアル",
+    "learn": "学ぶ"
   },
   "hero": {
     "badge": "v1.0.0 — プロダクションリリース",
@@ -286,6 +287,10 @@
     "ctaText": "もっとサンプルを見たい、または自分で作りたいですか？",
     "getStarted": "はじめる",
     "viewOnGitHub": "GitHubで見る"
+  },
+  "learn": {
+    "title": "学ぶ",
+    "description": "Oroya Animate向けの数式、操作、可視化を備えたインタラクティブな物理レッスン。"
   },
   "i18n": {
     "translationPending": "このコンテンツはまだお使いの言語では利用できません。英語版を表示しています。",
