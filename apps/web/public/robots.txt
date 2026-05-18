@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://oroya-animate.vercel.app/sitemap-index.xml
+Sitemap: https://oroya-animate.oroyajs.com/sitemap-index.xml

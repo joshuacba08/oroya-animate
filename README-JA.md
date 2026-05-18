@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9+-orange?style=flat-square&logo=pnpm)](https://pnpm.io/)
 
-**[ドキュメント](https://oroya-animate.vercel.app)** • **[NPM](https://www.npmjs.com/org/joroya)** • **[CDN](https://unpkg.com/@joroya/core)** • **[GitHub](https://github.com/joshuacba08/oroya-animate)**
+**[ドキュメント](https://oroya-animate.oroyajs.com)** • **[NPM](https://www.npmjs.com/org/joroya)** • **[CDN](https://unpkg.com/@joroya/core)** • **[GitHub](https://github.com/joshuacba08/oroya-animate)**
 
 </div>
 
@@ -226,7 +226,7 @@ renderer.render();
 
 ### ドキュメントウェブサイト
 
-利用可能: **https://oroya-animate.vercel.app**（Vercel経由でデプロイ）
+利用可能: **https://oroya-animate.oroyajs.com**（Vercel経由でデプロイ）
 
 ## 🤝 コントリビューション
 

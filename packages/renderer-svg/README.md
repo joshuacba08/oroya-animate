@@ -126,9 +126,9 @@ link.click();
 
 ## Documentation
 
-- 📖 [Full Documentation](https://oroya-animate.vercel.app)
-- 📚 [SVG Renderer Guide](https://oroya-animate.vercel.app/docs/renderers#svg-renderer)
-- 🎓 [SVG Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
+- 📖 [Full Documentation](https://oroya-animate.oroyajs.com)
+- 📚 [SVG Renderer Guide](https://oroya-animate.oroyajs.com/docs/renderers#svg-renderer)
+- 🎓 [SVG Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
 
 ## CDN Usage
 

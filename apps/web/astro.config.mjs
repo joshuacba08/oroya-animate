@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://oroya-animate.vercel.app",
+  site: "https://oroya-animate.oroyajs.com",
   integrations: [react(), sitemap()],
   i18n: {
     defaultLocale: "en",

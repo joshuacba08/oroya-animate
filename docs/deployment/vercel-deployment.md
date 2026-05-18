@@ -12,7 +12,7 @@ The website is the Astro app in `apps/web`, but it depends on workspace packages
 - Framework: Astro 5
 - Output mode: static
 - Static output directory: `apps/web/dist`
-- Production URL: `https://oroya-animate.vercel.app`
+- Production URL: `https://oroya-animate.oroyajs.com`
 - Root package manager: `pnpm@9.1.0`
 - Root build script for the site: `pnpm build:web`
 
@@ -256,7 +256,7 @@ The current site does not require custom Vercel environment variables.
 For public browser values in Astro, use the `PUBLIC_` prefix:
 
 ```text
-PUBLIC_SITE_URL=https://oroya-animate.vercel.app
+PUBLIC_SITE_URL=https://oroya-animate.oroyajs.com
 PUBLIC_NPM_SCOPE=@joroya
 ```
 

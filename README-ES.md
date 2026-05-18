@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9+-orange?style=flat-square&logo=pnpm)](https://pnpm.io/)
 
-**[Documentación](https://oroya-animate.vercel.app)** • **[NPM](https://www.npmjs.com/org/joroya)** • **[CDN](https://unpkg.com/@joroya/core)** • **[GitHub](https://github.com/joshuacba08/oroya-animate)**
+**[Documentación](https://oroya-animate.oroyajs.com)** • **[NPM](https://www.npmjs.com/org/joroya)** • **[CDN](https://unpkg.com/@joroya/core)** • **[GitHub](https://github.com/joshuacba08/oroya-animate)**
 
 </div>
 
@@ -226,7 +226,7 @@ Todos los paquetes están automáticamente disponibles en múltiples CDNs:
 
 ### Sitio Web de Documentación
 
-Disponible en: **https://oroya-animate.vercel.app** (desplegado vía Vercel)
+Disponible en: **https://oroya-animate.oroyajs.com** (desplegado vía Vercel)
 
 ## 🤝 Contribuir
 

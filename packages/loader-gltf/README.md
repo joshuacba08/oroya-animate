@@ -122,9 +122,9 @@ try {
 
 ## Documentation
 
-- 📖 [Full Documentation](https://oroya-animate.vercel.app)
-- 📚 [glTF Loader Guide](https://oroya-animate.vercel.app/docs/api-reference#gltf-loader)
-- 🎓 [Model Loading Tutorial](https://oroya-animate.vercel.app/docs/tutorials)
+- 📖 [Full Documentation](https://oroya-animate.oroyajs.com)
+- 📚 [glTF Loader Guide](https://oroya-animate.oroyajs.com/docs/api-reference#gltf-loader)
+- 🎓 [Model Loading Tutorial](https://oroya-animate.oroyajs.com/docs/tutorials)
 
 ## CDN Usage
 

@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 
 const locale = getLocaleFromUrl(Astro.url);
-const siteUrl = import.meta.env.SITE || "https://oroya-animate.vercel.app";
+const siteUrl = import.meta.env.SITE || "https://oroya-animate.oroyajs.com";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const ogImageURL = new URL(image, siteUrl);
 ---

@@ -206,5 +206,5 @@ Oroya Animateのすべての注目すべき変更はこのファイルに記録�
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf) - glTF/GLBモデルローダー
 
 ### ドキュメント
-- [メインドキュメント](https://oroya-animate.vercel.app)
+- [メインドキュメント](https://oroya-animate.oroyajs.com)
 - [GitHubリポジトリ](https://github.com/joshuacba08/oroya-animate)

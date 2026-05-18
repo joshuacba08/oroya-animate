@@ -122,10 +122,10 @@ renderer.render();
 
 ## Documentation
 
-- 📖 [Full Documentation](https://oroya-animate.vercel.app)
-- 🎓 [Getting Started Guide](https://oroya-animate.vercel.app/docs/getting-started)
-- 📚 [API Reference](https://oroya-animate.vercel.app/docs/api-reference)
-- 🎯 [Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
+- 📖 [Full Documentation](https://oroya-animate.oroyajs.com)
+- 🎓 [Getting Started Guide](https://oroya-animate.oroyajs.com/docs/getting-started)
+- 📚 [API Reference](https://oroya-animate.oroyajs.com/docs/api-reference)
+- 🎯 [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
 
 ## CDN Usage
 

@@ -165,6 +165,34 @@ Test CDN resolution:
 - Confirm the token has publish rights for the `@joroya` organization.
 - Keep `--access public` for scoped packages.
 
+### EOTP One-time Password Required
+
+If GitHub Actions fails with:
+
+```text
+npm error code EOTP
+npm error This operation requires a one-time password from your authenticator.
+```
+
+the `NPM_TOKEN` secret is not allowed to publish non-interactively. This usually
+means the token was created without bypassing 2FA, or it is a token type meant for
+interactive publishing.
+
+For CI, create a token that can publish without an OTP challenge:
+
+- Preferred current npm option: create a granular access token with **bypass 2FA**
+  enabled and publish access to the `@joroya` scope/packages.
+- If your npm UI shows classic token types, use an **Automation** token.
+
+Then replace the existing GitHub secret:
+
+```text
+Repository -> Settings -> Secrets and variables -> Actions -> NPM_TOKEN
+```
+
+Do not add `--otp=<code>` to GitHub Actions. OTP codes expire quickly and are not
+appropriate for automated releases.
+
 ### Version Already Published
 
 NPM does not allow re-publishing the same version. Sync a new patch, prerelease, or next version and publish again.

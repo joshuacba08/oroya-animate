@@ -92,13 +92,13 @@ npm view @joroya/renderer-svg version
 npm view @joroya/renderer-canvas2d version
 npm view @joroya/loader-gltf version
 curl https://unpkg.com/@joroya/core@1.0.0/package.json
-curl https://oroya-animate.vercel.app
+curl https://oroya-animate.oroyajs.com
 ```
 
 ## URLs Principales
 
 - NPM Org: https://www.npmjs.com/org/joroya
-- Documentacion: https://oroya-animate.vercel.app
+- Documentacion: https://oroya-animate.oroyajs.com
 - GitHub: https://github.com/joshuacba08/oroya-animate
 - CDN base: `https://unpkg.com/@joroya/core@1.0.0/dist/index.js`
 

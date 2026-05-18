@@ -32,7 +32,7 @@ Each package should have these fields in `package.json`:
     "url": "https://github.com/joshuacba08/oroya-animate.git",
     "directory": "packages/core"
   },
-  "homepage": "https://oroya-animate.vercel.app",
+  "homepage": "https://oroya-animate.oroyajs.com",
   "bugs": {
     "url": "https://github.com/joshuacba08/oroya-animate/issues"
   },
@@ -200,9 +200,9 @@ npm install @joroya/[package-name]
 
 ## Documentation
 
-- [Full Documentation](https://oroya-animate.vercel.app)
-- [API Reference](https://oroya-animate.vercel.app/docs/api-reference)
-- [Getting Started Guide](https://oroya-animate.vercel.app/docs/getting-started)
+- [Full Documentation](https://oroya-animate.oroyajs.com)
+- [API Reference](https://oroya-animate.oroyajs.com/docs/api-reference)
+- [Getting Started Guide](https://oroya-animate.oroyajs.com/docs/getting-started)
 
 ## Features
 
@@ -284,7 +284,7 @@ Set up at https://www.npmjs.com/settings/oroya/profile:
 {
   "name": "Oroya Animate",
   "description": "Engine-agnostic 2D/3D graphics library for the web",
-  "website": "https://oroya-animate.vercel.app",
+  "website": "https://oroya-animate.oroyajs.com",
   "twitter": "@joroya_animate",
   "github": "joshuacba08"
 }
@@ -315,9 +315,9 @@ Professional, engine-agnostic 2D/3D graphics library for the web.
 
 ## Resources
 
-- [Documentation](https://oroya-animate.vercel.app)
+- [Documentation](https://oroya-animate.oroyajs.com)
 - [GitHub](https://github.com/joshuacba08/oroya-animate)
-- [Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
+- [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
 ```
 
 ## Version Tags
@@ -418,7 +418,7 @@ const commonMetadata = {
     type: "git",
     url: "https://github.com/joshuacba08/oroya-animate.git"
   },
-  homepage: "https://oroya-animate.vercel.app",
+  homepage: "https://oroya-animate.oroyajs.com",
   bugs: {
     url: "https://github.com/joshuacba08/oroya-animate/issues"
   }

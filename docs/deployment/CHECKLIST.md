@@ -121,7 +121,7 @@ After NPM publishing, verify CDN availability:
 - [ ] Test website functionality
 
 ### Post-Deployment Verification
-- [ ] Website loads: https://oroya-animate.vercel.app
+- [ ] Website loads: https://oroya-animate.oroyajs.com
 - [ ] All pages accessible
 - [ ] Documentation readable
 - [ ] Interactive demos work

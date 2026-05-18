@@ -211,5 +211,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf) - glTF/GLB model loader
 
 ### Documentation
-- [Main Documentation](https://oroya-animate.vercel.app)
+- [Main Documentation](https://oroya-animate.oroyajs.com)
 - [GitHub Repository](https://github.com/joshuacba08/oroya-animate)

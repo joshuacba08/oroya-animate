@@ -92,9 +92,9 @@ renderer.dispose(): void
 
 ## Documentation
 
-- 📖 [Full Documentation](https://oroya-animate.vercel.app)
-- 📚 [Renderer Guide](https://oroya-animate.vercel.app/docs/renderers)
-- 🎓 [Tutorials](https://oroya-animate.vercel.app/docs/tutorials)
+- 📖 [Full Documentation](https://oroya-animate.oroyajs.com)
+- 📚 [Renderer Guide](https://oroya-animate.oroyajs.com/docs/renderers)
+- 🎓 [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
 
 ## CDN Usage
 

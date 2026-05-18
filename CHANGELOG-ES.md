@@ -204,5 +204,5 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf) - Cargador de modelos glTF/GLB
 
 ### Documentación
-- [Documentación Principal](https://oroya-animate.vercel.app)
+- [Documentación Principal](https://oroya-animate.oroyajs.com)
 - [Repositorio GitHub](https://github.com/joshuacba08/oroya-animate)

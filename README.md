@@ -1,346 +1,230 @@
-# Oroya Animate 
+# Oroya Animate
 
 <div align="center">
 
 [![NPM Version](https://img.shields.io/npm/v/@joroya/core?style=flat-square&logo=npm&label=@joroya/core)](https://www.npmjs.com/package/@joroya/core)
 [![License](https://img.shields.io/github/license/joshuacba08/oroya-animate?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
-[![CI Status](https://img.shields.io/github/actions/workflow/status/joshuacba08/oroya-animate/ci.yml?branch=main&style=flat-square&logo=github&label=CI)](https://github.com/joshuacba08/oroya-animate/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/joshuacba08/oroya-animate/ci.yml?branch=main&style=flat-square&logo=github&label=CI)](https://github.com/joshuacba08/oroya-animate/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9+-orange?style=flat-square&logo=pnpm)](https://pnpm.io/)
 
-**[Documentation](https://oroya-animate.vercel.app)** ? **[NPM](https://www.npmjs.com/org/joroya)** ? **[CDN](https://unpkg.com/@joroya/core)** ? **[GitHub](https://github.com/joshuacba08/oroya-animate)**
+[Documentation](https://oroya-animate.oroyajs.com) · [Packages](https://www.npmjs.com/org/joroya) · [Examples](https://oroya-animate.oroyajs.com/examples) · [Learn](https://oroya-animate.oroyajs.com/learn)
 
-📖 **Read this in other languages:** [Español](README-ES.md) • [日本語](README-JA.md)
+Read this in [Spanish](README-ES.md) or [Japanese](README-JA.md).
 
 </div>
 
-A professional, engine-agnostic 2D/3D graphics library for the web. Built with TypeScript, designed for scalability and performance.
+Oroya Animate is a TypeScript scene-graph library for building interactive 2D and 3D graphics on the web. You define a scene once, then render it through different backends such as Three.js, SVG, or Canvas2D.
 
-##  Vision
+The project is designed for applications that need a stable graphics model rather than code tied directly to one renderer: visual editors, educational simulations, generative graphics, product configurators, data/physics visualizers, and web experiences that may need multiple render targets.
 
-Oroya Animate is a high-level graphics library that decouples scene logic from rendering implementation. It allows developers to define complex scene graphs once and render them using different backends like Three.js (WebGL), SVG, or Canvas2D.
+## Why Oroya Animate
 
-## 🎯 Key Features
+- Renderer-independent scene graph with nodes, transforms, components, cameras, materials, lights, animation, and serialization.
+- Official renderers for Three.js, SVG, and Canvas2D.
+- glTF/GLB loader for importing 3D assets from tools such as Blender.
+- Physics integration through `cannon-es`, including rigid bodies, colliders, joints, sensors, raycasts, and vehicle helpers.
+- Built-in animation system with clips, blending, easing helpers, keyframe events, and backend parity.
+- Optional developer packages for input mapping, asset caching, scene inspection, React bindings, and Vue composables.
+- ESM/CJS builds with TypeScript declarations for every package.
 
-- **🦺 TypeScript First:** Fully typed API for a robust development experience.
-- **🧩 Modular Architecture:** Monorepo structure for clear separation of concerns.
-- **🔌 Engine Agnostic:** Define your scene once, render it anywhere.
-- **🎨 Multiple Backends:** Official support for Three.js (3D), SVG (2D), and Canvas2D.
-- **📦 glTF Support:** Load complex 3D models directly into the agnostic scene graph.
-- **🎥 Scene-Graph Camera:** Perspective & Orthographic cameras as scene graph nodes.
-- **🎬 Animation System:** Keyframe-based animation with `AnimationMixer` and interpolation.
-- **🖱️ Interactivity:** Built-in event system with raycasting (3D) and DOM events (SVG).
-- **🌐 Orbit Controls:** Mouse/touch camera controls for 3D scenes.
-- **🎨 Generative Art:** SvJs engine with noise, distributions, and SVG primitives.
-- **⚛️ Framework Friendly:** Alpha React and Vue wrappers for modern frontend apps.
-- **🧰 Developer Tooling:** Inspector, input manager, asset cache, plugins, and a reference visual editor.
+## Packages
 
-##  Project Structure
+| Package | Purpose |
+| --- | --- |
+| [`@joroya/core`](packages/core) | Scene graph, nodes, components, math, animation, serialization, and plugin contracts. |
+| [`@joroya/renderer-three`](packages/renderer-three) | WebGL renderer powered by Three.js. |
+| [`@joroya/renderer-svg`](packages/renderer-svg) | SVG renderer for vector output and DOM-based interaction. |
+| [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d) | Canvas2D renderer for browser-native 2D drawing. |
+| [`@joroya/loader-gltf`](packages/loader-gltf) | glTF/GLB import into the Oroya scene graph. |
+| [`@joroya/physics`](packages/physics) | Physics system built on top of `cannon-es`. |
+| [`@joroya/assets`](packages/assets) | Asset cache with preloading, progress events, and reference counting. |
+| [`@joroya/input`](packages/input) | Keyboard, mouse, and gamepad action mapping. |
+| [`@joroya/inspector`](packages/inspector) | Runtime scene inspector and frame metrics overlay. |
+| [`@joroya/react`](packages/react) | Experimental React bindings. |
+| [`@joroya/vue`](packages/vue) | Experimental Vue 3 composables. |
 
-This project is managed as a monorepo using `pnpm` workspaces:
+## Installation
 
-### Packages
-- [`@joroya/core`](packages/core): The heart of the library. Contains the Scene Graph, Node system, and base Components.
-- [`@joroya/renderer-three`](packages/renderer-three): WebGL rendering backend powered by Three.js.
-- [`@joroya/renderer-svg`](packages/renderer-svg): Lightweight 2D rendering backend for SVG.
-- [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d): Browser-native Canvas2D backend.
-- [`@joroya/loader-gltf`](packages/loader-gltf): Utilities for importing 3D models into the Oroya ecosystem.
-- [`@joroya/physics`](packages/physics): cannon-es integration for rigid bodies, joints, sensors, raycasts, and vehicles.
-- [`@joroya/assets`](packages/assets): Asset cache with preloading, progress events, and reference counting.
-- [`@joroya/input`](packages/input): Keyboard, mouse, and gamepad action mapping.
-- [`@joroya/inspector`](packages/inspector): Debug overlay for scene hierarchy, transforms, and frame metrics.
-- [`@joroya/react`](packages/react): Experimental React bindings.
-- [`@joroya/vue`](packages/vue): Experimental Vue 3 composables.
-
-### Apps
-- [`demo-react`](apps/demo-react): Showcase of Oroya Animate working with React and Three.js.
-- [`demo-vanilla`](apps/demo-vanilla): Minimal examples using vanilla JavaScript.
-- [`web`](apps/web): Documentation website powered by Astro (deployed to Vercel).
-- [`editor`](apps/editor): Alpha visual scene editor and serialization reference app.
-
-## ?? Documentation
-
-Detailed documentation is available in the [`docs/`](docs/) folder:
-
-### Core Documentation
-- [**Architecture Overview**](docs/architecture.md): Learn about the core engine-agnostic design.
-- [**Getting Started**](docs/getting-started.md): Your first scene in 5 minutes.
-- [**Scene Graph & Transformations**](docs/scene-graph.md): Deep dive into nodes and components.
-- [**API Reference**](docs/api-reference.md): Complete reference of classes, interfaces and functions.
-- [**Renderers**](docs/renderers.md): Three.js, SVG, and Canvas2D backend documentation.
-- [**Serialization**](docs/serialization.md): Save and load scenes as JSON.
-
-### Deployment & Publishing
-- [**NPM Publishing**](docs/deployment/npm-publishing.md): Publish packages to NPM registry.
-- [**CDN Setup**](docs/deployment/cdn-setup.md): Use packages directly from CDN.
-- [**Vercel Deployment**](docs/deployment/vercel-deployment.md): Deploy documentation website.
-
-### Development
-- [**Contributing & Development**](docs/contributing.md): Setup, scripts, and development workflow.
-- [**Programming Principles**](docs/programming-principles.md): Coding conventions and architectural rules.
-- [**Build Errors Postmortem**](docs/troubleshooting/build-errors-postmortem.md): Analysis of common build mistakes.
-
-### Tutorials
-- [**Tutorials**](docs/tutorials/README.md): Step-by-step guides from beginner to advanced.
-
-##  Getting Started
-
-### Installation
-
-#### NPM/PNPM (Recommended)
+Install the core package and at least one renderer:
 
 ```bash
-# Using npm
-npm install @joroya/core @joroya/renderer-three
-
-# Using pnpm
-pnpm add @joroya/core @joroya/renderer-three
-
-# Using yarn
-yarn add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 ```
 
-#### CDN (No Build Step)
-
-```html
-<script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
-  
-  // Your code here
-</script>
-```
-
-### For Development
-
-If you want to contribute or develop locally:
-
-**Prerequisites:**
-- [Node.js](https://nodejs.org/) (v18+)
-- [pnpm](https://pnpm.io/) (v9+)
+For SVG output:
 
 ```bash
-# Clone repository
-git clone https://github.com/joshuacba08/oroya-animate.git
-cd oroya-animate
-
-# Install dependencies
-pnpm install
-
-# Build packages
-pnpm build
+pnpm add @joroya/core @joroya/renderer-svg
 ```
 
-> ?? The workspace packages must be built before running any demo app, since they resolve through their `dist/` output.
+For physics:
 
-### Basic Usage (Core)
+```bash
+pnpm add @joroya/core @joroya/physics cannon-es
+```
 
-```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+## Quick Start
+
+```ts
+import {
+  Camera,
+  CameraType,
+  Material,
+  Node,
+  Scene,
+  createBox,
+  setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// 1. Create a scene
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+
+if (!canvas) {
+  throw new Error('Canvas element not found');
+}
+
 const scene = new Scene();
 
-// 2. Add a camera
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// 3. Create a node with geometry and material
-const box = new Node('my-box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 1, g: 0, b: 0 } }));
-scene.add(box);
+const cube = new Node('cube');
+cube.addComponent(createBox(1, 1, 1));
+cube.addComponent(new Material({ color: { r: 0.2, g: 0.5, b: 1 } }));
+scene.add(cube);
 
-// 4. Render with Three.js
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
+  canvas,
   width: window.innerWidth,
   height: window.innerHeight,
 });
+
 renderer.mount(scene);
-renderer.render();
+
+let angle = 0;
+
+function frame() {
+  angle += 0.01;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
+  cube.transform.updateLocalMatrix();
+  renderer.render();
+  requestAnimationFrame(frame);
+}
+
+frame();
 ```
 
-## Roadmap
+## Architecture
 
-### v0.1.0 - Architecture & Setup
-- [x] Monorepo with pnpm workspaces.
-- [x] TypeScript + tsup build pipeline.
-- [x] Base packages: `@joroya/core`, `@joroya/renderer-three`, `@joroya/renderer-svg`, `@joroya/loader-gltf`.
-- [x] Initial Scene Graph interfaces and base classes.
-- [x] Demo apps (Vanilla JS + React).
+Oroya Animate follows a "define once, render anywhere" model.
 
-### v0.2.0 - First Functional Release
-- [x] Functional Scene Graph API (`Scene`, `Node`, `Transform` with matrix math).
-- [x] Component system (`Geometry`, `Material`, `Camera`).
-- [x] Geometry primitives: `createBox`, `createSphere`, `createPath2D`.
-- [x] Three.js renderer: dynamic scene rendering, Box + Sphere support.
-- [x] Camera component integrated into the scene graph (Perspective).
-- [x] World matrix computation via `updateWorldMatrices()`.
-- [x] Working demos: Vanilla JS and React with animated rotating cubes.
-- [x] TSDoc on all public API surfaces.
-- [x] Comprehensive documentation (see [`docs/`](docs/)).
+```text
+@joroya/core  <-  renderers / loaders / physics  <-  applications
+```
 
-### v0.3.0 - Build Stabilization & Project Hardening
-- [x] Fixed build pipeline: all 4 packages compile successfully (CJS + ESM + DTS).
-- [x] Correct `package.json` exports (file extensions, `types`-first condition order).
-- [x] TypeScript `composite: false` override for tsup DTS compatibility.
-- [x] Barrel files (`index.ts`) for all module directories.
-- [x] Extended `MaterialDef` with SVG-specific properties (`fill`, `stroke`, `strokeWidth`).
-- [x] Missing `@types/three` added to `@joroya/loader-gltf`.
-- [x] Eliminated dead code (unused imports).
-- [x] Fixed syntax errors in renderer-svg template literals.
-- [x] New documentation: [Programming Principles](docs/programming-principles.md).
-- [x] New documentation: [Build Errors Postmortem](docs/troubleshooting/build-errors-postmortem.md).
+`@joroya/core` owns the portable scene representation. Renderers translate that representation into backend-specific output, such as Three.js objects, SVG markup, or Canvas2D draw calls. This keeps scene logic separate from renderer implementation details.
 
-### v0.4.0 — Interactivity, Animation & Generative Art ✅
-- [x] **Animation system**: `AnimationClip`, `AnimationMixer`, `KeyframeTrack` with linear/step/cubicspline interpolation.
-- [x] **Interactivity system**: `EventEmitter`, `Interactive` component, `InteractionEvent`, `BoundingBox` (AABB).
-- [x] **Raycasting** in Three.js renderer for 3D pointer events (click, hover, drag).
-- [x] **DOM event delegation** in SVG renderer for 2D interactivity.
-- [x] **Orbit controls**: `OrbitControlsWrapper` for camera manipulation (orbit, pan, zoom).
-- [x] **Orthographic camera** support in renderers.
-- [x] **Buffer geometry** and **Text geometry** support with AABB computation.
-- [x] **SvJs generative art engine**: `SvJs` class, `Gen` module (gaussian, pareto, noise), `Noise` (Perlin).
-- [x] **SVG advanced features**: gradients, filters, clip-paths, masks, `<animate>` / `<animateTransform>`.
-- [x] **Documentation website** (`apps/web`) deployed to Vercel via Astro.
-- [x] **i18n infrastructure**: Translation support for English, Spanish, and Japanese.
-- [x] Feature EPICs: [OA-001](docs/features/OA-001/EPICA.md) to [OA-004](docs/features/OA-004/EPIC.md).
+The core package intentionally avoids runtime dependencies on Three.js, `cannon-es`, DOM APIs, or renderer packages. Downstream packages may depend on core, but core does not depend on them.
 
-### v0.5.0 — Renderer Completion & 3D Pipeline ✅
-- [x] Full glTF/GLB loader (geometry + materials from Blender).
-- [x] Complete SVG backend (transform support, groups).
-- [x] Canvas2D renderer.
-- [x] Boolean operations 2D/3D (CSG).
-- [x] Cubic spline interpolation for animations.
-- [x] Proper quaternion SLERP.
-### v0.6.0 — Lighting, Textures & Transform Utilities ✅
-- [x] **Lighting System**: Directional, Point, Ambient lights with intensity control.
-- [x] **Advanced Materials**: PBR workflow (roughness, metalness) + emissive properties.
-- [x] **Texture Support**: Diffuse, normal, and PBR maps.
-- [x] **Environment**: Fog (exponential), background color, and global ambient light.
-- [x] **Extended Geometry**: Cylinder, Cone, Plane, Torus primitives.
-- [x] **Transform Utilities**: `lookAt()`, `rotateOnAxis()`, `setFromMatrix()`.
-- [x] **Math Helpers**: Enhanced `Vector3` and `Quaternion` libraries.
-- [x] **New Examples**: Textures & Environment, LookAt tracking.
+## Documentation
 
-### v0.7.0 — Rendering Optimization ✅
-- [x] **InstancedMesh**: High-performance rendering of repeated geometry.
-- [x] **Frustum Culling**: Skip nodes outside the camera frustum.
-- [x] **Scene Graph Optimization**: Dirty-flag-driven world-matrix updates.
+- [Getting Started](docs/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [Scene Graph](docs/scene-graph.md)
+- [API Reference](docs/api-reference.md)
+- [Renderers](docs/renderers.md)
+- [Serialization](docs/serialization.md)
+- [Tutorials](docs/tutorials/README.md)
+- [Programming Principles](docs/programming-principles.md)
 
-### v0.8.0 — Advanced Rendering & Effects ✅
-- [x] **Shadow System**: Cast/receive flags on every geometry variant; directional/point/spot lights with `shadowMapSize` / `shadowBias`.
-- [x] **Post-Processing**: Declarative `PostProcessing` component (Bloom + Reinhard/Cineon/ACESFilmic tone-mapping + SMAA antialiasing) anchored to the active camera.
-- [x] **Particle System**: CPU-simulated `ParticleSystem` with gravity, start/end color/size, emission rate.
-- [x] **Spatial Audio**: `AudioListener` + `AudioSource` mapped to `THREE.PositionalAudio`.
-- [x] [OA-006 EPIC](docs/features/OA-006/EPIC.md).
+The public documentation site is available at [oroya-animate.oroyajs.com](https://oroya-animate.oroyajs.com).
 
-### v0.9.0 — Physics & Animation ✅
-- [x] **Physics Engine** (`@joroya/physics`, cannon-es): `PhysicsSystem` with world-space sync.
-- [x] **Joints**: Hinge, Point-to-Point, Distance constraints.
-- [x] **Collision Events**: `collide-begin`/`collide`/`collide-end` + `trigger-enter`/`trigger-stay`/`trigger-exit`.
-- [x] **Sensor Colliders + Collision Filtering** (group/mask bitmasks).
-- [x] **Physics Raycast**: `raycast` and `raycastAll` against rigid bodies.
-- [x] **Animator Component**: `play`, `stop`, `crossFade`, `addClip`, `autoplay`.
-- [x] **Animation Blending**: Multi-clip weighted blending with quaternion nlerp + hemisphere correction.
-- [x] **Keyframe Events**: `AnimationClip.events` fires named events on time crossings.
-- [x] **Easing + Spring helpers**: 9 easing functions + critically-dampable spring integrator.
-- [x] `ThreeRenderer.render(dt?)` propagates real frame time; `Scene.update(dt)` is first-class.
-- [x] [OA-007 EPIC](docs/features/OA-007/EPIC.md).
+## Development
 
-### v0.10.0 — Serialization, Backend Parity & Hardening ✅
-- [x] **Full serialization**: TypedArray (Float32/Uint8/Uint16/Uint32) round-trip via base64 — `AnimationClip`, `BufferGeometry`, `InstancedMesh` matrices now save/load.
-- [x] **Component deserialization gap closed**: RigidBody, Collider, Animator, PostProcessing, ParticleSystem, AudioListener, AudioSource, Environment.
-- [x] **Backend parity**: SVG and Canvas2D renderers run `scene.update(dt)` — `Animator` works on all backends, not just Three.js.
-- [x] **Demos audited**: `animation-demo` uses the real Animator API (idle/walk/spin clips + crossFade + keyframe events).
-- [x] **ESLint**: `eslint-plugin-import` + no-unused + no-explicit-any rules in CI.
-- [x] [OA-008 EPIC](docs/features/OA-008/EPIC.md).
+Requirements:
 
-### v0.11.0 — Pre-1.0 Ecosystem ✅
-- [x] **Inspector / Debug UI** (`@joroya/inspector`): Vanilla-DOM overlay — hierarchy, transform inspection, FPS / frame-time / max-hitch, scene-graph stats.
-- [x] **Input Manager** (`@joroya/input`): Unified keyboard / mouse / gamepad layer with declarative action mapping and analog gamepad axes.
-- [x] **Asset Manager** (`@joroya/assets`): Centralized cache with deduplication, ref-counted release, progress events, pluggable loaders.
-- [x] **Framework Wrappers (alpha)**: `@joroya/react` (`<OroyaCanvas>` + `useFrame` / `useScene` + JSX primitives) and `@joroya/vue` (`useOroyaCanvas` / `useFrame` / `useNode` composables).
-- [x] [OA-009 EPIC](docs/features/OA-009/EPIC.md).
+- Node.js 18 or newer
+- pnpm 9
 
-### v0.12.0 — Skinned Mesh, IK & Vehicles ✅
-- [x] **glTF skinned-mesh pipeline**: `Skin` component + `skinIndices`/`skinWeights` on `BufferGeometryDef`; `loadGLTF` extracts skin attributes; `ThreeRenderer` builds `THREE.SkinnedMesh` and binds the skeleton in a post-pass.
-- [x] **2-bone analytical IK**: `solve2BoneIK(root, mid, end, target, pole?)` law-of-cosines solver — O(1), no iteration, pole-vector support.
-- [x] **Vehicle helper**: `Vehicle` wrapper over `CANNON.RaycastVehicle` with `drive` / `steer` / `brake` / `syncWheelNodes` API.
-- [x] [OA-010 EPIC](docs/features/OA-010/EPIC.md).
+```bash
+git clone https://github.com/joshuacba08/oroya-animate.git
+cd oroya-animate
+pnpm install
+pnpm build
+```
 
-### v1.0.0 — Production Ready ✅
-- [x] **API Stability**: `@public` / `@experimental` / `@internal` JSDoc tags + auditable via `pnpm api:check`. Public surface frozen — breaking changes require a major bump with a 1-major-version deprecation window. See [`docs/api-stability.md`](docs/api-stability.md).
-- [x] **Plugin System**: `PluginRegistry` + `ComponentHandler` in `@joroya/core/plugins`; `ThreeRenderer.usePlugin(plugin)` for renderer-level extensibility.
-- [x] **Visual Scene Editor** (`apps/editor`, alpha): hierarchy panel + transform inspector + Save / Load using the stable v1.0 serialization contract. Gizmo handles are post-1.0.
-- [x] **WASM Acceleration Hook**: `getMathBackend()` / `registerMathBackend(backend)` registry. Default backend is pure JS; a future `@joroya/wasm-math` package can drop in WASM without consumer code changes.
-- [x] **170 tests** across 11 packages + an `api:check` script + an ESLint gate forbidding `any` and `@ts-ignore` in source.
-- [x] [OA-011 EPIC](docs/features/OA-011/EPIC.md).
+Workspace packages are consumed through their compiled `dist/` output. After cloning, run `pnpm build` before starting any demo app.
 
-### Post-1.0 (future)
-- [ ] **Production WASM modules**: a real `@joroya/wasm-math` shipping the integration point from v1.0.
-- [ ] **Visual editor — gizmos**: translate / rotate / scale handles in 3D.
-- [ ] **Multi-bone IK** (CCD / FABRIK) — `solve2BoneIK` ships in v1.0 but covers 2-bone chains only.
-- [ ] **Playwright E2E suite** for the editor and demo apps.
-- [ ] **Animation timeline editor** integrated into the visual editor.
-- [ ] **Touch gestures** (pinch / swipe / rotate) on top of the input manager.
+Common commands:
 
-## 🚀 Publishing & Deployment
+```bash
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm build:web
+pnpm dev:web
+pnpm dev:react
+pnpm dev:vanilla
+```
 
-### Packages on NPM
+Run a single package command with pnpm filters:
 
-All packages are published to NPM under the `@joroya` scope:
-- [@joroya/core](https://www.npmjs.com/package/@joroya/core)
-- [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)
-- [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)
-- [@joroya/renderer-canvas2d](https://www.npmjs.com/package/@joroya/renderer-canvas2d)
-- [@joroya/loader-gltf](https://www.npmjs.com/package/@joroya/loader-gltf)
-- [@joroya/physics](https://www.npmjs.com/package/@joroya/physics)
-- [@joroya/assets](https://www.npmjs.com/package/@joroya/assets)
-- [@joroya/input](https://www.npmjs.com/package/@joroya/input)
-- [@joroya/inspector](https://www.npmjs.com/package/@joroya/inspector)
-- [@joroya/react](https://www.npmjs.com/package/@joroya/react)
-- [@joroya/vue](https://www.npmjs.com/package/@joroya/vue)
+```bash
+pnpm --filter @joroya/core build
+pnpm --filter @joroya/core typecheck
+pnpm test -- packages/core/tests/Node.test.ts
+```
 
-### Available on CDN
+## Repository Layout
 
-All packages are automatically available on multiple CDNs:
-- **unpkg:** `https://unpkg.com/@joroya/core`
-- **jsDelivr:** `https://cdn.jsdelivr.net/npm/@joroya/core`
-- **esm.sh:** `https://esm.sh/@joroya/core`
+```text
+packages/
+  core/
+  renderer-three/
+  renderer-svg/
+  renderer-canvas2d/
+  loader-gltf/
+  physics/
+  assets/
+  input/
+  inspector/
+  react/
+  vue/
+apps/
+  demo-react/
+  demo-vanilla/
+  editor/
+  web/
+docs/
+```
 
-### Documentation Website
+## Project Status
 
-Live at: **https://oroya-animate.vercel.app** (deployed via Vercel)
+The v1 public API is stable for the core scene graph, renderers, serialization, animation, and physics packages. React, Vue, and the visual editor are still considered experimental and may change more quickly.
 
-## 🤝 Contributing
+Breaking changes are reserved for major versions. New minor releases should extend the API without requiring existing projects to rewrite working scenes.
 
-Contributions are welcome! Please read our [Contributing Guide](docs/contributing.md) for details on:
-- Development setup
-- Code conventions
-- Pull request process
-- Issue reporting
+## Contributing
 
-## 📄 License
+Issues and pull requests are welcome. Before opening a PR, please run:
+
+```bash
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+See [Contributing](docs/contributing.md) and [Programming Principles](docs/programming-principles.md) for project conventions.
+
+## License
 
 MIT © [joshuacba08](https://github.com/joshuacba08)
-
----
-
-<div align="center">
-
-**Made with ❤️ by the Oroya AI Collaborator**
-
-[Report Bug](https://github.com/joshuacba08/oroya-animate/issues) · [Request Feature](https://github.com/joshuacba08/oroya-animate/issues) · [Discussions](https://github.com/joshuacba08/oroya-animate/discussions)
-
-</div>
