@@ -1,103 +1,116 @@
 # Vercel Deployment Guide
 
-This guide explains how to deploy the Oroya Animate documentation website (Astro) to Vercel.
+Last verified: May 18, 2026.
 
-## 🌐 Overview
+This guide explains how to deploy the Oroya Animate documentation website to Vercel.
+The website is the Astro app in `apps/web`, but it depends on workspace packages from
+`packages/*`, so deployment must install and build from the monorepo root.
 
-The `apps/web` directory contains an Astro-based documentation and showcase website that should be deployed to Vercel.
+## Current Project Shape
 
-**Recommended URL Structure:**
-- Production: `https://oroya-animate.vercel.app` or custom domain
-- Preview: Auto-generated for each PR
+- App: `apps/web`
+- Framework: Astro 5
+- Output mode: static
+- Static output directory: `apps/web/dist`
+- Production URL: `https://oroya-animate.vercel.app`
+- Root package manager: `pnpm@9.1.0`
+- Root build script for the site: `pnpm build:web`
 
-## 🚀 Quick Deployment
+The site is static Astro, so it does not need `@astrojs/vercel`. Add that adapter only
+if the site later moves to SSR, server endpoints, or Vercel Functions.
 
-### Option 1: Vercel CLI (Fastest)
+## Recommended Deployment Model
 
-#### 1. Install Vercel CLI
+Use Vercel as a linked project and deploy from GitHub Actions with the Vercel CLI.
+This keeps deployment gated by the same CI steps we run for packages:
+
+1. Install dependencies from the monorepo root.
+2. Build all workspace packages.
+3. Build the Astro site.
+4. Deploy to Vercel.
+
+The current workflow is `.github/workflows/deploy-web.yml`.
+
+Production deploys happen on pushes to `main` when files under these paths change:
+
+- `apps/web/**`
+- `packages/**`
+- `pnpm-lock.yaml`
+
+Preview deploys happen on pull requests to `main` for changes under:
+
+- `apps/web/**`
+- `packages/**`
+
+## Vercel Project Setup
+
+Create or link a Vercel project for the docs site.
+
 ```bash
-npm install -g vercel
-```
-
-#### 2. Login to Vercel
-```bash
+npm i -g vercel@latest
 vercel login
+vercel link
 ```
 
-#### 3. Deploy from Monorepo Root
-```bash
-# First deployment (interactive)
-vercel
+When prompted, link the repository to a project named something like `oroya-animate`.
+Run the command from the repository root, not from `apps/web`.
 
-# Select:
-# - Scope: Your account/team
-# - Link to existing project: No
-# - Project name: oroya-animate
-# - Directory: apps/web
-# - Build command: pnpm build
-# - Output directory: dist
+After linking, Vercel creates:
 
-# Production deployment
-vercel --prod
+```text
+.vercel/project.json
 ```
 
-### Option 2: Vercel Dashboard (Recommended for CI/CD)
+That file contains:
 
-#### 1. Import from GitHub
-
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository `joshuacba08/oroya-animate`
-3. Vercel will detect the monorepo structure
-
-#### 2. Configure Project
-
-**Framework Preset:** Astro
-
-**Root Directory:** `apps/web`
-
-**Build Command:**
-```bash
-cd ../.. && pnpm install && pnpm build && cd apps/web && pnpm build
+```json
+{
+  "orgId": "...",
+  "projectId": "..."
+}
 ```
 
-**Output Directory:** `dist` (default for Astro)
+Do not commit `.vercel/`. Use those values as GitHub Actions secrets instead.
 
-**Install Command:**
-```bash
-pnpm install
+## Required GitHub Secrets
+
+In GitHub:
+
+```text
+Repository -> Settings -> Secrets and variables -> Actions -> New repository secret
 ```
 
-#### 3. Environment Variables
+Add:
 
-Currently no environment variables needed. Add if you integrate:
-- `PUBLIC_API_URL` - API endpoint
-- `PUBLIC_GA_ID` - Google Analytics
-- `PUBLIC_NPM_SCOPE` - NPM organization
+| Secret | Source |
+|---|---|
+| `VERCEL_TOKEN` | Vercel account/team token |
+| `VERCEL_ORG_ID` | `.vercel/project.json` -> `orgId` |
+| `VERCEL_PROJECT_ID` | `.vercel/project.json` -> `projectId` |
 
-#### 4. Deploy
+Create the token in Vercel:
 
-Click **Deploy** button. Vercel will:
-1. Clone repository
-2. Install dependencies
-3. Build packages
-4. Build Astro site
-5. Deploy to CDN
+```text
+Vercel Dashboard -> Account Settings -> Tokens -> Create Token
+```
 
-## ⚙︁EConfiguration Files
+Use a name like `oroya-animate-github-actions`. Give it access to the team/project
+that owns `oroya-animate`.
 
-### vercel.json
+## Root `vercel.json`
 
-Create `vercel.json` at project root:
+Keep Vercel config at the repository root so the CLI can deploy from the same place
+GitHub Actions builds the monorepo.
 
 ```json
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "name": "oroya-animate",
-  "buildCommand": "pnpm install && pnpm build && cd apps/web && pnpm build",
-  "outputDirectory": "apps/web/dist",
-  "installCommand": "pnpm install",
   "framework": "astro",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build:web",
+  "outputDirectory": "apps/web/dist",
   "git": {
     "deploymentEnabled": {
       "main": true
@@ -112,6 +125,19 @@ Create `vercel.json` at project root:
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
+      ]
     }
   ],
   "redirects": [
@@ -120,378 +146,226 @@ Create `vercel.json` at project root:
       "destination": "/docs/getting-started",
       "permanent": false
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/apps/web/$1"
-    }
   ]
 }
 ```
 
-### apps/web/vercel.json (Alternative)
+Important: do not use `cd ../..` in a root-level `vercel.json`. Commands in this
+file are evaluated for the Vercel project root. For this repository, the intended
+project root is the monorepo root.
 
-Or place in `apps/web/` directory:
+## GitHub Actions Workflow
 
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "buildCommand": "cd ../.. && pnpm install && pnpm build && cd apps/web && pnpm build",
-  "outputDirectory": "dist",
-  "installCommand": "cd ../.. && pnpm install",
-  "framework": "astro"
-}
+The current workflow deploys from source:
+
+```yaml
+- name: Deploy to Vercel (Production)
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  run: npx vercel deploy --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+  env:
+    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 ```
 
-## 📂 Monorepo Setup
+Preview deploys are the same without `--prod`.
 
-### Important Notes
+This is acceptable for this repo. Vercel receives the source, runs the configured
+build, and serves the static `apps/web/dist` output.
 
-**Vercel needs access to workspace packages:**
-- Build must run from monorepo root or include pnpm install at root
-- Packages must be built before building the web app
-- `workspace:*` dependencies must be resolved
+### Optional: Prebuilt Deployments
 
-### Build Script Breakdown
+If you want GitHub Actions to build the exact artifact and then upload only the
+Vercel build output, use Vercel's prebuilt flow:
+
+```yaml
+- name: Pull Vercel project settings
+  run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+  env:
+    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+- name: Build Vercel output
+  run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+- name: Deploy prebuilt output
+  run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+Use this only if you specifically want CI-built artifacts to be uploaded. For this
+static Astro site, either source deploys or prebuilt deploys are valid. If the site
+starts depending on Vercel System Environment Variables at build time, prefer Git
+deployments or source deploys over `--prebuilt`.
+
+## Local Commands
+
+Run from the repository root:
 
 ```bash
-# Navigate to root (if in subdirectory)
-cd ../..
-
-# Install all workspace dependencies
-pnpm install
-
-# Build all packages in packages/ directory
-pnpm build
-
-# Navigate to web app
-cd apps/web
-
-# Build Astro site (uses built packages)
-pnpm build
+pnpm install --frozen-lockfile
+pnpm build:web
 ```
 
-### package.json Build Script (Root)
+Preview locally after build:
 
-Update root `package.json` to add deployment script:
-
-```json
-{
-  "scripts": {
-    "build": "pnpm --filter \"./packages/**\" build",
-    "build:web": "pnpm build && pnpm --filter \"web\" build",
-    "deploy:web": "pnpm build:web && vercel --prod"
-  }
-}
+```bash
+pnpm --filter web preview
 ```
 
-## 🔧 Vercel Project Settings
+Deploy a preview from the CLI:
 
-### Build & Development Settings
+```bash
+vercel deploy
+```
+
+Deploy production from the CLI:
+
+```bash
+vercel deploy --prod
+```
+
+Useful CLI checks:
+
+```bash
+vercel ls
+vercel inspect <deployment-url>
+vercel logs <deployment-url>
+vercel rollback <deployment-url>
+```
+
+## Vercel Dashboard Settings
+
+If configuring through the dashboard, use these values:
 
 | Setting | Value |
-|---------|-------|
-| Framework | Astro |
-| Root Directory | `apps/web` |
-| Build Command | `cd ../.. && pnpm install && pnpm build && cd apps/web && pnpm build` |
-| Output Directory | `dist` |
-| Install Command | `pnpm install` |
-| Node Version | 18.x or 20.x |
+|---|---|
+| Framework Preset | Astro |
+| Project Root Directory | repository root |
+| Install Command | `pnpm install --frozen-lockfile` |
+| Build Command | `pnpm build:web` |
+| Output Directory | `apps/web/dist` |
+| Node.js Version | 20.x |
 
-### Environment Variables (Optional)
+Do not set the root directory to `apps/web` unless you also rewrite build commands
+to jump back to the monorepo root. The root setup is simpler and matches the
+repository scripts.
 
-Add in Vercel Dashboard -> Settings -> Environment Variables:
+## Environment Variables
 
-```bash
-# Example variables
+The current site does not require custom Vercel environment variables.
+
+For public browser values in Astro, use the `PUBLIC_` prefix:
+
+```text
 PUBLIC_SITE_URL=https://oroya-animate.vercel.app
-PUBLIC_NPM_PACKAGE=@joroya/core
-PUBLIC_GITHUB_REPO=joshuacba08/oroya-animate
+PUBLIC_NPM_SCOPE=@joroya
 ```
 
-Access in Astro:
-```javascript
-const siteUrl = import.meta.env.PUBLIC_SITE_URL;
+For server-only values, do not use `PUBLIC_`.
+
+Vercel can automatically expose system variables such as `VERCEL_URL`,
+`VERCEL_BRANCH_URL`, and `VERCEL_PROJECT_PRODUCTION_URL`. Enable this in:
+
+```text
+Vercel Project -> Settings -> Environment Variables ->
+Automatically expose System Environment Variables
 ```
 
-## 🌍 Custom Domain
+The code currently uses the Astro `site` value in `apps/web/astro.config.mjs` and
+fallbacks in layouts, so no Vercel system variable is required for normal static
+deployments.
 
-### 1. Add Domain in Vercel
+## Custom Domain
 
-1. Go to Project Settings -> Domains
-2. Add your domain (e.g., `oroya-animate.com`)
-3. Follow DNS configuration instructions
+Add domains in:
 
-### 2. DNS Configuration
-
-**Option A: Vercel Nameservers (Recommended)**
-```
-ns1.vercel-dns.com
-ns2.vercel-dns.com
+```text
+Vercel Project -> Settings -> Domains
 ```
 
-**Option B: CNAME Record**
-```
-CNAME www cname.vercel-dns.com
-A @ 76.76.21.21
-```
+General DNS values as of May 18, 2026:
 
-### 3. Update Astro Config
-
-Update `apps/web/astro.config.mjs`:
-
-```javascript
-import { defineConfig } from 'astro/config';
-
-export default defineConfig({
-  site: 'https://oroya-animate.com',
-  // ... other config
-});
+```text
+A     @    76.76.21.21
+CNAME www  cname.vercel-dns-0.com
 ```
 
-## 🚦 Deployment Workflow
-
-### Automatic Deployments
-
-Vercel automatically deploys:
-
-- **Production:** Commits to `main` branch -> `oroya-animate.vercel.app`
-- **Preview:** Pull requests -> unique preview URL per PR
-
-### Manual Deployment
+Vercel may show project-specific DNS instructions. Prefer the values shown in the
+dashboard or verify with:
 
 ```bash
-# Preview deployment
-vercel
-
-# Production deployment
-vercel --prod
-
-# Deploy specific branch
-vercel --prod --scope your-team
+vercel domains inspect your-domain.com
 ```
 
-## 📊 GitHub Integration
+If you add a custom production domain, update:
 
-### Automatic Checks on PRs
+- `apps/web/astro.config.mjs`
+- `apps/web/public/robots.txt`
+- package `homepage` fields if the docs URL changes
 
-Vercel adds build status to PRs:
-- Build successful -> "Visit Preview"
-- Build failed -> see logs
+## Troubleshooting
 
-### Deployment Comments
+### `Command not found: pnpm`
 
-Vercel bot comments on PRs with:
-- Preview URL
-- Build logs
-- Deployment status
-
-### Configure in GitHub
-
-Repository Settings -> Integrations -> Vercel:
-- Enable status checks
-- Enable preview comments
-- Require build success before merge
-
-## 🔐 Protected Deployments
-
-### Password Protection
-
-For staging environments:
+Use the root `packageManager` field and keep the install command explicit:
 
 ```json
-{
-  "protection": {
-    "password": {
-      "enabled": true
-    }
-  }
-}
+"packageManager": "pnpm@9.1.0"
 ```
 
-### Authentication
+```text
+pnpm install --frozen-lockfile
+```
 
-Configure in Vercel Dashboard -> Settings -> Deployment Protection.
+### Workspace packages cannot be resolved
 
-## 📈 Analytics & Monitoring
-
-### Vercel Analytics
-
-Enable in Vercel Dashboard:
+Build from the monorepo root:
 
 ```bash
-pnpm add @vercel/analytics
+pnpm build:web
 ```
 
-In `apps/web/src/layouts/Layout.astro`:
-```astro
----
-import { Analytics } from '@vercel/analytics';
----
-<html>
-  <head>...</head>
-  <body>
-    ...
-    <Analytics />
-  </body>
-</html>
-```
+The web app imports workspace packages such as `@joroya/core`, so packages must be
+available through the workspace install and built before `astro build`.
 
-### Web Vitals
+### Vercel deploys but the page is stale
 
-Enable Speed Insights:
-```bash
-pnpm add @vercel/speed-insights
-```
+Check that the deploy-web workflow ran for the commit. The workflow has path filters,
+so docs-only changes outside `apps/web/**`, `packages/**`, or `pnpm-lock.yaml` do not
+trigger a web deployment.
 
-## 🎯 Best Practices
+### Production deploy did not run
 
-### 1. Preview Deployments
+Production deploys only run on pushes to `main`. Pull requests create preview
+deployments.
 
-Every PR gets a unique URL:
-```
-https://oroya-animate-pr-123.vercel.app
-```
+### `VERCEL_ORG_ID` or `VERCEL_PROJECT_ID` missing
 
-Use for:
-- Testing new features
-- Reviewing UI changes
-- Sharing with stakeholders
-
-### 2. Build Caching
-
-Vercel caches:
-- `node_modules/`
-- `pnpm-lock.yaml`
-- Build outputs
-
-Speed up builds by keeping dependencies stable.
-
-### 3. Output Optimization
-
-Astro automatically optimizes:
-- Image compression
-- Asset minification
-- Bundle splitting
-
-### 4. Edge Functions
-
-Use Astro SSR with Vercel Edge:
-
-```javascript
-// apps/web/astro.config.mjs
-import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless';
-
-export default defineConfig({
-  output: 'server',
-  adapter: vercel()
-});
-```
-
-## 🐛 Troubleshooting
-
-### Build Fails: "Package not found"
-
-**Problem:** Workspace dependencies not resolved.
-
-**Solution:**
-```bash
-# Build packages first
-cd ../.. && pnpm build
-```
-
-Update Build Command:
-```bash
-cd ../.. && pnpm install && pnpm build && cd apps/web && pnpm build
-```
-
-### Build Fails: "Command not found: pnpm"
-
-**Problem:** Vercel using npm instead of pnpm.
-
-**Solution:** Add `.npmrc` or `vercel.json`:
-
-```json
-{
-  "installCommand": "pnpm install"
-}
-```
-
-Or create `.vercelrc`:
-```json
-{
-  "installCommand": "pnpm install"
-}
-```
-
-### Blank Page After Deploy
-
-**Problem:** Base path or routing issue.
-
-**Solution:** Check `astro.config.mjs`:
-```javascript
-export default defineConfig({
-  site: 'https://oroya-animate.vercel.app',
-  base: '/', // Ensure this is correct
-});
-```
-
-### Assets Not Loading
-
-**Problem:** Incorrect asset paths.
-
-**Solution:** Use relative paths or Astro's asset imports:
-```astro
----
-import logo from '../assets/logo.svg';
----
-<img src={logo} alt="Logo" />
-```
-
-### Slow Build Times
-
-**Solutions:**
-1. Enable build caching
-2. Reduce package rebuilds (check if really needed)
-3. Use `--filter` to build only changed packages
-4. Split builds (packages in separate jobs)
-
-## 📚 Related Documentation
-
-- [NPM Publishing](./npm-publishing.md) - Publish packages referenced in docs
-- [GitHub Actions CI/CD](../../.github/workflows/deploy-web.yml) - Automated deployment
-- [Astro Documentation](https://docs.astro.build/) - Astro-specific configuration
-- [Vercel Documentation](https://vercel.com/docs) - Vercel platform
-
-## 🎬 Quick Reference
+Run:
 
 ```bash
-# First-time setup
-vercel login
-vercel
-
-# Deploy to production
-vercel --prod
-
-# Check deployment status
-vercel ls
-
-# View logs
-vercel logs oroya-animate
-
-# Remove deployment
-vercel rm oroya-animate
-
-# Rollback to previous deployment
-vercel rollback oroya-animate
+vercel link
 ```
 
-## 🔗 Useful Links
+Then copy values from:
 
-After deployment, update these in your repository:
-- **Live Site:** `https://oroya-animate.vercel.app`
-- **Vercel Dashboard:** `https://vercel.com/your-team/oroya-animate`
-- **Analytics:** `https://vercel.com/your-team/oroya-animate/analytics`
+```text
+.vercel/project.json
+```
+
+into GitHub Actions secrets.
+
+### `--prebuilt` deployment has missing build-time values
+
+Vercel documents that System Environment Variables are not present at build time for
+prebuilt deploys. Use source deploys or Git-based deployments if the build requires
+those values.
+
+## Official References
+
+- Vercel Astro framework guide: <https://vercel.com/docs/frameworks/frontend/astro>
+- Vercel monorepo guide: <https://vercel.com/docs/monorepos>
+- Vercel build settings: <https://vercel.com/docs/builds/configure-a-build>
+- Vercel CLI deploy: <https://vercel.com/docs/cli/deploy>
+- Vercel GitHub Actions guide: <https://vercel.com/guides/how-can-i-use-github-actions-with-vercel>
+- Vercel custom domains: <https://vercel.com/docs/domains/set-up-custom-domain>
+- Vercel system environment variables: <https://vercel.com/docs/environment-variables/system-environment-variables>
