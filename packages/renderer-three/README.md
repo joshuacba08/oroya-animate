@@ -1,20 +1,26 @@
 # @joroya/renderer-three
 
-> Three.js (WebGL) renderer for Oroya Animate scene graphs
+> WebGL backend that translates Oroya Animate scene graphs into Three.js objects.
 
 [![NPM Version](https://img.shields.io/npm/v/@joroya/renderer-three?style=flat-square)](https://www.npmjs.com/package/@joroya/renderer-three)
 [![License](https://img.shields.io/npm/l/@joroya/renderer-three?style=flat-square)](https://github.com/joshuacba08/oroya-animate/blob/main/LICENSE)
 
-Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engine-agnostic 2D/3D graphics library.
+Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate), a renderer-independent 2D/3D scene-graph library.
+
+## Relationship to Three.js
+
+This package uses Three.js as the rendering backend. You install `three`, but your application usually works with Oroya primitives such as `Scene`, `Node`, `Camera`, `Light`, `Material`, and `Geometry`. `ThreeRenderer` converts those components into Three.js objects during `mount()` and keeps them synchronized during `render(dt?)`.
+
+Use this package when you want Three.js rendering with Oroya's portable scene model, serialization, animation, physics integration, input, and inspection utilities. For lower-level rendering needs, extend the renderer through plugins or use Three.js directly in the specific area that requires it.
 
 ## Features
 
-- 🎮 **WebGL Rendering** - High-performance 3D graphics via Three.js
-- 🎥 **Camera Support** - Perspective and orthographic cameras
-- 💡 **Lighting** - Ambient, directional, point, and spot lights with optional shadows
-- 🎨 **Material Support** - PBR materials and basic colors
-- 📦 **Geometry Primitives** - Box, sphere, cylinder, and custom meshes
-- 🔄 **Per-frame Updates** - `render(dt?)` advances scene logic, animations, particles, controls, and backend sync
+- WebGL rendering through Three.js.
+- Perspective and orthographic cameras.
+- Ambient, directional, point, and spot lights with optional shadows.
+- PBR material fields, textures, emissive properties, transparency, and basic colors.
+- Box, sphere, cylinder, plane, cone, torus, circle, buffer, CSG, instanced, and skinned geometry support.
+- Per-frame updates through `render(dt?)` for scene logic, animations, particles, controls, and backend synchronization.
 
 ## Installation
 
@@ -25,7 +31,15 @@ npm install @joroya/core @joroya/renderer-three three
 ## Quick Example
 
 ```typescript
-import { Scene, Node, Camera, CameraType, createBox, Material } from '@joroya/core';
+import {
+  Camera,
+  CameraType,
+  Material,
+  Node,
+  Scene,
+  createBox,
+  setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
 // Create scene
@@ -58,8 +72,11 @@ const renderer = new ThreeRenderer({
 renderer.mount(scene);
 
 // Animation loop
+let angle = 0;
+
 function animate() {
-  cube.transform.rotation.y += 0.01;
+  angle += 0.01;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
   cube.transform.updateLocalMatrix();
   renderer.render();
   requestAnimationFrame(animate);
@@ -92,9 +109,9 @@ renderer.dispose(): void
 
 ## Documentation
 
-- 📖 [Full Documentation](https://oroya-animate.oroyajs.com)
-- 📚 [Renderer Guide](https://oroya-animate.oroyajs.com/docs/renderers)
-- 🎓 [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
+- [Full Documentation](https://oroya-animate.oroyajs.com)
+- [Renderer Guide](https://oroya-animate.oroyajs.com/docs/renderers)
+- [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
 
 ## CDN Usage
 

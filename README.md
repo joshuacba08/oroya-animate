@@ -33,7 +33,7 @@ The project is designed for applications that need a stable graphics model rathe
 | Package | Purpose |
 | --- | --- |
 | [`@joroya/core`](packages/core) | Scene graph, nodes, components, math, animation, serialization, and plugin contracts. |
-| [`@joroya/renderer-three`](packages/renderer-three) | WebGL renderer powered by Three.js. |
+| [`@joroya/renderer-three`](packages/renderer-three) | WebGL backend that translates Oroya scenes into Three.js objects. |
 | [`@joroya/renderer-svg`](packages/renderer-svg) | SVG renderer for vector output and DOM-based interaction. |
 | [`@joroya/renderer-canvas2d`](packages/renderer-canvas2d) | Canvas2D renderer for browser-native 2D drawing. |
 | [`@joroya/loader-gltf`](packages/loader-gltf) | glTF/GLB import into the Oroya scene graph. |
@@ -63,6 +63,12 @@ For physics:
 ```bash
 pnpm add @joroya/core @joroya/physics cannon-es
 ```
+
+## How It Relates to Three.js
+
+`@joroya/renderer-three` uses Three.js as its WebGL backend. You still install `three`, but most application code works against Oroya's renderer-independent scene graph instead of creating `THREE.Mesh`, `THREE.Material`, or `THREE.Camera` objects directly.
+
+This is useful when you want a portable scene model, serialization, multiple render targets, or higher-level systems such as animation, physics, input, and inspection. If your project needs full low-level access to the Three.js API, you can still build a renderer plugin or use Three.js directly for the parts that need it.
 
 ## Quick Start
 
