@@ -1355,7 +1355,7 @@ function pointInAABB(point: { x: number; y: number; z: number }, aabb: AABB): bo
 
 ### `ThreeRenderer`
 
-Renderer WebGL basado en Three.js.
+Backend WebGL que traduce escenas Oroya a objetos Three.js.
 
 **Archivo fuente:** [ThreeRenderer.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-three/src/ThreeRenderer.ts)
 
@@ -1396,8 +1396,8 @@ classDiagram
 
 | Método | Descripción |
 |--------|-------------|
-| `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js, busca la primera cámara, y agrega luces ambientales. Puede llamarse múltiples veces |
-| `render()` | Actualiza las matrices del mundo, sincroniza las posiciones de los objetos Three.js con el scene graph de Oroya, y dibuja el frame. Debe llamarse en un `requestAnimationFrame` loop |
+| `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js y busca la primera cámara. Puede llamarse múltiples veces |
+| `render(dt?)` | Ejecuta `scene.update(dt)`, actualiza matrices del mundo, sincroniza objetos Three.js con el scene graph de Oroya y dibuja el frame. Debe llamarse en un `requestAnimationFrame` loop |
 | `enableInteraction()` | Activa el sistema de interactividad (raycasting, listeners DOM). Debe llamarse después de `mount()`. |
 | `disableInteraction()` | Desactiva el sistema de interactividad y remueve listeners. |
 | `dispose()` | Libera los recursos del WebGLRenderer y limpia listeners de interacción. |
@@ -1407,21 +1407,26 @@ classDiagram
 | Oroya Component | Three.js Object |
 |----------------|-----------------|
 | `Node` sin geometría ni cámara | `THREE.Group` |
-| `Node` con `Geometry` (Box) | `THREE.Mesh` + `THREE.BoxGeometry` |
-| `Node` con `Geometry` (Sphere) | `THREE.Mesh` + `THREE.SphereGeometry` |
+| `Node` con `Geometry` de mesh soportada | `THREE.Mesh` |
+| `Node` con `Geometry` + `Skin` | `THREE.SkinnedMesh` |
+| `Node` con `InstancedMesh` | `THREE.InstancedMesh` |
 | `Node` con `Camera` (Perspective) | `THREE.PerspectiveCamera` |
+| `Node` con `Camera` (Orthographic) | `THREE.OrthographicCamera` |
+| `Node` con `Light` | Subclase de `THREE.Light` |
 | `Material` con `color` | `THREE.MeshStandardMaterial` |
 | `Material` con `opacity < 1` | `THREE.MeshStandardMaterial({ transparent: true })` |
-| Sin `Material` | `THREE.MeshStandardMaterial({ color: 0xcccccc })` (gris por defecto) |
+| Sin `Material` | `THREE.MeshStandardMaterial` por defecto |
 
-#### Iluminación automática
+#### Iluminación
 
-Al montar una escena, el renderer agrega automáticamente:
+El renderer traduce componentes `Light` explícitos desde el scene graph. No inyecta luces por defecto; agrega nodos con `Light` para iluminar materiales Three.js.
 
-| Luz | Configuración |
-|-----|---------------|
-| `AmbientLight` | Color: blanco, Intensidad: 0.5 |
-| `DirectionalLight` | Color: blanco, Intensidad: 1.5, Posición: `(2, 5, 3)` |
+| Luz Oroya | Objeto Three.js |
+|-----------|-----------------|
+| `LightType.Ambient` | `THREE.AmbientLight` |
+| `LightType.Directional` | `THREE.DirectionalLight` |
+| `LightType.Point` | `THREE.PointLight` |
+| `LightType.Spot` | `THREE.SpotLight` |
 
 #### Ejemplo
 

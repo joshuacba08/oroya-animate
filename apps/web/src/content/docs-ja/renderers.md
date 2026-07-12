@@ -39,7 +39,9 @@ graph TD
 
 ## `@joroya/renderer-three` — Three.js（WebGL）
 
-インタラクティブな3D可視化のためのメインレンダラー。
+Three.jsレンダラーは、Oroyaのシーングラフを描画するためのWebGLバックエンドです。アプリケーションコードはOroyaのノード、コンポーネント、カメラ、ライト、マテリアルを作成し、`ThreeRenderer` がそれらを内部で `THREE.Scene`、`THREE.Object3D`、`THREE.Mesh`、`THREE.Camera` などのThree.jsリソースへ変換します。
+
+これにより、シーンロジックの多くをThree.jsから独立させながら、描画処理にはThree.jsを利用できます。インタラクティブな3D、glTFアセット、シャドウ、ポストプロセス、パーティクル、空間オーディオ、レイキャストなどのWebGL機能が必要な場合にこのバックエンドを使います。低レベルのThree.js制御が必要な場合は、renderer pluginまたは該当箇所だけ直接Three.jsコードを使います。
 
 ### セットアップ
 
@@ -67,8 +69,8 @@ const renderer = new ThreeRenderer({
 
 | メソッド | 説明 |
 |----------|------|
-| `mount(scene)` | シーンを接続。Three.jsシーンを再構築し、アクティブカメラを検出、ライトを追加 |
-| `render()` | トランスフォームを同期し、行列を伝播してフレームを描画 |
+| `mount(scene)` | シーンを接続し、Three.jsオブジェクトを再構築してアクティブカメラを検出 |
+| `render(dt?)` | `scene.update(dt)` を実行し、トランスフォームを同期し、renderer管理のシステムを更新してフレームを描画 |
 | `dispose()` | WebGLリソースを解放 |
 
 ### ライフサイクル
@@ -81,13 +83,14 @@ sequenceDiagram
 
     Note over U,TS: マウント
     U->>TR: mount(scene)
-    TR->>TS: clear + add lights
-    TR->>TR: traverse → create Mesh/Group/Camera per node
+    TR->>TS: clear scene
+    TR->>TR: traverse → create Mesh/Group/Camera/Light/etc. per node
     TR->>TR: Set first Camera as activeCamera
 
     Note over U,TS: レンダーループ
     loop requestAnimationFrame
-        U->>TR: render()
+        U->>TR: render(dt)
+        TR->>TR: scene.update(dt)
         TR->>TR: updateWorldMatrices()
         TR->>TS: sync worldMatrix → Three.js objects
         TR->>TR: webglRenderer.render()
@@ -99,20 +102,30 @@ sequenceDiagram
 | Oroyaノード | Three.jsオブジェクト |
 |-------------|----------------------|
 | Geometry/CameraのないNode | `THREE.Group` |
-| Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
-| Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
-| Node + `Geometry(Path2D)` | ❌ 無視 |
+| Node + 対応しているmesh `Geometry` | Box/Sphere/Cylinder/Plane/Cone/Torus/Circle/Buffer/CSG geometryを持つ `THREE.Mesh` |
+| Node + `Geometry` + `Skin` | mount後にskeleton bindingされる `THREE.SkinnedMesh` |
+| Node + `InstancedMesh` | `THREE.InstancedMesh` |
+| Node + `Geometry(Path2D)` / `Geometry(Text)` | Three.jsバックエンドでは無視 |
 | Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
+| Node + `Camera(Orthographic)` | `THREE.OrthographicCamera` |
+| Node + `Light` | `THREE.Light` のサブクラス |
+| Node + `ParticleSystem` | `THREE.Points` |
+| Node + `AudioListener` / `AudioSource` | `THREE.AudioListener` / `THREE.PositionalAudio` |
 | `color` を持つ `Material` | `MeshStandardMaterial({ color })` |
 | `opacity < 1` を持つ `Material` | `MeshStandardMaterial({ transparent: true })` |
-| `Material` なし | `MeshStandardMaterial({ color: 0xcccccc })` |
+| PBRおよびテクスチャフィールド | roughness/metalness/emissive/mapsを持つ `MeshStandardMaterial` |
+| `Material` なし | デフォルトの `MeshStandardMaterial` |
 
-### 自動照明
+### ライティング
 
-| タイプ | 設定 |
-|--------|------|
-| `AmbientLight` | 白、強度 `0.5` |
-| `DirectionalLight` | 白、強度 `1.5`、位置 `(2, 5, 3)` |
+`ThreeRenderer` はシーングラフ上の明示的な `Light` コンポーネントを変換します。環境光、平行光、点光源、スポットライトを追加してライティングを制御します。デフォルトライトは自動挿入されません。
+
+| Oroyaライト | Three.jsオブジェクト |
+|-------------|----------------------|
+| `LightType.Ambient` | `THREE.AmbientLight` |
+| `LightType.Directional` | optional shadows and targetを持つ `THREE.DirectionalLight` |
+| `LightType.Point` | optional shadowsを持つ `THREE.PointLight` |
+| `LightType.Spot` | optional shadows、target、angle、penumbraを持つ `THREE.SpotLight` |
 
 ### カメラの解決
 
@@ -127,7 +140,15 @@ flowchart TD
 ### 完全な例
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera,
+  CameraType,
+  Material,
+  Node,
+  Scene,
+  createBox,
+  setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
@@ -151,8 +172,11 @@ const renderer = new ThreeRenderer({
 });
 renderer.mount(scene);
 
+let angle = 0;
+
 function loop() {
-  box.transform.rotation.y = performance.now() * 0.001;
+  angle += 0.01;
+  box.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
   box.transform.updateLocalMatrix();
   renderer.render();
   requestAnimationFrame(loop);

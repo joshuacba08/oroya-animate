@@ -18,13 +18,13 @@ Install the packages you need from npm using your preferred package manager:
 
 ```bash
 # npm
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 
 # yarn
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 
 # pnpm
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 ```
 
 ### Available packages (v1.0.0)
@@ -36,7 +36,7 @@ The library ships as 11 small, focused packages. Install only what you need.
 | Package | Description |
 |---|---|
 | `@joroya/core` | Scene graph, nodes, components, animation, math, plugins, serialization |
-| `@joroya/renderer-three` | WebGL renderer powered by Three.js (full PBR, shadows, post-FX, audio, skinned meshes) |
+| `@joroya/renderer-three` | WebGL backend that translates Oroya scenes into Three.js objects (PBR, shadows, post-FX, audio, skinned meshes) |
 | `@joroya/renderer-svg` | SVG renderer for 2D vector graphics |
 | `@joroya/renderer-canvas2d` | Lightweight Canvas2D renderer |
 | `@joroya/loader-gltf` | glTF / GLB model loader with skinned-mesh support |
@@ -90,7 +90,15 @@ This minimal example creates a scene with a camera and a red cube, then renders 
 ### 2. Scene Setup (`main.ts`)
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera,
+  CameraType,
+  Material,
+  Node,
+  Scene,
+  createBox,
+  setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
 // --- Scene ---
@@ -129,8 +137,10 @@ function animate(time: number) {
   requestAnimationFrame(animate);
 
   const speed = 0.5;
-  cubeNode.transform.rotation.x = Math.sin(time * speed) * 2;
-  cubeNode.transform.rotation.y = Math.cos(time * speed) * 2;
+  cubeNode.transform.rotation = setFromAxisAngle(
+    { x: 0.4, y: 1, z: 0 },
+    time * speed,
+  );
   cubeNode.transform.updateLocalMatrix();
 
   renderer.render();
@@ -389,10 +399,10 @@ function animate(time: number) {
   time *= 0.001;
   requestAnimationFrame(animate);
 
-  solarSystem.transform.rotation.y = time * 0.1;
+  solarSystem.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.1);
   solarSystem.transform.updateLocalMatrix();
 
-  earth.transform.rotation.y = time * 0.5;
+  earth.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.5);
   earth.transform.updateLocalMatrix();
 
   renderer.render();

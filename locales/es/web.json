@@ -34,9 +34,9 @@
   },
   "renderers": {
     "sectionTitle": "Un Grafo de Escena, <span>Tres Renderers</span>",
-    "sectionSubtitle": "Escribe tu lógica de escena una vez. Renderiza con Three.js para 3D WebGL inmersivo, SVG para gráficos vectoriales escalables, o Canvas2D para 2D nativo y ligero.",
+    "sectionSubtitle": "Escribe tu lógica de escena una vez. Renderiza mediante el backend Three.js para 3D WebGL inmersivo, SVG para gráficos vectoriales escalables, o Canvas2D para 2D nativo y ligero.",
     "threeTitle": "Renderer Three.js",
-    "threeDesc": "Renderizado 3D completo con Three.js y WebGL. Soporte para cámaras perspectiva y ortográficas, materiales PBR, carga de modelos glTF y eventos de interacción en tiempo real.",
+    "threeDesc": "Backend WebGL que traduce escenas Oroya a objetos Three.js, con soporte para cámaras perspectiva y ortográficas, materiales PBR, assets glTF y eventos de interacción en tiempo real.",
     "svgTitle": "Renderer SVG",
     "svgDesc": "Renderizado de gráficos vectoriales ligeros. Perfecto para arte generativo, visualización de datos, diagramas interactivos y gráficos independientes de resolución con soporte CSS.",
     "swapNote": "Mismo grafo de escena — solo cambia el renderer",

@@ -43,7 +43,9 @@ graph TD
 
 ## `@joroya/renderer-three` — Three.js (WebGL)
 
-The main renderer for interactive 3D visualization.
+The Three.js renderer is a WebGL backend for Oroya's scene graph. Application code creates Oroya nodes, components, cameras, lights, and materials; `ThreeRenderer` translates those objects into `THREE.Scene`, `THREE.Object3D`, `THREE.Mesh`, `THREE.Camera`, and related Three.js resources internally.
+
+This keeps most scene logic independent from Three.js while still using Three.js for the rendering work. Use this backend when you need interactive 3D, glTF assets, shadows, post-processing, particles, spatial audio, raycasting, or other WebGL features. If a project needs low-level Three.js control, use renderer plugins or direct Three.js code for that specific extension point.
 
 ### Setup
 
@@ -142,7 +144,15 @@ flowchart TD
 ### Full example
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera,
+  CameraType,
+  Material,
+  Node,
+  Scene,
+  createBox,
+  setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
 const scene = new Scene();
@@ -166,8 +176,11 @@ const renderer = new ThreeRenderer({
 });
 renderer.mount(scene);
 
+let angle = 0;
+
 function loop() {
-  box.transform.rotation.y = performance.now() * 0.001;
+  angle += 0.01;
+  box.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
   box.transform.updateLocalMatrix();
   renderer.render();
   requestAnimationFrame(loop);

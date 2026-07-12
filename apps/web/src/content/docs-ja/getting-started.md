@@ -18,13 +18,13 @@ Oroya Animateはシーンの定義とレンダリングバックエンドを分�
 
 ```bash
 # npm
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 
 # yarn
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 
 # pnpm
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 ```
 
 ### 利用可能なパッケージ
@@ -32,7 +32,7 @@ pnpm add @joroya/core @joroya/renderer-three
 | パッケージ | 説明 |
 |---|---|
 | `@joroya/core` | シーングラフ、ノード、コンポーネント、シリアライゼーション、数学ユーティリティ |
-| `@joroya/renderer-three` | Three.jsベースのWebGLレンダラー |
+| `@joroya/renderer-three` | OroyaシーンをThree.jsオブジェクトへ変換するWebGLバックエンド |
 | `@joroya/renderer-svg` | 2Dパスベースグラフィックス用SVGレンダラー |
 | `@joroya/renderer-canvas2d` | 2Dラスターグラフィックス用Canvas 2Dレンダラー |
 | `@joroya/loader-gltf` | glTFモデルをOroyaシーンに読み込み |
@@ -71,6 +71,7 @@ pnpm add @joroya/core @joroya/renderer-three
 import {
   Scene, Node, createBox, Material,
   Camera, CameraType, Light, LightType,
+  setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
@@ -124,8 +125,10 @@ function animate(time: number) {
   requestAnimationFrame(animate);
 
   const speed = 0.5;
-  cubeNode.transform.rotation.x = Math.sin(time * speed) * 2;
-  cubeNode.transform.rotation.y = Math.cos(time * speed) * 2;
+  cubeNode.transform.rotation = setFromAxisAngle(
+    { x: 0.4, y: 1, z: 0 },
+    time * speed,
+  );
   cubeNode.transform.updateLocalMatrix();
 
   renderer.render();
@@ -449,10 +452,10 @@ function animate(time: number) {
   time *= 0.001;
   requestAnimationFrame(animate);
 
-  solarSystem.transform.rotation.y = time * 0.1;
+  solarSystem.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.1);
   solarSystem.transform.updateLocalMatrix();
 
-  earth.transform.rotation.y = time * 0.5;
+  earth.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.5);
   earth.transform.updateLocalMatrix();
 
   renderer.render();

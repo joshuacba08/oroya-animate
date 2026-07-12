@@ -63,7 +63,7 @@ function SpinningCube() {
 
     useFrame((dt) => {
         if (ref.current) {
-            ref.current.transform.rotation.y += dt;
+            ref.current.transform.rotateOnAxis({ x: 0, y: 1, z: 0 }, dt);
             ref.current.transform.updateLocalMatrix();
         }
     });

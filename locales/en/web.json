@@ -34,9 +34,9 @@
   },
   "renderers": {
     "sectionTitle": "One Scene Graph, <span>Three Renderers</span>",
-    "sectionSubtitle": "Write your scene logic once. Render with Three.js for immersive 3D WebGL, SVG for scalable vector graphics, or Canvas2D for lightweight browser-native 2D.",
+    "sectionSubtitle": "Write your scene logic once. Render through the Three.js backend for immersive 3D WebGL, SVG for scalable vector graphics, or Canvas2D for lightweight browser-native 2D.",
     "threeTitle": "Three.js Renderer",
-    "threeDesc": "Full 3D rendering powered by Three.js and WebGL. Support for perspective and orthographic cameras, PBR materials, glTF model loading, and real-time interaction events.",
+    "threeDesc": "WebGL backend that translates Oroya scenes into Three.js objects, with support for perspective and orthographic cameras, PBR materials, glTF assets, and real-time interaction events.",
     "svgTitle": "SVG Renderer",
     "svgDesc": "Lightweight vector graphics rendering. Perfect for generative art, data visualization, interactive diagrams, and resolution-independent graphics with CSS styling support.",
     "swapNote": "Same scene graph — just swap the renderer",

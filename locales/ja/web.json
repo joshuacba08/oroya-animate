@@ -34,9 +34,9 @@
   },
   "renderers": {
     "sectionTitle": "1つのシーングラフ、<span>3つのレンダラー</span>",
-    "sectionSubtitle": "シーンロジックを一度だけ記述。Three.jsで没入型3D WebGL、SVGでスケーラブルなベクター、Canvas2Dで軽量ネイティブ2Dをレンダリング。",
+    "sectionSubtitle": "シーンロジックを一度だけ記述。Three.jsバックエンドで没入型3D WebGL、SVGでスケーラブルなベクター、Canvas2Dで軽量ネイティブ2Dをレンダリング。",
     "threeTitle": "Three.jsレンダラー",
-    "threeDesc": "Three.jsとWebGLによる完全な3Dレンダリング。透視投影・正投影カメラ、PBRマテリアル、glTFモデル読み込み、リアルタイムインタラクションイベントをサポート。",
+    "threeDesc": "OroyaシーンをThree.jsオブジェクトへ変換するWebGLバックエンド。透視投影・正投影カメラ、PBRマテリアル、glTFアセット、リアルタイムインタラクションイベントをサポート。",
     "svgTitle": "SVGレンダラー",
     "svgDesc": "軽量ベクターグラフィックスレンダリング。ジェネラティブアート、データビジュアライゼーション、インタラクティブダイアグラム、CSSスタイリング対応の解像度非依存グラフィックスに最適。",
     "swapNote": "同じシーングラフ — レンダラーを交換するだけ",

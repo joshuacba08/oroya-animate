@@ -18,13 +18,13 @@ Instala los paquetes que necesites desde npm usando tu gestor de paquetes prefer
 
 ```bash
 # npm
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 
 # yarn
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 
 # pnpm
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 ```
 
 ### Paquetes disponibles
@@ -32,7 +32,7 @@ pnpm add @joroya/core @joroya/renderer-three
 | Paquete | Descripción |
 |---|---|
 | `@joroya/core` | Grafo de escena, nodos, componentes, serialización, utilidades matemáticas |
-| `@joroya/renderer-three` | Renderer WebGL basado en Three.js |
+| `@joroya/renderer-three` | Backend WebGL que traduce escenas Oroya a objetos Three.js |
 | `@joroya/renderer-svg` | Renderer SVG para gráficos vectoriales 2D |
 | `@joroya/renderer-canvas2d` | Renderer Canvas 2D para gráficos rasterizados 2D |
 | `@joroya/loader-gltf` | Carga modelos glTF en una escena Oroya |
@@ -71,6 +71,7 @@ Este ejemplo mínimo crea una escena con una cámara, iluminación y un cubo roj
 import {
   Scene, Node, createBox, Material,
   Camera, CameraType, Light, LightType,
+  setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
@@ -124,8 +125,10 @@ function animate(time: number) {
   requestAnimationFrame(animate);
 
   const speed = 0.5;
-  cubeNode.transform.rotation.x = Math.sin(time * speed) * 2;
-  cubeNode.transform.rotation.y = Math.cos(time * speed) * 2;
+  cubeNode.transform.rotation = setFromAxisAngle(
+    { x: 0.4, y: 1, z: 0 },
+    time * speed,
+  );
   cubeNode.transform.updateLocalMatrix();
 
   renderer.render();
@@ -449,10 +452,10 @@ function animate(time: number) {
   time *= 0.001;
   requestAnimationFrame(animate);
 
-  solarSystem.transform.rotation.y = time * 0.1;
+  solarSystem.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.1);
   solarSystem.transform.updateLocalMatrix();
 
-  earth.transform.rotation.y = time * 0.5;
+  earth.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.5);
   earth.transform.updateLocalMatrix();
 
   renderer.render();
