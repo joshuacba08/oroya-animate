@@ -5,6 +5,18 @@ All notable changes to Oroya Animate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-08-04
+
+### Added
+- Deterministic authoring controls on `AnimationMixer` and `Animator`: `seek`, `pause`, `resume`,
+  pure `sampleAt`, and `tick` backed by an injectable monotonic clock.
+- Versioned `serializeAnimationClip` / `deserializeAnimationClip` helpers that round-trip typed
+  keyframe arrays through JSON-safe data.
+- Reliable event delivery when one update crosses multiple loop iterations.
+
+### Fixed
+- Non-looping clips now apply their exact final pose before reporting that playback finished.
+
 ## [1.0.0] - 2026-05-16
 
 > **First production release.** The engine, the developer ecosystem, and the

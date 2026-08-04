@@ -1,5 +1,10 @@
 import { Component, ComponentType } from './Component';
-import { AnimationMixer, type AnimationMixerEventMap } from '../animation/AnimationMixer';
+import {
+    AnimationMixer,
+    type AnimationClock,
+    type AnimationMixerEventMap,
+    type AnimationSampledValue,
+} from '../animation/AnimationMixer';
 import type { AnimationClip } from '../animation/AnimationClip';
 import type { Scene } from '../scene/Scene';
 
@@ -63,9 +68,9 @@ export class Animator extends Component {
      * once after `renderer.mount(scene)` so the mixer can resolve target
      * nodes by name.
      */
-    bindToScene(scene: Scene): void {
+    bindToScene(scene: Scene, clock?: AnimationClock): void {
         if (this.mixer) return;
-        this.mixer = new AnimationMixer(scene);
+        this.mixer = new AnimationMixer(scene, clock);
         if (this.pendingAutoplay && this.definition.animations[this.pendingAutoplay]) {
             this.play(this.pendingAutoplay);
             this.pendingAutoplay = undefined;
@@ -115,6 +120,36 @@ export class Animator extends Component {
         if (this.mixer) this.mixer.stop();
         this.definition.playing = false;
         this.definition.currentAnimation = '';
+    }
+
+    /** Pause without losing the current clip or pose. */
+    pause(): void {
+        this.mixer?.pause();
+        this.definition.playing = false;
+    }
+
+    /** Resume the paused clip from the same play-head. */
+    resume(): void {
+        this.mixer?.resume();
+        this.definition.playing = this.mixer?.playing ?? false;
+    }
+
+    /** Seek in seconds and apply the sampled pose immediately. */
+    seek(time: number, options: { emitEvents?: boolean } = {}): void {
+        this.mixer?.seek(time, options);
+        this.definition.playing = this.mixer?.playing ?? false;
+    }
+
+    /** Pure deterministic sampling for authoring and export pipelines. */
+    sampleAt(time: number, animationName = this.definition.currentAnimation): AnimationSampledValue[] {
+        const clip = this.definition.animations[animationName];
+        return clip && this.mixer ? this.mixer.sampleAt(time, clip) : [];
+    }
+
+    /** Advance from the clock supplied to `bindToScene`. */
+    tick(): void {
+        this.mixer?.tick();
+        this.definition.playing = this.mixer?.playing ?? false;
     }
 
     /** Subscribe to mixer events (`keyframe-event`, `finished`). */

@@ -29,6 +29,21 @@ interface ClipState {
     finished: boolean;
 }
 
+/** Monotonic time source used by `tick()`; injectable for deterministic runtimes and tests. */
+export interface AnimationClock {
+    now(): number;
+}
+
+export interface AnimationSampledValue {
+    targetNodeName: string;
+    property: KeyframeTrack['property'];
+    value: Vec3 | Quat;
+}
+
+const defaultAnimationClock: AnimationClock = {
+    now: () => (typeof performance === 'undefined' ? Date.now() : performance.now()) / 1000,
+};
+
 /**
  * Public event map for the mixer.
  *
@@ -53,9 +68,13 @@ export class AnimationMixer {
     private scene: Scene;
     private states: ClipState[] = [];
     private readonly emitter = new EventEmitter<AnimationMixerEventMap>();
+    private readonly clock: AnimationClock;
+    private lastClockTime: number | null = null;
+    private paused = false;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, clock: AnimationClock = defaultAnimationClock) {
         this.scene = scene;
+        this.clock = clock;
     }
 
     /**
@@ -63,6 +82,8 @@ export class AnimationMixer {
      * Equivalent to `crossFade(clip, 0)`.
      */
     play(clip: AnimationClip, options: { loop?: boolean; speed?: number } = {}): void {
+        this.validateClip(clip);
+        this.validateSpeed(options.speed);
         this.states = [{
             clip,
             time: 0,
@@ -75,6 +96,9 @@ export class AnimationMixer {
             lastEventTime: 0,
             finished: false,
         }];
+        this.paused = false;
+        this.resetClock();
+        this.applyBlendedState();
     }
 
     /**
@@ -84,6 +108,11 @@ export class AnimationMixer {
      * from 0 to 1. With `duration === 0` the swap is instant.
      */
     crossFade(clip: AnimationClip, duration: number, options: { loop?: boolean; speed?: number } = {}): void {
+        this.validateClip(clip);
+        this.validateSpeed(options.speed);
+        if (!Number.isFinite(duration) || duration < 0) {
+            throw new Error('AnimationMixer.crossFade() duration must be finite and non-negative.');
+        }
         for (const s of this.states) {
             s.targetWeight = 0;
             s.fadeDuration = duration;
@@ -101,21 +130,94 @@ export class AnimationMixer {
             lastEventTime: 0,
             finished: false,
         });
+        this.paused = false;
+        this.resetClock();
     }
 
     /** Stop all clips and discard their state. */
     stop(): void {
         this.states = [];
+        this.paused = false;
+        this.resetClock();
     }
 
     /** Returns `true` if at least one clip is currently active. */
     get playing(): boolean {
-        return this.states.length > 0;
+        return !this.paused && this.states.some((state) => !state.finished && state.weight > 0);
     }
 
     /** Time of the most-recently-played clip (useful for single-clip cases). */
     get time(): number {
         return this.states.length > 0 ? this.states[this.states.length - 1].time : 0;
+    }
+
+    /** Pause without discarding clip state or the current sampled pose. */
+    pause(): void {
+        if (this.states.length === 0) return;
+        this.paused = true;
+        this.resetClock();
+    }
+
+    /** Continue from the exact paused play-head. */
+    resume(): void {
+        if (this.states.length === 0) return;
+        this.paused = false;
+        for (const state of this.states) state.finished = false;
+        this.resetClock();
+    }
+
+    get isPaused(): boolean {
+        return this.paused;
+    }
+
+    /** Seek and immediately apply the pose; scrubbing is event-free unless requested. */
+    seek(time: number, options: { emitEvents?: boolean } = {}): void {
+        const state = this.states[this.states.length - 1];
+        if (!state) return;
+        if (!Number.isFinite(time)) throw new Error('AnimationMixer.seek() time must be finite.');
+        const previous = state.time;
+        state.time = state.loop && state.clip.duration > 0
+            ? Math.max(0, time) % state.clip.duration
+            : Math.max(0, Math.min(time, state.clip.duration));
+        state.finished = !state.loop && state.time >= state.clip.duration;
+        if (options.emitEvents && state.time >= previous) {
+            state.lastEventTime = previous;
+            this.dispatchEvents(state);
+        } else {
+            state.lastEventTime = state.time;
+        }
+        this.applyBlendedState();
+        this.resetClock();
+    }
+
+    /** Pure sampling that does not mutate mixer, scene, events, or playback state. */
+    sampleAt(time: number, clip?: AnimationClip): AnimationSampledValue[] {
+        const selected = clip ?? this.states[this.states.length - 1]?.clip;
+        if (!selected) return [];
+        this.validateClip(selected);
+        if (!Number.isFinite(time)) throw new Error('AnimationMixer.sampleAt() time must be finite.');
+        const sampleTime = Math.max(0, Math.min(time, selected.duration));
+        return selected.tracks.flatMap((track) => {
+            const value = this.interpolateTrack(track, sampleTime);
+            return value ? [{ targetNodeName: track.targetNodeName, property: track.property, value }] : [];
+        });
+    }
+
+    /** Advance using the injected monotonic clock. The first call establishes a baseline. */
+    tick(): void {
+        const current = this.clock.now();
+        if (!Number.isFinite(current)) throw new Error('Animation clock returned a non-finite value.');
+        if (this.lastClockTime === null) {
+            this.lastClockTime = current;
+            return;
+        }
+        const delta = Math.max(0, current - this.lastClockTime);
+        this.lastClockTime = current;
+        this.update(delta);
+    }
+
+    resetClock(): void {
+        this.lastClockTime = null;
     }
 
     on<K extends keyof AnimationMixerEventMap>(
@@ -137,19 +239,27 @@ export class AnimationMixer {
      * blended result to each affected node's transform.
      */
     update(deltaTime: number): void {
-        if (this.states.length === 0) return;
+        if (this.states.length === 0 || this.paused) return;
+        if (!Number.isFinite(deltaTime) || deltaTime < 0) {
+            throw new Error('AnimationMixer.update() deltaTime must be finite and non-negative.');
+        }
 
         // 1. Advance time and fade weights for each clip.
         for (const s of this.states) {
-            s.time += deltaTime * s.speed;
+            if (s.finished) continue;
+            this.advancePlayback(s, deltaTime * s.speed);
             this.advanceFade(s, deltaTime);
-            this.dispatchEvents(s);
-            this.handleLoop(s);
         }
 
         // 2. Drop fully faded-out clips (after dispatching their tail events).
-        this.states = this.states.filter((s) => s.weight > 0 && !s.finished);
+        this.states = this.states.filter((s) => s.weight > 0);
 
+        if (this.states.length === 0) return;
+
+        this.applyBlendedState();
+    }
+
+    private applyBlendedState(): void {
         if (this.states.length === 0) return;
 
         // 3. Sample each track from each clip, blend by normalized weight.
@@ -195,6 +305,49 @@ export class AnimationMixer {
         }
     }
 
+    private validateClip(clip: AnimationClip): void {
+        if (!Number.isFinite(clip.duration) || clip.duration <= 0) {
+            throw new Error(`Animation clip "${clip.name}" must have a positive finite duration.`);
+        }
+        for (const track of clip.tracks) {
+            if (track.times.length === 0) {
+                throw new Error(`Animation track "${track.targetNodeName}.${track.property}" has no keyframes.`);
+            }
+        }
+    }
+
+    private validateSpeed(speed: number | undefined): void {
+        if (speed !== undefined && (!Number.isFinite(speed) || speed < 0)) {
+            throw new Error('Animation playback speed must be finite and non-negative.');
+        }
+    }
+
+    private advancePlayback(s: ClipState, amount: number): void {
+        if (amount <= 0) return;
+        if (!s.loop) {
+            s.time = Math.min(s.time + amount, s.clip.duration);
+            this.dispatchEvents(s);
+            if (s.time >= s.clip.duration && !s.finished) {
+                s.finished = true;
+                this.emitter.emit('finished', { clip: s.clip });
+            }
+            return;
+        }
+
+        let remaining = amount;
+        while (remaining > 0) {
+            const untilEnd = s.clip.duration - s.time;
+            const step = Math.min(remaining, untilEnd);
+            s.time += step;
+            this.dispatchEvents(s);
+            remaining -= step;
+            if (s.time >= s.clip.duration) {
+                s.time = 0;
+                s.lastEventTime = 0;
+            }
+        }
+    }
+
     private advanceFade(s: ClipState, dt: number): void {
         if (s.weight === s.targetWeight) return;
         if (s.fadeDuration <= 0) {
@@ -205,20 +358,6 @@ export class AnimationMixer {
         const alpha = Math.min(s.fadeElapsed / s.fadeDuration, 1);
         const start = s.targetWeight === 0 ? 1 : 0;
         s.weight = start + (s.targetWeight - start) * alpha;
-    }
-
-    private handleLoop(s: ClipState): void {
-        if (s.time < s.clip.duration) return;
-        if (s.loop) {
-            s.time = s.time % s.clip.duration;
-            s.lastEventTime = 0;
-        } else {
-            s.time = s.clip.duration;
-            if (!s.finished) {
-                s.finished = true;
-                this.emitter.emit('finished', { clip: s.clip });
-            }
-        }
     }
 
     private dispatchEvents(s: ClipState): void {
