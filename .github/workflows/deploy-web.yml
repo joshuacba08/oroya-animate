@@ -93,7 +93,7 @@ jobs:
         env:
           DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
         run: |
-          pnpm dlx vercel@63.1.2 curl / --deployment "$DEPLOYMENT_URL" --token="$VERCEL_TOKEN" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
+          pnpm dlx vercel@63.1.2 --token "$VERCEL_TOKEN" curl / --deployment "$DEPLOYMENT_URL" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
           node scripts/deployment-auth.js
       - name: Promote production deployment
         if: steps.target.outputs.environment == 'production'
@@ -125,7 +125,14 @@ jobs:
         if: failure() && steps.release.outcome == 'success' && steps.target.outputs.environment == 'production'
         env:
           PREVIOUS_DEPLOYMENT: ${{ steps.previous.outputs.id }}
-        run: pnpm dlx vercel@63.1.2 rollback "$PREVIOUS_DEPLOYMENT" --yes --token="$VERCEL_TOKEN"
+        run: |
+          pnpm dlx vercel@63.1.2 inspect https://oroya-animate.oroyajs.com --json --token="$VERCEL_TOKEN" > current-deployment.json
+          current=$(node --input-type=module -e 'import { readFileSync } from "node:fs"; const result = JSON.parse(readFileSync("current-deployment.json", "utf8")); console.log((result.deployment ?? result).id);')
+          if [ "$current" = "$PREVIOUS_DEPLOYMENT" ]; then
+            echo "Previous production deployment is already active."
+          else
+            pnpm dlx vercel@63.1.2 rollback "$PREVIOUS_DEPLOYMENT" --yes --token="$VERCEL_TOKEN"
+          fi
       - uses: actions/upload-artifact@v4
         if: steps.release.outcome == 'success'
         with:
