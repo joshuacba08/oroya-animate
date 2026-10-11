@@ -93,7 +93,7 @@ jobs:
         env:
           DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
         run: |
-          pnpm dlx vercel@63.1.2 --token "$VERCEL_TOKEN" curl / --deployment "$DEPLOYMENT_URL" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
+          pnpm dlx vercel@63.1.2 curl / --deployment "$DEPLOYMENT_URL" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
           node scripts/deployment-auth.js
       - name: Promote production deployment
         if: steps.target.outputs.environment == 'production'
