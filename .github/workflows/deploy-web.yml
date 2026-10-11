@@ -89,8 +89,20 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
           printf '%s\n' "$url" > deployment-url.txt
           printf 'Commit: %s\nDeployment: %s\n' "$GITHUB_SHA" "$url" >> "$GITHUB_STEP_SUMMARY"
+      - name: Authorize protected deployment checks
+        env:
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: |
+          pnpm dlx vercel@63.1.2 curl / --deployment "$DEPLOYMENT_URL" --token="$VERCEL_TOKEN" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
+          node scripts/deployment-auth.js
+      - name: Promote production deployment
+        if: steps.target.outputs.environment == 'production'
+        env:
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: pnpm dlx vercel@63.1.2 promote "$DEPLOYMENT_URL" --yes --token="$VERCEL_TOKEN"
       - name: Verify public guides
         env:
+          DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json
           EXPECTED_COMMIT: ${{ github.sha }}
           PUBLIC_URL: ${{ steps.target.outputs.environment == 'production' && 'https://oroya-animate.oroyajs.com' || '' }}
           DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
@@ -98,7 +110,8 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - name: Verify deployed site in browser
         env:
-          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+          DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json
+          DEPLOYMENT_URL: ${{ steps.target.outputs.environment == 'production' && 'https://oroya-animate.oroyajs.com' || steps.release.outputs.url }}
         run: pnpm test:browser
       - uses: actions/upload-artifact@v4
         if: always()

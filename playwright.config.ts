@@ -5,7 +5,8 @@ export default defineConfig({
   use: { baseURL: process.env.DEPLOYMENT_URL || 'http://127.0.0.1:4321',
     viewport: { width: 1280, height: 800 },
     ...(process.platform === 'win32' ? { channel: 'msedge' } : {}),
-    trace: 'retain-on-failure' },
+    storageState: process.env.DEPLOYMENT_STORAGE_STATE,
+    trace: process.env.DEPLOYMENT_STORAGE_STATE ? 'off' : 'retain-on-failure' },
   reporter: [['list'], ['html', { open: 'never' }]],
   webServer: process.env.DEPLOYMENT_URL ? undefined : {
     command: 'pnpm --filter web preview --host 127.0.0.1 --port 4321',

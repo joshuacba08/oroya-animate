@@ -50,7 +50,9 @@ does not create deployments alongside Actions.
    builds and browser tests on Node 24, after packages have been built.
 3. Actions pulls preview settings, builds with Vercel CLI 63.1.2 and deploys
    the prebuilt output to the existing linked project.
-4. HTTP checks confirm the expected commit and new guides in English, Spanish and Japanese.
+4. Vercel CLI authenticates the protected deployment URL and writes host-scoped cookies
+   into the runner temporary directory. Verification traces containing authentication are disabled.
+   The public production domain is checked anonymously. HTTP checks confirm the expected commit and new guides in English, Spanish and Japanese.
    Browser checks cover navigation, WebGL, SVG interaction, gallery mount cycles and Monaco execution.
 5. Integrate into `main` only after the preview succeeds. The production workflow repeats
    validation, captures the current production deployment, then builds and deploys production.

@@ -1,4 +1,8 @@
 import { manifest } from './sync-docs.js';
+import { readFileSync } from 'node:fs';
+import { verificationHeaders } from './deployment-auth.js';
+const state = process.env.DEPLOYMENT_STORAGE_STATE
+  ? JSON.parse(readFileSync(process.env.DEPLOYMENT_STORAGE_STATE, 'utf8')) : { cookies: [] };
 const targets = [...new Set([process.env.DEPLOYMENT_URL, process.env.PUBLIC_URL].filter(Boolean))];
 if (!targets.length || targets.some((base) => !/^https:\/\//.test(base))) {
   throw new Error('DEPLOYMENT_URL and optional PUBLIC_URL must be HTTPS');
@@ -6,7 +10,8 @@ if (!targets.length || targets.some((base) => !/^https:\/\//.test(base))) {
 for (const base of targets) {
   for (const route of ['/', ...manifest.filter((entry) =>
     ['getting-started', 'scene-graph', 'serialization'].includes(entry.topic)).map((entry) => entry.route)]) {
-    const response = await fetch(new URL(route, base), { signal: AbortSignal.timeout(20000) });
+    const response = await fetch(new URL(route, base), { signal: AbortSignal.timeout(20000),
+      headers: verificationHeaders(base, process.env.DEPLOYMENT_URL, state) });
     if (!response.ok) throw new Error(base + route + ': HTTP ' + response.status);
     const html = await response.text();
     if (!html.includes('Oroya')) throw new Error(base + route + ': unexpected page');

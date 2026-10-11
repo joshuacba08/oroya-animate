@@ -29,7 +29,7 @@ Fecha: 11 de octubre de 2026.
 - La publicación de paquetes npm no forma parte de esta entrega.
 
 ## Validación
-Se mantienen los 175 tests originales: 203 tests en 29 archivos, incluidos los nuevos de runtime, auditoría, sincronización y extracción de ejemplos. Se comprueban 95 enlaces locales y se compilan 25 ejemplos completos de guías y tutoriales; lint incluye aplicaciones. Siete pruebas de navegador verifican guías en español, inglés y japonés, portada, galería con ciclos de montaje, interacción SVG y playground.
+Se mantienen los 175 tests originales: 206 tests en 30 archivos, incluidos los nuevos de runtime, auditoría, sincronización y extracción de ejemplos. Se comprueban 95 enlaces locales y se compilan 25 ejemplos completos de guías y tutoriales; lint incluye aplicaciones. Siete pruebas de navegador verifican guías en español, inglés y japonés, portada, galería con ciclos de montaje, interacción SVG y playground.
 
 Las mediciones de transferencia están en validation/transfer-before.json y validation/transfer-after.json. Miden bytes del JavaScript recibido descomprimido durante los primeros tres segundos, en un viewport de 1280×800 y una página nueva por ruta; no representan bytes comprimidos en producción.
 
