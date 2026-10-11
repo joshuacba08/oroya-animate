@@ -3,10 +3,8 @@ import {
     Node,
     InstancedMesh,
     GeometryPrimitive,
-    Material,
     Light,
     LightType,
-    type ColorRGB,
     type Matrix4
 } from '@joroya/core';
 import * as THREE from 'three';

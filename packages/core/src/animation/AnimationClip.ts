@@ -11,6 +11,7 @@ import type { KeyframeTrack } from './KeyframeTrack';
  *
  * Events are de-duplicated per loop iteration — they only fire once per
  * crossing, even if the mixer ticks past the time in a single large `dt`.
+ * @public
  */
 export interface KeyframeEvent {
     /** Time within the clip (seconds) at which the event fires. */
@@ -24,6 +25,7 @@ export interface KeyframeEvent {
 /**
  * An animation clip is a collection of keyframe tracks that can be played together.
  * This is the engine-agnostic representation of an animation.
+ * @public
  */
 export interface AnimationClip {
     /**

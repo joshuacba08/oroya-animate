@@ -5,6 +5,7 @@ import * as V from './Vector3';
  * Result of a 2-bone IK solve. Apply the rotations to the corresponding
  * bones to make the chain reach the target — `rootRotation` to the
  * shoulder/hip, `midRotation` to the elbow/knee.
+ * @public
  */
 export interface IK2BoneResult {
     /** New world-space rotation for the root bone (shoulder / hip). */

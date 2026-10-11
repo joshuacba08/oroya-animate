@@ -1,314 +1,106 @@
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
-import type { Scene } from "@joroya/core";
-import { Camera, CameraType, ComponentType } from "@joroya/core";
-import { ThreeRenderer } from "@joroya/renderer-three";
-import { renderToSVG, SvJs } from "@joroya/renderer-svg";
+import { useEffect, useRef, useState } from "react";
+import { Camera, CameraType, ComponentType, type Scene } from "@joroya/core";
+import type { ThreeRenderer } from "@joroya/renderer-three";
+import type { SvJs } from "@joroya/renderer-svg";
 
+export interface ExampleResult {
+  scene: Scene | SvJs;
+  animate: (time: number) => void;
+  dispose?: () => void;
+}
 export interface ExampleDef {
   id: string;
   title: string;
   description: string;
   category: "3d" | "svg" | "svjs";
-  factory: () => {
-    scene: Scene | SvJs;
-    animate: (time: number) => void;
-  };
+  factory: () => Promise<ExampleResult>;
 }
+interface RendererProps { example: ExampleDef; eager?: boolean }
 
-/* ── Error Boundary ───────────────────────────────────────────────────── */
-
-interface EBProps { children: ReactNode; fallback?: ReactNode }
-interface EBState { hasError: boolean }
-
-class RendererErrorBoundary extends Component<EBProps, EBState> {
-  state: EBState = { hasError: false };
-  static getDerivedStateFromError() { return { hasError: true }; }
-  componentDidCatch(err: Error) { console.error("[RendererErrorBoundary]", err); }
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback ?? (
-        <div className="absolute inset-0 flex items-center justify-center text-base-content/40 text-sm">
-          Error loading example
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-/* ── Renderer props ───────────────────────────────────────────────────── */
-
-interface RendererProps {
-  example: ExampleDef;
-  eager?: boolean;
-}
-
-/* ── Three.js Renderer ────────────────────────────────────────────────── */
-
-export function ThreeRenderer3D({ example, eager }: RendererProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rendererRef = useRef<ThreeRenderer | null>(null);
-  const rafRef = useRef<number>(0);
-  const [isVisible, setIsVisible] = useState(eager ?? false);
-  const [hasError, setHasError] = useState(false);
-
+export function DemoRenderer({ example, eager = false }: RendererProps) {
+  const host = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(eager);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   useEffect(() => {
-    if (eager) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(canvas);
+    if (eager || !host.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setVisible(entry.isIntersecting);
+    }, { threshold: 0.1 });
+    observer.observe(host.current);
     return () => observer.disconnect();
   }, [eager]);
-
   useEffect(() => {
-    if (!isVisible || !canvasRef.current) return;
-
-    let disposed = false;
-
-    try {
-      const canvas = canvasRef.current;
-      const width = canvas.clientWidth || 300;
-      const height = canvas.clientHeight || 300;
-
-      const { scene, animate } = example.factory();
-
-      if (!(scene as any).root) throw new Error("Not a 3D scene");
-      const threeScene = scene as Scene;
-
-      const cameraNode = threeScene.root.children.find((n) =>
-        n.hasComponent(ComponentType.Camera)
-      );
-      if (cameraNode) {
-        const cam = cameraNode.getComponent<Camera>(ComponentType.Camera)!;
-        if (cam.definition.type === CameraType.Perspective) {
-          cam.definition.aspect = width / height;
+    if (!visible || !host.current) return;
+    const container = host.current;
+    let abandoned = false, frame = 0;
+    let renderer: ThreeRenderer | undefined;
+    let release: (() => void) | undefined;
+    setStatus("loading");
+    void (async () => {
+      try {
+        const result = await example.factory();
+        release = result.dispose;
+        if (abandoned) { release?.(); release = undefined; return; }
+        if (example.category === "3d") {
+          const { ThreeRenderer } = await import("@joroya/renderer-three");
+          if (abandoned) { release?.(); release = undefined; return; }
+          if (!("root" in result.scene)) throw new Error("Expected scene graph");
+          const scene = result.scene;
+          const canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block";
+          container.appendChild(canvas);
+          const width = container.clientWidth || 300, height = container.clientHeight || 300;
+          scene.traverse((node) => {
+            const camera = node.getComponent<Camera>(ComponentType.Camera);
+            if (camera?.definition.type === CameraType.Perspective) camera.definition.aspect = width / height;
+          });
+          renderer = new ThreeRenderer({ canvas, width, height });
+          renderer.mount(scene);
+          renderer.enableInteraction();
+          let previous = performance.now() * 0.001;
+          const loop = (time: number) => {
+            if (abandoned) return;
+            try {
+              const seconds = time * 0.001;
+              result.animate(seconds);
+              renderer!.render(Math.min(seconds - previous, 0.1));
+              previous = seconds;
+              frame = requestAnimationFrame(loop);
+            } catch (error) { console.error(error); setStatus("error"); }
+          };
+          frame = requestAnimationFrame(loop);
+        } else if (example.category === "svjs") {
+          if (!("element" in result.scene)) throw new Error("Expected SvJs");
+          const svg = result.scene;
+          container.appendChild(svg.element); svg.set({ width: "100%", height: "100%" });
+          const loop = (time: number) => {
+            if (abandoned) return;
+            result.animate(time * 0.001); frame = requestAnimationFrame(loop);
+          };
+          frame = requestAnimationFrame(loop);
+        } else {
+          const { renderToSVGElement } = await import("@joroya/renderer-svg");
+          if (abandoned) return;
+          if (!("root" in result.scene)) throw new Error("Expected scene graph");
+          const { svg, dispose } = renderToSVGElement(result.scene, { width: 1000, height: 1000 });
+          const releaseFactory = release;
+          release = () => { dispose(); releaseFactory?.(); };
+          container.appendChild(svg); svg.style.width = "100%"; svg.style.height = "100%";
         }
-      }
-
-      const renderer = new ThreeRenderer({ canvas, width, height });
-      renderer.mount(threeScene);
-      rendererRef.current = renderer;
-
-      let lastTime = performance.now() * 0.001;
-      const loop = (time: number) => {
-        if (disposed) return;
-        try {
-          const t = time * 0.001;
-          const dt = t - lastTime;
-          lastTime = t;
-
-          animate(t);
-
-          if (typeof (threeScene as any).update === 'function') {
-            (threeScene as any).update(dt);
-          }
-
-          renderer.render();
-        } catch { /* swallow animation errors */ }
-        rafRef.current = requestAnimationFrame(loop);
-      };
-      rafRef.current = requestAnimationFrame(loop);
-    } catch (e) {
-      console.error(e);
-      setHasError(true);
-    }
-
+        if (!abandoned) setStatus("ready");
+      } catch (error) { if (!abandoned) { console.error(error); setStatus("error"); } }
+    })();
     return () => {
-      disposed = true;
-      cancelAnimationFrame(rafRef.current);
-      try { rendererRef.current?.dispose(); } catch { /* safe */ }
-      rendererRef.current = null;
+      abandoned = true; cancelAnimationFrame(frame);
+      renderer?.dispose(); release?.(); release = undefined; container.replaceChildren();
     };
-  }, [isVisible, example]);
-
-  if (hasError) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center text-base-content/40 text-sm">
-        Error loading example
-      </div>
-    );
-  }
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{ width: "100%", height: "100%", display: "block" }}
-    />
-  );
-}
-
-/* ── SVG Renderer ─────────────────────────────────────────────────────── */
-
-export function SvgRenderer({ example, eager }: RendererProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(eager ?? false);
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    if (eager) return;
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [eager]);
-
-  useEffect(() => {
-    if (!isVisible || !containerRef.current) return;
-
-    try {
-      const { scene } = example.factory();
-      if (!(scene as any).root) throw new Error("Not a Scene graph");
-
-      const size = 1000;
-      const svgString = renderToSVG(scene as Scene, {
-        width: size,
-        height: size,
-      });
-      containerRef.current.innerHTML = svgString;
-
-      const svgEl = containerRef.current.querySelector("svg");
-      if (svgEl) {
-        svgEl.style.width = "100%";
-        svgEl.style.height = "100%";
-      }
-    } catch (e) {
-      console.error(e);
-      setHasError(true);
-    }
-
-    return () => {
-      if (containerRef.current) containerRef.current.innerHTML = '';
-    };
-  }, [isVisible, example]);
-
-  if (hasError) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center text-base-content/40 text-sm">
-        Error loading example
-      </div>
-    );
-  }
-
-  return (
-    <div
-      ref={containerRef}
-      style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
-    />
-  );
-}
-
-/* ── SvJs Renderer ────────────────────────────────────────────────────── */
-
-export function SvJsRenderer({ example, eager }: RendererProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
-  const [isVisible, setIsVisible] = useState(eager ?? false);
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    if (eager) return;
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [eager]);
-
-  useEffect(() => {
-    if (!isVisible || !containerRef.current) return;
-
-    let disposed = false;
-
-    try {
-      const { scene, animate } = example.factory();
-      const svjs = scene as any as SvJs;
-
-      if (!svjs.element) throw new Error("Not a valid SvJs instance");
-
-      containerRef.current.innerHTML = '';
-      containerRef.current.appendChild(svjs.element);
-
-      svjs.set({ width: '100%', height: '100%' });
-
-      const loop = (time: number) => {
-        if (disposed) return;
-        try {
-          const t = time * 0.001;
-          animate(t);
-        } catch { /* swallow animation errors */ }
-        rafRef.current = requestAnimationFrame(loop);
-      };
-      rafRef.current = requestAnimationFrame(loop);
-    } catch (e) {
-      console.error(e);
-      setHasError(true);
-    }
-
-    return () => {
-      disposed = true;
-      cancelAnimationFrame(rafRef.current);
-      try { if (containerRef.current) containerRef.current.innerHTML = ''; } catch { /* safe */ }
-    };
-  }, [isVisible, example]);
-
-  if (hasError) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center text-base-content/40 text-sm">
-        Error loading example
-      </div>
-    );
-  }
-
-  return (
-    <div
-      ref={containerRef}
-      style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
-    />
-  );
-}
-
-/* ── DemoRenderer (with error boundary) ───────────────────────────────── */
-
-export function DemoRenderer({ example, eager }: RendererProps) {
-  const inner = (() => {
-    if (example.category === "svg") return <SvgRenderer example={example} eager={eager} />;
-    if (example.category === "svjs") return <SvJsRenderer example={example} eager={eager} />;
-    return <ThreeRenderer3D example={example} eager={eager} />;
-  })();
-
-  return <RendererErrorBoundary key={example.id}>{inner}</RendererErrorBoundary>;
+  }, [visible, example]);
+  return <div className="relative w-full h-full">
+    <div ref={host} className="w-full h-full flex items-center justify-center" />
+    {status !== "ready" && <div role="status" className="absolute inset-0 flex items-center justify-center text-sm text-base-content/40 pointer-events-none">
+      {status === "error" ? "Error loading example" : "Loading example…"}
+    </div>}
+  </div>;
 }
 
 export function getBadgeColor(cat: string) {

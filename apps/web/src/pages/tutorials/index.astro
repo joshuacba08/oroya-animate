@@ -64,7 +64,7 @@ const levels = [
         </h2>
         <p class="text-sm text-base-content/50 mb-4 not-prose">{level.description}</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
-          {levelTutorials.map((tutorial, i) => (
+          {levelTutorials.map((tutorial) => (
             <a
               href={getLocalizedPath(`/tutorials/${tutorial.id}`, locale)}
               class="glass-card rounded-xl p-5 group block no-underline"

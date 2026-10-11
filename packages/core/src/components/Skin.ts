@@ -14,6 +14,7 @@ import { Component, ComponentType } from './Component';
  * baked into glTF; the renderer uses them to transform vertex positions
  * from mesh space into bone-local space before re-applying each frame's
  * animated bone pose.
+ * @public
  */
 export interface SkinDef {
     /**
@@ -46,6 +47,7 @@ export interface SkinDef {
  * follows the bone Nodes' animated transforms automatically — the
  * `Animator` component animates bone transforms; the skin component
  * tells the renderer those bones drive *this* mesh.
+ * @public
  */
 export class Skin extends Component {
     readonly type = ComponentType.Skin;

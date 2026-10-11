@@ -5,16 +5,19 @@ import * as VectorUtils from '../math/Vector3';
 
 /**
  * An interface for representing a 3D vector.
+ * @public
  */
 export interface Vec3 { x: number; y: number; z: number; }
 
 /**
  * An interface for representing a quaternion for rotations.
+ * @public
  */
 export interface Quat { x: number; y: number; z: number; w: number; }
 
 /**
  * A component that defines the position, rotation, and scale of a node in 3D space.
+ * @public
  */
 export class Transform extends Component {
   readonly type = ComponentType.Transform;
@@ -49,6 +52,24 @@ export class Transform extends Component {
    * A flag indicating whether the transform needs to be recalculated.
    */
   isDirty: boolean = true;
+
+  /** Copy a position and invalidate the local matrix. */
+  setPosition(value: Vec3): void {
+    this.position = { x: value.x, y: value.y, z: value.z };
+    this.isDirty = true;
+  }
+
+  /** Copy a quaternion and invalidate the local matrix. */
+  setRotation(value: Quat): void {
+    this.rotation = { x: value.x, y: value.y, z: value.z, w: value.w };
+    this.isDirty = true;
+  }
+
+  /** Copy a scale and invalidate the local matrix. */
+  setScale(value: Vec3): void {
+    this.scale = { x: value.x, y: value.y, z: value.z };
+    this.isDirty = true;
+  }
 
   /**
    * Updates the local matrix from the current position, rotation, and scale.

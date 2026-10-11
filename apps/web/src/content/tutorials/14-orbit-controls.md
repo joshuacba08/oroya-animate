@@ -7,8 +7,8 @@ duration: "15 min"
 ---
 # Tutorial 14: Orbit Controls
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 15 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 15 minutos\
 > **Qué aprenderás:** Habilitar controles de cámara interactivos con `OrbitControlsWrapper` para orbitar, hacer pan y zoom en escenas 3D.
 
 ---
@@ -336,4 +336,4 @@ Has completado todos los tutoriales de Oroya Animate. Ahora puedes:
 - Exportar SVG animados e interactivos.
 - Cargar modelos glTF con animaciones.
 
-→ [Volver al índice de tutoriales](./README.md)
+→ [Volver al índice de tutoriales](https://github.com/joshuacba08/oroya-animate/blob/main/docs/tutorials/README.md)

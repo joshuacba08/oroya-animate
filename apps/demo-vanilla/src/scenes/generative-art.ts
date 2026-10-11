@@ -155,7 +155,7 @@ export function createGenerativeArtScene(params: ParamValues) {
     }
 
     // Build material definition
-    const matDef: any = { fill: el.color };
+    const matDef: ConstructorParameters<typeof Material>[0] = { fill: el.color };
     
     if (el.opacity !== undefined) {
       matDef.opacity = el.opacity;

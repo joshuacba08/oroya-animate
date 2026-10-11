@@ -3,11 +3,13 @@ import { EventEmitter } from '@joroya/core';
 /**
  * Built-in asset kinds. Custom loaders extend this union via
  * `AssetManager.registerLoader`.
+ * @public
  */
 export type AssetType = 'image' | 'audio' | 'json' | 'text' | 'binary';
 
 /**
  * A request to preload a specific asset.
+ * @public
  */
 export interface PreloadEntry {
     url: string;
@@ -18,6 +20,7 @@ export interface PreloadEntry {
  * Signature of a custom loader. Receives the URL and an `AbortSignal` for
  * mid-flight cancellation; returns whatever decoded representation the
  * application expects.
+ * @public
  */
 export type AssetLoader<T> = (url: string, signal: AbortSignal) => Promise<T>;
 
@@ -37,6 +40,7 @@ interface CacheEntry<T = unknown> {
  * fires per item. `error` fires per failing item; the overall `preload()`
  * promise still resolves (with the failing items unloaded) so a single bad
  * URL doesn't crash the loader.
+ * @public
  */
 export interface AssetEventMap {
     progress: { loaded: number; total: number; url: string };

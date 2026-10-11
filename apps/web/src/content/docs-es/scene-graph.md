@@ -423,3 +423,13 @@ scene.traverse(node => {
   });
 });
 ```
+
+## Actualización explícita de transforms
+
+Usa setPosition(value: Vec3), setRotation(value: Quat) y setScale(value: Vec3). Copian el valor recibido, devuelven void y marcan isDirty. Las escrituras directas conservan el contrato v1: llama a updateLocalMatrix() o establece isDirty = true.
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

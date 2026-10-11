@@ -3,6 +3,7 @@ import type { ColorRGB } from './Material';
 
 /**
  * Fog type enumeration.
+ * @public
  */
 export enum FogType {
     Linear = 'Linear',
@@ -11,6 +12,7 @@ export enum FogType {
 
 /**
  * Linear fog definition with near/far distances.
+ * @public
  */
 export interface LinearFogDef {
     type: FogType.Linear;
@@ -23,6 +25,7 @@ export interface LinearFogDef {
 
 /**
  * Exponential fog definition with density.
+ * @public
  */
 export interface ExponentialFogDef {
     type: FogType.Exponential;
@@ -33,11 +36,13 @@ export interface ExponentialFogDef {
 
 /**
  * Union of fog definitions.
+ * @public
  */
 export type FogDef = LinearFogDef | ExponentialFogDef;
 
 /**
  * Environment definition for scene-wide atmospheric settings.
+ * @public
  */
 export interface EnvironmentDef {
     /**
@@ -62,6 +67,7 @@ export interface EnvironmentDef {
 /**
  * Environment component for scene-wide settings like background, fog, and ambient light.
  * Typically attached to a single node in the scene (e.g., scene root or dedicated environment node).
+ * @public
  */
 export class Environment extends Component {
     readonly type = ComponentType.Environment;

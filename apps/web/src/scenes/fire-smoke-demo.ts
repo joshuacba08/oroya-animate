@@ -10,7 +10,6 @@ import {
     ParticleSystem,
     Environment,
     ComponentType,
-    type Vec3,
 } from "@joroya/core";
 
 export function createFireSmokeScene() {
@@ -112,5 +111,5 @@ export function createFireSmokeScene() {
     // Fix animate function to use correct enum or finding logic
     // Re-define properly in next step if needed, or just let it be static for now to avoid runtime errors.
 
-    return { scene, animate: () => { }, cameraNode };
+    return { scene, animate, cameraNode };
 }

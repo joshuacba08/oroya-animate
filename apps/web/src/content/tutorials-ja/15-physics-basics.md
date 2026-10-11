@@ -5,7 +5,6 @@ order: 15
 level: "intermediate"
 duration: "20 min"
 ---
-
 # チュートリアル 15: 物理 — 剛体、ジョイント、衝突イベント
 
 > **レベル:** 中級
@@ -26,16 +25,30 @@ npm install @joroya/core @joroya/renderer-three @joroya/physics three
 
 `RigidBody` + `Collider` は通常の Oroya ノードに付ける*コンポーネント*です。`PhysicsSystem` はフレームごとにシーンを走査し、両方を持つノードに対応する cannon ボディを生成し、シミュレートされた姿勢を `node.transform` に書き戻します。
 
+<!-- docs-example:start -->
 ```ts
 import {
-    Scene, Node, createBox, createPlane, Material,
+    Scene, Node, Camera, CameraType, Light, LightType, createBox, createPlane, Material,
     RigidBody, RigidBodyType,
     Collider, ColliderShape,
 } from "@joroya/core";
 import { PhysicsSystem } from "@joroya/physics";
+import { ThreeRenderer } from "@joroya/renderer-three";
+
+const scene = new Scene();
+const cam = new Node("camera");
+cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 50, aspect: 16 / 9, near: 0.1, far: 100 }));
+cam.transform.setPosition({ x: 6, y: 6, z: 10 });
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+scene.add(cam);
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+scene.add(ambient);
+
 
 const floor = new Node("floor");
 floor.addComponent(createPlane(20, 20, 1, 1, { receiveShadow: true }));
+floor.addComponent(new Material({ color: { r: 0.25, g: 0.27, b: 0.32 } }));
 floor.transform.rotation = { x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 };
 floor.addComponent(new RigidBody({ type: RigidBodyType.Static }));
 floor.addComponent(new Collider({
@@ -46,6 +59,7 @@ scene.add(floor);
 
 const cube = new Node("cube");
 cube.addComponent(createBox(1, 1, 1, { castShadow: true }));
+cube.addComponent(new Material({ color: { r: 1, g: 0.55, b: 0.2 } }));
 cube.transform.position = { x: 0, y: 5, z: 0 };
 cube.transform.updateLocalMatrix();
 cube.addComponent(new RigidBody({ type: RigidBodyType.Dynamic, mass: 1 }));
@@ -62,6 +76,12 @@ scene.add(cube);
 ## ステップ 2 — レンダーループで物理を実行
 
 ```ts
+const renderer = new ThreeRenderer({
+    canvas: document.getElementById("canvas") as HTMLCanvasElement,
+    width: window.innerWidth, height: window.innerHeight,
+});
+renderer.mount(scene);
+
 const physics = new PhysicsSystem({ gravity: { x: 0, y: -9.82, z: 0 } });
 
 let last = performance.now();
@@ -74,6 +94,7 @@ function frame(now: number) {
 }
 requestAnimationFrame(frame);
 ```
+<!-- docs-example:end -->
 
 ---
 

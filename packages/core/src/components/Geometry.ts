@@ -3,6 +3,7 @@ import { Matrix4 } from '../math/Matrix4';
 
 /**
  * An enumeration of the available geometry primitive types.
+ * @public
  */
 export enum GeometryPrimitive {
   Box = 'Box',
@@ -20,6 +21,7 @@ export enum GeometryPrimitive {
 
 /**
  * The definition for a box geometry.
+ * @public
  */
 export interface BoxGeometryDef {
   type: GeometryPrimitive.Box;
@@ -32,6 +34,7 @@ export interface BoxGeometryDef {
 
 /**
  * The definition for a sphere geometry.
+ * @public
  */
 export interface SphereGeometryDef {
   type: GeometryPrimitive.Sphere;
@@ -44,6 +47,7 @@ export interface SphereGeometryDef {
 
 /**
  * The definition for a cylinder geometry.
+ * @public
  */
 export interface CylinderGeometryDef {
   type: GeometryPrimitive.Cylinder;
@@ -59,6 +63,7 @@ export interface CylinderGeometryDef {
 
 /**
  * The definition for a plane geometry.
+ * @public
  */
 export interface PlaneGeometryDef {
   type: GeometryPrimitive.Plane;
@@ -72,6 +77,7 @@ export interface PlaneGeometryDef {
 
 /**
  * The definition for a cone geometry.
+ * @public
  */
 export interface ConeGeometryDef {
   type: GeometryPrimitive.Cone;
@@ -86,6 +92,7 @@ export interface ConeGeometryDef {
 
 /**
  * The definition for a torus geometry.
+ * @public
  */
 export interface TorusGeometryDef {
   type: GeometryPrimitive.Torus;
@@ -100,6 +107,7 @@ export interface TorusGeometryDef {
 
 /**
  * The definition for a circle geometry.
+ * @public
  */
 export interface CircleGeometryDef {
   type: GeometryPrimitive.Circle;
@@ -113,6 +121,7 @@ export interface CircleGeometryDef {
 
 /**
  * A command for a 2D path, using standard SVG path command letters.
+ * @public
  */
 export interface Path2DCommand {
   command: 'M' | 'L' | 'H' | 'V' | 'C' | 'S' | 'Q' | 'T' | 'A' | 'Z';
@@ -121,6 +130,7 @@ export interface Path2DCommand {
 
 /**
  * The definition for a 2D path geometry.
+ * @public
  */
 export interface Path2DGeometryDef {
   type: GeometryPrimitive.Path2D;
@@ -131,6 +141,7 @@ export interface Path2DGeometryDef {
 
 /**
  * The definition for a text geometry.
+ * @public
  */
 export interface TextGeometryDef {
   type: GeometryPrimitive.Text;
@@ -153,6 +164,7 @@ export interface TextGeometryDef {
 /**
  * The definition for a buffer geometry with arbitrary mesh data.
  * Used for loading complex models from glTF/GLB files.
+ * @public
  */
 export interface BufferGeometryDef {
   type: GeometryPrimitive.Buffer;
@@ -181,6 +193,7 @@ export interface BufferGeometryDef {
 
 /**
  * Operations for Constructive Solid Geometry.
+ * @public
  */
 export enum CSGOperation {
   Union = 'Union',
@@ -190,6 +203,7 @@ export enum CSGOperation {
 
 /**
  * The definition for a CSG geometry, combining two geometries with a boolean operation.
+ * @public
  */
 export interface CSGGeometryDef {
   type: GeometryPrimitive.CSG;
@@ -207,6 +221,7 @@ export interface CSGGeometryDef {
 
 /**
  * A union of all possible geometry definitions.
+ * @public
  */
 export type GeometryDef =
   | BoxGeometryDef
@@ -223,6 +238,7 @@ export type GeometryDef =
 
 /**
  * A component that defines the geometry of a node.
+ * @public
  */
 export class Geometry extends Component {
   readonly type = ComponentType.Geometry;

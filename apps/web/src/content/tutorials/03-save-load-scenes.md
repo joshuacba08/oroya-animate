@@ -7,8 +7,8 @@ duration: "10 min"
 ---
 # Tutorial 3: Guardar y Cargar Escenas
 
-> **Nivel:** Principiante  
-> **Tiempo estimado:** 10 minutos  
+> **Nivel:** Principiante\
+> **Tiempo estimado:** 10 minutos\
 > **Qué aprenderás:** Serializar una escena a JSON y reconstruirla con `serialize` y `deserialize`.
 
 ---
@@ -57,12 +57,12 @@ La función `serialize` recorre todo el scene graph y convierte cada nodo y sus 
 
 | Dato | ¿Se preserva? |
 |------|----------------|
-| Nombre del nodo | ✁E|
-| ID único (UUID) | ✁E|
-| Jerarquía padre-hijo | ✁E|
-| Transform (position, rotation, scale) | ✁E|
-| Geometry (tipo y parámetros) | ✁E|
-| Material (color, opacity) | ✁E|
+| Nombre del nodo | ✓ |
+| ID único (UUID) | ✓ |
+| Jerarquía padre-hijo | ✓ |
+| Transform (position, rotation, scale) | ✓ |
+| Geometry (tipo y parámetros) | ✓ |
+| Material (color, opacity) | ✓ |
 
 ---
 
@@ -74,14 +74,14 @@ const restoredScene = deserialize(json);
 // Verificar que la escena se restauró
 const foundCube = restoredScene.findNodeByName('hero-cube');
 console.log(foundCube?.transform.position);
-// ↁE{ x: -2, y: 0, z: -0 }
+// → { x: -2, y: 0, z: -0 }
 
 const foundSphere = restoredScene.findNodeByName('companion-sphere');
 console.log(foundSphere?.transform.position);
-// ↁE{ x: 2, y: 1, z: -1 }
+// → { x: 2, y: 1, z: -1 }
 ```
 
-La escena restaurada es **completamente funcional**  Epuede montarse directamente en cualquier renderer:
+La escena restaurada es **completamente funcional** — puede montarse directamente en cualquier renderer:
 
 ```typescript
 import { ThreeRenderer } from '@joroya/renderer-three';
@@ -119,12 +119,12 @@ function downloadScene(scene: Scene, filename: string): void {
   const json = serialize(scene);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  
+
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   a.click();
-  
+
   URL.revokeObjectURL(url);
 }
 
@@ -141,4 +141,4 @@ Una escena que puede ser guardada, compartida y restaurada sin perder ningún da
 
 ## Siguiente tutorial
 
-ↁE[Tutorial 4: Sistema Solar](./04-solar-system.md)  Etransforms jerárquicos y animación.
+→ [Tutorial 4: Sistema Solar](/tutorials/04-solar-system) — transforms jerárquicos y animación.

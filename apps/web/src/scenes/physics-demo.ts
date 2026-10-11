@@ -13,7 +13,6 @@ import {
     RigidBodyType,
     Collider,
     ColliderShape,
-    ComponentType,
 } from "@joroya/core";
 import { PhysicsSystem } from "@joroya/physics";
 
@@ -129,9 +128,8 @@ export function createPhysicsScene() {
         // Physics
         cube.addComponent(new RigidBody({
             type: RigidBodyType.Dynamic,
-            mass: 1,
-            restitution: 0.5 // Bouncy
-        } as any)); // Restitution not in RigidBodyDef but ColliderDef? 
+            mass: 1
+        }));
         // Oops, restitution is in ColliderDef in my implementation plan. 
         // RigidBodyDef has mass/type.
 

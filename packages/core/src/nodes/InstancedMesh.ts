@@ -11,6 +11,7 @@ import { ComponentType } from '../components/Component';
 /**
  * A specialized Node that represents multiple instances of the same geometry and material.
  * This is a high-level wrapper around the InstancedMeshComponent.
+ * @public
  */
 export class InstancedMesh extends Node {
     readonly instancedMeshComponent: InstancedMeshComponent;

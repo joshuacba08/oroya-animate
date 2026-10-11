@@ -13,6 +13,7 @@ import * as CANNON from 'cannon-es';
 
 /**
  * Options for constructing a `PhysicsSystem`.
+ * @public
  */
 export interface PhysicsSystemOptions {
     /** World gravity vector. Default `{ x: 0, y: -9.82, z: 0 }`. */
@@ -29,6 +30,7 @@ export interface PhysicsSystemOptions {
 
 /**
  * Result of a single physics raycast hit.
+ * @public
  */
 export interface PhysicsRaycastHit {
     /** The node attached to the hit body. */

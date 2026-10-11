@@ -1,0 +1,80 @@
+[
+  {
+    "route": "/docs/serialization",
+    "bytes": 3619677,
+    "scripts": [
+      {
+        "url": "https://cdn.jsdelivr.net/npm/pako@2/dist/pako.min.js",
+        "bytes": 47016
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js",
+        "bytes": 3572661
+      }
+    ]
+  },
+  {
+    "route": "/examples",
+    "bytes": 1088292,
+    "scripts": [
+      {
+        "url": "http://127.0.0.1:4321/_astro/ExamplesGallery.Dhgb_ofE.js",
+        "bytes": 16162
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/client.CYO73L8O.js",
+        "bytes": 136510
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/jsx-runtime.BHhRKAr4.js",
+        "bytes": 1002
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.PqzScJKx.js",
+        "bytes": 6936
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/scenes.DjksjZYs.js",
+        "bytes": 83667
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.DF1I6_B5.js",
+        "bytes": 158436
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.aEX-BP2h.js",
+        "bytes": 685579
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "bytes": 950236,
+    "scripts": [
+      {
+        "url": "http://127.0.0.1:4321/_astro/LandingAnimations.astro_astro_type_script_index_0_lang.axm08Mqi.js",
+        "bytes": 116285
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/HeroDemoWrapper.4WHWalS1.js",
+        "bytes": 3924
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/client.CYO73L8O.js",
+        "bytes": 136510
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/jsx-runtime.BHhRKAr4.js",
+        "bytes": 1002
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.PqzScJKx.js",
+        "bytes": 6936
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.aEX-BP2h.js",
+        "bytes": 685579
+      }
+    ]
+  }
+]

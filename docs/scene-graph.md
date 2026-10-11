@@ -417,3 +417,13 @@ scene.traverse(node => {
   });
 });
 ```
+
+## Explicit transform updates
+
+Use setPosition(value: Vec3), setRotation(value: Quat) and setScale(value: Vec3). Each copies its input, returns void and marks isDirty. Direct property writes retain v1 behavior: call updateLocalMatrix() or set isDirty = true.
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

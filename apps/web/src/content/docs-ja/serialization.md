@@ -4,7 +4,6 @@ description: "シーンの保存、読み込み、共有のためのJSONシリ�
 order: 5
 category: "concepts"
 ---
-
 # シリアライゼーション
 
 Oroya Animateには、シーン全体を保存・読み込みできるJSONシリアライゼーションシステムが含まれています。ビジュアルエディター、コラボレーション、シーンのバージョン管理の基盤となります。
@@ -47,7 +46,7 @@ console.log(json);
 flowchart LR
     S["Scene"] -->|"serialize()"| SR["serializeNode(root)"]
     SR -->|"recursive"| SN["For each node:\nid, name, components, children"]
-    SN -->|"spread"| SC["Each component:\n{ type, ...data }"]
+    SN -->|"adapter"| SC["Declarative component data"]
     SC --> JSON["JSON.stringify()\nwith indent 2"]
     JSON --> STR["string"]
 ```
@@ -67,7 +66,7 @@ const found = restoredScene.findNodeByName('hero-cube');
 console.log(found?.transform.position); // { x: 3, y: 0, z: -1 }
 ```
 
-復元されたシーンは完全に機能し、任意のレンダラーにマウントできます：
+対応するコンポーネントを復元したシーンをレンダラーにマウントできます。以下の制限事項も確認してください：
 
 ```typescript
 import { ThreeRenderer } from '@joroya/renderer-three';
@@ -172,51 +171,34 @@ graph TD
 
 ## サポートされているコンポーネント
 
-### シリアライズ時（`serialize`）
+対応する宣言的データだけを保存します。実行時フィールド、コールバック、ノード参照、バックエンドのインスタンスは、イベントデータ内も含めて除外します。バインド済み Animator も安全に保存できます。
 
-すべてのコンポーネントはスプレッド（`{ ...component }`）を使用してシリアライズされます：
+| コンポーネント | デシリアライズ |
+| --- | --- |
+| `Transform` | 新しい `Transform` にフィールドを復元 |
+| `Geometry`, `Material`, `Camera`, `Interactive`, `Light`, `Environment` | `definition` から再構築 |
+| `RigidBody`, `Collider`, `PostProcessing`, `ParticleSystem` | 定義を再構築。バックエンドの実行状態は別途作成 |
+| `Animator`, `AudioListener`, `AudioSource`, `Skin` | 定義を再構築。再生セッションと読み込み済みリソースは保存しない |
+| `Animation` | `animations` から再構築 |
+| `InstancedMesh`, `Script`, 未知の型 | スキップ。アプリケーションのアダプターが必要 |
 
-| コンポーネント | シリアライズされるデータ |
-|----------------|--------------------------|
-| `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | 完全な`definition`（タイプ + ジオメトリパラメータ） |
-| `Material` | 完全な`definition`（color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask） |
-| `Camera` | 完全な`definition`（Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far） |
-| `Animation` | `animations[]` — `SvgAnimationDef`（animate / animateTransform）の配列 |
+### Typed arrays
 
-### デシリアライズ時（`deserialize`）
+`Float32Array`、`Uint8Array`、`Uint16Array`、`Uint32Array` は `{ __typedArray, base64 }` として保存し、元の配列型に復元します。アニメーショントラックとバッファジオメトリに利用できますが、`InstancedMesh` コンポーネント自体は復元されません。他の typed array 型はこの形式では未対応です。
 
-| コンポーネント | 復元? | メソッド |
-|----------------|-------|---------|
-| `Transform` | ✅ | `Object.assign(new Transform(), data)` |
-| `Geometry` | ✅ | `new Geometry(data.definition)` |
-| `Material` | ✅ | `new Material(data.definition)` |
-| `Camera` | ✅ | `new Camera(data.definition)` |
-| `Animation` | ✅ | `new Animation(data.animations)` |
+```ts
+import { typedArrayReplacer, typedArrayReviver } from '@joroya/core';
 
-> **注意:** `Camera`と`Animation`を含むすべてのコンポーネントが正しくシリアライズおよびデシリアライズされます。
+const encoded = JSON.stringify({ values: new Float32Array([0, 1, 2]) }, typedArrayReplacer);
+const decoded = JSON.parse(encoded, typedArrayReviver);
+console.log(decoded.values instanceof Float32Array); // true
+```
 
-### データの保持
+### 保持されるデータ
 
-| データ | 保持? |
-|--------|-------|
-| ノードUUID | ✅ 完全一致 |
-| ノード名 | ✅ |
-| 親子階層 | ✅ |
-| 位置 | ✅ |
-| 回転（クォータニオン） | ✅ |
-| スケール | ✅ |
-| 行列（ローカル + ワールド） | ✅ |
-| ジオメトリタイプ | ✅ |
-| ジオメトリパラメータ | ✅ |
-| マテリアルカラー | ✅ |
-| 不透明度 | ✅ |
-| 塗り/線（SVG） | ✅ |
-| グラデーション（塗り/線） | ✅ |
-| フィルター / ClipPath / Mask | ✅ |
-| カメラ（Perspective + Orthographic） | ✅ |
-| SVGアニメーション | ✅ |
-| `cssClass` / `cssId` | ✅ |
+ルートを含む全ノードの ID、名前、親子関係、transform、`cssClass`、`cssId` と対応するコンポーネント定義を保持します。`addComponent()` が `component.node` を再設定し、描画時にワールド行列を再計算します。
+
+保存したルートの ID、名前、CSS 情報、transform と対応するコンポーネントを復元します。Scene(root?: Node) は親のないルートを受け取り、引数なしのコンストラクターも利用できます。古い JSON に Transform がない場合はデフォルトを作成します。
 
 ---
 
@@ -283,7 +265,7 @@ import { renderToSVG } from '@joroya/renderer-svg';
 
 function handleRequest(jsonBody: string): string {
   const scene = deserialize(jsonBody);
-  return renderToSVG(scene, { width: 800, height: 600 });
+  return renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 }
 ```
 
@@ -313,10 +295,12 @@ Gitの差分で変更内容が正確に表示されます：
 
 ## 制限事項
 
-| 制限 | 影響 | 回避策 |
-|------|------|--------|
-| UUIDは保持される | 同じJSONから作成した2つのシーンは、同一のIDを持つノードを持つ | 独立したシーンが必要な場合は、デシリアライズ後にIDを再生成する |
-| ~~復元時にシーンがカメラを失う~~ | ✅ **解決済み** — CameraとAnimationは正しくデシリアライズされます | — |
-| 未知のコンポーネント | カスタムタイプが追加され、`switch`に登録されていない場合は無視される | `deserializeNode()`に新しいタイプを追加して拡張する |
-| JSONテキスト形式 | 多数のノードを持つシーンのファイルが大きくなる | 将来: バイナリシリアライゼーション（MessagePack） |
-| `component.node`への参照なし | 循環参照`component → node`は失われる | `addComponent()`によって自動的に再構築される |
+| 制限 | 影響と対処 |
+| --- | --- |
+| 実行時コールバック | `onUpdate` とイベントリスナーを読み込み後に再登録 |
+| インスタンシングと独自コンポーネント | `InstancedMesh`、`Script`、未知の型はスキップ。アダプターで復元 |
+| 子孫の ID を保持 | 二度読み込むと ID が重複する場合あり。独立コピーには新しいノードを作成 (`id` は readonly) |
+| スキーマ検証なし | 不正な JSON やデータ形状は例外を発生させる場合あり。アプリケーション側で検証 |
+| 外部リソース | URI と定義を保存。テクスチャ、音声、モデルのファイルや物理の実行状態は保存しない |
+
+内部アダプターは transform、コンポーネント定義と SVG アニメーションだけを保存します。バインド済み、再生中、停止中の Animator もシリアライズできます。mixer、コールバック、ノード参照とバックエンドのリソースは除外します。クリップ定義は復元しますが、再生の正確な時点は復元しません。

@@ -4,6 +4,7 @@ import { EventEmitter } from '@joroya/core';
  * Standard gamepad button names (from the Web Gamepad API "Standard"
  * mapping). Using semantic names keeps app code legible vs. numeric
  * indices: `'A'` instead of `buttons[0]`, `'DPadUp'` instead of `buttons[12]`.
+ * @public
  */
 export type GamepadButton =
     | 'A' | 'B' | 'X' | 'Y'
@@ -25,6 +26,7 @@ const STANDARD_BUTTON_NAMES: GamepadButton[] = [
 /**
  * A device-agnostic action binding. Any of the listed inputs activate the
  * action — the binding is an OR across devices.
+ * @public
  */
 export interface ActionBinding {
     /** Keyboard key (KeyboardEvent.code, e.g. `'KeyW'`, `'Space'`, `'ArrowLeft'`). */
@@ -41,6 +43,7 @@ export interface ActionBinding {
  * - `action-down` / `action-up` fire when an action transitions states.
  * - `action` fires every poll while the action is held (poll-driven so
  *   gamepad analog state stays in sync).
+ * @public
  */
 export interface InputEventMap {
     'action-down': { name: string };

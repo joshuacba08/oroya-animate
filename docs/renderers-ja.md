@@ -22,7 +22,7 @@ graph TD
 
 | 観点 | `ThreeRenderer` | `renderToSVG` |
 |------|-----------------|---------------|
-| **パラダイム** | ステートフルなインスタンス（クラス） | 純粋関数（ステートレス） |
+| **パラダイム** | ステートフルなインスタンス（クラス） | 文字列または DOM スナップショット |
 | **出力** | `<canvas>` に描画 | SVG `string` を返す |
 | **DOM必須** | ✅ はい（`HTMLCanvasElement`） | ❌ いいえ（Node.jsで動作） |
 | **3D** | ✅ 透視投影、ライト、シャドウ | ❌ 2Dのみ |
@@ -100,12 +100,9 @@ sequenceDiagram
 | `opacity < 1` を持つ `Material` | `MeshStandardMaterial({ transparent: true })` |
 | `Material` なし | `MeshStandardMaterial({ color: 0xcccccc })` |
 
-### 自動照明
+### ライティング
 
-| タイプ | 設定 |
-|--------|------|
-| `AmbientLight` | 白、強度 `0.5` |
-| `DirectionalLight` | 白、強度 `1.5`、位置 `(2, 5, 3)` |
+`Light` コンポーネントを明示的に追加してください。既定のライトは追加されません。`MeshStandardMaterial` にはライトが必要です。Ambient、Directional、Point、Spot に対応しています。
 
 ### カメラの解決
 
@@ -120,37 +117,67 @@ flowchart TD
 ### 完全な例
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
+
 const scene = new Scene();
-
-const cam = new Node('cam');
-cam.addComponent(new Camera({
-  type: CameraType.Perspective, fov: 75,
-  aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000,
+const camera = new Node('camera');
+camera.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 60,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 100,
 }));
-cam.transform.position.z = 5;
-scene.add(cam);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-const box = new Node('box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: window.innerWidth, height: window.innerHeight,
+  canvas,
+  width: window.innerWidth,
+  height: window.innerHeight,
 });
 renderer.mount(scene);
 
-function loop() {
-  box.transform.rotation.y = performance.now() * 0.001;
-  box.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(loop);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(loop);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ---
@@ -159,9 +186,9 @@ requestAnimationFrame(loop);
 
 SVGマークアップを生成する軽量レンダラー。ジェネラティブアート、ベクターエクスポート、サーバーサイドレンダリングに最適。
 
-### `renderToSVG` — 純粋な文字列（サーバーセーフ）
+### `renderToSVG` — SVG 文字列（サーバーセーフ）
 
-純粋関数でステートレス、SVG文字列を返します。DOMなしでNode.jsで動作します。
+シーンのロジックを更新し、SVG 文字列を返します。DOM なしで Node.js で動作します。
 
 ```typescript
 import { renderToSVG } from '@joroya/renderer-svg';
@@ -418,7 +445,7 @@ new Material({
   filter: {
     effects: [{
       type: 'dropShadow', dx: 4, dy: 4,
-      stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6,
+      stdDeviation: 2, floodColor: { r: 0.2, g: 0.2, b: 0.2 }, floodOpacity: 0.6,
     }],
   },
 });
@@ -452,7 +479,7 @@ new Material({
       { command: 'L', args: [80, 80] },
       { command: 'Z', args: [] },
     ],
-    fill: 'white',
+    fill: { r: 1, g: 1, b: 1 },
     opacity: 0.8,
   },
 });
@@ -647,3 +674,36 @@ export class Canvas2DRenderer {
 | 4 | `render()` を実装 — トランスフォームを同期して描画 |
 | 5 | `dispose()` を実装 — リソースを解放 |
 | 6 | サポートするジオメトリとマテリアルを文書化 |
+
+
+## `@joroya/renderer-canvas2d` — Canvas2D
+
+```ts
+import { renderToCanvas, CanvasRenderer } from '@joroya/renderer-canvas2d';
+
+renderToCanvas(scene, canvas, { width: 800, height: 600, dt: 0 });
+
+const renderer = new CanvasRenderer();
+renderer.mount(container, { width: 800, height: 600 });
+renderer.render(scene, { width: 800, height: 600, dt: 0 });
+renderer.unmount();
+```
+
+
+## フレーム更新と共有シーン
+
+公式の描画エントリーポイントは `scene.update(dt)` を実行し、ワールド行列を更新します。Three.js は `render(dt)`、SVG と Canvas2D は `options.dt` を使います。既定値は `1 / 60` 秒です。SVG 文字列の生成は Node.js で動作しますが、シーンのロジックを更新するため純粋関数ではありません。
+
+シーンを共有する場合は一つのレンダラーで時間を進め、他の出力に `dt: 0` を渡します。
+
+```ts
+threeRenderer.render(dt);
+const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
+renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
+```
+
+`dt: 0` でも `onUpdate(0)` は呼ばれます。コールバックは時間に基づき、呼び出し回数ごとの無条件な副作用を避けてください。SVG と Canvas2D は `Animator` を自動バインドしません。再生前に `animator.bindToScene(scene)` を呼びます。`renderToSVGElement()` はイベントリスナー付き DOM スナップショットを作成しますが、継続的な描画ループは提供しません。
+
+`setSize(width, height)` は WebGL と composer のサイズを変更しますが、カメラ投影は更新しません。`dispose()` の前に描画ループと独自リスナーを停止してください。
+
+Three.js は親子構造を保持し、ローカル行列を同期します。各フレームで追加・削除・親の変更を反映し、削除ノードの操作状態を解除して、残るカメラか既存のフォールバックを選択します。削除、再マウント、冪等な dispose() は所有する geometry、material、texture、skeleton、audio、mixer、pass と render target を解放します。プラグインは hook で所有リソースを解放します。解放後に非同期ロードがリソースを再接続することはありません。

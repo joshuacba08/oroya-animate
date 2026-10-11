@@ -1,141 +1,155 @@
 # Contributing & Development
 
-Guide for setting up the dev environment, running the project locally, and contributing.
-
----
-
-## Prerequisites
-
-- **Node.js** v18 or higher
-- **pnpm** v9+ (managed via [Corepack](https://nodejs.org/api/corepack.html))
-
-To enable Corepack (ensures the correct pnpm version is used automatically):
-
-```bash
-corepack enable
-```
-
----
+This guide describes the scripts and workspace layout in this checkout.
 
 ## Setup
 
+Use pnpm 9 (the root `packageManager` pins 9.1.0). Library package manifests declare Node.js 18 or newer; the docs app has its own toolchain requirements. Check the installed Astro/Vite engine requirements when choosing a Node version for the website.
+
 ```bash
-# Clone the repository
 git clone https://github.com/joshuacba08/oroya-animate.git
 cd oroya-animate
-
-# Install all dependencies (root + all packages + all apps)
 pnpm install
-```
-
----
-
-## Available Scripts (Root)
-
-| Script           | Command               | Description                                   |
-|------------------|-----------------------|-----------------------------------------------|
-| Build all packages | `pnpm build`        | Builds all packages under `packages/` with tsup. |
-| Run tests        | `pnpm test`           | Runs all tests with Vitest.                   |
-| Watch tests      | `pnpm test:watch`     | Runs tests in watch mode.                     |
-| Dev (Vanilla)    | `pnpm dev:vanilla`    | Starts the vanilla JS demo with Vite.         |
-| Dev (React)      | `pnpm dev:react`      | Starts the React demo with Vite.              |
-| Clean            | `pnpm clean`          | Removes all `dist/` folders.                  |
-| Typecheck        | `pnpm typecheck`      | Runs `tsc --noEmit` across all packages.      |
-
----
-
-## Development Workflow
-
-### 1. Build the core packages first
-
-Before running any demo, make sure the packages are built:
-
-```bash
 pnpm build
 ```
 
-### 2. Start a demo
+Workspace consumers load compiled `dist/` files. Build packages before starting a demo or the docs app.
+
+## Root commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm build` | Build all 11 packages with tsup (ESM, CJS, declarations) |
+| `pnpm build:web` | Check documentation synchronization, build packages, then build the Astro site |
+| `pnpm typecheck` | Run declared workspace typecheck scripts; packages and all four apps |
+| `pnpm lint` / `pnpm lint:fix` | Lint package and app source files / apply fixes |
+| `pnpm test` / `pnpm test:watch` | Run Vitest once / watch |
+| `pnpm dev:react` / `pnpm dev:vanilla` | Start the Vite demo apps |
+| `pnpm dev:web` | Start the Astro docs app |
+| `pnpm docs:sync` | Generate managed Astro guide bodies from `docs/` |
+| `pnpm docs:check` | Fail if managed guide bodies differ from their source |
+| `pnpm api:check` | Informational AST audit of all resolved public exports |
+| `pnpm sync-versions` | Align package versions; review its changes before publishing |
+| `pnpm clean` | Run `rm -rf dist .turbo` recursively; requires a shell with `rm` |
+| `pnpm publish:packages` | Build and publish packages to npm |
+| `pnpm deploy:web` | Dispatch the verified documentation deployment through GitHub Actions |
+
+Publishing and deployment commands modify external services. Run them only as part of an intended release.
+
+## Development workflow
+
+Build once, then keep these running in separate terminals:
 
 ```bash
-# Vanilla JS demo
-pnpm dev:vanilla
+pnpm --filter "./packages/**" dev
+```
 
-# React demo
+```bash
 pnpm dev:react
+# Or: pnpm dev:vanilla / pnpm dev:web
 ```
 
-### 3. Make changes to a package
-
-If you're modifying a package (e.g., `@joroya/core`), you can run its build in watch mode:
+For one package:
 
 ```bash
-# In one terminal  Ewatch for core changes
-cd packages/core
-pnpm dev
-
-# In another terminal  Erun the demo
-cd ../..
-pnpm dev:vanilla
+pnpm --filter @joroya/core dev
+pnpm --filter @joroya/core typecheck
 ```
 
-### 4. Run tests
+The visual editor is an experimental Vite app:
 
 ```bash
+pnpm --filter editor dev
+```
+
+## Workspace
+
+```text
+packages/
+  core/               Scene graph, math, components, animation, serialization, plugins
+  renderer-three/     Three.js WebGL backend
+  renderer-svg/       SVG string and DOM output
+  renderer-canvas2d/  Browser Canvas2D backend
+  loader-gltf/        glTF/GLB scene and clip import
+  physics/            cannon-es systems and helpers
+  assets/             Asset cache and preloading
+  input/              Keyboard, mouse and gamepad actions
+  inspector/          Scene inspection and frame metrics
+  react/              Experimental React bindings
+  vue/                Experimental Vue 3 composables
+apps/
+  demo-react/         React showcase
+  demo-vanilla/       Vanilla examples
+  editor/             Experimental scene editor
+  web/                Astro documentation site
+docs/                 Repository guides and feature notes
+```
+
+## Documentation workflow
+
+The guides listed in `scripts/docs-manifest.json` have their source in `docs/`.
+Spanish and Japanese sources use `-es.md` and `-ja.md` suffixes.
+The corresponding files in `apps/web/src/content/docs*/` keep their
+frontmatter; their bodies are generated. Edit the source, then run:
+
+```bash
+pnpm docs:sync
+pnpm docs:check
+pnpm build:web
+```
+
+The synchronizer converts local guide links to localized site routes and
+repository file links to GitHub links. Guides outside its explicit list
+are outside synchronization until added to the manifest. Tutorials use topic slugs, with localized sources in docs/tutorials/es and docs/tutorials/ja. New site entries need
+frontmatter, and sidebar links must be added in `DocsSidebar.astro`.
+Localized routes fall back to English when a translation is absent.
+
+Keep examples aligned with exported interfaces: rotations are quaternions,
+direct transform writes need a matrix refresh, explicit lights are needed
+for standard Three.js materials, and renderers already advance scene logic.
+See [Renderers](renderers.md) and [Serialization](serialization.md).
+
+## Validation
+
+Before opening a PR:
+
+```bash
+pnpm build
+pnpm docs:check
+pnpm docs:validate
+pnpm api:check:strict
+pnpm lint
+pnpm typecheck
 pnpm test
 ```
 
-Tests are located in `packages/core/tests/` and use [Vitest](https://vitest.dev/).
+For website or guide changes, also run `pnpm build:web` and `pnpm test:browser`.
 
----
+The example checker covers standalone TypeScript/TSX programs throughout the manifest.
+Mark a fence `ts complete` or `tsx complete` to require checking, and `ts fragment` to identify a setup fragment.
+For programs spread across tutorial steps, wrap the relevant Markdown region in
+`<!-- docs-example:start -->` and `<!-- docs-example:end -->`; its TypeScript fences compile together in order.
+Build packages before typechecking their consumers. CI validates library packages on Node 18/20 and all apps on Node 24, including astro check, app builds, link/example checks and strict API audit. Deployment uses that complete validation workflow.
 
-## Project Layout
-
-```
-oroya-animate/
-├── package.json              # Root scripts and devDependencies
-├── pnpm-workspace.yaml       # Workspace definition
-├── tsconfig.base.json        # Shared TypeScript config
-├── docs/                     # Documentation (you are here)
-├── packages/
-━E  ├── core/                 # @joroya/core  EScene graph, nodes, components
-━E  ├── renderer-three/       # @joroya/renderer-three  EWebGL backend
-━E  ├── renderer-svg/         # @joroya/renderer-svg  ESVG backend
-━E  └── loader-gltf/          # @joroya/loader-gltf  EglTF importer
-└── apps/
-    ├── demo-vanilla/         # Vanilla JS demo app
-    └── demo-react/           # React demo app
-```
-
----
-
-## Build System
-
-Each package uses [tsup](https://tsup.egoist.dev/) for building:
-- Outputs both **ESM** (`.js`) and **CJS** (`.cjs`) formats.
-- Generates TypeScript declaration files (`.d.ts`).
-- Configuration is in `tsup.config.ts` inside each package.
-
----
-
-## Testing Strategy
-
-- **Framework:** [Vitest](https://vitest.dev/) (Vite-native, Jest-compatible API).
-- **Location:** `packages/core/tests/`
-- **Current coverage:**
-  - Node creation and hierarchy (add/remove children)
-  - Scene serialization/deserialization round-trip
-
-### Running a specific test file
+Vitest discovers tests under `packages/*/tests/` and
+`packages/core/test/`; the root vitest.config.ts resolves workspace packages to source.
+Coverage includes scene semantics, animation, serialization, SVG output,
+physics, input, assets, inspection, plugins, and math.
 
 ```bash
 pnpm test -- packages/core/tests/Node.test.ts
 ```
 
----
+## Implementation conventions
 
-## Code Style
+- Keep TypeScript strict and avoid `any` escapes.
+- Core depends only on `uuid`, never renderers or external engines.
+- Renderers and systems depend on core and their own engine packages.
+- Extend core contracts before reading new fields in a renderer.
+- Export new public symbols through the appropriate barrels.
+- Keep `composite: false` in package tsconfigs for tsup declarations.
+- Put `types` first in package `exports`, then `import` and `require`.
+- Declare required `@types/*` in each consuming package.
 
-- TypeScript strict mode.
-- Components follow the ECS (Entity-Component System) pattern.
-- The core must **never** import from any renderer or external engine.
-- Renderers may import from `@joroya/core` only.
+See [Programming Principles](programming-principles.md),
+[API Stability](api-stability.md), and [Migration to v1](migration-v1.md).

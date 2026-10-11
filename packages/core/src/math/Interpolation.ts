@@ -15,6 +15,7 @@ import type { Vec3 } from '../components/Transform';
  * @param p1 End value
  * @param m1 End tangent (in-tangent to next keyframe)
  * @returns Interpolated value
+ * @public
  */
 export function cubicSpline(
     t: number,
@@ -44,6 +45,7 @@ export function cubicSpline(
  * @param p1 End position
  * @param m1 End tangent
  * @returns Interpolated position
+ * @public
  */
 export function hermite(
     t: number,
@@ -66,6 +68,7 @@ export function hermite(
  * @param b End value
  * @param t Interpolation factor [0, 1]
  * @returns Interpolated value
+ * @public
  */
 export function lerp(a: number, b: number, t: number): number {
     return a + (b - a) * t;
@@ -78,6 +81,7 @@ export function lerp(a: number, b: number, t: number): number {
  * @param v2 End vector
  * @param t Interpolation factor [0, 1]
  * @returns Interpolated vector
+ * @public
  */
 export function lerpVec3(v1: Vec3, v2: Vec3, t: number): Vec3 {
     return {
@@ -93,27 +97,39 @@ export function lerpVec3(v1: Vec3, v2: Vec3, t: number): Vec3 {
 // Penner / Robert Penner-style formulations, with quad and cubic
 // variants. Use with `lerp(a, b, easeXxx(t))` to apply to a value.
 
-/** No easing — identity. */
+/** No easing — identity. * @public
+ */
 export type Easing = (t: number) => number;
 
+/** @public */
 export const linear: Easing = (t) => t;
 
+/** @public */
 export const easeInQuad: Easing = (t) => t * t;
+/** @public */
 export const easeOutQuad: Easing = (t) => 1 - (1 - t) * (1 - t);
+/** @public */
 export const easeInOutQuad: Easing = (t) =>
     t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
+/** @public */
 export const easeInCubic: Easing = (t) => t * t * t;
+/** @public */
 export const easeOutCubic: Easing = (t) => 1 - Math.pow(1 - t, 3);
+/** @public */
 export const easeInOutCubic: Easing = (t) =>
     t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-/** Sine-based eases, gentlest curve. */
+/** Sine-based eases, gentlest curve. * @public
+ */
 export const easeInSine: Easing = (t) => 1 - Math.cos((t * Math.PI) / 2);
+/** @public */
 export const easeOutSine: Easing = (t) => Math.sin((t * Math.PI) / 2);
+/** @public */
 export const easeInOutSine: Easing = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
 
-/** Elastic bounce-out for snappy "settle into place" feel. */
+/** Elastic bounce-out for snappy "settle into place" feel. * @public
+ */
 export const easeOutElastic: Easing = (t) => {
     if (t === 0) return 0;
     if (t === 1) return 1;
@@ -141,6 +157,7 @@ export const easeOutElastic: Easing = (t) => {
  * @param damping   Damping coefficient (higher = less oscillation). Typical 10-30.
  *                  Critical damping ≈ 2 * sqrt(stiffness).
  * @param dt        Timestep in seconds.
+ * @public
  */
 export function spring(
     current: number,

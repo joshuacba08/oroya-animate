@@ -1,7 +1,7 @@
 # Tutorial 16: Carga modelos 3D con el glTF Loader 🟡
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 20 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 20 minutos\
 > **Qué aprenderás:** Importar modelos 3D en formato glTF/GLB desde Blender u otras herramientas 3D al scene graph agnóstico de Oroya, incluyendo geometría, materiales PBR y animaciones.
 
 ---

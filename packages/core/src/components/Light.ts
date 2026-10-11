@@ -2,6 +2,7 @@ import { Component, ComponentType } from './Component';
 
 /**
  * An enumeration of available light types.
+ * @public
  */
 export enum LightType {
     Ambient = 'Ambient',
@@ -13,6 +14,7 @@ export enum LightType {
 /**
  * Definition for an ambient light.
  * Provides uniform illumination from all directions.
+ * @public
  */
 export interface AmbientLightDef {
     type: LightType.Ambient;
@@ -25,6 +27,7 @@ export interface AmbientLightDef {
 /**
  * Definition for a directional light.
  * Emits parallel rays in a single direction (like sunlight).
+ * @public
  */
 export interface DirectionalLightDef {
     type: LightType.Directional;
@@ -45,6 +48,7 @@ export interface DirectionalLightDef {
 /**
  * Definition for a point light.
  * Emits light in all directions from a single point (like a light bulb).
+ * @public
  */
 export interface PointLightDef {
     type: LightType.Point;
@@ -67,6 +71,7 @@ export interface PointLightDef {
 /**
  * Definition for a spot light.
  * Emits light in a cone from a point (like a flashlight).
+ * @public
  */
 export interface SpotLightDef {
     type: LightType.Spot;
@@ -94,11 +99,13 @@ export interface SpotLightDef {
 
 /**
  * A union of all light definitions.
+ * @public
  */
 export type LightDef = AmbientLightDef | DirectionalLightDef | PointLightDef | SpotLightDef;
 
 /**
  * A component that defines a light source in the scene.
+ * @public
  */
 export class Light extends Component {
     readonly type = ComponentType.Light;

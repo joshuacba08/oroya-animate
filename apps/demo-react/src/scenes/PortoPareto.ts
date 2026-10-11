@@ -55,7 +55,7 @@ export function createPortoParetoScene(params: ParamValues) {
         .set({ filter: 'blur(4px)' });
 
     return {
-        scene: svg as any,
+        scene: svg,
         animate: () => { }
     };
 }

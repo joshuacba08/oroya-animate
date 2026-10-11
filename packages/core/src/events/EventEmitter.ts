@@ -20,13 +20,8 @@
 
 type EventHandler<T> = (event: T) => void;
 
-// `Record<string, any>` is the standard bound for typed event-emitter event
-// maps (rxjs, mitt, etc.) — it accepts both interfaces with specific keys
-// and index-signature maps. `unknown` would force consumers to widen every
-// payload to `unknown`, defeating the purpose of typed events.
-//
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class EventEmitter<EventMap extends Record<string, any>> {
+/** @public */
+export class EventEmitter<EventMap extends object> {
     // Internally the handler set is heterogeneous: each key in `EventMap`
     // can carry a differently-typed payload. We erase the payload type for
     // storage and re-narrow on `on()` / `emit()` via the generic `K`.

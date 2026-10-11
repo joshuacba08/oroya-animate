@@ -4,6 +4,7 @@ import type { Node, Scene } from '@joroya/core';
 /**
  * Frame callback signature. Receives `dt` in seconds since the previous
  * frame — same convention as `ThreeRenderer.render(dt)`.
+ * @experimental
  */
 export type FrameCallback = (dt: number) => void;
 
@@ -16,6 +17,7 @@ export type FrameCallback = (dt: number) => void;
  *
  * `registerFrameCallback` powers the `useFrame` hook — children push into a
  * shared list that the canvas iterates each animation frame.
+ * @experimental
  */
 export interface OroyaContextValue {
     scene: Scene;
@@ -23,11 +25,13 @@ export interface OroyaContextValue {
     registerFrameCallback: (cb: FrameCallback) => () => void;
 }
 
+/** @experimental */
 export const OroyaContext = createContext<OroyaContextValue | null>(null);
 
 /**
  * Throws if used outside `<OroyaCanvas>` so misuse fails loudly at the
  * first render instead of silently dropping nodes on the floor.
+ * @experimental
  */
 export function useOroya(): OroyaContextValue {
     const ctx = useContext(OroyaContext);

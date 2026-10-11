@@ -7,8 +7,8 @@ duration: "15 min"
 ---
 # Tutorial 2: Paleta de Colores
 
-> **Nivel:** Principiante  
-> **Tiempo estimado:** 15 minutos  
+> **Nivel:** Principiante\
+> **Tiempo estimado:** 15 minutos\
 > **Qué aprenderás:** Crear múltiples nodos con diferentes geometrías, colores y posiciones.
 
 ---
@@ -95,7 +95,7 @@ palette.forEach((shape) => {
 ### Conceptos clave
 
 - **`createBox(w, h, d)`** y **`createSphere(r, wSeg, hSeg)`** son factory functions que devuelven un componente `Geometry`.
-- Cada nodo es **independiente**  Etiene su propia posición, geometría y material.
+- Cada nodo es **independiente** — tiene su propia posición, geometría y material.
 - Pueden mezclarse diferentes tipos de geometría en la misma escena.
 
 ---
@@ -158,4 +158,4 @@ Cinco figuras geométricas de colores vibrantes rotando a diferentes velocidades
 
 ## Siguiente tutorial
 
-ↁE[Tutorial 3: Guardar y Cargar Escenas](./03-save-load-scenes.md)  Eserialización JSON.
+→ [Tutorial 3: Guardar y Cargar Escenas](/tutorials/03-save-load-scenes) — serialización JSON.

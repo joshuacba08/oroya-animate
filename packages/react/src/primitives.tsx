@@ -79,7 +79,8 @@ interface GroupProps extends NodeBaseProps {
     nodeRef?: { current: OroyaNode | null };
 }
 
-/** A transform-only container — analogous to `<group>` in r3f. */
+/** A transform-only container — analogous to `<group>` in r3f. * @experimental
+ */
 export function Group(props: GroupProps) {
     return (
         <NodeHost
@@ -96,6 +97,7 @@ interface BoxProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
+/** @experimental */
 export function Box(props: BoxProps) {
     const [w, h, d] = useMemo<[number, number, number]>(() => {
         if (Array.isArray(props.size)) return props.size;
@@ -125,6 +127,7 @@ interface SphereProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
+/** @experimental */
 export function Sphere(props: SphereProps) {
     return (
         <NodeHost
@@ -150,6 +153,7 @@ interface PlaneProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
+/** @experimental */
 export function Plane(props: PlaneProps) {
     return (
         <NodeHost
@@ -177,6 +181,7 @@ interface PerspectiveCameraProps extends NodeBaseProps {
     active?: boolean;
 }
 
+/** @experimental */
 export function PerspectiveCamera(props: PerspectiveCameraProps) {
     return (
         <NodeHost
@@ -200,6 +205,7 @@ interface AmbientLightProps extends Omit<NodeBaseProps, 'children'> {
     color?: ColorRGB;
 }
 
+/** @experimental */
 export function AmbientLight(props: AmbientLightProps) {
     return (
         <NodeHost
@@ -222,6 +228,7 @@ interface DirectionalLightProps extends Omit<NodeBaseProps, 'children'> {
     castShadow?: boolean;
 }
 
+/** @experimental */
 export function DirectionalLight(props: DirectionalLightProps) {
     return (
         <NodeHost
@@ -239,7 +246,8 @@ export function DirectionalLight(props: DirectionalLightProps) {
     );
 }
 
-/** Bridge for app code that wants to forward a ref to the underlying Oroya node. */
+/** Bridge for app code that wants to forward a ref to the underlying Oroya node. * @experimental
+ */
 export function useNodeRef() {
     return useRef<OroyaNode | null>(null);
 }

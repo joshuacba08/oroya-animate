@@ -3,6 +3,7 @@ import { Component, ComponentType } from './Component';
 /**
  * Tone-mapping curves supported by the post-processing pipeline.
  * Maps to Three.js `WebGLRenderer.toneMapping` (Reinhard, Cineon, ACESFilmic).
+ * @public
  */
 export enum ToneMapping {
   None = 'None',
@@ -13,6 +14,7 @@ export enum ToneMapping {
 
 /**
  * Options for the UnrealBloom pass.
+ * @public
  */
 export interface BloomOptions {
   enabled: boolean;
@@ -30,6 +32,7 @@ export interface BloomOptions {
  * Backends consume this to assemble a render-pass graph. The Three.js backend
  * maps it to an `EffectComposer` with RenderPass → UnrealBloomPass → SMAAPass
  * → OutputPass (each pass added only when its option is enabled).
+ * @public
  */
 export interface PostProcessingDef {
   toneMapping?: ToneMapping;
@@ -54,6 +57,7 @@ export interface PostProcessingDef {
  * look up the post-processing chain off the camera being rendered, so each
  * camera can carry its own effects (useful for split-screen, picture-in-picture,
  * or render-target previews).
+ * @public
  */
 export class PostProcessing extends Component {
   readonly type = ComponentType.PostProcessing;

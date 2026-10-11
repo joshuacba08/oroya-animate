@@ -1,7 +1,7 @@
 # Tutorial 18: Iluminación 3D — Ambient, Directional, Point y Spot 🟡
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 20 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 20 minutos\
 > **Qué aprenderás:** Agregar luces al scene graph de Oroya usando el componente `Light`. Dominar los 4 tipos de luz: Ambient, Directional, Point y Spot, incluyendo sombras y configuración avanzada.
 
 ---

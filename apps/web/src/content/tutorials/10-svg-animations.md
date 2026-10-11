@@ -7,8 +7,8 @@ duration: "20 min"
 ---
 # Tutorial 10: Animaciones SVG Nativas
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 20 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 20 minutos\
 > **Qué aprenderás:** Crear animaciones declarativas con `<animate>` y `<animateTransform>` usando el componente `Animation` de Oroya.
 
 ---
@@ -19,7 +19,7 @@ Las animaciones SVG nativas se declaran dentro del markup SVG y el navegador las
 
 - **Exportación:** El archivo `.svg` es auto-animado al abrirlo en un browser.
 - **Performance:** El motor de renderizado del browser optimiza las animaciones.
-- **Server-side:** Funciona con `renderToSVG()`  Eel string SVG incluye las animaciones.
+- **Server-side:** Funciona con `renderToSVG()` — el string SVG incluye las animaciones.
 
 ```mermaid
 graph LR
@@ -139,7 +139,7 @@ scalable.addComponent(new Animation([
   {
     type: 'animateTransform',
     transformType: 'scale',
-    values: '1;1.5;1',           // Tres keyframes: normal ↁEgrande ↁEnormal
+    values: '1;1.5;1',           // Tres keyframes: normal → grande → normal
     dur: '1.5s',
     repeatCount: 'indefinite',
   },
@@ -277,9 +277,9 @@ oneShot.addComponent(new Animation([
 ]));
 ```
 
-> **`fill="remove"` vs `fill="freeze"`:**  
-> - `remove` (default)  Eal terminar, vuelve al valor original.  
-> - `freeze`  Emantiene el valor final de la animación.
+> **`fill="remove"` vs `fill="freeze"`:**\
+> - `remove` (default) — al terminar, vuelve al valor original.
+> - `freeze` — mantiene el valor final de la animación.
 
 ---
 
@@ -334,4 +334,4 @@ Explora todas estas animaciones en la demo **"SVG Animations"** del demo-react.
 
 ## Siguiente tutorial
 
-ↁE[Tutorial 11: SVG Interactivo](./11-svg-interactive.md)  Eevent delegation con `renderToSVGElement`.
+→ [Tutorial 11: SVG Interactivo](/tutorials/11-svg-interactive) — event delegation con `renderToSVGElement`.

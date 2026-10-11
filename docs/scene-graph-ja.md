@@ -417,3 +417,13 @@ scene.traverse(node => {
   });
 });
 ```
+
+## Transform の明示的な更新
+
+setPosition(value: Vec3)、setRotation(value: Quat)、setScale(value: Vec3) は入力をコピーし、void を返して isDirty を設定します。直接代入は v1 の動作を維持するため、updateLocalMatrix() を呼ぶか isDirty = true を設定してください。
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

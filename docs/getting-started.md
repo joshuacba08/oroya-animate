@@ -12,38 +12,62 @@ Install the packages you need from npm using your preferred package manager:
 
 ```bash
 # npm
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 
 # yarn
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 
 # pnpm
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 ```
 
 ### Available packages (v1.0.0)
 
-The library ships as focused packages. Install only what you need.
+The library ships as 11 small, focused packages. Install only what you need.
+
+**Core engine**
 
 | Package | Description |
 |---|---|
-| `@joroya/core` | Scene graph, nodes, components, animation, math, plugins, and serialization |
-| `@joroya/renderer-three` | WebGL renderer powered by Three.js: PBR materials, lights, shadows, post-FX, audio, instancing, and skinned meshes |
-| `@joroya/renderer-svg` | SVG renderer for 2D vector graphics and server-safe SVG string output |
+| `@joroya/core` | Scene graph, nodes, components, animation, math, plugins, serialization |
+| `@joroya/renderer-three` | WebGL backend that translates Oroya scenes into Three.js objects (PBR, shadows, post-FX, audio, skinned meshes) |
+| `@joroya/renderer-svg` | SVG renderer for 2D vector graphics |
 | `@joroya/renderer-canvas2d` | Lightweight Canvas2D renderer |
-| `@joroya/loader-gltf` | glTF / GLB model loader with animation and skinned-mesh support |
-| `@joroya/physics` | cannon-es-backed physics: rigid bodies, joints, sensors, raycasts, and vehicles |
-| `@joroya/inspector` | Vanilla-DOM debug overlay: hierarchy, transform inspector, FPS and frame-time metrics |
-| `@joroya/input` | Keyboard, mouse, and gamepad layer with declarative action mapping |
-| `@joroya/assets` | Asset cache with deduplication, ref-counting, and progress events |
-| `@joroya/react` | Experimental React bindings: `<OroyaCanvas>`, `useFrame`, `useScene`, JSX primitives |
-| `@joroya/vue` | Experimental Vue 3 composables: `useOroyaCanvas`, `useFrame`, `useNode` |
+| `@joroya/loader-gltf` | glTF / GLB model loader with skinned-mesh support |
+| `@joroya/physics` | `cannon-es`-backed physics: rigid bodies, joints, sensors, raycast, vehicles |
 
-> **Peer dependencies:** `@joroya/renderer-three` and `@joroya/loader-gltf` need `three` (`npm install three`). `@joroya/react` needs `react`, `react-dom`, and the Three renderer stack. `@joroya/vue` needs `vue` and the Three renderer stack.
+**Developer ecosystem**
 
-> **Stability:** v1.0.0 uses the [`@public` / `@experimental` / `@internal` API stability policy](api-stability.md). Breaking changes to `@public` exports require a major version bump.
+| Package | Description |
+|---|---|
+| `@joroya/inspector` | Vanilla-DOM debug overlay: hierarchy, transform inspector, FPS / frame-time metrics |
+| `@joroya/input` | Keyboard / mouse / gamepad layer with declarative action mapping |
+| `@joroya/assets` | Asset cache with deduplication, ref-counting, progress events |
+
+**Framework wrappers** (`@experimental`)
+
+| Package | Description |
+|---|---|
+| `@joroya/react` | React bindings: `<OroyaCanvas>`, `useFrame`, `useScene`, JSX primitives |
+| `@joroya/vue` | Vue 3 composables: `useOroyaCanvas`, `useFrame`, `useNode` |
+
+> **Peer dependencies:** `@joroya/renderer-three` and `@joroya/loader-gltf` need `three` (`npm install three`). `@joroya/physics` needs `cannon-es` (auto-installed). `@joroya/react` needs `react`, `react-dom`, and the Three renderer stack. `@joroya/vue` needs `vue` and the Three renderer stack.
+
+> **Stability:** untagged exports default to `@public`. Public APIs deprecated in major `N` remain available through `N+1` and may be removed in `N+2`. See [API Stability](api-stability.md).
 
 ---
+
+The HTML below uses a bundler to load TypeScript and package imports. For a new project:
+
+```bash
+pnpm create vite oroya-demo --template vanilla-ts
+cd oroya-demo
+pnpm install
+pnpm add @joroya/core @joroya/renderer-three three
+pnpm dev
+```
+
+Put the scene code in `src/main.ts` and use `/src/main.ts` as the script URL in `index.html`.
 
 ## Quick Start - Rotating Cube
 
@@ -64,7 +88,7 @@ This minimal example creates a scene with a camera and a red cube, then renders 
 </head>
 <body>
   <canvas id="oroya-canvas"></canvas>
-  <script type="module" src="./main.ts"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
 ```
@@ -72,32 +96,41 @@ This minimal example creates a scene with a camera and a red cube, then renders 
 ### 2. Scene Setup (`main.ts`)
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// --- Scene ---
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// --- Camera ---
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const scene = new Scene();
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// --- Cube ---
-const cubeNode = new Node('my-cube');
-cubeNode.addComponent(createBox(1, 1, 1));
-cubeNode.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
-scene.add(cubeNode);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
 
-// --- Renderer ---
-const canvas = document.getElementById('oroya-canvas') as HTMLCanvasElement;
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
+
 const renderer = new ThreeRenderer({
   canvas,
   width: window.innerWidth,
@@ -105,20 +138,28 @@ const renderer = new ThreeRenderer({
 });
 renderer.mount(scene);
 
-// --- Animation loop ---
-function animate(time: number) {
-  time *= 0.001; // convert to seconds
-  requestAnimationFrame(animate);
-
-  const speed = 0.5;
-  cubeNode.transform.rotation.x = Math.sin(time * speed) * 2;
-  cubeNode.transform.rotation.y = Math.cos(time * speed) * 2;
-  cubeNode.transform.updateLocalMatrix();
-
-  renderer.render();
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(animate);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
+
+`dt` is in seconds. `render(dt)` calls `scene.update(dt)` itself; do not call it twice in the same loop. Rotations are quaternions: use `setFromAxisAngle()` with a unit axis. Explicit lights are required for `MeshStandardMaterial`. Stop the animation loop before disposing the renderer. `setSize()` changes the render target size; it does not update the camera projection.
 
 That's it - you should see a red cube rotating on screen.
 
@@ -217,7 +258,7 @@ const triangle = createPath2D([
 node.addComponent(triangle);
 ```
 
-Other built-in geometry helpers include `createCylinder`, `createPlane`, `createCone`, and `createText`. Torus, circle, buffer, and CSG definitions are available through the `Geometry` component types directly.
+Other built-in geometry helpers include `createCylinder`, `createPlane`, `createCone`, `createText`, `createTorus`, and `createCircle`. Buffer and CSG definitions use the `Geometry` component types directly.
 
 ---
 
@@ -371,10 +412,10 @@ function animate(time: number) {
   time *= 0.001;
   requestAnimationFrame(animate);
 
-  solarSystem.transform.rotation.y = time * 0.1;
+  solarSystem.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.1);
   solarSystem.transform.updateLocalMatrix();
 
-  earth.transform.rotation.y = time * 0.5;
+  earth.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, time * 0.5);
   earth.transform.updateLocalMatrix();
 
   renderer.render();
@@ -393,24 +434,39 @@ npm install @joroya/loader-gltf three
 ```
 
 ```typescript
+import { Animator, Light, LightType, Node } from '@joroya/core';
 import { loadGLTF } from '@joroya/loader-gltf';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-const gltfScene = await loadGLTF('/models/robot.glb');
+const result = await loadGLTF('/models/robot.glb');
+const animationNode = new Node('model-animation');
+const animator = new Animator();
+for (const clip of result.animations) animator.addClip(clip);
+animationNode.addComponent(animator);
+result.scene.add(animationNode);
+animator.bindToScene(result.scene);
 
-const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: 800,
-  height: 600,
-});
-renderer.mount(gltfScene);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+result.scene.add(ambient);
 
-function loop() {
-  renderer.render();
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
+const renderer = new ThreeRenderer({ canvas, width: 800, height: 600 });
+renderer.mount(result.scene);
+if (result.animations[0]) animator.play(result.animations[0].name);
+
+let previousTime: number | undefined;
+function loop(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  renderer.render(dt);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 ```
+
+`loadGLTF()` returns `{ scene, animations }`. Imported scenes may need a camera and lights. For clip playback, attach an `Animator` to a child node, bind it to the scene, register the clips, and call `play()`. When merging scenes, iterate over `[...result.scene.root.children]`; reparenting modifies the original child list.
 
 ---
 
@@ -473,6 +529,8 @@ node.transform.scale = { x: 2, y: 2, z: 2 };
 node.transform.updateLocalMatrix();
 ```
 
+Direct writes to `position`, `rotation`, or `scale` do not set `isDirty`. Call `updateLocalMatrix()` afterwards, or set `isDirty = true` before the next world-matrix update. `rotateOnAxis()` and `lookAt()` mark the transform dirty themselves.
+
 ---
 
 ## Traversal and Search
@@ -504,3 +562,13 @@ const children = node.children;       // Node[]
 - **[Serialization](serialization.md)** - Full details on the JSON format.
 - **[API Reference](api-reference.md)** - Complete API documentation.
 - **[Contributing](contributing.md)** - How to contribute to Oroya Animate.
+
+## Explicit transform updates
+
+Use setPosition(value: Vec3), setRotation(value: Quat) and setScale(value: Vec3). Each copies its input, returns void and marks isDirty. Direct property writes retain v1 behavior: call updateLocalMatrix() or set isDirty = true.
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

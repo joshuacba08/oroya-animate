@@ -31,7 +31,9 @@ La configuracion de publicacion cubre NPM, CDNs publicos y el sitio de documenta
 
 - `.github/workflows/ci.yml` ejecuta lint, typecheck, tests y build.
 - `.github/workflows/publish.yml` publica en NPM cuando se pushea un tag `v*.*.*`.
-- `.github/workflows/deploy-web.yml` despliega el sitio web.
+- `.github/workflows/deploy-web.yml` exige CI completa, publica preview de la PR y producción tras integrar en main. GitHub Actions es la única vía; Vercel Git queda desactivado. Verifica commit, guías en tres idiomas y dominio público, con rollback al despliegue anterior si falla.
+
+La guía canónica es [Despliegue Vercel](./vercel-deployment.md). Para mantenimiento de documentación, no crear tags ni publicar paquetes npm.
 
 ## Configuracion Requerida
 
@@ -66,10 +68,13 @@ node scripts/sync-versions.js 1.0.1
 
 # 2. Validar localmente
 pnpm install --frozen-lockfile
+pnpm build
 pnpm lint
 pnpm typecheck
+pnpm api:check:strict
+pnpm docs:check
+pnpm docs:validate
 pnpm test
-pnpm build
 
 # 3. Commit y tag
 git add .

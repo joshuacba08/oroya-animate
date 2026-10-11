@@ -2,6 +2,7 @@
  * An implementation of Ken Perlin's noise algorithm in 2D.
  *
  * With thanks to Joe Iddon. https://github.com/joeiddon/perlin
+ * @public
  */
 export class Noise {
     private grad: Record<string, { x: number; y: number }>;

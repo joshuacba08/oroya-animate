@@ -5,7 +5,6 @@ order: 16
 level: "intermediate"
 duration: "20 min"
 ---
-
 # Tutorial 16: Animator — biblioteca de clips, crossfade y eventos de keyframe
 
 > **Nivel:** Intermedio

@@ -36,10 +36,28 @@ pnpm add @joroya/core @joroya/renderer-three three
 | `@joroya/renderer-svg` | Renderer SVG para gráficos vectoriales 2D |
 | `@joroya/renderer-canvas2d` | Renderer Canvas 2D para gráficos rasterizados 2D |
 | `@joroya/loader-gltf` | Carga modelos glTF en una escena Oroya |
+| `@joroya/physics` | Física con cannon-es |
+| `@joroya/assets` | Caché y precarga de assets |
+| `@joroya/input` | Acciones de teclado, mouse y gamepad |
+| `@joroya/inspector` | Inspector de escena y métricas |
+| `@joroya/react` | Bindings experimentales para React |
+| `@joroya/vue` | Composables experimentales para Vue 3 |
 
 > **Nota:** `@joroya/renderer-three` y `@joroya/loader-gltf` tienen `three` como dependencia peer. Asegúrate de instalarlo en tu proyecto: `npm install three`.
 
 ---
+
+El HTML de abajo usa un bundler para cargar TypeScript y los paquetes. Para un proyecto nuevo:
+
+```bash
+pnpm create vite oroya-demo --template vanilla-ts
+cd oroya-demo
+pnpm install
+pnpm add @joroya/core @joroya/renderer-three three
+pnpm dev
+```
+
+Guarda la escena en `src/main.ts` y usa `/src/main.ts` como URL del script en `index.html`.
 
 ## Inicio Rápido — Cubo Rotando
 
@@ -60,7 +78,7 @@ Este ejemplo mínimo crea una escena con una cámara, iluminación y un cubo roj
 </head>
 <body>
   <canvas id="oroya-canvas"></canvas>
-  <script type="module" src="./main.ts"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
 ```
@@ -69,49 +87,40 @@ Este ejemplo mínimo crea una escena con una cámara, iluminación y un cubo roj
 
 ```typescript
 import {
-  Scene, Node, createBox, Material,
-  Camera, CameraType, Light, LightType,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// --- Escena ---
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// --- Cámara ---
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const scene = new Scene();
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// --- Iluminación ---
 const ambient = new Node('ambient');
-ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
 scene.add(ambient);
 
 const sun = new Node('sun');
-sun.addComponent(new Light({
-  type: LightType.Directional,
-  intensity: 0.8,
-  target: { x: 0, y: 0, z: 0 },
-}));
-sun.transform.position = { x: 3, y: 6, z: 4 };
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
 scene.add(sun);
 
-// --- Cubo ---
-const cubeNode = new Node('my-cube');
-cubeNode.addComponent(createBox(1, 1, 1));
-cubeNode.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
-scene.add(cubeNode);
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
-// --- Renderer ---
-const canvas = document.getElementById('oroya-canvas') as HTMLCanvasElement;
 const renderer = new ThreeRenderer({
   canvas,
   width: window.innerWidth,
@@ -119,22 +128,28 @@ const renderer = new ThreeRenderer({
 });
 renderer.mount(scene);
 
-// --- Bucle de animación ---
-function animate(time: number) {
-  time *= 0.001; // convertir a segundos
-  requestAnimationFrame(animate);
-
-  const speed = 0.5;
-  cubeNode.transform.rotation = setFromAxisAngle(
-    { x: 0.4, y: 1, z: 0 },
-    time * speed,
-  );
-  cubeNode.transform.updateLocalMatrix();
-
-  renderer.render();
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(animate);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
+
+`dt` se mide en segundos. `render(dt)` llama a `scene.update(dt)`; no lo llames dos veces en el mismo bucle. Las rotaciones son cuaterniones: usa `setFromAxisAngle()` con un eje unitario. `MeshStandardMaterial` necesita luces explícitas. Detén el bucle antes de liberar el renderer. `setSize()` cambia el tamaño del render, pero no actualiza la proyección de la cámara.
 
 ¡Eso es todo! Deberías ver un cubo rojo rotando en pantalla.
 
@@ -474,30 +489,39 @@ npm install @joroya/loader-gltf three
 ```
 
 ```typescript
+import { Animator, Light, LightType, Node } from '@joroya/core';
 import { loadGLTF } from '@joroya/loader-gltf';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-const { scene: gltfScene, animations } = await loadGLTF('/models/robot.glb');
+const result = await loadGLTF('/models/robot.glb');
+const animationNode = new Node('model-animation');
+const animator = new Animator();
+for (const clip of result.animations) animator.addClip(clip);
+animationNode.addComponent(animator);
+result.scene.add(animationNode);
+animator.bindToScene(result.scene);
 
-const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: 800,
-  height: 600,
-});
-renderer.mount(gltfScene);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+result.scene.add(ambient);
 
-// Reproducir animaciones si existen
-if (animations.length > 0) {
-  const mixer = new AnimationMixer(gltfScene);
-  mixer.play(animations[0]);
-}
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
+const renderer = new ThreeRenderer({ canvas, width: 800, height: 600 });
+renderer.mount(result.scene);
+if (result.animations[0]) animator.play(result.animations[0].name);
 
-function loop() {
-  renderer.render();
+let previousTime: number | undefined;
+function loop(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  renderer.render(dt);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 ```
+
+`loadGLTF()` devuelve `{ scene, animations }`. Las escenas importadas pueden necesitar cámara y luces. Para reproducir clips, añade un `Animator` a un nodo hijo, enlázalo a la escena, registra los clips y llama a `play()`. Al combinar escenas, recorre `[...result.scene.root.children]`: cambiar el padre modifica la lista original de hijos.
 
 ---
 
@@ -546,7 +570,7 @@ function OroyaCanvas({ scene }: { scene: Scene }) {
     renderer.mount(scene);
 
     let frameId: number;
-    const animate = (time: number) => {
+    const animate = () => {
       renderer.render();
       frameId = requestAnimationFrame(animate);
     };
@@ -562,7 +586,7 @@ function OroyaCanvas({ scene }: { scene: Scene }) {
 }
 
 // Uso
-function App() {
+export default function App() {
   const scene = new Scene();
 
   const cam = new Node('cam');
@@ -608,6 +632,8 @@ node.transform.scale = { x: 2, y: 2, z: 2 };
 node.transform.updateLocalMatrix();
 ```
 
+Escribir directamente en `position`, `rotation` o `scale` no activa `isDirty`. Llama a `updateLocalMatrix()` después, o asigna `isDirty = true` antes de actualizar las matrices de mundo. `rotateOnAxis()` y `lookAt()` sí marcan el transform como modificado.
+
 ---
 
 ## Recorrido y Búsqueda
@@ -633,9 +659,19 @@ const children = node.children;       // Node[]
 
 ## Siguientes Pasos
 
-- **[Arquitectura](architecture.md)** — Entiende la filosofía de diseño y los límites de módulos.
-- **[Renderers](renderers.md)** — Profundiza en las implementaciones de renderers.
-- **[Grafo de Escena](scene-graph.md)** — Aprende cómo funciona la jerarquía de nodos y las transformaciones.
-- **[Serialización](serialization.md)** — Detalles completos del formato JSON.
-- **[Referencia API](api-reference.md)** — Documentación completa de la API.
-- **[Contribuir](contributing.md)** — Cómo contribuir a Oroya Animate.
+- **[Arquitectura](/es/docs/architecture)** — Entiende la filosofía de diseño y los límites de módulos.
+- **[Renderers](/es/docs/renderers)** — Profundiza en las implementaciones de renderers.
+- **[Grafo de Escena](/es/docs/scene-graph)** — Aprende cómo funciona la jerarquía de nodos y las transformaciones.
+- **[Serialización](/es/docs/serialization)** — Detalles completos del formato JSON.
+- **[Referencia API](/docs/api-reference)** — Documentación completa de la API.
+- **[Contribuir](/docs/contributing)** — Cómo contribuir a Oroya Animate.
+
+## Actualización explícita de transforms
+
+Usa setPosition(value: Vec3), setRotation(value: Quat) y setScale(value: Vec3). Copian el valor recibido, devuelven void y marcan isDirty. Las escrituras directas conservan el contrato v1: llama a updateLocalMatrix() o establece isDirty = true.
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

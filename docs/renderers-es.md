@@ -22,7 +22,7 @@ graph TD
 
 | Aspecto | `ThreeRenderer` | `renderToSVG` |
 |---------|----------------|---------------|
-| **Paradigma** | Instancia con estado (class) | Función pura (stateless) |
+| **Paradigma** | Instancia con estado (class) | String o instantánea DOM |
 | **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
 | **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
 | **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
@@ -100,12 +100,9 @@ sequenceDiagram
 | `Material` con `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
 | Sin `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
 
-### Iluminación automática
+### Iluminación
 
-| Tipo | Config |
-|------|--------|
-| `AmbientLight` | Blanco, intensidad `0.5` |
-| `DirectionalLight` | Blanco, intensidad `1.5`, posición `(2, 5, 3)` |
+Añade componentes `Light` explícitos. No se inyectan luces por defecto; los materiales `MeshStandardMaterial` requieren iluminación. Se admiten luces Ambient, Directional, Point y Spot.
 
 ### Resolución de cámaras
 
@@ -120,37 +117,67 @@ flowchart TD
 ### Ejemplo completo
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
+
 const scene = new Scene();
-
-const cam = new Node('cam');
-cam.addComponent(new Camera({
-  type: CameraType.Perspective, fov: 75,
-  aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000,
+const camera = new Node('camera');
+camera.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 60,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 100,
 }));
-cam.transform.position.z = 5;
-scene.add(cam);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-const box = new Node('box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: window.innerWidth, height: window.innerHeight,
+  canvas,
+  width: window.innerWidth,
+  height: window.innerHeight,
 });
 renderer.mount(scene);
 
-function loop() {
-  box.transform.rotation.y = performance.now() * 0.001;
-  box.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(loop);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(loop);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ---
@@ -159,9 +186,9 @@ requestAnimationFrame(loop);
 
 Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### `renderToSVG` — String puro (server-safe)
+### `renderToSVG` — String SVG (server-safe)
 
-Función pura y stateless que retorna un string SVG. Funciona en Node.js sin DOM.
+Retorna un string SVG y actualiza la lógica de la escena. Funciona en Node.js sin DOM.
 
 ```typescript
 import { renderToSVG } from '@joroya/renderer-svg';
@@ -418,7 +445,7 @@ new Material({
   filter: {
     effects: [{
       type: 'dropShadow', dx: 4, dy: 4,
-      stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6,
+      stdDeviation: 2, floodColor: { r: 0.2, g: 0.2, b: 0.2 }, floodOpacity: 0.6,
     }],
   },
 });
@@ -452,7 +479,7 @@ new Material({
       { command: 'L', args: [80, 80] },
       { command: 'Z', args: [] },
     ],
-    fill: 'white',
+    fill: { r: 1, g: 1, b: 1 },
     opacity: 0.8,
   },
 });
@@ -647,3 +674,36 @@ export class Canvas2DRenderer {
 | 4 | Implementar `render()` — sincronizar transforms y dibujar |
 | 5 | Implementar `dispose()` — liberar recursos |
 | 6 | Documentar geometrías y materiales soportados |
+
+
+## `@joroya/renderer-canvas2d` — Canvas2D
+
+```ts
+import { renderToCanvas, CanvasRenderer } from '@joroya/renderer-canvas2d';
+
+renderToCanvas(scene, canvas, { width: 800, height: 600, dt: 0 });
+
+const renderer = new CanvasRenderer();
+renderer.mount(container, { width: 800, height: 600 });
+renderer.render(scene, { width: 800, height: 600, dt: 0 });
+renderer.unmount();
+```
+
+
+## Actualización por frame y escenas compartidas
+
+Todos los puntos de entrada oficiales llaman a `scene.update(dt)` y actualizan las matrices de mundo. Three.js recibe `render(dt)`; SVG y Canvas2D reciben `options.dt`. El valor por defecto es `1 / 60` de segundo. Generar un string SVG funciona en Node.js, pero modifica la lógica de la escena: no es una función pura.
+
+Para compartir una escena, avanza el tiempo con un solo renderer y usa `dt: 0` en los demás:
+
+```ts
+threeRenderer.render(dt);
+const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
+renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
+```
+
+`dt: 0` también llama a `onUpdate(0)`. Usa callbacks basados en tiempo, sin efectos que se ejecuten incondicionalmente en cada llamada. SVG y Canvas2D no enlazan los `Animator` automáticamente: llama a `animator.bindToScene(scene)` antes de reproducir. `renderToSVGElement()` genera una instantánea DOM con listeners; no incluye un bucle de render persistente.
+
+`setSize(width, height)` cambia las dimensiones de WebGL y del composer, pero no la proyección de la cámara. Detén tu `requestAnimationFrame` y elimina tus listeners antes de llamar a `dispose()`.
+
+Three.js conserva la jerarquía padre-hijo y sincroniza matrices locales. Cada frame reconcilia altas, bajas y cambios de padre, limpia la interacción de nodos eliminados y elige una cámara restante o el fallback existente. Eliminación, remount y dispose() idempotente comparten la liberación de geometrías, materiales, texturas, skeletons, audio, mixers, passes y render targets propios. Los hooks liberan los recursos de plugins; las cargas pendientes no pueden adjuntar recursos tras su retirada.

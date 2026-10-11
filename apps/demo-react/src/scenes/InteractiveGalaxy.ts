@@ -62,7 +62,7 @@ export function createInteractiveGalaxyScene(params: ParamValues) {
     }
 
     return {
-        scene: svg as any,
+        scene: svg,
         animate: animate
     };
 }

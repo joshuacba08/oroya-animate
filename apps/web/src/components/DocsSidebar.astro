@@ -36,6 +36,8 @@ const docsSections: SidebarSection[] = [
     title: t('docs.reference'),
     items: [
       { slug: "api-reference", label: t('docs.sidebar.apiReference') },
+      { slug: "api-stability", label: locale === 'es' ? 'Estabilidad de API' : locale === 'ja' ? 'API の安定性' : 'API Stability' },
+      { slug: "migration-v1", label: locale === 'es' ? 'Migración a v1' : locale === 'ja' ? 'v1 への移行' : 'Migration to v1' },
     ],
   },
   {

@@ -1,6 +1,7 @@
 import { Component, ComponentType } from './Component';
 import { Vec3 } from './Transform';
 
+/** @public */
 export interface Particle {
     position: Vec3;
     velocity: Vec3;
@@ -10,6 +11,7 @@ export interface Particle {
     size: number;
 }
 
+/** @public */
 export interface ParticleSystemDef {
     maxParticles?: number;
     emissionRate?: number; // particles per second
@@ -22,6 +24,7 @@ export interface ParticleSystemDef {
     gravity?: Vec3;
 }
 
+/** @public */
 export class ParticleSystem extends Component {
     readonly type = ComponentType.ParticleSystem;
 

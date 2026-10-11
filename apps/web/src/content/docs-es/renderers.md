@@ -4,7 +4,6 @@ description: "Implementaciones en profundidad del renderer Three.js WebGL y SVG"
 order: 4
 category: "concepts"
 ---
-
 # Renderers
 
 Los renderers de Oroya Animate son **traductores** que convierten el scene graph agnóstico en salida visual. El core no conoce a los renderers — cada uno lee el scene graph y produce su propia representación.
@@ -29,7 +28,7 @@ graph TD
 
 | Aspecto | `ThreeRenderer` | `renderToSVG` |
 |---------|----------------|---------------|
-| **Paradigma** | Instancia con estado (class) | Función pura (stateless) |
+| **Paradigma** | Instancia con estado (class) | String o instantánea DOM |
 | **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
 | **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
 | **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
@@ -39,9 +38,7 @@ graph TD
 
 ## `@joroya/renderer-three` — Three.js (WebGL)
 
-El renderer Three.js es el backend WebGL del scene graph de Oroya. El código de aplicación crea nodos, componentes, cámaras, luces y materiales de Oroya; `ThreeRenderer` traduce esos objetos internamente a `THREE.Scene`, `THREE.Object3D`, `THREE.Mesh`, `THREE.Camera` y otros recursos de Three.js.
-
-Esto permite mantener la lógica de escena independiente de Three.js, usando Three.js para el trabajo de renderizado. Usa este backend cuando necesites 3D interactivo, assets glTF, sombras, post-processing, partículas, audio espacial, raycasting u otras capacidades WebGL. Si un proyecto necesita control de bajo nivel sobre Three.js, puedes usar plugins de renderer o código Three.js directo en ese punto específico.
+El renderer principal para visualización 3D interactiva.
 
 ### Setup
 
@@ -69,8 +66,8 @@ const renderer = new ThreeRenderer({
 
 | Método | Descripción |
 |--------|-------------|
-| `mount(scene)` | Conecta una escena, reconstruye los objetos Three.js y detecta la cámara activa |
-| `render(dt?)` | Ejecuta `scene.update(dt)`, sincroniza transforms, actualiza sistemas gestionados por el renderer y dibuja un frame |
+| `mount(scene)` | Conecta una escena. Reconstruye la escena Three.js, detecta la cámara activa, agrega luces |
+| `render()` | Sincroniza transforms, propaga matrices y dibuja un frame |
 | `dispose()` | Libera recursos WebGL |
 
 ### Ciclo de vida
@@ -83,14 +80,13 @@ sequenceDiagram
 
     Note over U,TS: Montaje
     U->>TR: mount(scene)
-    TR->>TS: clear scene
-    TR->>TR: traverse → create Mesh/Group/Camera/Light/etc. per node
+    TR->>TS: clear + add lights
+    TR->>TR: traverse → create Mesh/Group/Camera per node
     TR->>TR: Set first Camera as activeCamera
 
     Note over U,TS: Render loop
     loop requestAnimationFrame
-        U->>TR: render(dt)
-        TR->>TR: scene.update(dt)
+        U->>TR: render()
         TR->>TR: updateWorldMatrices()
         TR->>TS: sync worldMatrix → Three.js objects
         TR->>TR: webglRenderer.render()
@@ -102,30 +98,17 @@ sequenceDiagram
 | Nodo Oroya | Objeto Three.js |
 |------------|-----------------|
 | Node sin Geometry ni Camera | `THREE.Group` |
-| Node + `Geometry` de mesh soportada | `THREE.Mesh` con geometría Box/Sphere/Cylinder/Plane/Cone/Torus/Circle/Buffer/CSG |
-| Node + `Geometry` + `Skin` | `THREE.SkinnedMesh` con binding de skeleton después del montaje |
-| Node + `InstancedMesh` | `THREE.InstancedMesh` |
-| Node + `Geometry(Path2D)` / `Geometry(Text)` | Ignorado por el backend Three.js |
+| Node + `Geometry(Box)` | `THREE.Mesh(BoxGeometry)` |
+| Node + `Geometry(Sphere)` | `THREE.Mesh(SphereGeometry)` |
+| Node + `Geometry(Path2D)` | ❌ Ignorado |
 | Node + `Camera(Perspective)` | `THREE.PerspectiveCamera` |
-| Node + `Camera(Orthographic)` | `THREE.OrthographicCamera` |
-| Node + `Light` | Subclase de `THREE.Light` |
-| Node + `ParticleSystem` | `THREE.Points` |
-| Node + `AudioListener` / `AudioSource` | `THREE.AudioListener` / `THREE.PositionalAudio` |
 | `Material` con `color` | `MeshStandardMaterial({ color })` |
 | `Material` con `opacity < 1` | `MeshStandardMaterial({ transparent: true })` |
-| Campos PBR y texturas | `MeshStandardMaterial` con roughness/metalness/emissive/maps |
-| Sin `Material` | `MeshStandardMaterial` por defecto |
+| Sin `Material` | `MeshStandardMaterial({ color: 0xcccccc })` |
 
 ### Iluminación
 
-`ThreeRenderer` traduce componentes `Light` explícitos desde el scene graph. Agrega luces ambientales, direccionales, puntuales o spot para controlar la iluminación; no se inyectan luces por defecto.
-
-| Luz Oroya | Objeto Three.js |
-|-----------|-----------------|
-| `LightType.Ambient` | `THREE.AmbientLight` |
-| `LightType.Directional` | `THREE.DirectionalLight` con sombras y target opcionales |
-| `LightType.Point` | `THREE.PointLight` con sombras opcionales |
-| `LightType.Spot` | `THREE.SpotLight` con sombras, target, ángulo y penumbra opcionales |
+Añade componentes `Light` explícitos. No se inyectan luces por defecto; los materiales `MeshStandardMaterial` requieren iluminación. Se admiten luces Ambient, Directional, Point y Spot.
 
 ### Resolución de cámaras
 
@@ -141,47 +124,66 @@ flowchart TD
 
 ```typescript
 import {
-  Camera,
-  CameraType,
-  Material,
-  Node,
-  Scene,
-  createBox,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
+
 const scene = new Scene();
-
-const cam = new Node('cam');
-cam.addComponent(new Camera({
-  type: CameraType.Perspective, fov: 75,
-  aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000,
+const camera = new Node('camera');
+camera.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 60,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 100,
 }));
-cam.transform.position.z = 5;
-scene.add(cam);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-const box = new Node('box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: window.innerWidth, height: window.innerHeight,
+  canvas,
+  width: window.innerWidth,
+  height: window.innerHeight,
 });
 renderer.mount(scene);
 
-let angle = 0;
-
-function loop() {
-  angle += 0.01;
-  box.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
-  box.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(loop);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(loop);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ---
@@ -190,9 +192,9 @@ requestAnimationFrame(loop);
 
 Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
 
-### `renderToSVG` — String puro (server-safe)
+### `renderToSVG` — String SVG (server-safe)
 
-Función pura y stateless que retorna un string SVG. Funciona en Node.js sin DOM.
+Retorna un string SVG y actualiza la lógica de la escena. Funciona en Node.js sin DOM.
 
 ```typescript
 import { renderToSVG } from '@joroya/renderer-svg';
@@ -449,7 +451,7 @@ new Material({
   filter: {
     effects: [{
       type: 'dropShadow', dx: 4, dy: 4,
-      stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6,
+      stdDeviation: 2, floodColor: { r: 0.2, g: 0.2, b: 0.2 }, floodOpacity: 0.6,
     }],
   },
 });
@@ -483,7 +485,7 @@ new Material({
       { command: 'L', args: [80, 80] },
       { command: 'Z', args: [] },
     ],
-    fill: 'white',
+    fill: { r: 1, g: 1, b: 1 },
     opacity: 0.8,
   },
 });
@@ -678,3 +680,36 @@ export class Canvas2DRenderer {
 | 4 | Implementar `render()` — sincronizar transforms y dibujar |
 | 5 | Implementar `dispose()` — liberar recursos |
 | 6 | Documentar geometrías y materiales soportados |
+
+
+## `@joroya/renderer-canvas2d` — Canvas2D
+
+```ts
+import { renderToCanvas, CanvasRenderer } from '@joroya/renderer-canvas2d';
+
+renderToCanvas(scene, canvas, { width: 800, height: 600, dt: 0 });
+
+const renderer = new CanvasRenderer();
+renderer.mount(container, { width: 800, height: 600 });
+renderer.render(scene, { width: 800, height: 600, dt: 0 });
+renderer.unmount();
+```
+
+
+## Actualización por frame y escenas compartidas
+
+Todos los puntos de entrada oficiales llaman a `scene.update(dt)` y actualizan las matrices de mundo. Three.js recibe `render(dt)`; SVG y Canvas2D reciben `options.dt`. El valor por defecto es `1 / 60` de segundo. Generar un string SVG funciona en Node.js, pero modifica la lógica de la escena: no es una función pura.
+
+Para compartir una escena, avanza el tiempo con un solo renderer y usa `dt: 0` en los demás:
+
+```ts
+threeRenderer.render(dt);
+const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
+renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
+```
+
+`dt: 0` también llama a `onUpdate(0)`. Usa callbacks basados en tiempo, sin efectos que se ejecuten incondicionalmente en cada llamada. SVG y Canvas2D no enlazan los `Animator` automáticamente: llama a `animator.bindToScene(scene)` antes de reproducir. `renderToSVGElement()` genera una instantánea DOM con listeners; no incluye un bucle de render persistente.
+
+`setSize(width, height)` cambia las dimensiones de WebGL y del composer, pero no la proyección de la cámara. Detén tu `requestAnimationFrame` y elimina tus listeners antes de llamar a `dispose()`.
+
+Three.js conserva la jerarquía padre-hijo y sincroniza matrices locales. Cada frame reconcilia altas, bajas y cambios de padre, limpia la interacción de nodos eliminados y elige una cámara restante o el fallback existente. Eliminación, remount y dispose() idempotente comparten la liberación de geometrías, materiales, texturas, skeletons, audio, mixers, passes y render targets propios. Los hooks liberan los recursos de plugins; las cargas pendientes no pueden adjuntar recursos tras su retirada.

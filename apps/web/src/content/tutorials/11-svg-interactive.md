@@ -7,8 +7,8 @@ duration: "25 min"
 ---
 # Tutorial 11: SVG Interactivo
 
-> **Nivel:** Avanzado  
-> **Tiempo estimado:** 25 minutos  
+> **Nivel:** Avanzado\
+> **Tiempo estimado:** 25 minutos\
 > **Qué aprenderás:** Crear interfaces SVG interactivas con `renderToSVGElement`, el componente `Interactive` y event delegation sobre nodos del scene graph.
 
 ---
@@ -32,7 +32,7 @@ sequenceDiagram
     User->>SVG: click / hover / wheel
     SVG->>Oroya: dispatch InteractionEvent
     Oroya->>Handler: node.on('click', handler)
-    Note over Oroya: Event bubbling (hijo ↁEpadre)
+    Note over Oroya: Event bubbling (hijo → padre)
 ```
 
 ---
@@ -166,7 +166,7 @@ group.on('click', (e) => {
 
 ---
 
-## Paso 7: Grilla interactiva  Eejemplo completo
+## Paso 7: Grilla interactiva — ejemplo completo
 
 Un ejemplo práctico con múltiples elementos interactivos:
 
@@ -298,7 +298,7 @@ const result = renderToSVGElement(scene, {
 // Actualizar la referencia de dispose
 ```
 
-> **Nota:** A diferencia de Three.js (que re-renderiza en un loop), el SVG renderer es funcional  Ecada llamada genera un SVG nuevo. Para animaciones, usa el componente `Animation` (SVG nativo) o re-renderiza periódicamente.
+> **Nota:** A diferencia de Three.js (que re-renderiza en un loop), el SVG renderer es funcional — cada llamada genera un SVG nuevo. Para animaciones, usa el componente `Animation` (SVG nativo) o re-renderiza periódicamente.
 
 ---
 
@@ -333,6 +333,6 @@ Has completado todos los tutoriales de SVG. Ahora puedes:
 - Crear dashboards interactivos SVG con event delegation.
 - Usar `renderToSVG` en Node.js para server-side rendering.
 
-→ [Tutorial 12: Animación por Keyframes](./12-keyframe-animation.md) — AnimationMixer, KeyframeTrack e interpolación.
+→ [Tutorial 12: Animación por Keyframes](/tutorials/12-keyframe-animation) — AnimationMixer, KeyframeTrack e interpolación.
 
-ↁE[Volver al índice de tutoriales](./README.md)
+→ [Volver al índice de tutoriales](https://github.com/joshuacba08/oroya-animate/blob/main/docs/tutorials/README.md)

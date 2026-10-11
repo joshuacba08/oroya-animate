@@ -8,8 +8,9 @@ import { Node } from '../nodes/Node';
 export class Scene {
   readonly root: Node;
 
-  constructor() {
-    this.root = new Node('root');
+  constructor(root: Node = new Node('root')) {
+    if (root.parent) throw new Error('Scene root must not have a parent.');
+    this.root = root;
   }
 
   /**

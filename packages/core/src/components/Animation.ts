@@ -2,6 +2,7 @@ import { Component, ComponentType } from './Component';
 
 /**
  * Definition for an `<animate>` element that animates a single attribute.
+ * @public
  */
 export interface SvgAnimateDef {
   type: 'animate';
@@ -31,6 +32,7 @@ export interface SvgAnimateDef {
 
 /**
  * Definition for an `<animateTransform>` element.
+ * @public
  */
 export interface SvgAnimateTransformDef {
   type: 'animateTransform';
@@ -56,6 +58,7 @@ export interface SvgAnimateTransformDef {
 
 /**
  * A union of all SVG animation definition types.
+ * @public
  */
 export type SvgAnimationDef = SvgAnimateDef | SvgAnimateTransformDef;
 
@@ -72,6 +75,7 @@ export type SvgAnimationDef = SvgAnimateDef | SvgAnimateTransformDef;
  *   { type: 'animate', attributeName: 'r', from: '20', to: '30', dur: '1s', repeatCount: 'indefinite' }
  * ]));
  * ```
+ * @public
  */
 export class Animation extends Component {
   readonly type = ComponentType.Animation;

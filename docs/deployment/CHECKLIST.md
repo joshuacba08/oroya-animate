@@ -116,7 +116,9 @@ After NPM publishing, verify CDN availability:
 
 #### Option B: Manual
 - [ ] Build locally: `pnpm build:web`
-- [ ] Deploy: `vercel --prod`
+- [ ] Pass full CI and verify the PR preview
+- [ ] Merge to main; Actions deploys production
+- [ ] Verify the deployment commit, public domain and rollback result if verification fails
 - [ ] Get deployment URL
 - [ ] Test website functionality
 
@@ -202,7 +204,8 @@ pnpm publish:packages
 vercel ls
 
 # Rollback to previous
-vercel rollback oroya-animate --target DEPLOYMENT_URL
+# The deploy workflow rolls back to its captured previous deployment on failure.
+# Review the rollback step in GitHub Actions; see vercel-deployment.md.
 ```
 
 ### GitHub Release
@@ -245,5 +248,5 @@ After each release, document:
 
 ---
 
-**Last Updated:** 2026-02-16
+**Last Updated:** 2026-10-11
 **Template Version:** 1.0.0

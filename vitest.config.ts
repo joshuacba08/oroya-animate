@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config';
 const workspacePath = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
+  test: { exclude: ["**/node_modules/**", "**/dist/**", "tests/browser/**"] },
   resolve: {
     alias: {
       '@joroya/assets': workspacePath('./packages/assets/src/index.ts'),

@@ -18,13 +18,12 @@ export default tseslint.config(
             '**/node_modules/**',
             '**/.astro/**',
             '**/coverage/**',
-            'apps/**',                  // demos use loose typing during prototyping
             'packages/*/dist/**',
         ],
     },
     ...tseslint.configs.recommended,
     {
-        files: ['packages/*/src/**/*.ts'],
+        files: ['packages/*/src/**/*.{ts,tsx}', 'apps/*/src/**/*.{ts,tsx}'],
         rules: {
             '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/ban-ts-comment': ['error', {

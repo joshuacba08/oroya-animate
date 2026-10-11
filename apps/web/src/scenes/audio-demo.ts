@@ -14,22 +14,6 @@ import {
     ComponentType,
 } from "@joroya/core";
 
-// Short beep sound (base64 WAV)
-const BEEP_URL = "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU";
-// Note: The string above is truncated/invalid. I need a real one.
-// Let's use a simple looping noise or synth if possible, or just a valid short base64 wav.
-// This is a 1-second 440Hz sine wave (approximate, generated for testing)
-const SINE_WAVE = "data:audio/wav;base64,UklGRi4AAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; // Empty?
-
-// Let's us a placeholder and ask user to provide one if it fails, or just put a comment.
-// For now I will try to use a valid short beep.
-const VALID_BEEP = "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YXIGAACBhYqFbF1fdJivrJBhNjxWq3J4da2wsG45P12rdXp2rrGxbjk/Xat1enausbFuOT9dq3V6vq6xsG45P12rdXp2rrGxbjk/Xa=="; // Truncated again.
-
-// Okay, I will use a specific URL that is likely to exist or just a placeholder string 
-// and the user can replace it. Or I can use a silent buffer if it fails.
-// Actually, for the sake of the demo code correctness, the URL doesn't have to be valid 
-// for the code to compile. But for it to work, it needs to be valid.
-// I'll try to use a generic creative commons sound URL if I can, or just a marker.
 const SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3";
 // Mixkit free sample (GSM ringtone type beep).
 

@@ -107,7 +107,6 @@ function App() {
   // Create scene — rebuilds only when buildKey changes
   const { scene, animate } = useMemo(
     () => activeDemo.factory(paramsRef.current),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeDemo, buildKey],
   );
 
@@ -140,13 +139,13 @@ function App() {
       {/* Main canvas area */}
       <div style={mainAreaStyles}>
         {/* Renderer — Three.js canvas or SVG element */}
-        {activeDemo.renderer === 'svg' ? (
+        {activeDemo.renderer === 'svg' && 'root' in scene ? (
           <OroyaSvg
             key={`${activeId}-${buildKey}`}
             scene={scene}
             onAnimate={onAnimate}
           />
-        ) : activeDemo.renderer === 'svjs' ? (
+        ) : activeDemo.renderer === 'svjs' && 'element' in scene ? (
           <OroyaSvJs
             key={`${activeId}-${buildKey}`}
             scene={scene}
@@ -155,7 +154,7 @@ function App() {
         ) : (
           <OroyaCanvas
             key={`${activeId}-${buildKey}`}
-            scene={scene}
+            scene={scene as import('@joroya/core').Scene}
             onAnimate={onAnimate}
           />
         )}

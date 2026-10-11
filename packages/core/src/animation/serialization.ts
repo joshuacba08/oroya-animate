@@ -1,6 +1,7 @@
 import type { AnimationClip, KeyframeEvent } from './AnimationClip';
 import type { InterpolationMode, KeyframeTrack } from './KeyframeTrack';
 
+/** @public */
 export interface SerializedKeyframeTrack {
     targetNodeName: string;
     property: KeyframeTrack['property'];
@@ -9,6 +10,7 @@ export interface SerializedKeyframeTrack {
     interpolation: InterpolationMode;
 }
 
+/** @public */
 export interface SerializedAnimationClip {
     schemaVersion: 1;
     name: string;
@@ -17,7 +19,8 @@ export interface SerializedAnimationClip {
     events?: KeyframeEvent[];
 }
 
-/** Convert typed arrays into a JSON-safe, versioned authoring contract. */
+/** Convert typed arrays into a JSON-safe, versioned authoring contract. * @public
+ */
 export function serializeAnimationClip(clip: AnimationClip): SerializedAnimationClip {
     return {
         schemaVersion: 1,
@@ -34,7 +37,8 @@ export function serializeAnimationClip(clip: AnimationClip): SerializedAnimation
     };
 }
 
-/** Restore fresh `Float32Array` instances and reject malformed persisted clips. */
+/** Restore fresh `Float32Array` instances and reject malformed persisted clips. * @public
+ */
 export function deserializeAnimationClip(serialized: SerializedAnimationClip): AnimationClip {
     if (serialized.schemaVersion !== 1) {
         throw new Error(`Unsupported animation clip schema version: ${String(serialized.schemaVersion)}`);

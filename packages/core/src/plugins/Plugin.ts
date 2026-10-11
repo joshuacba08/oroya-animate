@@ -14,6 +14,7 @@ import type { Node } from '../nodes/Node';
  * renderer adapts its own `BackendObject` (e.g. `THREE.Object3D` for the
  * Three.js backend, a SVG element for the SVG backend). Plugins targeting
  * a specific backend declare it via the generic.
+ * @experimental
  */
 export interface ComponentHandler<BackendObject = unknown> {
     /** The component type this handler responds to. */
@@ -44,6 +45,7 @@ export interface ComponentHandler<BackendObject = unknown> {
  *
  * Plugins remain valid across `renderer.mount()` calls — they are owned
  * by the plugin host (the renderer or scene), not by the scene graph.
+ * @experimental
  */
 export interface Plugin {
     /** Human-readable plugin identifier. Used for telemetry / debug. */
@@ -71,6 +73,7 @@ export class PluginRegistry {
 
     /** Register a plugin and its handlers. Returns the plugin for chaining. */
     register(plugin: Plugin): Plugin {
+        if (this.plugins.includes(plugin)) return plugin;
         this.plugins.push(plugin);
         if (plugin.handlers) {
             for (const h of plugin.handlers) {

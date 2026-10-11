@@ -1,6 +1,7 @@
 import { Component, ComponentType } from './Component';
 import { Vec3 } from './Transform';
 
+/** @public */
 export enum ColliderShape {
     Box = 'Box',
     Sphere = 'Sphere',
@@ -8,6 +9,7 @@ export enum ColliderShape {
     Cylinder = 'Cylinder'
 }
 
+/** @public */
 export interface ColliderDef {
     shape: ColliderShape;
     /** Box half-extents. */
@@ -45,6 +47,7 @@ export interface ColliderDef {
     collisionMask?: number;
 }
 
+/** @public */
 export class Collider extends Component {
     readonly type = ComponentType.Collider;
 

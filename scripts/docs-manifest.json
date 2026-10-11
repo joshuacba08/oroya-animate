@@ -1,0 +1,401 @@
+[
+  {
+    "locale": "en",
+    "topic": "getting-started",
+    "source": "docs/getting-started.md",
+    "target": "apps/web/src/content/docs/getting-started.md",
+    "route": "/docs/getting-started"
+  },
+  {
+    "locale": "en",
+    "topic": "renderers",
+    "source": "docs/renderers.md",
+    "target": "apps/web/src/content/docs/renderers.md",
+    "route": "/docs/renderers"
+  },
+  {
+    "locale": "en",
+    "topic": "serialization",
+    "source": "docs/serialization.md",
+    "target": "apps/web/src/content/docs/serialization.md",
+    "route": "/docs/serialization"
+  },
+  {
+    "locale": "en",
+    "topic": "architecture",
+    "source": "docs/architecture.md",
+    "target": "apps/web/src/content/docs/architecture.md",
+    "route": "/docs/architecture"
+  },
+  {
+    "locale": "en",
+    "topic": "scene-graph",
+    "source": "docs/scene-graph.md",
+    "target": "apps/web/src/content/docs/scene-graph.md",
+    "route": "/docs/scene-graph"
+  },
+  {
+    "locale": "es",
+    "topic": "getting-started",
+    "source": "docs/getting-started-es.md",
+    "target": "apps/web/src/content/docs-es/getting-started.md",
+    "route": "/es/docs/getting-started"
+  },
+  {
+    "locale": "es",
+    "topic": "renderers",
+    "source": "docs/renderers-es.md",
+    "target": "apps/web/src/content/docs-es/renderers.md",
+    "route": "/es/docs/renderers"
+  },
+  {
+    "locale": "es",
+    "topic": "serialization",
+    "source": "docs/serialization-es.md",
+    "target": "apps/web/src/content/docs-es/serialization.md",
+    "route": "/es/docs/serialization"
+  },
+  {
+    "locale": "es",
+    "topic": "architecture",
+    "source": "docs/architecture-es.md",
+    "target": "apps/web/src/content/docs-es/architecture.md",
+    "route": "/es/docs/architecture"
+  },
+  {
+    "locale": "es",
+    "topic": "scene-graph",
+    "source": "docs/scene-graph-es.md",
+    "target": "apps/web/src/content/docs-es/scene-graph.md",
+    "route": "/es/docs/scene-graph"
+  },
+  {
+    "locale": "ja",
+    "topic": "getting-started",
+    "source": "docs/getting-started-ja.md",
+    "target": "apps/web/src/content/docs-ja/getting-started.md",
+    "route": "/ja/docs/getting-started"
+  },
+  {
+    "locale": "ja",
+    "topic": "renderers",
+    "source": "docs/renderers-ja.md",
+    "target": "apps/web/src/content/docs-ja/renderers.md",
+    "route": "/ja/docs/renderers"
+  },
+  {
+    "locale": "ja",
+    "topic": "serialization",
+    "source": "docs/serialization-ja.md",
+    "target": "apps/web/src/content/docs-ja/serialization.md",
+    "route": "/ja/docs/serialization"
+  },
+  {
+    "locale": "ja",
+    "topic": "architecture",
+    "source": "docs/architecture-ja.md",
+    "target": "apps/web/src/content/docs-ja/architecture.md",
+    "route": "/ja/docs/architecture"
+  },
+  {
+    "locale": "ja",
+    "topic": "scene-graph",
+    "source": "docs/scene-graph-ja.md",
+    "target": "apps/web/src/content/docs-ja/scene-graph.md",
+    "route": "/ja/docs/scene-graph"
+  },
+  {
+    "locale": "en",
+    "topic": "contributing",
+    "source": "docs/contributing.md",
+    "target": "apps/web/src/content/docs/contributing.md",
+    "route": "/docs/contributing"
+  },
+  {
+    "locale": "en",
+    "topic": "api-stability",
+    "source": "docs/api-stability.md",
+    "target": "apps/web/src/content/docs/api-stability.md",
+    "route": "/docs/api-stability"
+  },
+  {
+    "locale": "en",
+    "topic": "migration-v1",
+    "source": "docs/migration-v1.md",
+    "target": "apps/web/src/content/docs/migration-v1.md",
+    "route": "/docs/migration-v1"
+  },
+  {
+    "locale": "en",
+    "topic": "api-reference",
+    "source": "docs/api-reference.md",
+    "target": "apps/web/src/content/docs/api-reference.md",
+    "route": "/docs/api-reference"
+  },
+  {
+    "locale": "en",
+    "topic": "programming-principles",
+    "source": "docs/programming-principles.md",
+    "target": "apps/web/src/content/docs/programming-principles.md",
+    "route": "/docs/programming-principles"
+  },
+  {
+    "locale": "en",
+    "topic": "hello-cube",
+    "source": "docs/tutorials/01-hello-cube.md",
+    "target": "apps/web/src/content/tutorials/01-hello-cube.md",
+    "route": "/tutorials/01-hello-cube"
+  },
+  {
+    "locale": "en",
+    "topic": "color-palette",
+    "source": "docs/tutorials/02-color-palette.md",
+    "target": "apps/web/src/content/tutorials/02-color-palette.md",
+    "route": "/tutorials/02-color-palette"
+  },
+  {
+    "locale": "en",
+    "topic": "save-load-scenes",
+    "source": "docs/tutorials/03-save-load-scenes.md",
+    "target": "apps/web/src/content/tutorials/03-save-load-scenes.md",
+    "route": "/tutorials/03-save-load-scenes"
+  },
+  {
+    "locale": "en",
+    "topic": "solar-system",
+    "source": "docs/tutorials/04-solar-system.md",
+    "target": "apps/web/src/content/tutorials/04-solar-system.md",
+    "route": "/tutorials/04-solar-system"
+  },
+  {
+    "locale": "en",
+    "topic": "svg-generative-art",
+    "source": "docs/tutorials/05-svg-generative-art.md",
+    "target": "apps/web/src/content/tutorials/05-svg-generative-art.md",
+    "route": "/tutorials/05-svg-generative-art"
+  },
+  {
+    "locale": "en",
+    "topic": "cameras-viewpoints",
+    "source": "docs/tutorials/06-cameras-viewpoints.md",
+    "target": "apps/web/src/content/tutorials/06-cameras-viewpoints.md",
+    "route": "/tutorials/06-cameras-viewpoints"
+  },
+  {
+    "locale": "en",
+    "topic": "procedural-city",
+    "source": "docs/tutorials/07-procedural-city.md",
+    "target": "apps/web/src/content/tutorials/07-procedural-city.md",
+    "route": "/tutorials/07-procedural-city"
+  },
+  {
+    "locale": "en",
+    "topic": "multi-renderer",
+    "source": "docs/tutorials/08-multi-renderer.md",
+    "target": "apps/web/src/content/tutorials/08-multi-renderer.md",
+    "route": "/tutorials/08-multi-renderer"
+  },
+  {
+    "locale": "en",
+    "topic": "svg-gradients-filters",
+    "source": "docs/tutorials/09-svg-gradients-filters.md",
+    "target": "apps/web/src/content/tutorials/09-svg-gradients-filters.md",
+    "route": "/tutorials/09-svg-gradients-filters"
+  },
+  {
+    "locale": "en",
+    "topic": "svg-animations",
+    "source": "docs/tutorials/10-svg-animations.md",
+    "target": "apps/web/src/content/tutorials/10-svg-animations.md",
+    "route": "/tutorials/10-svg-animations"
+  },
+  {
+    "locale": "en",
+    "topic": "svg-interactive",
+    "source": "docs/tutorials/11-svg-interactive.md",
+    "target": "apps/web/src/content/tutorials/11-svg-interactive.md",
+    "route": "/tutorials/11-svg-interactive"
+  },
+  {
+    "locale": "en",
+    "topic": "keyframe-animation",
+    "source": "docs/tutorials/12-keyframe-animation.md",
+    "target": "apps/web/src/content/tutorials/12-keyframe-animation.md",
+    "route": "/tutorials/12-keyframe-animation"
+  },
+  {
+    "locale": "en",
+    "topic": "3d-interactivity",
+    "source": "docs/tutorials/13-3d-interactivity.md",
+    "target": "apps/web/src/content/tutorials/13-3d-interactivity.md",
+    "route": "/tutorials/13-3d-interactivity"
+  },
+  {
+    "locale": "en",
+    "topic": "orbit-controls",
+    "source": "docs/tutorials/14-orbit-controls.md",
+    "target": "apps/web/src/content/tutorials/14-orbit-controls.md",
+    "route": "/tutorials/14-orbit-controls"
+  },
+  {
+    "locale": "en",
+    "topic": "physics-basics",
+    "source": "docs/tutorials/15-physics-basics.md",
+    "target": "apps/web/src/content/tutorials/15-physics-basics.md",
+    "route": "/tutorials/15-physics-basics"
+  },
+  {
+    "locale": "en",
+    "topic": "animator-clips",
+    "source": "docs/tutorials/16-animator-clips.md",
+    "target": "apps/web/src/content/tutorials/16-animator-clips.md",
+    "route": "/tutorials/16-animator-clips"
+  },
+  {
+    "locale": "en",
+    "topic": "react-bindings",
+    "source": "docs/tutorials/17-react-bindings.md",
+    "target": "apps/web/src/content/tutorials/17-react-bindings.md",
+    "route": "/tutorials/17-react-bindings"
+  },
+  {
+    "locale": "en",
+    "topic": "plugins-and-extensibility",
+    "source": "docs/tutorials/18-plugins-and-extensibility.md",
+    "target": "apps/web/src/content/tutorials/18-plugins-and-extensibility.md",
+    "route": "/tutorials/18-plugins-and-extensibility"
+  },
+  {
+    "locale": "en",
+    "topic": "developer-tools",
+    "source": "docs/tutorials/19-developer-tools.md",
+    "target": "apps/web/src/content/tutorials/19-developer-tools.md",
+    "route": "/tutorials/19-developer-tools"
+  },
+  {
+    "locale": "en",
+    "topic": "visual-editor",
+    "source": "docs/tutorials/20-visual-editor.md",
+    "target": "apps/web/src/content/tutorials/20-visual-editor.md",
+    "route": "/tutorials/20-visual-editor"
+  },
+  {
+    "locale": "es",
+    "topic": "physics-basics",
+    "source": "docs/tutorials/es/15-physics-basics.md",
+    "target": "apps/web/src/content/tutorials-es/15-physics-basics.md",
+    "route": "/es/tutorials/15-physics-basics"
+  },
+  {
+    "locale": "es",
+    "topic": "animator-clips",
+    "source": "docs/tutorials/es/16-animator-clips.md",
+    "target": "apps/web/src/content/tutorials-es/16-animator-clips.md",
+    "route": "/es/tutorials/16-animator-clips"
+  },
+  {
+    "locale": "es",
+    "topic": "react-bindings",
+    "source": "docs/tutorials/es/17-react-bindings.md",
+    "target": "apps/web/src/content/tutorials-es/17-react-bindings.md",
+    "route": "/es/tutorials/17-react-bindings"
+  },
+  {
+    "locale": "es",
+    "topic": "plugins-and-extensibility",
+    "source": "docs/tutorials/es/18-plugins-and-extensibility.md",
+    "target": "apps/web/src/content/tutorials-es/18-plugins-and-extensibility.md",
+    "route": "/es/tutorials/18-plugins-and-extensibility"
+  },
+  {
+    "locale": "es",
+    "topic": "developer-tools",
+    "source": "docs/tutorials/es/19-developer-tools.md",
+    "target": "apps/web/src/content/tutorials-es/19-developer-tools.md",
+    "route": "/es/tutorials/19-developer-tools"
+  },
+  {
+    "locale": "es",
+    "topic": "visual-editor",
+    "source": "docs/tutorials/es/20-visual-editor.md",
+    "target": "apps/web/src/content/tutorials-es/20-visual-editor.md",
+    "route": "/es/tutorials/20-visual-editor"
+  },
+  {
+    "locale": "ja",
+    "topic": "physics-basics",
+    "source": "docs/tutorials/ja/15-physics-basics.md",
+    "target": "apps/web/src/content/tutorials-ja/15-physics-basics.md",
+    "route": "/ja/tutorials/15-physics-basics"
+  },
+  {
+    "locale": "ja",
+    "topic": "animator-clips",
+    "source": "docs/tutorials/ja/16-animator-clips.md",
+    "target": "apps/web/src/content/tutorials-ja/16-animator-clips.md",
+    "route": "/ja/tutorials/16-animator-clips"
+  },
+  {
+    "locale": "ja",
+    "topic": "react-bindings",
+    "source": "docs/tutorials/ja/17-react-bindings.md",
+    "target": "apps/web/src/content/tutorials-ja/17-react-bindings.md",
+    "route": "/ja/tutorials/17-react-bindings"
+  },
+  {
+    "locale": "ja",
+    "topic": "plugins-and-extensibility",
+    "source": "docs/tutorials/ja/18-plugins-and-extensibility.md",
+    "target": "apps/web/src/content/tutorials-ja/18-plugins-and-extensibility.md",
+    "route": "/ja/tutorials/18-plugins-and-extensibility"
+  },
+  {
+    "locale": "ja",
+    "topic": "developer-tools",
+    "source": "docs/tutorials/ja/19-developer-tools.md",
+    "target": "apps/web/src/content/tutorials-ja/19-developer-tools.md",
+    "route": "/ja/tutorials/19-developer-tools"
+  },
+  {
+    "locale": "ja",
+    "topic": "visual-editor",
+    "source": "docs/tutorials/ja/20-visual-editor.md",
+    "target": "apps/web/src/content/tutorials-ja/20-visual-editor.md",
+    "route": "/ja/tutorials/20-visual-editor"
+  },
+  {
+    "locale": "en",
+    "topic": "canvas2d-renderer",
+    "source": "docs/tutorials/15-canvas2d-renderer.md",
+    "target": "apps/web/src/content/tutorials/15-canvas2d-renderer.md",
+    "route": "/tutorials/15-canvas2d-renderer"
+  },
+  {
+    "locale": "en",
+    "topic": "gltf-loader",
+    "source": "docs/tutorials/16-gltf-loader.md",
+    "target": "apps/web/src/content/tutorials/16-gltf-loader.md",
+    "route": "/tutorials/16-gltf-loader"
+  },
+  {
+    "locale": "en",
+    "topic": "boolean-csg",
+    "source": "docs/tutorials/17-boolean-csg.md",
+    "target": "apps/web/src/content/tutorials/17-boolean-csg.md",
+    "route": "/tutorials/17-boolean-csg"
+  },
+  {
+    "locale": "en",
+    "topic": "lighting",
+    "source": "docs/tutorials/18-lighting.md",
+    "target": "apps/web/src/content/tutorials/18-lighting.md",
+    "route": "/tutorials/18-lighting"
+  },
+  {
+    "locale": "en",
+    "topic": "cubic-spline",
+    "source": "docs/tutorials/19-cubic-spline.md",
+    "target": "apps/web/src/content/tutorials/19-cubic-spline.md",
+    "route": "/tutorials/19-cubic-spline"
+  }
+]

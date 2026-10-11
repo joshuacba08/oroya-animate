@@ -67,6 +67,7 @@ export class ThreeRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene: THREE.Scene;
   private activeCamera: THREE.Camera | null = null;
+  private fallbackCamera: THREE.Camera | null = null;
   private oroyaScene: OroyaScene | null = null;
   private orbitControls: OrbitControlsWrapper | null = null;
   private nodeMap: Map<string, THREE.Object3D> = new Map();
@@ -92,6 +93,10 @@ export class ThreeRenderer {
   private readonly audioCache = new Map<string, AudioBuffer>();
   private audioListener: THREE.AudioListener | null = null;
   private mixers: THREE.AnimationMixer[] = [];
+  private disposed = false;
+  private generation = 0;
+  private readonly released = new WeakSet<object>();
+  private readonly retiredObjects = new WeakSet<THREE.Object3D>();
 
   // Skinned-mesh bindings queued during the create-objects pass, resolved
   // after every Oroya node has a corresponding `THREE.Object3D` so the
@@ -104,7 +109,7 @@ export class ThreeRenderer {
   private readonly plugins = new PluginRegistry();
   // Plugin-managed backend objects keyed by node id so we can call
   // `handler.update(node, obj, dt)` per frame and `dispose` on rebuild.
-  private readonly pluginObjects = new Map<string, { handler: import('@joroya/core').ComponentHandler<THREE.Object3D>; obj: THREE.Object3D }>();
+  private readonly pluginObjects = new Map<string, { handler: import('@joroya/core').ComponentHandler<THREE.Object3D>; obj: THREE.Object3D; node: OroyaNode }>();
 
   constructor(options: ThreeRendererOptions) {
     this.canvas = options.canvas;
@@ -128,7 +133,10 @@ export class ThreeRenderer {
   // ── Public API ────────────────────────────────────────────
 
   mount(oroyaScene: OroyaScene) {
+    if (this.disposed) throw new Error('Cannot mount a disposed ThreeRenderer.');
+    this.releaseScene();
     this.oroyaScene = oroyaScene;
+    this.composer ??= new EffectComposer(this.renderer);
     this.rebuildScene();
   }
 
@@ -143,18 +151,25 @@ export class ThreeRenderer {
    * make existing nodes pick it up.
    */
   usePlugin(plugin: Plugin): void {
+    if (this.disposed) throw new Error("Cannot install a plugin on a disposed renderer.");
     this.plugins.register(plugin);
   }
 
   /** Remove a previously installed plugin. */
   removePlugin(plugin: Plugin): void {
+    const handlers = new Set(plugin.handlers ?? []);
+    this.releaseNodes([...this.pluginObjects].filter(([, entry]) => handlers.has(entry.handler)).map(([id]) => id));
     this.plugins.unregister(plugin);
+    this.reconcileScene();
   }
 
   /**
    * Apply environment settings (background, fog, ambient light) from the scene.
    */
   private applyEnvironment(oroyaScene: OroyaScene): void {
+    const previousBackground = this.scene.background;
+    this.scene.background = null;
+    this.scene.fog = null;
     // Find Environment component in scene
     let envNode: OroyaNode | null = null;
     oroyaScene.traverse((node) => {
@@ -167,6 +182,7 @@ export class ThreeRenderer {
       // Clear environment if none found
       this.scene.background = null;
       this.scene.fog = null;
+      this.releaseUnusedBackground(previousBackground);
       return;
     }
 
@@ -202,6 +218,18 @@ export class ThreeRenderer {
         );
       }
     }
+    this.releaseUnusedBackground(previousBackground);
+  }
+
+  private releaseUnusedBackground(previous: THREE.Texture | THREE.Color | null): void {
+    if (!(previous instanceof THREE.Texture) || previous === this.scene.background || previous === this.scene.environment) return;
+    for (const [id, object] of this.nodeMap) {
+      if (!this.pluginObjects.has(id) && this.resourcesOf(object).has(previous)) return;
+    }
+    this.releaseResource(previous);
+    for (const [url, texture] of this.textureCache) {
+      if (texture === previous) this.textureCache.delete(url);
+    }
   }
 
   /**
@@ -214,7 +242,7 @@ export class ThreeRenderer {
    *           (back-compat for synchronous "draw a still" callers).
    */
   render(dt: number = 1 / 60) {
-    if (!this.oroyaScene || !this.activeCamera) return;
+    if (this.disposed || !this.oroyaScene) return;
 
     // Tick scene logic FIRST. This advances Animator components (which mutate
     // node.transform via the core AnimationMixer) and any user-attached
@@ -223,29 +251,12 @@ export class ThreeRenderer {
 
     this.applyEnvironment(this.oroyaScene);
     this.oroyaScene.updateWorldMatrices();
+    this.reconcileScene();
 
     this.oroyaScene.root.traverse((oroyaNode) => {
-      let threeObject = this.nodeMap.get(oroyaNode.id);
-
-      // Dynamically create Three.js objects for nodes added after mount()
-      if (!threeObject) {
-        const newObj = this.createThreeObject(oroyaNode);
-        if (newObj) {
-          threeObject = newObj;
-          this.nodeMap.set(oroyaNode.id, threeObject);
-          this.reverseNodeMap.set(threeObject, oroyaNode);
-
-          const parentThreeObject = oroyaNode.parent
-            ? this.nodeMap.get(oroyaNode.parent.id)
-            : this.scene;
-          (parentThreeObject ?? this.scene).add(threeObject);
-        }
-      }
+      const threeObject = this.nodeMap.get(oroyaNode.id);
 
       if (threeObject) {
-        threeObject.matrix.fromArray(oroyaNode.transform.worldMatrix);
-        threeObject.matrix.decompose(threeObject.position, threeObject.quaternion, threeObject.scale);
-
         // Sync material properties (color, opacity) every frame
         if (threeObject instanceof THREE.Mesh && oroyaNode.hasComponent(ComponentType.Material)) {
           const oroyaMat = oroyaNode.getComponent<OroyaMaterial>(ComponentType.Material)!;
@@ -297,8 +308,18 @@ export class ThreeRenderer {
     // Update orbit controls if enabled
     if (this.orbitControls) {
       this.orbitControls.update();
+      if (this.activeCamera) {
+        this.activeCamera.updateMatrix();
+        const cameraNode = this.reverseNodeMap.get(this.activeCamera);
+        if (cameraNode) {
+          cameraNode.transform.setPosition(this.activeCamera.position);
+          cameraNode.transform.setRotation(this.activeCamera.quaternion);
+          cameraNode.transform.setScale(this.activeCamera.scale);
+        }
+      }
     }
 
+    this.scene.updateMatrixWorld(true);
     this.updateParticleSystems();
 
     // THREE.AnimationMixer is reserved for skeletal / morph-target animation
@@ -325,7 +346,7 @@ export class ThreeRenderer {
     if (ppDef && this.composer) {
       this.renderPostFX(ppDef);
     } else {
-      this.renderer.render(this.scene, this.activeCamera);
+      if (this.activeCamera) this.renderer.render(this.scene, this.activeCamera);
     }
   }
 
@@ -349,6 +370,7 @@ export class ThreeRenderer {
     // RenderPass (always first; rebind scene/camera in case they changed)
     const firstPass = this.composer.passes[0];
     if (!(firstPass instanceof RenderPass)) {
+      for (const pass of this.composer.passes) this.releaseResource(pass);
       this.composer.passes = [];
       this.composer.addPass(new RenderPass(this.scene, this.activeCamera));
     } else {
@@ -470,7 +492,7 @@ export class ThreeRenderer {
    * Call after `mount()`.
    */
   enableInteraction(): void {
-    if (this.interactionEnabled) return;
+    if (this.disposed || this.interactionEnabled) return;
     this.interactionEnabled = true;
 
     this.abortController = new AbortController();
@@ -515,18 +537,146 @@ export class ThreeRenderer {
     this.orbitControls = null;
   }
 
-  dispose() {
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.disableInteraction();
-    this.disableOrbitControls();
-
-    // Stop all audio
-    if (this.audioListener && this.audioListener.context.state !== 'closed') {
-      try {
-        this.audioListener.context.suspend();
-      } catch { }
+    this.releaseScene();
+    this.plugins.dispose();
+    if (this.composer) {
+      this.releaseResource(this.composer);
+      this.composer = null;
     }
-
     this.renderer.dispose();
+  }
+
+  private releaseResource(resource: { dispose(): void }): void {
+    if (this.released.has(resource)) return;
+    this.released.add(resource);
+    resource.dispose();
+  }
+
+  /** Collect only renderer-owned descendants; node/plugin subtrees own themselves. */
+  private resourcesOf(object: THREE.Object3D): Set<{ dispose(): void }> {
+    const resources = new Set<{ dispose(): void }>();
+    const visit = (obj: THREE.Object3D) => {
+      if (obj !== object && this.reverseNodeMap.has(obj)) return;
+      if (obj instanceof THREE.Mesh || obj instanceof THREE.Points || obj instanceof THREE.Line) {
+        resources.add(obj.geometry);
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const material of materials) {
+          resources.add(material);
+          for (const value of Object.values(material)) {
+            if (value instanceof THREE.Texture) resources.add(value);
+          }
+        }
+      }
+      if (obj instanceof THREE.SkinnedMesh && obj.skeleton) resources.add(obj.skeleton);
+      if (obj instanceof THREE.Light && 'shadow' in obj) {
+        const light = obj as THREE.DirectionalLight | THREE.PointLight | THREE.SpotLight;
+        if (light.shadow) resources.add(light.shadow);
+      }
+      for (const child of obj.children) visit(child);
+    };
+    visit(object);
+    return resources;
+  }
+
+  private releaseNodes(ids: string[]): void {
+    if (ids.length === 0) return;
+    const removed = new Set(ids);
+    const retained = new Set<{ dispose(): void }>();
+    for (const [id, object] of this.nodeMap) {
+      if (!removed.has(id) && !this.pluginObjects.has(id)) {
+        for (const resource of this.resourcesOf(object)) retained.add(resource);
+      }
+    }
+    if (this.scene.background instanceof THREE.Texture) retained.add(this.scene.background);
+    if (this.scene.environment instanceof THREE.Texture) retained.add(this.scene.environment);
+    const resources = new Set<{ dispose(): void }>();
+    for (const id of ids) {
+      const object = this.nodeMap.get(id);
+      if (!object) continue;
+      const node = this.reverseNodeMap.get(object);
+      node?.getComponent<OroyaAnimator>(ComponentType.Animator)?.unbindFromScene();
+      const plugin = this.pluginObjects.get(id);
+      if (plugin) {
+        plugin.handler.dispose?.(plugin.node, plugin.obj);
+        this.pluginObjects.delete(id);
+      } else {
+        for (const resource of this.resourcesOf(object)) resources.add(resource);
+        const stopAudio = (child: THREE.Object3D): void => {
+          if (child !== object && this.reverseNodeMap.has(child)) return;
+          if (child instanceof THREE.Audio) {
+            this.retiredObjects.add(child);
+            if (child.isPlaying) child.stop();
+            child.disconnect();
+            child.gain.disconnect();
+          }
+          for (const descendant of child.children) stopAudio(descendant);
+        };
+        stopAudio(object);
+      }
+      this.retiredObjects.add(object);
+      if (object === this.audioListener) {
+        this.audioListener.gain.disconnect();
+        this.audioListener = null;
+      }
+      if (node === this.hoveredNode) {
+        this.hoveredNode = null;
+        this.canvas.style.cursor = '';
+      }
+      this.reverseNodeMap.delete(object);
+      this.nodeMap.delete(id);
+      object.removeFromParent();
+    }
+    for (const resource of resources) {
+      if (!retained.has(resource)) {
+        this.releaseResource(resource);
+        if (resource instanceof THREE.Texture) {
+          for (const [url, texture] of this.textureCache) {
+            if (texture === resource) this.textureCache.delete(url);
+          }
+        }
+      }
+    }
+    this.mixers = this.mixers.filter((mixer) => {
+      const root = mixer.getRoot();
+      if (root instanceof THREE.Object3D && !this.retiredObjects.has(root)) return true;
+      mixer.stopAllAction();
+      mixer.uncacheRoot(root);
+      return false;
+    });
+  }
+
+  private releaseScene(): void {
+    this.generation++;
+    this.disableOrbitControls();
+    this.scene.background = null;
+    this.scene.environment = null;
+    this.releaseNodes([...this.nodeMap.keys()]);
+    for (const texture of this.textureCache.values()) this.releaseResource(texture);
+    this.textureCache.clear();
+    this.audioCache.clear();
+    if (this.audioListener) {
+      this.audioListener.gain.disconnect();
+      this.audioListener = null;
+    }
+    for (const mixer of this.mixers) {
+      mixer.stopAllAction();
+      mixer.uncacheRoot(mixer.getRoot());
+    }
+    this.mixers = [];
+    this.pendingSkinBindings = [];
+    for (const pass of this.composer?.passes ?? []) this.releaseResource(pass);
+    if (this.composer) {
+      this.composer.passes = [];
+      if (this.oroyaScene) { this.releaseResource(this.composer); this.composer = null; }
+    }
+    this.scene.clear();
+    this.activeCamera = null;
+    this.fallbackCamera = null;
+    this.oroyaScene = null;
   }
 
   // ── Raycasting ────────────────────────────────────────────
@@ -664,47 +814,57 @@ export class ThreeRenderer {
   private rebuildScene() {
     if (!this.oroyaScene) return;
 
-    // Tear down any plugin-managed objects from a previous mount before
-    // we wipe the scene tree — plugins may own GPU resources that need
-    // explicit disposal.
-    for (const [nodeId, entry] of this.pluginObjects) {
-      const node = this.oroyaScene?.findNodeById(nodeId);
-      if (node && entry.handler.dispose) entry.handler.dispose(node, entry.obj);
-    }
-    this.pluginObjects.clear();
+    this.oroyaScene.updateWorldMatrices();
+    this.reconcileScene();
+  }
 
-    this.scene.clear();
-    this.nodeMap.clear();
-    this.reverseNodeMap.clear();
-    this.mixers = [];
-    this.pendingSkinBindings = [];
-    this.activeCamera = null;
-
-    this.oroyaScene.root.traverse((oroyaNode) => {
-      const threeObject = this.createThreeObject(oroyaNode);
-      if (threeObject) {
-        this.nodeMap.set(oroyaNode.id, threeObject);
-        this.reverseNodeMap.set(threeObject, oroyaNode);
-
-        const parentThreeObject = oroyaNode.parent ? this.nodeMap.get(oroyaNode.parent.id) : this.scene;
-        parentThreeObject?.add(threeObject);
-
-        if (threeObject instanceof THREE.Camera && !this.activeCamera) {
-          this.activeCamera = threeObject;
-        }
+  private reconcileScene(): void {
+    if (!this.oroyaScene) return;
+    const live = new Map<string, OroyaNode>();
+    this.oroyaScene.traverse((node) => live.set(node.id, node));
+    this.releaseNodes([...this.nodeMap.keys()].filter((id) => !live.has(id)
+      || this.reverseNodeMap.get(this.nodeMap.get(id)!) !== live.get(id)));
+    for (const node of live.values()) {
+      let object = this.nodeMap.get(node.id);
+      if (!object) {
+        object = this.createThreeObject(node) ?? undefined;
+        if (!object) continue;
+        this.nodeMap.set(node.id, object);
+        this.reverseNodeMap.set(object, node);
       }
-    });
-
-    // Skinned meshes can only bind once every bone Object3D exists in
-    // `nodeMap` — defer the bind here so forward references work.
-    this.resolveSkinBindings();
-
-    if (!this.activeCamera) {
-      const defaultCamera = new THREE.PerspectiveCamera(75, this.renderer.domElement.width / this.renderer.domElement.height, 0.1, 1000);
-      defaultCamera.position.z = 5;
-      this.scene.add(defaultCamera);
-      this.activeCamera = defaultCamera;
+      const parent = node.parent ? this.nodeMap.get(node.parent.id) ?? this.scene : this.scene;
+      if (object.parent !== parent) parent.add(object);
+      object.matrixAutoUpdate = false;
+      object.matrix.fromArray(node.transform.localMatrix);
+      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      object.matrixWorldNeedsUpdate = true;
     }
+    this.scene.updateMatrixWorld(true);
+    this.resolveSkinBindings();
+    const cameras = [...this.nodeMap.values()].filter((obj): obj is THREE.Camera => obj instanceof THREE.Camera);
+    const nextCamera = cameras.includes(this.activeCamera!) ? this.activeCamera : cameras[0] ?? this.fallbackCamera;
+    if (nextCamera !== this.activeCamera || (this.activeCamera && this.activeCamera !== this.fallbackCamera && !cameras.includes(this.activeCamera))) {
+      const controlsEnabled = !!this.orbitControls;
+      this.disableOrbitControls();
+      if (this.activeCamera && !this.reverseNodeMap.has(this.activeCamera)) this.activeCamera.removeFromParent();
+      for (const pass of this.composer?.passes ?? []) this.releaseResource(pass);
+      if (this.composer) this.composer.passes = [];
+      this.activeCamera = nextCamera ?? null;
+      if (this.activeCamera === this.fallbackCamera && this.activeCamera) this.scene.add(this.activeCamera);
+      if (!this.activeCamera) this.createFallbackCamera();
+      if (controlsEnabled) this.enableOrbitControls();
+    }
+    if (!this.activeCamera) this.createFallbackCamera();
+    if (this.audioListener && (!this.audioListener.parent || this.retiredObjects.has(this.audioListener.parent))) this.activeCamera!.add(this.audioListener);
+  }
+
+  private createFallbackCamera(): void {
+    const camera = new THREE.PerspectiveCamera(75,
+      this.renderer.domElement.width / this.renderer.domElement.height, 0.1, 1000);
+    camera.position.z = 5;
+    this.scene.add(camera);
+    this.activeCamera = camera;
+    this.fallbackCamera = camera;
   }
 
   private createThreeObject(oroyaNode: OroyaNode): THREE.Object3D | null {
@@ -720,7 +880,7 @@ export class ThreeRenderer {
       if (handler) {
         const obj = handler.create(oroyaNode);
         if (obj) {
-          this.pluginObjects.set(oroyaNode.id, { handler, obj });
+          this.pluginObjects.set(oroyaNode.id, { handler, obj, node: oroyaNode });
           return obj;
         }
       }
@@ -886,8 +1046,9 @@ export class ThreeRenderer {
     audio.setLoop(def.loop);
 
     // Load buffer
-    this.loadAudioBuffer(def.url).then(buffer => {
-      if (buffer) {
+    const generation = this.generation;
+    void this.loadAudioBuffer(def.url).then(buffer => {
+      if (buffer && !this.disposed && generation === this.generation && !this.retiredObjects.has(audio)) {
         audio.setBuffer(buffer);
         if (def.autoplay) {
           audio.play();
@@ -902,7 +1063,9 @@ export class ThreeRenderer {
     if (this.audioCache.has(url)) return this.audioCache.get(url)!;
 
     try {
+      const generation = this.generation;
       const buffer = await this.audioLoader.loadAsync(url);
+      if (this.disposed || generation !== this.generation) return null;
       this.audioCache.set(url, buffer);
       return buffer;
     } catch (e) {
@@ -1107,9 +1270,16 @@ export class ThreeRenderer {
         resultMesh = CSG.intersect(baseMesh, modMesh);
         break;
       default:
+        this.releaseResource(modGeo);
+        this.releaseResource(baseMesh.material as THREE.Material);
+        this.releaseResource(modMesh.material as THREE.Material);
         return baseGeo;
     }
 
+    this.releaseResource(baseGeo);
+    this.releaseResource(modGeo);
+    this.releaseResource(baseMesh.material as THREE.Material);
+    this.releaseResource(modMesh.material as THREE.Material);
     return resultMesh.geometry;
   }
 
@@ -1122,7 +1292,13 @@ export class ThreeRenderer {
     }
 
     try {
-      const texture = this.textureLoader.load(url);
+      const generation = this.generation;
+      const texture = this.textureLoader.load(url, (loaded) => {
+        if (this.disposed || generation !== this.generation || this.released.has(loaded)) {
+          this.releaseResource(loaded);
+          loaded.image = null;
+        }
+      });
       this.textureCache.set(url, texture);
       return texture;
     } catch (e) {

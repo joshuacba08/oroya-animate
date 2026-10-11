@@ -2,6 +2,7 @@ import { Component, ComponentType } from './Component';
 
 /**
  * An enumeration of the available camera types.
+ * @public
  */
 export enum CameraType {
   Perspective = 'Perspective',
@@ -10,6 +11,7 @@ export enum CameraType {
 
 /**
  * The definition for a perspective camera.
+ * @public
  */
 export interface PerspectiveCameraDef {
   type: CameraType.Perspective;
@@ -38,6 +40,7 @@ export interface PerspectiveCameraDef {
 /**
  * The definition for an orthographic camera.
  * Defines a rectangular view frustum.
+ * @public
  */
 export interface OrthographicCameraDef {
   type: CameraType.Orthographic;
@@ -63,11 +66,13 @@ export interface OrthographicCameraDef {
 
 /**
  * A union of all possible camera definitions.
+ * @public
  */
 export type CameraDef = PerspectiveCameraDef | OrthographicCameraDef;
 
 /**
  * A component that defines a camera in the scene.
+ * @public
  */
 export class Camera extends Component {
   readonly type = ComponentType.Camera;

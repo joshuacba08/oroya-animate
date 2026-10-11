@@ -22,10 +22,10 @@ this policy:
 
 1. The breaking change ships in version `N.x.y` with a `@deprecated`
    tag on the old shape and a `console.warn` on first use (when feasible).
-2. The old shape remains usable through every release in the `N` major
-   series.
-3. The old shape is removed in `(N+1).0.0` — at least one full major
-   version of notice.
+2. The old shape remains usable through every release in both the `N`
+   and `N+1` major series.
+3. The old shape is removed in `(N+2).0.0`, following the deprecation
+   window in [API Stability Policy](api-stability.md).
 
 `@experimental` symbols (listed in [`api-stability.md`](api-stability.md))
 do **not** get this guarantee. They may change in minor releases. Pin the
@@ -73,10 +73,12 @@ What is *new* (additive, opt-in):
   switched the implementation from a missing FXAA pass to a real SMAA
   pass. Existing code that wrote `fxaa: true` was silently a no-op
   before — now they should write `antialiasing: true`.
-- **TypedArrays survive serialization**: scenes that contain
-  `AnimationClip`, `BufferGeometry`, or `InstancedMesh` now round-trip
-  cleanly through `serialize` / `deserialize`. If you wrote a
-  workaround that base64-encoded these manually, you can drop it.
+- **TypedArrays survive serialization**: supported arrays in
+  `AnimationClip` and `BufferGeometry` survive `serialize` / `deserialize`.
+  `InstancedMesh` components are intentionally skipped by `deserialize`;
+  restore them with an application adapter. Their arrays can be saved
+  separately with `typedArrayReplacer` / `typedArrayReviver`. See
+  [Serialization](serialization.md) for the supported array types.
 
 ### v0.8.x → v0.9.0
 
@@ -116,3 +118,7 @@ stability doc, treat it as `@public` (the conservative default).
   with the version you're coming from and the symbol you're stuck on.
 - The [`CHANGELOG.md`](../CHANGELOG.md) is the authoritative log of
   every shape-affecting change.
+
+## Runtime maintenance updates
+
+The current workspace adds Transform.setPosition, setRotation and setScale (all return void and copy values), plus Scene(root?: Node), without removing v1 signatures. JSON now saves only supported declarative data and preserves the complete root. Three.js reconciles the graph every frame and releases owned resources on removal, remount and disposal. Previously direct transform writes still require an explicit refresh. Package publishing is a separate release; this documentation deployment does not publish npm artifacts.

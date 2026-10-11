@@ -11,7 +11,6 @@ import {
     PostProcessing,
     ToneMapping,
     Environment,
-    type Vec3,
 } from "@joroya/core";
 
 export function createNeonCityScene() {

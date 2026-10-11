@@ -2,6 +2,7 @@ import { Vec3 } from '../components/Transform';
 import * as Vector3 from './Vector3';
 import { Matrix4 } from './Matrix4';
 
+/** @public */
 export class BoundingSphere {
     center: Vec3;
     radius: number;

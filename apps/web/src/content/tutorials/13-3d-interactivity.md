@@ -7,8 +7,8 @@ duration: "25 min"
 ---
 # Tutorial 13: Interactividad 3D con Raycasting
 
-> **Nivel:** Avanzado  
-> **Tiempo estimado:** 25 minutos  
+> **Nivel:** Avanzado\
+> **Tiempo estimado:** 25 minutos\
 > **Qué aprenderás:** Habilitar interactividad en escenas 3D usando el componente `Interactive`, raycasting con `ThreeRenderer.enableInteraction()`, y manejar eventos de click, hover y drag.
 
 ---
@@ -40,7 +40,7 @@ sequenceDiagram
 
 ## Paso 1: Setup
 
-```typescript
+```typescript fragment
 import {
   Scene, Node, Camera, CameraType,
   Material, Interactive,
@@ -363,4 +363,4 @@ Explora la interactividad 3D en la demo **"Interactive Cubes"** de la galería d
 
 ## Siguiente tutorial
 
-→ [Tutorial 14: Orbit Controls](./14-orbit-controls.md) — manipulación de cámara con mouse y touch.
+→ [Tutorial 14: Orbit Controls](/tutorials/14-orbit-controls) — manipulación de cámara con mouse y touch.

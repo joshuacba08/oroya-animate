@@ -61,12 +61,12 @@ Oroya Animateは、シーンロジックをレンダリング実装から分離�
 詳細なドキュメントは[`docs/`](docs/)フォルダーとウェブサイトで利用できます：
 
 ### コアドキュメント
-- [**アーキテクチャ概要**](docs/architecture.md): エンジン非依存設計の中核を学ぶ。
-- [**はじめに**](docs/getting-started.md): 5分で最初のシーンを作成。
-- [**シーングラフと変換**](docs/scene-graph.md): ノードとコンポーネントの詳細解説。
+- [**アーキテクチャ概要**](docs/architecture-ja.md): エンジン非依存設計の中核を学ぶ。
+- [**はじめに**](docs/getting-started-ja.md): 5分で最初のシーンを作成。
+- [**シーングラフと変換**](docs/scene-graph-ja.md): ノードとコンポーネントの詳細解説。
 - [**APIリファレンス**](docs/api-reference.md): クラス、インターフェース、関数の完全リファレンス。
-- [**レンダラー**](docs/renderers.md): Three.js、SVG、Canvas2Dバックエンドのドキュメント。
-- [**シリアライゼーション**](docs/serialization.md): シーンをJSONとして保存・読み込み。
+- [**レンダラー**](docs/renderers-ja.md): Three.js、SVG、Canvas2Dバックエンドのドキュメント。
+- [**シリアライゼーション**](docs/serialization-ja.md): シーンをJSONとして保存・読み込み。
 
 ### デプロイと公開
 - [**NPM公開**](docs/deployment/npm-publishing.md): NPMレジストリへのパッケージ公開。
@@ -87,58 +87,81 @@ Oroya Animateは、シーンロジックをレンダリング実装から分離�
 #### NPM/PNPM（推奨）
 
 ```bash
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 # または
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 # または
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 ```
 
-#### CDN（インストール不要）
+#### ブラウザーでの実行
 
-```html
-<script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
-  // あなたのコードをここに...
-</script>
-```
+TypeScript の例は Vite などのバンドラーで実行してください。`dist/` の ESM ファイルには外部パッケージの import が残るため、ブラウザー側で依存関係の解決が必要です。[スタートガイド](docs/getting-started-ja.md) を参照してください。
 
 ### 基本的な使い方
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// 1. シーンを作成
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// 2. カメラを追加
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const scene = new Scene();
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// 3. ジオメトリとマテリアルでノードを作成
-const box = new Node('my-box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 1, g: 0, b: 0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
 
-// 4. Three.jsでレンダリング
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
+
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
+  canvas,
   width: window.innerWidth,
   height: window.innerHeight,
 });
 renderer.mount(scene);
-renderer.render();
+
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
+}
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ## 🗺️ ロードマップ

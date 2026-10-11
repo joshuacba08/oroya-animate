@@ -1,58 +1,117 @@
 name: Deploy Web to Vercel
-
 on:
   push:
     branches: [main]
     paths:
-      - 'apps/web/**'
+      - 'apps/**'
       - 'packages/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+      - '*README*'
+      - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'vercel.json'
+      - '*config*'
   pull_request:
     branches: [main]
     paths:
-      - 'apps/web/**'
+      - 'apps/**'
       - 'packages/**'
-
+      - 'docs/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+      - '*README*'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'vercel.json'
+      - '*config*'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: docs-deploy-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
+  validate:
+    uses: ./.github/workflows/ci.yml
   deploy:
+    needs: validate
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          version: 9
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify Vercel credentials
+        run: test -n "$VERCEL_TOKEN" && test -n "$VERCEL_ORG_ID" && test -n "$VERCEL_PROJECT_ID"
+      - name: Select target
+        id: target
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ] && [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "flags=--prod" >> "$GITHUB_OUTPUT"
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "flags=" >> "$GITHUB_OUTPUT"
+            echo "environment=preview" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Pull project settings
+        run: pnpm dlx vercel@63.1.2 pull --yes --environment=${{ steps.target.outputs.environment }} --token="$VERCEL_TOKEN"
+      - name: Build verified deployment
+        env:
+          PUBLIC_DOCS_COMMIT: ${{ github.sha }}
+        run: pnpm dlx vercel@63.1.2 build ${{ steps.target.outputs.flags }} --token="$VERCEL_TOKEN"
+      - name: Capture previous production deployment
+        id: previous
+        if: steps.target.outputs.environment == 'production'
+        run: |
+          pnpm dlx vercel@63.1.2 inspect https://oroya-animate.oroyajs.com --json --token="$VERCEL_TOKEN" > previous-deployment.json
+          node scripts/remember-deployment.js
+      - name: Deploy
+        id: release
+        run: |
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt ${{ steps.target.outputs.flags }} --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$url" > deployment-url.txt
+          printf 'Commit: %s\nDeployment: %s\n' "$GITHUB_SHA" "$url" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify public guides
+        env:
+          EXPECTED_COMMIT: ${{ github.sha }}
+          PUBLIC_URL: ${{ steps.target.outputs.environment == 'production' && 'https://oroya-animate.oroyajs.com' || '' }}
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: node scripts/verify-deployment.js
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Verify deployed site in browser
+        env:
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: pnpm test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      
-      - name: Build packages
-        run: pnpm build
-      
-      - name: Build web app
-        run: pnpm --filter "web" build
-      
-      - name: Deploy to Vercel (Production)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          npx vercel deploy --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+          name: deployment-browser-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+      - name: Roll back failed production verification
+        if: failure() && steps.release.outcome == 'success' && steps.target.outputs.environment == 'production'
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      
-      - name: Deploy to Vercel (Preview)
-        if: github.event_name == 'pull_request'
-        run: |
-          npx vercel deploy --token ${{ secrets.VERCEL_TOKEN }} --yes
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          PREVIOUS_DEPLOYMENT: ${{ steps.previous.outputs.id }}
+        run: pnpm dlx vercel@63.1.2 rollback "$PREVIOUS_DEPLOYMENT" --yes --token="$VERCEL_TOKEN"
+      - uses: actions/upload-artifact@v4
+        if: steps.release.outcome == 'success'
+        with:
+          name: documentation-deployment
+          path: deployment-url.txt
