@@ -22,13 +22,18 @@ The linked project's IDs live in the ignored `.vercel/project.json`; keep the ex
 
 ## Credentials
 
-Configure these repository secrets in GitHub Settings → Secrets and variables → Actions:
+The linked project's credentials already live in GitHub Settings → Environments →
+`Production`. The deployment job selects that environment to access its secrets:
 
 | Secret | Value |
 | --- | --- |
 | VERCEL_TOKEN | A Vercel token with access to the linked project's team |
 | VERCEL_ORG_ID | `orgId` from `.vercel/project.json` |
 | VERCEL_PROJECT_ID | `projectId` from `.vercel/project.json` |
+
+The credential environment is shared by this project's preview and production jobs.
+The workflow's selected Vercel target (`preview` or `production`) determines where the
+artifact is deployed; the GitHub environment name does not override that target.
 
 Never commit or send the token in chat. If linking a new checkout is necessary, use
 `pnpm dlx vercel@63.1.2 link` from the repository root. Project linking is setup;
@@ -98,7 +103,7 @@ layout fallbacks, robots.txt and the workflow's public verification URL together
 
 ## Troubleshooting
 
-- Missing credentials: add all three Vercel secrets before rerunning the failed deployment job.
+- Missing credentials: verify that the job selects `Production` and that its three environment secrets are present before rerunning it.
 - Unresolved workspace imports: build packages before running consumers; their entry points use `dist/`.
 - Synchronization drift: edit canonical `docs/` sources, run `pnpm docs:sync` and commit both copies.
 - HTTP 401 on preview: inspect deployment protection for the linked project and arrange authorized
