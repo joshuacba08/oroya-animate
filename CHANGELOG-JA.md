@@ -1,5 +1,16 @@
 # 変更履歴
 
+## 未リリース — ランタイムとドキュメントの保守
+
+- シーンのルート全体を保持し、バインド済み・再生中の Animator の定義を安全にシリアライズ。
+- 値をコピーして行列を無効化する Transform の明示的な setter を追加。
+- Three.js の階層と動的ツリーを修正し、リソース・音声・プラグインを適切に解放。
+- TypeScript で exports を監査し、パッケージと 4 つのアプリを CI で検証。
+- ガイドとチュートリアルを統合し、ファクトリー・renderer・Monaco を必要時に読み込み。
+- Actions のみでドキュメントをデプロイし、preview、HTTP・ブラウザー検証、rollback を実行。
+- 今回の変更では npm パッケージを公開しません。
+
+
 Oroya Animateのすべての注目すべき変更はこのファイルに記録されます。
 
 このフォーマットは[Keep a Changelog](https://keepachangelog.com/ja/1.0.0/)に基づいており、

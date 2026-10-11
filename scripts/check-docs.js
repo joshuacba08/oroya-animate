@@ -11,7 +11,7 @@ for (const entry of manifest) {
   routes.add(entry.route);
   if (entry.locale === 'en') for (const locale of ['es', 'ja']) routes.add('/' + locale + entry.route);
 }
-for (const page of ['examples', 'playground', 'learn', 'tutorials', 'changelog']) {
+for (const page of ['examples', 'playground', 'learn', 'tutorials']) {
   for (const prefix of ['', '/es', '/ja']) routes.add(prefix + '/' + page);
 }
 let links = 0;

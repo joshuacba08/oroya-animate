@@ -1,5 +1,16 @@
 # Registro de Cambios
 
+## Sin publicar — mantenimiento de runtime y documentación
+
+- Conservar la raíz completa y serializar definiciones de Animator enlazado o en reproducción.
+- Añadir setters explícitos de Transform que copian valores e invalidan matrices.
+- Corregir jerarquías Three.js, reconciliar cambios del árbol y liberar recursos, audio y plugins.
+- Auditar exports con TypeScript y validar paquetes y las cuatro aplicaciones en CI.
+- Consolidar guías y tutoriales; cargar fábricas, renderers y Monaco bajo demanda.
+- Desplegar documentación exclusivamente mediante Actions, con preview, verificación HTTP/navegador y rollback.
+- Esta entrega no publica paquetes npm.
+
+
 Todos los cambios notables de Oroya Animate se documentarán en este archivo.
 
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
