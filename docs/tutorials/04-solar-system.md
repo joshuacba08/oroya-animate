@@ -1,7 +1,7 @@
-# Tutorial 4: Sistema Solar 🟡
+# Tutorial 4: Sistema Solar
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 20 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 20 minutos\
 > **Qué aprenderás:** Transforms jerárquicos padre-hijo para crear órbitas anidadas.
 
 ---
@@ -13,10 +13,10 @@ Cuando un nodo hijo rota, lo hace **relativo a su padre**. Si el padre también 
 ```
 Scene
 └── Sol (esfera amarilla, rota sobre sí mismo)
-    ├── Pivot Tierra (nodo vacío, rota ↁEgenera la órbita)
-    ━E  └── Tierra (esfera azul, desplazada en X)
-    ━E      ├── Pivot Luna (nodo vacío, rota más rápido)
-    ━E      ━E  └── Luna (esfera gris, desplazada en X)
+    ├── Pivot Tierra (nodo vacío, rota → genera la órbita)
+    │  └── Tierra (esfera azul, desplazada en X)
+    │      ├── Pivot Luna (nodo vacío, rota más rápido)
+    │      │  └── Luna (esfera gris, desplazada en X)
     └── Pivot Marte (nodo vacío, rota más lento)
         └── Marte (esfera roja, desplazada en X)
 ```
@@ -119,15 +119,15 @@ function animate() {
   sun.transform.rotation = rotateY(time * 0.5);
   sun.transform.updateLocalMatrix();
 
-  // Pivot de la Tierra rota ↁEla Tierra orbita el Sol
+  // Pivot de la Tierra rota → la Tierra orbita el Sol
   earthPivot.transform.rotation = rotateY(time * 2);
   earthPivot.transform.updateLocalMatrix();
 
-  // Pivot de la Luna rota más rápido ↁEla Luna orbita la Tierra
+  // Pivot de la Luna rota más rápido → la Luna orbita la Tierra
   moonPivot.transform.rotation = rotateY(time * 8);
   moonPivot.transform.updateLocalMatrix();
 
-  // Pivot de Marte rota más lento ↁEMarte tiene órbita más lenta
+  // Pivot de Marte rota más lento → Marte tiene órbita más lenta
   marsPivot.transform.rotation = rotateY(time * 1.2);
   marsPivot.transform.updateLocalMatrix();
 
@@ -166,4 +166,4 @@ worldMatrix(luna) = local(luna) ÁElocal(moonPivot) ÁElocal(earth) ÁElocal(ear
 
 ## Siguiente tutorial
 
-➡�E�E[Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md)  Erenderer SVG y Path2D.
+→ [Tutorial 5: Arte Generativo SVG](./05-svg-generative-art.md) — renderer SVG y Path2D.

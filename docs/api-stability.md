@@ -2,7 +2,8 @@
 
 Starting with **v1.0.0**, Oroya Animate follows a tagged stability model
 inspired by `@microsoft/api-extractor`. Every export from a `@joroya/*`
-package's barrel (`src/index.ts`) carries one of three TSDoc tags:
+package's barrel (`src/index.ts`) is governed by one of three TSDoc tags.
+The AST audit requires every exported declaration to carry a stability tag:
 
 | Tag | Stability | Breaking change policy |
 |-----|-----------|------------------------|
@@ -60,9 +61,8 @@ Everything else exported from the `@joroya/core`, `@joroya/renderer-*`,
 
 ## Tooling
 
-- `pnpm api:check` — scans every barrel for exports lacking a stability
-  tag and reports them. Currently informational (not a CI gate) — the
-  intent is to make accidental missing tags visible during code review.
+- `pnpm api:check` reports missing tags, exposed internals and unresolved exports across direct declarations, aliases, types and star chains. It remains informational.
+- `pnpm api:check:strict` fails on those issues and is required by CI.
 - Per-package `dist/index.d.ts` is the canonical surface. If a symbol is
   in that file, it is part of the public API regardless of in-source
   tag. Use `@internal` *and* keep the symbol out of the barrel for

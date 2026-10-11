@@ -3,6 +3,7 @@ import { Scene, Camera, CameraType, Node as OroyaNode } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 import { OroyaContext, type FrameCallback, type OroyaContextValue } from './context';
 
+/** @experimental */
 export interface OroyaCanvasProps {
     /** CSS width of the canvas. Default `100%`. */
     width?: number | string;

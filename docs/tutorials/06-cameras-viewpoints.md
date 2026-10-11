@@ -1,7 +1,7 @@
-# Tutorial 6: Cámaras y Puntos de Vista 🟡
+# Tutorial 6: Cámaras y Puntos de Vista
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 15 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 15 minutos\
 > **Qué aprenderás:** Posicionar cámaras, cambiar puntos de vista dinámicamente, y entender cómo la cámara como nodo del scene graph hereda transforms.
 
 ---
@@ -118,7 +118,7 @@ function switchCamera(index: number) {
   // Mover la cámara activa al inicio del árbol
   // Removemos todas las cámaras y re-agregamos con la seleccionada primero
   cameras.forEach(cam => scene.remove(cam));
-  
+
   activeCameraIndex = index;
   scene.add(cameras[activeCameraIndex]); // Primera cámara = activa
   cameras.forEach((cam, i) => {
@@ -126,7 +126,7 @@ function switchCamera(index: number) {
   });
 
   renderer.mount(scene); // Re-montar para que detecte la nueva cámara
-  console.log(`📷 Cámara activa: ${cameraNames[activeCameraIndex]}`);
+  console.log(`[Camera] Cámara activa: ${cameraNames[activeCameraIndex]}`);
 }
 
 // Escuchar teclado
@@ -203,17 +203,17 @@ character.add(followCam);
 // Cuando el personaje se mueve, la cámara lo sigue automáticamente
 character.transform.position = { x: 5, y: 0, z: 0 };
 character.transform.updateLocalMatrix();
-// ↁELa cámara ahora está en (5, 3, 8) en coordenadas del mundo
+// → La cámara ahora está en (5, 3, 8) en coordenadas del mundo
 ```
 
 ---
 
 ## Resultado
 
-Una escena con múltiples puntos de vista intercambiables con el teclado (`1`, `2`, `3`) y una cámara animada que orbita la escena. 🎥
+Una escena con múltiples puntos de vista intercambiables con el teclado (`1`, `2`, `3`) y una cámara animada que orbita la escena.
 
 ---
 
 ## Siguiente tutorial
 
-➡�E�E[Tutorial 7: Ciudad Procedural](./07-procedural-city.md)  Egeneración algorítmica.
+→ [Tutorial 7: Ciudad Procedural](./07-procedural-city.md) — generación algorítmica.

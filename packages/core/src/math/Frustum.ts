@@ -20,6 +20,7 @@ class Plane {
     }
 }
 
+/** @public */
 export class Frustum {
     planes: Plane[];
 

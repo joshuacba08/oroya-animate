@@ -21,6 +21,7 @@ import {
 
 /**
  * Options for Canvas2D rendering.
+ * @public
  */
 export interface Canvas2DRenderOptions {
     width: number;
@@ -312,6 +313,7 @@ function renderNode(
 
 /**
  * Render a scene to a canvas element (one-shot render).
+ * @public
  */
 export function renderToCanvas(
     scene: Scene,
@@ -363,6 +365,7 @@ export function renderToCanvas(
 
 /**
  * Persistent Canvas2D renderer with animation loop support.
+ * @public
  */
 export class CanvasRenderer {
     private canvas: HTMLCanvasElement | null = null;

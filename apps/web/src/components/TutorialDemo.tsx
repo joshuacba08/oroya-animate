@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Scene } from "@joroya/core";
 import { Camera, CameraType, ComponentType } from "@joroya/core";
-import { ThreeRenderer } from "@joroya/renderer-three";
-import { renderToSVG } from "@joroya/renderer-svg";
+import type { ThreeRenderer } from "@joroya/renderer-three";
 import type { SvJs } from "@joroya/renderer-svg";
-import { EXAMPLES } from "./examples/scenes";
+import { EXAMPLES } from "./examples/metadata";
 import type { ExampleDef } from "./examples/ExampleCard";
 
 /**
@@ -114,9 +113,14 @@ function DemoPlayer({ example, onRestart }: DemoPlayerProps) {
 
   useEffect(() => {
     let disposed = false;
+    let release: (() => void) | undefined;
 
+    void (async () => {
     try {
-      const { scene, animate } = example.factory();
+      const result = await example.factory();
+      release = result.dispose;
+      if (disposed) { release?.(); release = undefined; return; }
+      const { scene, animate } = result;
 
       if (is3D) {
         const canvas = canvasRef.current;
@@ -137,9 +141,12 @@ function DemoPlayer({ example, onRestart }: DemoPlayerProps) {
           }
         }
 
+        const { ThreeRenderer } = await import("@joroya/renderer-three");
+        if (disposed) return;
         const renderer = new ThreeRenderer({ canvas, width, height });
         renderer.mount(threeScene);
         rendererRef.current = renderer;
+        renderer.enableInteraction();
         setIsLoaded(true);
 
         const loop = (time: number) => {
@@ -177,25 +184,27 @@ function DemoPlayer({ example, onRestart }: DemoPlayerProps) {
         const container = svgContainerRef.current;
         if (!container) return;
 
-        const svgString = renderToSVG(scene as Scene, { width: 1000, height: 1000 });
-        container.innerHTML = svgString;
-        const svgEl = container.querySelector("svg");
-        if (svgEl) {
-          svgEl.style.width = "100%";
-          svgEl.style.height = "100%";
-        }
+        const { renderToSVGElement } = await import("@joroya/renderer-svg");
+        if (disposed) return;
+        const { svg, dispose } = renderToSVGElement(scene as Scene, { width: 1000, height: 1000 });
+        const releaseFactory = release;
+        release = () => { dispose(); releaseFactory?.(); };
+        container.appendChild(svg); svg.style.width = "100%"; svg.style.height = "100%";
         setIsLoaded(true);
       }
     } catch (e) {
       console.error("[TutorialDemo]", e);
-      setHasError(true);
+      if (!disposed) setHasError(true);
     }
+    })();
 
     return () => {
       disposed = true;
       cancelAnimationFrame(rafRef.current);
       try { rendererRef.current?.dispose(); } catch { /* safe */ }
       rendererRef.current = null;
+      release?.(); release = undefined;
+      svgContainerRef.current?.replaceChildren();
     };
   }, [example, is3D, isSvJs]);
 

@@ -7,8 +7,8 @@ duration: "30 min"
 ---
 # Tutorial 7: Ciudad Procedural
 
-> **Nivel:** Avanzado  
-> **Tiempo estimado:** 30 minutos  
+> **Nivel:** Avanzado\
+> **Tiempo estimado:** 30 minutos\
 > **Qué aprenderás:** Generar escenas complejas algorítmicamente, usar el scene graph como estructura de datos, y aplicar técnicas de generación procedural de ciudades.
 
 ---
@@ -92,9 +92,9 @@ for (let row = 0; row < config.gridSize; row++) {
 
     // Generar edificios dentro de la cuadra
     for (let b = 0; b < config.buildingsPerBlock; b++) {
-      const height = config.minBuildingHeight + 
+      const height = config.minBuildingHeight +
         Math.random() * (config.maxBuildingHeight - config.minBuildingHeight);
-      
+
       // Posición aleatoria dentro de la cuadra
       const margin = 1;
       const maxOffset = config.blockSize / 2 - margin;
@@ -107,12 +107,12 @@ for (let row = 0; row < config.gridSize; row++) {
 
       const building = new Node(`building-${row}-${col}-${b}`);
       building.addComponent(createBox(width, height, depth));
-      
+
       // Color: tonos grises/azulados para edificios urbanos
       building.addComponent(new Material({
         color: randomColor({ r: 0.4, g: 0.45, b: 0.55 }, 0.15),
       }));
-      
+
       building.transform.position = { x: bx, y: height / 2, z: bz };
       block.add(building);
     }
@@ -122,7 +122,7 @@ for (let row = 0; row < config.gridSize; row++) {
 
 ---
 
-## Paso 4: Agregar detalles  EParque central y torre destacada
+## Paso 4: Agregar detalles — Parque central y torre destacada
 
 ```typescript
 // Parque central (cuadra central diferente)
@@ -211,10 +211,10 @@ Todo gestionado por el scene graph con actualizaciones de matrices automáticas.
 
 ## Técnicas aplicadas
 
-1. **Generación procedural**  ESin hardcodear posiciones, todo es algorítmico.
-2. **Agrupación jerárquica**  ECada cuadra es un nodo padre, facilitando operaciones como "eliminar toda la cuadra".
-3. **Scene graph como datos**  EUsar `findNodeByName` para localizar y modificar secciones.
-4. **Variación controlada**  EAleatorización dentro de rangos definidos para resultados orgánicos pero coherentes.
+1. **Generación procedural** — Sin hardcodear posiciones, todo es algorítmico.
+2. **Agrupación jerárquica** — Cada cuadra es un nodo padre, facilitando operaciones como "eliminar toda la cuadra".
+3. **Scene graph como datos** — Usar `findNodeByName` para localizar y modificar secciones.
+4. **Variación controlada** — Aleatorización dentro de rangos definidos para resultados orgánicos pero coherentes.
 
 ---
 
@@ -229,4 +229,4 @@ Todo gestionado por el scene graph con actualizaciones de matrices automáticas.
 
 ## Siguiente tutorial
 
-ↁE[Tutorial 8: Multi-Renderer](./08-multi-renderer.md)  Emisma escena en Three.js y SVG.
+→ [Tutorial 8: Multi-Renderer](/tutorials/08-multi-renderer) — misma escena en Three.js y SVG.

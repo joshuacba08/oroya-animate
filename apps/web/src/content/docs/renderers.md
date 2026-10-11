@@ -4,7 +4,6 @@ description: "Three.js WebGL and SVG renderer implementations in depth"
 order: 4
 category: "concepts"
 ---
-
 # Renderers
 
 Oroya Animate renderers are **translators** that convert the agnostic scene graph into visual output. The core does not know about renderers — each one reads the scene graph and produces its own representation.
@@ -33,7 +32,7 @@ graph TD
 
 | Aspect | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` | `renderToCanvas` / `CanvasRenderer` |
 |---------|----------------|--------------------------------------|----------------------------------------|
-| **Paradigm** | Stateful instance (class) | Pure string function or DOM element helper | One-shot function or persistent class |
+| **Paradigm** | Stateful instance (class) | String output or DOM snapshot helper | One-shot function or persistent class |
 | **Output** | Draws to a WebGL `<canvas>` | Returns an SVG `string` or `SVGSVGElement` | Draws to a Canvas2D `<canvas>` |
 | **Requires DOM** | Yes (`HTMLCanvasElement`) | String mode: no; DOM mode: yes | Yes (`HTMLCanvasElement`) |
 | **3D** | Perspective/orthographic, lights, shadows | 2D projection only | 2D projection only |
@@ -75,7 +74,7 @@ const renderer = new ThreeRenderer({
 |--------|-------------|
 | `mount(scene)` | Connects a scene, rebuilds the Three.js scene, and detects the active camera |
 | `render(dt?)` | Runs `scene.update(dt)`, syncs transforms, updates renderer-managed systems, and draws a frame |
-| `dispose()` | Releases WebGL resources |
+| `dispose()` | Disables interaction and orbit controls, suspends audio, and disposes the WebGLRenderer |
 
 ### Lifecycle
 
@@ -145,47 +144,66 @@ flowchart TD
 
 ```typescript
 import {
-  Camera,
-  CameraType,
-  Material,
-  Node,
-  Scene,
-  createBox,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
+
 const scene = new Scene();
-
-const cam = new Node('cam');
-cam.addComponent(new Camera({
-  type: CameraType.Perspective, fov: 75,
-  aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000,
+const camera = new Node('camera');
+camera.addComponent(new Camera({
+  type: CameraType.Perspective,
+  fov: 60,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 100,
 }));
-cam.transform.position.z = 5;
-scene.add(cam);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-const box = new Node('box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 0.2, g: 0.6, b: 1.0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: window.innerWidth, height: window.innerHeight,
+  canvas,
+  width: window.innerWidth,
+  height: window.innerHeight,
 });
 renderer.mount(scene);
 
-let angle = 0;
-
-function loop() {
-  angle += 0.01;
-  box.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
-  box.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(loop);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(loop);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ---
@@ -194,9 +212,9 @@ requestAnimationFrame(loop);
 
 Lightweight renderer that generates SVG markup. Ideal for generative art, vector export, and server-side rendering.
 
-### `renderToSVG` — Pure string (server-safe)
+### `renderToSVG` — String output (server-safe)
 
-Pure, stateless function that returns an SVG string. Works in Node.js without DOM.
+Returns an SVG string and advances scene logic. Works in Node.js without DOM.
 
 ```typescript
 import { renderToSVG } from '@joroya/renderer-svg';
@@ -455,7 +473,7 @@ new Material({
   filter: {
     effects: [{
       type: 'dropShadow', dx: 4, dy: 4,
-      stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6,
+      stdDeviation: 2, floodColor: { r: 0.2, g: 0.2, b: 0.2 }, floodOpacity: 0.6,
     }],
   },
 });
@@ -489,7 +507,7 @@ new Material({
       { command: 'L', args: [80, 80] },
       { command: 'Z', args: [] },
     ],
-    fill: 'white',
+    fill: { r: 1, g: 1, b: 1 },
     opacity: 0.8,
   },
 });
@@ -732,3 +750,22 @@ export class Canvas2DRenderer {
 | 4 | Implement `render()` — sync transforms and draw |
 | 5 | Implement `dispose()` — release resources |
 | 6 | Document supported geometries and materials |
+
+
+## Frame updates and shared scenes
+
+All official rendering entry points advance `scene.update(dt)` and then update world matrices. Three.js takes `render(dt)`; SVG and Canvas2D take an `options.dt` value. The default is `1 / 60` second. SVG string generation is safe in Node.js, but it mutates scene logic and is not a pure function.
+
+For a shared scene, let one renderer advance time and pass `dt: 0` to the other outputs:
+
+```ts
+threeRenderer.render(dt);
+const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
+renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
+```
+
+`dt: 0` still invokes `onUpdate(0)`. Keep callbacks time-based and free of unconditional per-call side effects. SVG and Canvas2D do not bind `Animator` components automatically: call `animator.bindToScene(scene)` before playback. `renderToSVGElement()` builds a DOM snapshot with event listeners; it does not provide a persistent `render()` loop.
+
+`setSize(width, height)` updates the WebGL renderer and composer dimensions, not the camera projection. Stop your own `requestAnimationFrame` loop and remove your own listeners before calling `dispose()`.
+
+Three.js preserves parent-child structure and synchronizes local matrices. Every frame reconciles added, removed and reparented nodes, clears interaction for removed nodes, and selects a remaining camera or the existing fallback. Removal, remount and idempotent dispose() share cleanup for owned geometry, materials, textures, skeletons, audio, mixers, passes and render targets. Plugin-owned resources are released through plugin hooks; asynchronous loads cannot attach after retirement.

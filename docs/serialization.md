@@ -1,6 +1,6 @@
 # Serialization
 
-Oroya Animate includes a JSON serialization system that allows saving and loading complete scenes. It is the foundation for visual editors, collaboration, and scene versioning.
+Oroya Animate includes a JSON serialization system that allows saving and loading scene definitions. It is the foundation for visual editors, collaboration, and scene versioning.
 
 ---
 
@@ -40,7 +40,7 @@ console.log(json);
 flowchart LR
     S["Scene"] -->|"serialize()"| SR["serializeNode(root)"]
     SR -->|"recursive"| SN["For each node:\nid, name, components, children"]
-    SN -->|"spread"| SC["Each component:\n{ type, ...data }"]
+    SN -->|"adapter"| SC["Declarative component data"]
     SC --> JSON["JSON.stringify()\nwith indent 2"]
     JSON --> STR["string"]
 ```
@@ -165,51 +165,34 @@ graph TD
 
 ## Supported components
 
-### In serialization (`serialize`)
+`serialize()` uses typed internal adapters to save declarative definitions, TRS values and SVG animations. It excludes runtime state, callbacks, node references and backend instances, including references nested in event data. Bound Animator components can be saved safely.
 
-All components are serialized using spread (`{ ...component }`):
+| Component | Deserialization |
+| --- | --- |
+| `Transform` | Restores position, quaternion and scale; cached matrices are ignored |
+| `Geometry`, `Material`, `Camera`, `Interactive`, `Light`, `Environment` | Reconstructs from `definition` |
+| `RigidBody`, `Collider`, `PostProcessing`, `ParticleSystem` | Reconstructs definitions; backend runtime is recreated separately |
+| `Animator`, `AudioListener`, `AudioSource`, `Skin` | Reconstructs definitions; playback and loaded resources are not a saved session |
+| `Animation` | Reconstructs from `animations` |
+| `InstancedMesh`, `Script`, unknown component types | Skipped; restore through application adapters |
 
-| Component | Serialized data |
-|-----------|-----------------|
-| `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | Full `definition` (type + geometry parameters) |
-| `Material` | Full `definition` (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
-| `Camera` | Full `definition` (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
-| `Animation` | `animations[]` — array of `SvgAnimationDef` (animate / animateTransform) |
+### Typed arrays
 
-### In deserialization (`deserialize`)
+`Float32Array`, `Uint8Array`, `Uint16Array`, and `Uint32Array` are encoded as `{ __typedArray, base64 }` and restored to their original array type. This supports animation tracks and buffer geometry. It does not make an `InstancedMesh` component restorable. Other typed-array classes are not supported by this encoding.
 
-| Component | Restored? | Method |
-|-----------|-----------|--------|
-| `Transform` | ✅ | `Object.assign(new Transform(), data)` |
-| `Geometry` | ✅ | `new Geometry(data.definition)` |
-| `Material` | ✅ | `new Material(data.definition)` |
-| `Camera` | ✅ | `new Camera(data.definition)` |
-| `Animation` | ✅ | `new Animation(data.animations)` |
+```ts
+import { typedArrayReplacer, typedArrayReviver } from '@joroya/core';
 
-> **Note:** All components serialize and deserialize correctly, including `Camera` and `Animation`.
+const encoded = JSON.stringify({ values: new Float32Array([0, 1, 2]) }, typedArrayReplacer);
+const decoded = JSON.parse(encoded, typedArrayReviver);
+console.log(decoded.values instanceof Float32Array); // true
+```
 
-### Data preservation
+### What is preserved
 
-| Data | Preserved? |
-|------|------------|
-| Node UUID | ✅ Exact |
-| Node name | ✅ |
-| Parent-child hierarchy | ✅ |
-| Position | ✅ |
-| Rotation (quaternion) | ✅ |
-| Scale | ✅ |
-| Matrices (local + world) | ✅ |
-| Geometry type | ✅ |
-| Geometry parameters | ✅ |
-| Material color | ✅ |
-| Opacity | ✅ |
-| Fill/Stroke (SVG) | ✅ |
-| Gradients (fill/stroke) | ✅ |
-| Filter / ClipPath / Mask | ✅ |
-| Camera (Perspective + Orthographic) | ✅ |
-| SVG animations | ✅ |
-| `cssClass` / `cssId` | ✅ |
+Node IDs (including the root), names, parent-child relationships, transforms, `cssClass`, `cssId`, and supported component definitions are preserved. `component.node` is reattached by `addComponent()`. World matrices are recomputed on rendering.
+
+The saved root is reconstructed with its ID, name, CSS metadata, transform and supported components. Scene(root?: Node) accepts a parentless root; the no-argument constructor remains supported. Legacy JSON without a Transform receives the default Transform.
 
 ---
 
@@ -276,7 +259,7 @@ import { renderToSVG } from '@joroya/renderer-svg';
 
 function handleRequest(jsonBody: string): string {
   const scene = deserialize(jsonBody);
-  return renderToSVG(scene, { width: 800, height: 600 });
+  return renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 }
 ```
 
@@ -306,10 +289,12 @@ Git diffs show exactly what changed:
 
 ## Limitations
 
-| Limitation | Impact | Workaround |
-|------------|--------|------------|
-| UUIDs are preserved | Two scenes from the same JSON will have nodes with identical IDs | Regenerate IDs after deserialization if independent scenes are needed |
-| ~~Scene loses its camera when restored~~ | ✅ **Resolved** — Camera and Animation are deserialized correctly | — |
-| Unknown components | If a custom type is added and not registered in the `switch`, it is ignored | Extend `deserializeNode()` with new types |
-| JSON text format | Large files for scenes with many nodes | Future: binary serialization (MessagePack) |
-| No reference to `component.node` | The circular reference `component → node` is lost | Automatically rebuilt by `addComponent()` |
+| Limitation | Impact and workaround |
+| --- | --- |
+| Runtime callbacks | `onUpdate` and event handlers are not persisted; register them again after loading |
+| Instancing and custom components | `InstancedMesh`, `Script`, and unknown types are skipped by the reviver; restore with an adapter |
+| IDs are preserved on all nodes | Importing the same scene twice can create duplicate IDs; create new nodes for independent copies (`id` is readonly) |
+| No schema validation | Invalid JSON or unsupported shapes can throw; validate imported data at the application boundary |
+| External resources | JSON stores resource URIs and definitions, not texture/audio/model files or live physics state |
+
+Internal adapters save transforms, component definitions and SVG animations. Bound, playing and paused Animator components are safe to serialize; mixers, callbacks, node references and backend resources are excluded. Clip definitions survive loading, but the exact playback instant is not restored.

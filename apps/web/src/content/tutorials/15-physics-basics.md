@@ -5,7 +5,6 @@ order: 15
 level: "intermediate"
 duration: "20 min"
 ---
-
 # Tutorial 15: Physics — rigid bodies, joints, and collision events
 
 > **Level:** Intermediate
@@ -28,6 +27,7 @@ npm install @joroya/core @joroya/renderer-three @joroya/physics three
 
 `RigidBody` + `Collider` are *components* you attach to regular Oroya nodes. The `PhysicsSystem` traverses the scene each frame, materializes a cannon body for every node that has both, and writes the simulated transform back to `node.transform`.
 
+<!-- docs-example:start -->
 ```ts
 import {
     Scene, Node, Camera, CameraType, Light, LightType,
@@ -52,7 +52,9 @@ const sun = new Node("sun");
 sun.transform.position = { x: 5, y: 10, z: 5 };
 sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.0, castShadow: true }));
 scene.add(sun);
-scene.add(Object.assign(new Node("amb"), {})).addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+scene.add(ambient);
 
 // Floor — static body
 const floor = new Node("floor");
@@ -107,6 +109,7 @@ function frame(now: number) {
 }
 requestAnimationFrame(frame);
 ```
+<!-- docs-example:end -->
 
 That's it — the cube falls, hits the floor, and bounces with the configured `restitution`.
 

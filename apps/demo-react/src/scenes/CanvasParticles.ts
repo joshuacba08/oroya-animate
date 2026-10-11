@@ -87,7 +87,7 @@ export function createCanvasParticlesScene(params: ParamValues) {
 
         for (let i = 0; i < count; i++) {
             const p = particles[i];
-            let pos = p.node.transform.position;
+            const pos = p.node.transform.position;
 
             // Update position
             pos.x += p.vx * s;

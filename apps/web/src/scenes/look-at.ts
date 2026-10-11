@@ -10,7 +10,6 @@ import {
     Light,
     LightType,
     Environment,
-    type Vec3
 } from '@joroya/core';
 
 export function createLookAtScene(aspect: number = 16 / 9) {

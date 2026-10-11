@@ -7,8 +7,8 @@ duration: "20 min"
 ---
 # Tutorial 5: Arte Generativo SVG
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 20 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 20 minutos\
 > **Qué aprenderás:** Usar el renderer SVG con `createPath2D` para generar arte vectorial procedural.
 
 ---
@@ -71,26 +71,26 @@ document.body.innerHTML = svgString;
 
 ---
 
-## Paso 3: Arte generativo  EPatrón de espiral
+## Paso 3: Arte generativo — Patrón de espiral
 
 Ahora algo más interesante. Generamos una espiral usando matemáticas:
 
 ```typescript
 function createSpiral(centerX: number, centerY: number, turns: number, points: number) {
   const commands: { command: string; args: number[] }[] = [];
-  
+
   for (let i = 0; i <= points; i++) {
     const t = (i / points) * turns * Math.PI * 2;
     const radius = 5 + (i / points) * 80;
     const x = centerX + Math.cos(t) * radius;
     const y = centerY + Math.sin(t) * radius;
-    
+
     commands.push({
       command: i === 0 ? 'M' : 'L',
       args: [Math.round(x * 10) / 10, Math.round(y * 10) / 10],
     });
   }
-  
+
   return commands;
 }
 
@@ -215,4 +215,4 @@ Un mosaico de colores con cuadrados, diamantes y triángulos generados procedura
 
 ## Siguiente tutorial
 
-ↁE[Tutorial 6: Cámaras y Puntos de Vista](./06-cameras-viewpoints.md)  Eposicionando cámaras.
+→ [Tutorial 6: Cámaras y Puntos de Vista](/tutorials/06-cameras-viewpoints) — posicionando cámaras.

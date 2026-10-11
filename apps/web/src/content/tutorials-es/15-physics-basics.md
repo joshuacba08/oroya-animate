@@ -5,7 +5,6 @@ order: 15
 level: "intermediate"
 duration: "20 min"
 ---
-
 # Tutorial 15: Física — rigid bodies, joints y eventos de colisión
 
 > **Nivel:** Intermedio
@@ -28,6 +27,7 @@ npm install @joroya/core @joroya/renderer-three @joroya/physics three
 
 `RigidBody` + `Collider` son *componentes* que adjuntás a nodos normales de Oroya. El `PhysicsSystem` recorre la escena cada frame, materializa un body de cannon para cada nodo que tenga ambos componentes, y escribe la pose simulada de vuelta a `node.transform`.
 
+<!-- docs-example:start -->
 ```ts
 import {
     Scene, Node, Camera, CameraType, Light, LightType,
@@ -39,6 +39,15 @@ import { ThreeRenderer } from "@joroya/renderer-three";
 import { PhysicsSystem } from "@joroya/physics";
 
 const scene = new Scene();
+
+const cam = new Node("camera");
+cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 50, aspect: 16 / 9, near: 0.1, far: 100 }));
+cam.transform.setPosition({ x: 6, y: 6, z: 10 });
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+scene.add(cam);
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+scene.add(ambient);
 
 // Piso estático
 const floor = new Node("floor");
@@ -72,6 +81,12 @@ scene.add(cube);
 ## Paso 2 — Ejecutar la física en el render loop
 
 ```ts
+const renderer = new ThreeRenderer({
+    canvas: document.getElementById("canvas") as HTMLCanvasElement,
+    width: window.innerWidth, height: window.innerHeight,
+});
+renderer.mount(scene);
+
 const physics = new PhysicsSystem({ gravity: { x: 0, y: -9.82, z: 0 } });
 
 let last = performance.now();
@@ -84,6 +99,7 @@ function frame(now: number) {
 }
 requestAnimationFrame(frame);
 ```
+<!-- docs-example:end -->
 
 ---
 

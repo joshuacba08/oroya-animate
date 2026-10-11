@@ -44,3 +44,15 @@ Aprende a usar Oroya Animate paso a paso, desde tu primera escena hasta técnica
 | 11 | [SVG Interactivo](./11-svg-interactive.md) | Event delegation con `renderToSVGElement` e `Interactive` |
 | 17 | [Boolean Operations — CSG](./17-boolean-csg.md) | Crear formas complejas con Union, Subtract e Intersect |
 | 19 | [Animaciones con Cubic Spline](./19-cubic-spline.md) | Interpolación suave con tangentes para movimiento natural |
+
+
+## Tutoriales canónicos por tema
+
+Los tutoriales conservan archivos y slugs históricos. Su tema identifica cada entrada en scripts/docs-manifest.json; dos temas pueden compartir un número. Edita estas fuentes y ejecuta pnpm docs:sync.
+
+- [Física básica](./es/15-physics-basics.md)
+- [Clips y Animator](./es/16-animator-clips.md)
+- [Bindings de React](./es/17-react-bindings.md)
+- [Plugins y extensibilidad](./es/18-plugins-and-extensibility.md)
+- [Herramientas de desarrollo](./es/19-developer-tools.md)
+- [Editor visual](./es/20-visual-editor.md)

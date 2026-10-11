@@ -28,10 +28,10 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
 
         // Run a loop to create ellipses
         for (let i = 0; i < iterations; i += 1) {
-            let center = 500;
-            let radiusX = 100 + (i * 3);
-            let radiusY = 300 + (i * 2);
-            let rotation = baseRotation + (i * 2);
+            const center = 500;
+            const radiusX = 100 + (i * 3);
+            const radiusY = 300 + (i * 2);
+            const rotation = baseRotation + (i * 2);
 
             let hue;
             if (baseHue < 180) {
@@ -51,7 +51,7 @@ export const SvJsGenerativeDemo: DemoSceneDef = {
         }
 
         return {
-            scene: svg as any, // Cast to any to bypass Scene type check in DemoSceneDef for now
+            scene: svg, // Cast to any to bypass Scene type check in DemoSceneDef for now
             animate: (_time: number) => {
                 // We could animate here if we wanted
             },

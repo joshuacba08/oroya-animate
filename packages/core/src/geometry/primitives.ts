@@ -1,5 +1,6 @@
 import { BoxGeometryDef, CircleGeometryDef, ConeGeometryDef, CylinderGeometryDef, Geometry, GeometryPrimitive, Path2DGeometryDef, PlaneGeometryDef, SphereGeometryDef, TextGeometryDef, TorusGeometryDef } from '../components';
 
+/** @public */
 export interface GeometryOptions {
   castShadow?: boolean;
   receiveShadow?: boolean;
@@ -11,6 +12,7 @@ export interface GeometryOptions {
  * @param height The height of the box.
  * @param depth The depth of the box.
  * @returns A new Geometry component with a box definition.
+ * @public
  */
 export function createBox(width = 1, height = 1, depth = 1, options?: GeometryOptions): Geometry {
   const def: BoxGeometryDef = { type: GeometryPrimitive.Box, width, height, depth, ...options };
@@ -23,6 +25,7 @@ export function createBox(width = 1, height = 1, depth = 1, options?: GeometryOp
  * @param widthSegments The number of horizontal segments.
  * @param heightSegments The number of vertical segments.
  * @returns A new Geometry component with a sphere definition.
+ * @public
  */
 export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 16, options?: GeometryOptions): Geometry {
   const def: SphereGeometryDef = {
@@ -39,6 +42,7 @@ export function createSphere(radius = 0.5, widthSegments = 16, heightSegments = 
  * Creates a new 2D path geometry component.
  * @param path An array of path commands.
  * @returns A new Geometry component with a 2D path definition.
+ * @public
  */
 export function createPath2D(path: Path2DGeometryDef['path'], options?: GeometryOptions): Geometry {
   const def: Path2DGeometryDef = { type: GeometryPrimitive.Path2D, path, ...options };
@@ -50,6 +54,7 @@ export function createPath2D(path: Path2DGeometryDef['path'], options?: Geometry
  * @param text The text content to display.
  * @param options Optional text styling (fontSize, fontFamily, fontWeight, textAnchor, dominantBaseline).
  * @returns A new Geometry component with a text definition.
+ * @public
  */
 export function createText(
   text: string,
@@ -68,6 +73,7 @@ export function createText(
  * @param heightSegments Number of rows of faces along the height of the cylinder.
  * @param openEnded A boolean indicating whether the ends of the cylinder are open or capped.
  * @returns A new Geometry component with a cylinder definition.
+ * @public
  */
 export function createCylinder(
   radiusTop = 1,
@@ -98,6 +104,7 @@ export function createCylinder(
  * @param widthSegments Number of segments along the width.
  * @param heightSegments Number of segments along the height.
  * @returns A new Geometry component with a plane definition.
+ * @public
  */
 export function createPlane(width = 1, height = 1, widthSegments = 1, heightSegments = 1, options?: GeometryOptions): Geometry {
   const def: PlaneGeometryDef = {
@@ -119,6 +126,7 @@ export function createPlane(width = 1, height = 1, widthSegments = 1, heightSegm
  * @param heightSegments Number of rows of faces along the height of the cone.
  * @param openEnded A boolean indicating whether the base of the cone is open or capped.
  * @returns A new Geometry component with a cone definition.
+ * @public
  */
 export function createCone(
   radius = 1,
@@ -148,6 +156,7 @@ export function createCone(
  * @param tubularSegments Number of segments around the torus.
  * @param arc Central angle in radians (default `Math.PI * 2` — a full torus).
  * @returns A new Geometry component with a torus definition.
+ * @public
  */
 export function createTorus(
   radius = 1,
@@ -176,6 +185,7 @@ export function createTorus(
  * @param thetaStart Start angle in radians.
  * @param thetaLength Central angle in radians (default `Math.PI * 2` — full circle).
  * @returns A new Geometry component with a circle definition.
+ * @public
  */
 export function createCircle(
   radius = 1,

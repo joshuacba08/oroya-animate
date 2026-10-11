@@ -3,6 +3,7 @@ import type { Vec3 } from '../components/Transform';
 
 /**
  * All supported interaction event types.
+ * @public
  */
 export enum InteractionEventType {
     Click = 'click',
@@ -24,6 +25,7 @@ export enum InteractionEventType {
  * - `target` is the node where the event originated.
  * - `currentTarget` changes as the event bubbles up the hierarchy.
  * - Call `stopPropagation()` to prevent further bubbling.
+ * @public
  */
 export interface InteractionEvent {
     /** The type of interaction. */
@@ -66,6 +68,7 @@ export interface InteractionEvent {
  */
 import type { PhysicsEventMap } from './CollisionEvent';
 
+/** @public */
 export interface InteractionEventMap extends PhysicsEventMap {
     click: InteractionEvent;
     pointerdown: InteractionEvent;
@@ -81,6 +84,7 @@ export interface InteractionEventMap extends PhysicsEventMap {
 
 /**
  * Factory to create an InteractionEvent with sensible defaults.
+ * @public
  */
 export function createInteractionEvent(
     type: InteractionEventType,

@@ -5,7 +5,6 @@ order: 20
 level: "beginner"
 duration: "10 min"
 ---
-
 # Tutorial 20: Visual editor (alpha)
 
 > **Level:** Beginner

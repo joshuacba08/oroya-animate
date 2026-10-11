@@ -29,11 +29,13 @@ interface ClipState {
     finished: boolean;
 }
 
-/** Monotonic time source used by `tick()`; injectable for deterministic runtimes and tests. */
+/** Monotonic time source used by `tick()`; injectable for deterministic runtimes and tests. * @public
+ */
 export interface AnimationClock {
     now(): number;
 }
 
+/** @public */
 export interface AnimationSampledValue {
     targetNodeName: string;
     property: KeyframeTrack['property'];
@@ -50,6 +52,7 @@ const defaultAnimationClock: AnimationClock = {
  * - `keyframe-event` fires when the play-head of any active clip crosses a
  *   `KeyframeEvent` time.
  * - `finished` fires when a non-looping clip reaches its duration.
+ * @public
  */
 export interface AnimationMixerEventMap {
     'keyframe-event': { clip: AnimationClip; event: KeyframeEvent };
@@ -63,6 +66,7 @@ export interface AnimationMixerEventMap {
  * The mixer is intentionally engine-agnostic — it only reads/writes
  * `Vec3`/`Quat` on `Transform`. Renderers translate transforms to backend
  * objects as they would for any node mutation.
+ * @public
  */
 export class AnimationMixer {
     private scene: Scene;

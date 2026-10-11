@@ -1,9 +1,11 @@
 import { Component, ComponentType } from './Component';
 
+/** @public */
 export interface AudioListenerDef {
     masterVolume?: number;
 }
 
+/** @public */
 export class AudioListener extends Component {
     readonly type = ComponentType.AudioListener;
 

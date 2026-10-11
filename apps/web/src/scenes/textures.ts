@@ -10,8 +10,6 @@ import {
     LightType,
     Environment,
     FogType,
-    type Vec3,
-    type Quat
 } from '@joroya/core';
 
 export function createTexturesScene(aspect: number = 16 / 9) {

@@ -13,6 +13,7 @@ import type { Vec3 } from '../components/Transform';
  * Trigger colliders (`Collider.isTrigger === true`) emit `trigger-enter`,
  * `trigger-stay`, `trigger-exit` instead — same payload shape, no impulse
  * information because triggers don't generate a contact response.
+ * @public
  */
 export interface CollisionEvent {
     /** The other node involved in the collision. */
@@ -27,6 +28,7 @@ export interface CollisionEvent {
 
 /**
  * Event names appended to the Node event map by the physics system.
+ * @public
  */
 export interface PhysicsEventMap {
     'collide-begin': CollisionEvent;

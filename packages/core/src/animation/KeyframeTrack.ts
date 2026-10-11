@@ -1,11 +1,13 @@
 /**
  * Interpolation modes for keyframe animation.
+ * @public
  */
 export type InterpolationMode = 'linear' | 'step' | 'cubicspline';
 
 /**
  * A keyframe track defines animation data for a single property of a node.
  * This is engine-agnostic and can be translated to Three.js AnimationClip or other backends.
+ * @public
  */
 export interface KeyframeTrack {
     /**

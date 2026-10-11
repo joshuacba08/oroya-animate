@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — runtime and documentation maintenance
+
+- Preserve complete scene roots and safely serialize bound/playing Animator definitions.
+- Add explicit copying Transform setters with invalidation.
+- Correct nested Three.js matrices, reconcile dynamic trees, and dispose owned resources and plugin/audio lifecycles.
+- Audit all exports with TypeScript and gate CI on stability tags; validate all applications.
+- Consolidate localized documentation and tutorials; defer scene factories, renderers and Monaco.
+- Gate Vercel documentation deployments through GitHub Actions with browser/HTTP checks and rollback.
+- No npm package publication is included.
+
 All notable changes to Oroya Animate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

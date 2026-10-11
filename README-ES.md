@@ -61,12 +61,14 @@ Este proyecto se gestiona como un monorepo usando espacios de trabajo de `pnpm`:
 La documentación detallada está disponible en la carpeta [`docs/`](docs/) y en el sitio web:
 
 ### Documentación Principal
-- [**Visión General de Arquitectura**](docs/architecture.md): Aprende sobre el diseño central agnóstico al motor.
-- [**Comenzando**](docs/getting-started.md): Tu primera escena en 5 minutos.
-- [**Grafo de Escena y Transformaciones**](docs/scene-graph.md): Inmersión profunda en nodos y componentes.
+- [Estabilidad de API](docs/api-stability.md) y [migración a v1](docs/migration-v1.md).
+- [Revisión de mejoras](docs/maintenance-review.md): hallazgos verificados y prioridades.
+- [**Visión General de Arquitectura**](docs/architecture-es.md): Aprende sobre el diseño central agnóstico al motor.
+- [**Comenzando**](docs/getting-started-es.md): Tu primera escena en 5 minutos.
+- [**Grafo de Escena y Transformaciones**](docs/scene-graph-es.md): Inmersión profunda en nodos y componentes.
 - [**Referencia API**](docs/api-reference.md): Referencia completa de clases, interfaces y funciones.
-- [**Renderizadores**](docs/renderers.md): Documentación de backends Three.js, SVG y Canvas2D.
-- [**Serialización**](docs/serialization.md): Guardar y cargar escenas como JSON.
+- [**Renderizadores**](docs/renderers-es.md): Documentación de backends Three.js, SVG y Canvas2D.
+- [**Serialización**](docs/serialization-es.md): Guardar y cargar escenas como JSON.
 
 ### Despliegue y Publicación
 - [**Publicación NPM**](docs/deployment/npm-publishing.md): Publicar paquetes en el registro NPM.
@@ -87,58 +89,81 @@ La documentación detallada está disponible en la carpeta [`docs/`](docs/) y en
 #### NPM/PNPM (Recomendado)
 
 ```bash
-npm install @joroya/core @joroya/renderer-three
+npm install @joroya/core @joroya/renderer-three three
 # o
-pnpm add @joroya/core @joroya/renderer-three
+pnpm add @joroya/core @joroya/renderer-three three
 # o
-yarn add @joroya/core @joroya/renderer-three
+yarn add @joroya/core @joroya/renderer-three three
 ```
 
-#### CDN (Sin instalación)
+#### Uso en el navegador
 
-```html
-<script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
-  // Tu código aquí...
-</script>
-```
+Los ejemplos TypeScript requieren un bundler como Vite. Los archivos ESM de `dist/` conservan imports de dependencias: copiarlos a un script remoto requiere resolver esas dependencias. Sigue la [guía de inicio](docs/getting-started-es.md) para una configuración reproducible.
 
 ### Uso Básico
 
 ```typescript
-import { Scene, Node, createBox, Material, Camera, CameraType } from '@joroya/core';
+import {
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
+} from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// 1. Crear una escena
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// 2. Agregar una cámara
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const scene = new Scene();
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// 3. Crear un nodo con geometría y material
-const box = new Node('my-box');
-box.addComponent(createBox(1, 1, 1));
-box.addComponent(new Material({ color: { r: 1, g: 0, b: 0 } }));
-scene.add(box);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
 
-// 4. Renderizar con Three.js
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
+
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
+  canvas,
   width: window.innerWidth,
   height: window.innerHeight,
 });
 renderer.mount(scene);
-renderer.render();
+
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
+}
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ## 🗺️ Hoja de Ruta
@@ -204,7 +229,7 @@ renderer.render();
 
 ### Paquetes en NPM
 
-Todos los paquetes están publicados en NPM bajo el scope `@joroya`:
+Los paquetes del workspace usan el scope `@joroya`. Consulta el registro para comprobar las versiones disponibles:
 - [@joroya/core](https://www.npmjs.com/package/@joroya/core)
 - [@joroya/renderer-three](https://www.npmjs.com/package/@joroya/renderer-three)
 - [@joroya/renderer-svg](https://www.npmjs.com/package/@joroya/renderer-svg)

@@ -1040,7 +1040,6 @@ function OrbitDemo({ copy }: { copy: LabCopy }) {
   const circularSpeed = Math.sqrt(mu / radius);
   const orbitalSpeed = circularSpeed * speedFactor;
   const escapeSpeed = Math.SQRT2 * circularSpeed;
-  const gravityPull = mu / (radius * radius);
   const period = 2 * Math.PI * Math.sqrt((radius * radius * radius) / mu);
   const orbitStatus = speedFactor < 0.9 ? "slowOrbit" : speedFactor > 1.25 ? "fastOrbit" : "stableOrbit";
   const angle = (phase / 100) * Math.PI * 2;

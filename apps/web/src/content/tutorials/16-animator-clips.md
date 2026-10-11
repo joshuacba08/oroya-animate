@@ -5,7 +5,6 @@ order: 16
 level: "intermediate"
 duration: "20 min"
 ---
-
 # Tutorial 16: Animator — clip library, crossfade, and keyframe events
 
 > **Level:** Intermediate
@@ -20,6 +19,7 @@ The `Animator` component sits on a node and owns an `AnimationMixer` that mutate
 
 A clip is engine-agnostic data: a list of keyframe tracks (`times` + `values` as `Float32Array`s) plus optional named events.
 
+<!-- docs-example:start -->
 ```ts
 import {
     Scene, Node, Camera, CameraType, Light, LightType,
@@ -31,7 +31,20 @@ import { ThreeRenderer } from "@joroya/renderer-three";
 
 const scene = new Scene();
 
-// … standard camera + lights + ground here …
+const cam = new Node("camera");
+cam.addComponent(new Camera({ type: CameraType.Perspective, fov: 50, aspect: 16 / 9, near: 0.1, far: 100 }));
+cam.transform.setPosition({ x: 6, y: 6, z: 10 });
+cam.transform.lookAt({ x: 0, y: 0, z: 0 });
+scene.add(cam);
+const ambient = new Node("ambient");
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+scene.add(ambient);
+
+const ground = new Node("ground");
+ground.addComponent(createPlane(20, 20));
+ground.addComponent(new Material({ color: { r: 0.2, g: 0.2, b: 0.25 } }));
+ground.transform.setRotation({ x: -Math.SQRT1_2, y: 0, z: 0, w: Math.SQRT1_2 });
+scene.add(ground);
 
 const hero = new Node("hero");
 hero.addComponent(createBox(1, 1, 1, { castShadow: true }));
@@ -137,6 +150,7 @@ function frame(now: number) {
 }
 requestAnimationFrame(frame);
 ```
+<!-- docs-example:end -->
 
 ---
 

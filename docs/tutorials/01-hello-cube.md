@@ -1,7 +1,7 @@
-# Tutorial 1: Hello Cube 🟢
+# Tutorial 1: Hello Cube
 
-> **Nivel:** Principiante  
-> **Tiempo estimado:** 10 minutos  
+> **Nivel:** Principiante\
+> **Tiempo estimado:** 10 minutos\
 > **Qué aprenderás:** Crear una escena mínima con un cubo 3D que rota usando `@joroya/core` y `@joroya/renderer-three`.
 
 ---
@@ -22,7 +22,7 @@ Crea un archivo HTML con un `<canvas>`:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hello Cube  EOroya Animate</title>
+  <title>Hello Cube — Oroya Animate</title>
   <style>
     body { margin: 0; overflow: hidden; background: #1a1a2e; }
     canvas { display: block; }
@@ -118,7 +118,7 @@ animate();
 
 ## Resultado
 
-Un cubo azul brillante rotando suavemente sobre fondo oscuro. 🎉
+Un cubo azul brillante rotando suavemente sobre fondo oscuro.
 
 ---
 
@@ -173,4 +173,4 @@ animate();
 
 ## Siguiente tutorial
 
-➡�E�E[Tutorial 2: Paleta de Colores](./02-color-palette.md)  Emúltiples formas y colores.
+→ [Tutorial 2: Paleta de Colores](./02-color-palette.md) — múltiples formas y colores.

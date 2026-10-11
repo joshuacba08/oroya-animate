@@ -151,14 +151,12 @@ const currentNumber = currentIndex + 1;
       });
     });
 
-    let activeIndex = 0;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const idx = Array.from(headings).indexOf(entry.target as HTMLHeadingElement);
             if (idx !== -1) {
-              activeIndex = idx;
               updateActiveStep(idx);
             }
           }

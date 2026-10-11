@@ -7,8 +7,8 @@ duration: "25 min"
 ---
 # Tutorial 12: Sistema de Animación por Keyframes
 
-> **Nivel:** Intermedio  
-> **Tiempo estimado:** 25 minutos  
+> **Nivel:** Intermedio\
+> **Tiempo estimado:** 25 minutos\
 > **Qué aprenderás:** Animar nodos 3D usando `AnimationMixer`, `AnimationClip` y `KeyframeTrack` con los tres modos de interpolación: linear, step y cubicspline.
 
 ---
@@ -358,4 +358,4 @@ Explora la comparación de interpolaciones en la demo **"Interpolation Modes"** 
 
 ## Siguiente tutorial
 
-→ [Tutorial 13: Interactividad 3D](./13-3d-interactivity.md) — raycasting y eventos de puntero en Three.js.
+→ [Tutorial 13: Interactividad 3D](/tutorials/13-3d-interactivity) — raycasting y eventos de puntero en Three.js.

@@ -11,9 +11,11 @@ import { ThreeRenderer } from '@joroya/renderer-three';
 /**
  * Per-frame callback. Receives `dt` in seconds — same convention as the
  * core renderer.
+ * @experimental
  */
 export type FrameCallback = (dt: number) => void;
 
+/** @experimental */
 export interface OroyaContext {
     scene: Scene;
     parentNode: OroyaNode;

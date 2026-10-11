@@ -2,6 +2,7 @@ import { Component, ComponentType } from './Component';
 
 /**
  * Definition for the Interactive component.
+ * @public
  */
 export interface InteractiveDef {
     /**
@@ -35,6 +36,7 @@ export interface InteractiveDef {
  * node.addComponent(new Interactive({ cursor: 'pointer' }));
  * node.on('click', (e) => console.log('Clicked!', e.target.name));
  * ```
+ * @public
  */
 export class Interactive extends Component {
     readonly type = ComponentType.Interactive;

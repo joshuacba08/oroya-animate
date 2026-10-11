@@ -38,7 +38,7 @@ export function createGaussianDistScene(params: ParamValues) {
     graphGroup.line(0, centerY, 1000, centerY).stroke('#fff', 1, 0.2);
 
     return {
-        scene: svg as any,
+        scene: svg,
         animate: () => { }
     };
 }

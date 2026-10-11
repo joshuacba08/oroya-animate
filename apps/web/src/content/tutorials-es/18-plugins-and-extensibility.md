@@ -5,7 +5,6 @@ order: 18
 level: "advanced"
 duration: "20 min"
 ---
-
 # Tutorial 18: Plugins — extender el renderer sin forkearlo
 
 > **Nivel:** Avanzado

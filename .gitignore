@@ -21,3 +21,7 @@ Thumbs.db
 .idea
 .vscode
 .vercel
+
+# Browser validation
+playwright-report/
+test-results/

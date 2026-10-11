@@ -2,6 +2,7 @@ import type { Node } from '../nodes/Node';
 
 /**
  * An enumeration of the available component types.
+ * @public
  */
 export enum ComponentType {
   Transform = 'Transform',
@@ -26,6 +27,7 @@ export enum ComponentType {
 
 /**
  * The base class for all components that can be attached to a Node.
+ * @public
  */
 export abstract class Component {
   /**

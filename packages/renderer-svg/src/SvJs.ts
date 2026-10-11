@@ -1,5 +1,6 @@
 /**
  * A class to instantiate a new SvJs element.
+ * @public
  */
 export class SvJs {
     public element: SVGElement;

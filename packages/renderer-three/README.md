@@ -32,56 +32,66 @@ npm install @joroya/core @joroya/renderer-three three
 
 ```typescript
 import {
-  Camera,
-  CameraType,
-  Material,
-  Node,
-  Scene,
-  createBox,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// Create scene
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// Add camera
+const scene = new Scene();
 const camera = new Node('camera');
 camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000
+  far: 100,
 }));
 camera.transform.position.z = 5;
 scene.add(camera);
 
-// Add cube
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
 const cube = new Node('cube');
-cube.addComponent(createBox(1, 1, 1));
-cube.addComponent(new Material({ color: { r: 1, g: 0.5, b: 0 } }));
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
 scene.add(cube);
 
-// Create renderer
 const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
+  canvas,
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
 });
 renderer.mount(scene);
 
-// Animation loop
-let angle = 0;
-
-function animate() {
-  angle += 0.01;
-  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
   cube.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(animate);
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-animate();
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ## API
@@ -103,6 +113,9 @@ const renderer = new ThreeRenderer({
 renderer.mount(scene: Scene): void
 renderer.render(dt?: number): void
 renderer.setSize(width: number, height: number): void
+renderer.enableOrbitControls(): void
+renderer.disableOrbitControls(): void
+renderer.disableInteraction(): void
 renderer.enableInteraction(): void
 renderer.dispose(): void
 ```
@@ -111,18 +124,11 @@ renderer.dispose(): void
 
 - [Full Documentation](https://oroya-animate.oroyajs.com)
 - [Renderer Guide](https://oroya-animate.oroyajs.com/docs/renderers)
-- [Tutorials](https://oroya-animate.oroyajs.com/docs/tutorials)
+- [Tutorials](https://oroya-animate.oroyajs.com/tutorials)
 
-## CDN Usage
+## Browser setup
 
-```html
-<script type="module">
-  import { Scene, Node } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
-  import { ThreeRenderer } from 'https://unpkg.com/@joroya/renderer-three@1.0.0/dist/index.js';
-  
-  // Your code here
-</script>
-```
+Use the [Getting Started guide](../../docs/getting-started.md) with a bundler such as Vite. Raw `dist/index.js` files retain external package imports and require dependency resolution in the browser.
 
 ## Contributing
 

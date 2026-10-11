@@ -80,7 +80,7 @@ export function createColourfulGridsScene(params: ParamValues) {
     function clipId(base: string) { return `clip-${base}-${Math.floor(Math.random() * 10000)}`; }
 
     return {
-        scene: svg as any,
+        scene: svg,
         animate: () => { }
     };
 }

@@ -687,6 +687,7 @@ function renderNodeToString(node: Node, indent: string, gradients: GradientColle
   return '';
 }
 
+/** @public */
 export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
   // Advance scene logic first (Animator, custom onUpdate hooks). The SVG
   // backend is pure render so `dt` defaults to a single 60Hz tick — callers
@@ -965,6 +966,7 @@ function renderNodeToDom(
  */
 // `renderToSVGElement` mirrors `renderToSVG` but emits a live DOM element;
 // it shares the same `scene.update(dt)` semantics.
+/** @public */
 export function renderToSVGElement(
   scene: Scene,
   options: SvgElementRenderOptions,

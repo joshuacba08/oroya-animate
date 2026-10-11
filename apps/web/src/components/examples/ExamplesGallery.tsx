@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { ExampleCard, getCategoryLabel } from "./ExampleCard";
 import { ExampleModal } from "./ExampleModal";
-import { EXAMPLES } from "./scenes";
+import { EXAMPLES } from "./metadata";
 import type { ExampleDef } from "./ExampleCard";
 
 type CategoryFilter = "all" | "3d" | "svg" | "svjs";

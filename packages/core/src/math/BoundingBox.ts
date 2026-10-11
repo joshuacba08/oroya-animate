@@ -8,6 +8,7 @@ import type { Matrix4 } from './Matrix4';
  *
  * Represents a rectangular volume aligned to the world axes,
  * defined by its minimum and maximum corners.
+ * @public
  */
 export interface AABB {
     min: Vec3;
@@ -20,6 +21,7 @@ export interface AABB {
  * - **Box**: centered at origin, extends ±half in each axis.
  * - **Sphere**: a cube enclosing the sphere.
  * - **Path2D**: bounding box of all path control points.
+ * @public
  */
 export function computeLocalAABB(def: GeometryDef): AABB {
     switch (def.type) {
@@ -197,6 +199,7 @@ export function computeLocalAABB(def: GeometryDef): AABB {
  * Computes the AABB of the 8 transformed corner points.
  * The result is still axis-aligned, so it may be larger than the actual
  * oriented bounding box.
+ * @public
  */
 export function transformAABB(aabb: AABB, matrix: Matrix4): AABB {
     const corners: Vec3[] = [
@@ -235,6 +238,7 @@ export function transformAABB(aabb: AABB, matrix: Matrix4): AABB {
 
 /**
  * Test whether a point lies inside an AABB (inclusive).
+ * @public
  */
 export function pointInAABB(point: Vec3, aabb: AABB): boolean {
     return (

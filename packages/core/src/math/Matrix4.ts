@@ -1,5 +1,6 @@
 import { Quat, Vec3 } from '../components/Transform';
 
+/** @public */
 export type Matrix4 = [
   number, number, number, number,
   number, number, number, number,
@@ -7,6 +8,7 @@ export type Matrix4 = [
   number, number, number, number
 ];
 
+/** @public */
 export const Matrix4Identity: Readonly<Matrix4> = [
   1, 0, 0, 0,
   0, 1, 0, 0,
@@ -14,6 +16,7 @@ export const Matrix4Identity: Readonly<Matrix4> = [
   0, 0, 0, 1
 ];
 
+/** @public */
 export function composeMatrix(position: Vec3, quaternion: Quat, scale: Vec3): Matrix4 {
   const te = [...Matrix4Identity];
 
@@ -49,6 +52,7 @@ export function composeMatrix(position: Vec3, quaternion: Quat, scale: Vec3): Ma
   return te as Matrix4;
 }
 
+/** @public */
 export function multiplyMatrices(a: Matrix4, b: Matrix4): Matrix4 {
   const ae = a;
   const be = b;

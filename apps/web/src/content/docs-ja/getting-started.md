@@ -36,10 +36,28 @@ pnpm add @joroya/core @joroya/renderer-three three
 | `@joroya/renderer-svg` | 2Dパスベースグラフィックス用SVGレンダラー |
 | `@joroya/renderer-canvas2d` | 2Dラスターグラフィックス用Canvas 2Dレンダラー |
 | `@joroya/loader-gltf` | glTFモデルをOroyaシーンに読み込み |
+| `@joroya/physics` | cannon-es による物理システム |
+| `@joroya/assets` | アセットのキャッシュとプリロード |
+| `@joroya/input` | キーボード、マウス、ゲームパッドのアクション |
+| `@joroya/inspector` | シーンのインスペクターとメトリクス |
+| `@joroya/react` | 実験的な React バインディング |
+| `@joroya/vue` | 実験的な Vue 3 コンポーザブル |
 
 > **注意:** `@joroya/renderer-three` と `@joroya/loader-gltf` は `three` をpeer dependencyとして持っています。プロジェクトにインストールされていることを確認してください：`npm install three`
 
 ---
+
+以下の HTML は TypeScript とパッケージを読み込むためにバンドラーが必要です。新しいプロジェクトでは以下を実行します。
+
+```bash
+pnpm create vite oroya-demo --template vanilla-ts
+cd oroya-demo
+pnpm install
+pnpm add @joroya/core @joroya/renderer-three three
+pnpm dev
+```
+
+シーンを `src/main.ts` に保存し、`index.html` のスクリプト URL を `/src/main.ts` にしてください。
 
 ## クイックスタート — 回転するキューブ
 
@@ -60,7 +78,7 @@ pnpm add @joroya/core @joroya/renderer-three three
 </head>
 <body>
   <canvas id="oroya-canvas"></canvas>
-  <script type="module" src="./main.ts"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
 ```
@@ -69,49 +87,40 @@ pnpm add @joroya/core @joroya/renderer-three three
 
 ```typescript
 import {
-  Scene, Node, createBox, Material,
-  Camera, CameraType, Light, LightType,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-// --- シーン ---
-const scene = new Scene();
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
 
-// --- カメラ ---
-const cameraNode = new Node('main-camera');
-cameraNode.addComponent(new Camera({
+const scene = new Scene();
+const camera = new Node('camera');
+camera.addComponent(new Camera({
   type: CameraType.Perspective,
-  fov: 75,
+  fov: 60,
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
-  far: 1000,
+  far: 100,
 }));
-cameraNode.transform.position.z = 5;
-scene.add(cameraNode);
+camera.transform.position.z = 5;
+scene.add(camera);
 
-// --- ライティング ---
 const ambient = new Node('ambient');
-ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.4 }));
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
 scene.add(ambient);
 
 const sun = new Node('sun');
-sun.addComponent(new Light({
-  type: LightType.Directional,
-  intensity: 0.8,
-  target: { x: 0, y: 0, z: 0 },
-}));
-sun.transform.position = { x: 3, y: 6, z: 4 };
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
 scene.add(sun);
 
-// --- キューブ ---
-const cubeNode = new Node('my-cube');
-cubeNode.addComponent(createBox(1, 1, 1));
-cubeNode.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
-scene.add(cubeNode);
+const cube = new Node('cube');
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
+scene.add(cube);
 
-// --- レンダラー ---
-const canvas = document.getElementById('oroya-canvas') as HTMLCanvasElement;
 const renderer = new ThreeRenderer({
   canvas,
   width: window.innerWidth,
@@ -119,22 +128,28 @@ const renderer = new ThreeRenderer({
 });
 renderer.mount(scene);
 
-// --- アニメーションループ ---
-function animate(time: number) {
-  time *= 0.001; // 秒に変換
-  requestAnimationFrame(animate);
-
-  const speed = 0.5;
-  cubeNode.transform.rotation = setFromAxisAngle(
-    { x: 0.4, y: 1, z: 0 },
-    time * speed,
-  );
-  cubeNode.transform.updateLocalMatrix();
-
-  renderer.render();
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
+  cube.transform.updateLocalMatrix();
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
-requestAnimationFrame(animate);
+frameId = requestAnimationFrame(frame);
+
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
+
+`dt` の単位は秒です。`render(dt)` が `scene.update(dt)` を呼ぶため、同じループで二度呼ばないでください。回転はクォータニオンです。単位軸で `setFromAxisAngle()` を使います。`MeshStandardMaterial` には明示的なライトが必要です。破棄前にループを停止します。`setSize()` は描画サイズを変更しますが、カメラの投影は更新しません。
 
 これだけです！画面上に赤いキューブが回転して表示されるはずです。
 
@@ -474,30 +489,39 @@ npm install @joroya/loader-gltf three
 ```
 
 ```typescript
+import { Animator, Light, LightType, Node } from '@joroya/core';
 import { loadGLTF } from '@joroya/loader-gltf';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
-const { scene: gltfScene, animations } = await loadGLTF('/models/robot.glb');
+const result = await loadGLTF('/models/robot.glb');
+const animationNode = new Node('model-animation');
+const animator = new Animator();
+for (const clip of result.animations) animator.addClip(clip);
+animationNode.addComponent(animator);
+result.scene.add(animationNode);
+animator.bindToScene(result.scene);
 
-const renderer = new ThreeRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-  width: 800,
-  height: 600,
-});
-renderer.mount(gltfScene);
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 1 }));
+result.scene.add(ambient);
 
-// アニメーションがあれば再生
-if (animations.length > 0) {
-  const mixer = new AnimationMixer(gltfScene);
-  mixer.play(animations[0]);
-}
+const canvas = document.querySelector<HTMLCanvasElement>('#oroya-canvas');
+if (!canvas) throw new Error('Canvas element not found');
+const renderer = new ThreeRenderer({ canvas, width: 800, height: 600 });
+renderer.mount(result.scene);
+if (result.animations[0]) animator.play(result.animations[0].name);
 
-function loop() {
-  renderer.render();
+let previousTime: number | undefined;
+function loop(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  renderer.render(dt);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 ```
+
+`loadGLTF()` の戻り値は `{ scene, animations }` です。カメラとライトの追加が必要な場合があります。クリップの再生には子ノードに `Animator` を追加し、シーンにバインドしてクリップを登録し、`play()` を呼びます。別のシーンへ移す際は `[...result.scene.root.children]` を走査してください。親の変更は元の子配列を変更します。
 
 ---
 
@@ -546,7 +570,7 @@ function OroyaCanvas({ scene }: { scene: Scene }) {
     renderer.mount(scene);
 
     let frameId: number;
-    const animate = (time: number) => {
+    const animate = () => {
       renderer.render();
       frameId = requestAnimationFrame(animate);
     };
@@ -562,7 +586,7 @@ function OroyaCanvas({ scene }: { scene: Scene }) {
 }
 
 // 使用例
-function App() {
+export default function App() {
   const scene = new Scene();
 
   const cam = new Node('cam');
@@ -608,6 +632,8 @@ node.transform.scale = { x: 2, y: 2, z: 2 };
 node.transform.updateLocalMatrix();
 ```
 
+`position`、`rotation`、`scale` を直接変更しても `isDirty` は更新されません。変更後に `updateLocalMatrix()` を呼ぶか、ワールド行列の更新前に `isDirty = true` を設定してください。`rotateOnAxis()` と `lookAt()` は自動で dirty フラグを設定します。
+
 ---
 
 ## トラバーサルと検索
@@ -633,9 +659,19 @@ const children = node.children;       // Node[]
 
 ## 次のステップ
 
-- **[アーキテクチャ](architecture.md)** — 設計哲学とモジュール境界を理解する。
-- **[レンダラー](renderers.md)** — レンダラーの実装を詳しく学ぶ。
-- **[シーングラフ](scene-graph.md)** — ノード階層と変換の仕組みを学ぶ。
-- **[シリアライゼーション](serialization.md)** — JSON形式の完全な詳細。
-- **[APIリファレンス](api-reference.md)** — 完全なAPIドキュメント。
-- **[コントリビュート](contributing.md)** — Oroya Animateへの貢献方法。
+- **[アーキテクチャ](/ja/docs/architecture)** — 設計哲学とモジュール境界を理解する。
+- **[レンダラー](/ja/docs/renderers)** — レンダラーの実装を詳しく学ぶ。
+- **[シーングラフ](/ja/docs/scene-graph)** — ノード階層と変換の仕組みを学ぶ。
+- **[シリアライゼーション](/ja/docs/serialization)** — JSON形式の完全な詳細。
+- **[APIリファレンス](/docs/api-reference)** — API リファレンスとパッケージガイド。
+- **[コントリビュート](/docs/contributing)** — Oroya Animateへの貢献方法。
+
+## Transform の明示的な更新
+
+setPosition(value: Vec3)、setRotation(value: Quat)、setScale(value: Vec3) は入力をコピーし、void を返して isDirty を設定します。直接代入は v1 の動作を維持するため、updateLocalMatrix() を呼ぶか isDirty = true を設定してください。
+
+```ts
+node.transform.setPosition({ x: 2, y: 0, z: -3 });
+node.transform.setScale({ x: 2, y: 2, z: 2 });
+node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+```

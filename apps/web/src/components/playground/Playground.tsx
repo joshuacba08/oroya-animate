@@ -1,6 +1,8 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import Editor, { type OnMount } from "@monaco-editor/react";
-import { TEMPLATES, type PlaygroundTemplate } from "./templates";
+import { lazy, Suspense, useState, useRef, useCallback, useEffect, useMemo } from "react";
+import type { OnMount } from "@monaco-editor/react";
+import type { editor as MonacoEditor } from "monaco-editor";
+const Editor = lazy(() => import("@monaco-editor/react"));
+import { TEMPLATES } from "./templates";
 import {
   Scene,
   Node,
@@ -58,10 +60,6 @@ import {
   easeOutElastic,
   spring,
   solve2BoneIK,
-  type AnimationClip,
-  type KeyframeTrack,
-  type InterpolationMode,
-  type Path2DCommand,
 } from "@joroya/core";
 import { ThreeRenderer } from "@joroya/renderer-three";
 import { renderToSVG, SvJs, Gen } from "@joroya/renderer-svg";
@@ -188,7 +186,7 @@ export function Playground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void)[]>([]);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
   const autoRunTimerRef = useRef<number>(0);
   const consoleEndRef = useRef<HTMLDivElement>(null);
 
@@ -254,7 +252,7 @@ export function Playground() {
     const availW = Math.floor(rect.width) - pad * 2;
     const availH = Math.floor(rect.height) - pad * 2;
 
-    let w = availW;
+    const w = availW;
     let h = availH;
 
     // Constrain aspect ratio to a balanced viewport (between 4:3 landscape and full width)
@@ -299,8 +297,8 @@ export function Playground() {
       const fn = new Function(...scopeKeys, code);
       fn(...scopeValues);
       addLog("info", "✓ Ejecutado correctamente");
-    } catch (err: any) {
-      addLog("error", err.message || String(err));
+    } catch (err) {
+      addLog("error", err instanceof Error ? err.message : String(err));
     }
 
     setIsRunning(false);
@@ -333,7 +331,7 @@ export function Playground() {
 
   const handleEditorMount: OnMount = useCallback((editor) => {
     editorRef.current = editor;
-    editor.onDidChangeCursorPosition((e: any) => {
+    editor.onDidChangeCursorPosition((e) => {
       setCursorPos({ line: e.position.lineNumber, col: e.position.column });
     });
   }, []);
@@ -565,7 +563,7 @@ export function Playground() {
           } lg:flex ${isPreviewFullscreen ? "lg:hidden" : "lg:w-1/2"} w-full`}
         >
           <div className="flex-1 min-h-0 overflow-hidden">
-            <Editor
+            <Suspense fallback={<div role="status">Loading editor…</div>}><Editor
               height="100%"
               defaultLanguage="javascript"
               value={code}
@@ -590,7 +588,7 @@ export function Playground() {
                 bracketPairColorization: { enabled: true },
                 renderLineHighlight: "gutter",
               }}
-            />
+            /></Suspense>
           </div>
 
           {/* ── Console ──────────────────────────────────────── */}

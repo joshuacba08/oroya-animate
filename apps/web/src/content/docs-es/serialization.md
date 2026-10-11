@@ -4,10 +4,9 @@ description: "Serialización JSON para guardar, cargar y compartir escenas"
 order: 5
 category: "concepts"
 ---
-
 # Serialización
 
-Oroya Animate incluye un sistema de serialización JSON que permite guardar y cargar escenas completas. Es la base para editores visuales, colaboración y versionado de escenas.
+Oroya Animate incluye un sistema de serialización JSON que permite guardar y cargar definiciones de escena. Es la base para editores visuales, colaboración y versionado de escenas.
 
 ---
 
@@ -172,51 +171,34 @@ graph TD
 
 ## Componentes soportados
 
-### En serialización (`serialize`)
+La serialización conserva solo los datos declarativos soportados. Se excluyen campos del runtime, callbacks, referencias a nodos y objetos del backend, también en datos de eventos. Un Animator enlazado se puede guardar con seguridad.
 
-Todos los componentes se serializan usando spread (`{ ...component }`):
+| Componente | Deserialización |
+| --- | --- |
+| `Transform` | Restaura los campos en un `Transform` nuevo |
+| `Geometry`, `Material`, `Camera`, `Interactive`, `Light`, `Environment` | Reconstruye desde `definition` |
+| `RigidBody`, `Collider`, `PostProcessing`, `ParticleSystem` | Reconstruye definiciones; el runtime del backend se crea por separado |
+| `Animator`, `AudioListener`, `AudioSource`, `Skin` | Reconstruye definiciones; no guarda una sesión de reproducción ni recursos cargados |
+| `Animation` | Reconstruye desde `animations` |
+| `InstancedMesh`, `Script`, tipos desconocidos | Se omiten; necesitan adaptadores de la aplicación |
 
-| Componente | Datos serializados |
-|------------|-------------------|
-| `Transform` | `position`, `rotation`, `scale`, `localMatrix`, `worldMatrix`, `isDirty` |
-| `Geometry` | `definition` completo (tipo + parámetros de geometría) |
-| `Material` | `definition` completo (color, opacity, fill, stroke, strokeWidth, fillGradient, strokeGradient, filter, clipPath, mask) |
-| `Camera` | `definition` completo (Perspective: type, fov, aspect, near, far; Orthographic: type, left, right, top, bottom, near, far) |
-| `Animation` | `animations[]` — array de `SvgAnimationDef` (animate / animateTransform) |
+### Typed arrays
 
-### En deserialización (`deserialize`)
+`Float32Array`, `Uint8Array`, `Uint16Array` y `Uint32Array` se codifican como `{ __typedArray, base64 }` y recuperan su tipo original. Esto permite guardar tracks de animación y geometrías buffer, pero no restaura el componente `InstancedMesh`. Otras clases de typed array no están soportadas por esta codificación.
 
-| Componente | ¿Se restaura? | Método |
-|------------|----------------|--------|
-| `Transform` | ✅ | `Object.assign(new Transform(), data)` |
-| `Geometry` | ✅ | `new Geometry(data.definition)` |
-| `Material` | ✅ | `new Material(data.definition)` |
-| `Camera` | ✅ | `new Camera(data.definition)` |
-| `Animation` | ✅ | `new Animation(data.animations)` |
+```ts
+import { typedArrayReplacer, typedArrayReviver } from '@joroya/core';
 
-> **Nota:** Todos los componentes se serializan y deserializan correctamente, incluyendo `Camera` y `Animation`.
+const encoded = JSON.stringify({ values: new Float32Array([0, 1, 2]) }, typedArrayReplacer);
+const decoded = JSON.parse(encoded, typedArrayReviver);
+console.log(decoded.values instanceof Float32Array); // true
+```
 
-### Preservación de datos
+### Datos conservados
 
-| Dato | ¿Se preserva? |
-|------|----------------|
-| UUID del nodo | ✅ Exacto |
-| Nombre del nodo | ✅ |
-| Jerarquía padre-hijo | ✅ |
-| Posición | ✅ |
-| Rotación (quaternion) | ✅ |
-| Escala | ✅ |
-| Matrices (local + world) | ✅ |
-| Tipo de geometría | ✅ |
-| Parámetros de geometría | ✅ |
-| Color del material | ✅ |
-| Opacidad | ✅ |
-| Fill/Stroke (SVG) | ✅ |
-| Gradientes (fill/stroke) | ✅ |
-| Filter / ClipPath / Mask | ✅ |
-| Cámara (Perspective + Orthographic) | ✅ |
-| Animaciones SVG | ✅ |
-| `cssClass` / `cssId` | ✅ |
+Se conservan IDs, nombres, relaciones padre-hijo, transforms, `cssClass`, `cssId` y definiciones soportadas de todos los nodos, incluida la raíz. `addComponent()` reconstruye `component.node`. Las matrices de mundo se recalculan al renderizar.
+
+La raíz guardada conserva ID, nombre, metadatos CSS, transform y componentes soportados. Scene(root?: Node) acepta una raíz sin padre y mantiene el constructor sin argumentos. El JSON antiguo sin Transform recibe uno por defecto.
 
 ---
 
@@ -283,7 +265,7 @@ import { renderToSVG } from '@joroya/renderer-svg';
 
 function handleRequest(jsonBody: string): string {
   const scene = deserialize(jsonBody);
-  return renderToSVG(scene, { width: 800, height: 600 });
+  return renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 }
 ```
 
@@ -313,10 +295,12 @@ Los diffs de Git muestran exactamente qué cambió:
 
 ## Limitaciones
 
-| Limitación | Impacto | Workaround |
-|------------|---------|------------|
-| UUIDs se preservan | Dos escenas del mismo JSON tendrán nodos con IDs idénticos | Regenerar IDs post-deserialización si se necesitan escenas independientes |
-| Camera no se deserializa | ~~La escena pierde su cámara al restaurar~~ | ✅ **Resuelto** — Camera y Animation se deserializan correctamente |
-| Componentes desconocidos | Si se agrega un tipo custom y no se registra en el `switch`, se ignora | Extender `deserializeNode()` con nuevos tipos |
-| Formato de texto JSON | Archivos grandes para escenas con muchos nodos | Futuro: serialización binaria (MessagePack) |
-| Sin referencia a `component.node` | La referencia circular `component → node` se pierde | Se reconstruye automáticamente por `addComponent()` |
+| Limitación | Impacto y alternativa |
+| --- | --- |
+| Callbacks del runtime | `onUpdate` y los listeners no se guardan; regístralos de nuevo después de cargar |
+| Instancing y componentes personalizados | El reviver omite `InstancedMesh`, `Script` y tipos desconocidos; usa un adaptador |
+| IDs conservados en toda la escena | Importar dos veces puede duplicarlos; crea nodos nuevos para copias independientes (`id` es readonly) |
+| Sin validación de esquema | JSON o estructuras inválidas pueden lanzar errores; valida las entradas en la aplicación |
+| Recursos externos | El JSON guarda URIs y definiciones, no archivos de texturas, audio, modelos ni el estado físico en ejecución |
+
+Los adaptadores internos guardan transforms, definiciones y animaciones SVG. Se puede serializar un Animator enlazado, reproduciendo o pausado; se excluyen mixers, callbacks, referencias a nodos y recursos del backend. Se restauran las definiciones de clips, sin garantizar el instante exacto de reproducción.

@@ -1,0 +1,120 @@
+[
+  {
+    "route": "/docs/serialization",
+    "bytes": 3619677,
+    "scripts": [
+      {
+        "url": "https://cdn.jsdelivr.net/npm/pako@2/dist/pako.min.js",
+        "bytes": 47016
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js",
+        "bytes": 3572661
+      }
+    ]
+  },
+  {
+    "route": "/examples",
+    "bytes": 948622,
+    "scripts": [
+      {
+        "url": "http://127.0.0.1:4321/_astro/ExamplesGallery.DW9AGDds.js",
+        "bytes": 14833
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/client.CYO73L8O.js",
+        "bytes": 136510
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/jsx-runtime.BHhRKAr4.js",
+        "bytes": 1002
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.PqzScJKx.js",
+        "bytes": 6936
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/metadata.DM-4TIz2.js",
+        "bytes": 18746
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.VFGIBVyQ.js",
+        "bytes": 28615
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/createGLTFDemo.B0szN3b4.js",
+        "bytes": 921
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/createColourSpiral.B56xTxbJ.js",
+        "bytes": 833
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/createGradientGallery.BfrtSb-O.js",
+        "bytes": 1777
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/shared.Zsgb3Kge.js",
+        "bytes": 1902
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.Cf5dN1aL.js",
+        "bytes": 22967
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.HM2difT3.js",
+        "bytes": 49028
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.59us8skq.js",
+        "bytes": 124643
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/three.module.D39woDmf.js",
+        "bytes": 539909
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "bytes": 958569,
+    "scripts": [
+      {
+        "url": "http://127.0.0.1:4321/_astro/LandingAnimations.astro_astro_type_script_index_0_lang.axm08Mqi.js",
+        "bytes": 116285
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/HeroDemoWrapper.CkvIhFGr.js",
+        "bytes": 2274
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/client.CYO73L8O.js",
+        "bytes": 136510
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/jsx-runtime.BHhRKAr4.js",
+        "bytes": 1002
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.PqzScJKx.js",
+        "bytes": 6936
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.VFGIBVyQ.js",
+        "bytes": 28615
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/hello-cube.BdEk5yra.js",
+        "bytes": 2395
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/index.59us8skq.js",
+        "bytes": 124643
+      },
+      {
+        "url": "http://127.0.0.1:4321/_astro/three.module.D39woDmf.js",
+        "bytes": 539909
+      }
+    ]
+  }
+]

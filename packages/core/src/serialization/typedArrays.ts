@@ -102,6 +102,7 @@ function atobSafe(s: string): string {
 /**
  * `JSON.stringify` replacer that swaps typed arrays for their encoded form.
  * Compose with other replacers via wrapping if needed.
+ * @public
  */
 export const typedArrayReplacer = (_key: string, value: unknown): unknown => {
     if (
@@ -119,6 +120,7 @@ export const typedArrayReplacer = (_key: string, value: unknown): unknown => {
 
 /**
  * `JSON.parse` reviver that materializes encoded typed arrays.
+ * @public
  */
 export const typedArrayReviver = (_key: string, value: unknown): unknown => {
     if (!isEncoded(value)) return value;

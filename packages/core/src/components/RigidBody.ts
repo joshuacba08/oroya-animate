@@ -1,11 +1,13 @@
 import { Component, ComponentType } from './Component';
 
+/** @public */
 export enum RigidBodyType {
     Dynamic = 'Dynamic',
     Static = 'Static',
     Kinematic = 'Kinematic'
 }
 
+/** @public */
 export interface RigidBodyDef {
     mass?: number; // 0 for static
     type?: RigidBodyType;
@@ -14,6 +16,7 @@ export interface RigidBodyDef {
     fixedRotation?: boolean;
 }
 
+/** @public */
 export class RigidBody extends Component {
     readonly type = ComponentType.RigidBody;
 

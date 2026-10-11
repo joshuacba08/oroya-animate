@@ -11,6 +11,7 @@ import { Component, ComponentType } from './Component';
  * scene graph stay serializable (an `AudioBuffer` is not JSON-friendly) and
  * lets each renderer reuse its own loader/cache (Three.js has `AudioLoader`,
  * a Web-Audio-only backend would `fetch + decodeAudioData`).
+ * @public
  */
 export interface AudioSourceDef {
     /** URL of the audio asset. Fetched and decoded by the active renderer. */
@@ -27,6 +28,7 @@ export interface AudioSourceDef {
     coneOuterGain?: number;
 }
 
+/** @public */
 export class AudioSource extends Component {
     readonly type = ComponentType.AudioSource;
 

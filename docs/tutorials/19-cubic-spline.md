@@ -1,7 +1,7 @@
 # Tutorial 19: Animaciones suaves con Cubic Spline 🔴
 
-> **Nivel:** Avanzado  
-> **Tiempo estimado:** 25 minutos  
+> **Nivel:** Avanzado\
+> **Tiempo estimado:** 25 minutos\
 > **Qué aprenderás:** Crear animaciones fluidas usando interpolación cubic spline (Hermite), entender las tangentes, comparar con linear/step, y usar el `AnimationMixer` con tracks cubic spline.
 
 ---

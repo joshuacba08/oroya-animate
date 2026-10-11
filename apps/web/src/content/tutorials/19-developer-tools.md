@@ -5,7 +5,6 @@ order: 19
 level: "intermediate"
 duration: "25 min"
 ---
-
 # Tutorial 19: Developer tools — Inspector, Input, and Assets
 
 > **Level:** Intermediate

@@ -1,4 +1,5 @@
-// import type { Scene } from '@joroya/core';
+import type { Scene } from '@joroya/core';
+import type { SvJs } from '@joroya/renderer-svg';
 
 /* ── Control definitions ─────────────────────────────────────────────── */
 
@@ -54,7 +55,7 @@ export interface DemoSceneDef {
   renderer: RendererType;
   controls: ControlDef[];
   factory: (params: ParamValues) => {
-    scene: any; // visual scene instance (Scene or SvJs)
+    scene: Scene | SvJs;
     animate: (time: number, params: ParamValues) => void;
   };
 }

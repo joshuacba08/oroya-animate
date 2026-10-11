@@ -33,13 +33,11 @@ git push && git push --tags
 
 ### Deploy Website to Vercel
 
-```bash
-# One-time setup
-npm install -g vercel
-vercel login
+See the [canonical deployment guide](./vercel-deployment.md) for credentials, full validation, preview checks and rollback. Actions is the only deployment path.
 
-# Deploy
-vercel --prod
+```bash
+# After the validated PR preview has succeeded and changes are merged:
+gh workflow run deploy-web.yml --ref main
 ```
 
 ## ⚙️ Configuration Files Created
@@ -116,7 +114,7 @@ Published & Deployed
    ↓
 ├─ NPM Registry
 ├─ CDN (unpkg, jsDelivr, esm.sh)
-└─ Vercel (oroya-animate.vercel.app)
+└─ Vercel (oroya-animate.oroyajs.com)
 ```
 
 ## 🎯 First-Time Setup Checklist
@@ -136,7 +134,9 @@ Published & Deployed
 - [ ] Link project: `vercel link`
 - [ ] Get secrets: `cat .vercel/project.json`
 - [ ] Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` to GitHub Secrets
-- [ ] Push to main to test automatic deployment
+- [ ] Validate a PR preview, then merge to main for production
+- [ ] Disable Vercel Git deployment with git.deploymentEnabled=false
+- [ ] Verify the production domain and deployment commit via the workflow
 
 ## 📝 New Package.json Scripts
 
@@ -148,7 +148,7 @@ The root `package.json` now includes:
   "dev:web": "Run web app in development",
   "sync-versions": "Synchronize package versions",
   "publish:packages": "Build and publish all packages",
-  "deploy:web": "Build and deploy website to Vercel"
+  "deploy:web": "Dispatch the validated GitHub Actions deployment"
 }
 ```
 
@@ -196,6 +196,6 @@ See detailed troubleshooting in each guide:
 
 ---
 
-**Last Updated:** 2026-02-16  
+**Last Updated:** 2026-10-11
 **Documentation Version:** 1.0.0
 

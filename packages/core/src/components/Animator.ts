@@ -14,6 +14,7 @@ import type { Scene } from '../scene/Scene';
  * `animations` is keyed by clip name so consumers can `play('walk')` without
  * juggling clip object references. The `AnimationClip` type comes from
  * `@joroya/core`'s animation module — same shape glTF imports use.
+ * @public
  */
 export interface AnimatorDef {
     /** Whether the animator is currently playing (read-only mirror of mixer state). */
@@ -41,6 +42,7 @@ export interface AnimatorDef {
  *
  * `onUpdate(dt)` is called by `Scene.update(dt)` each frame, so the
  * Three.js renderer (or any backend) just needs to invoke `scene.update`.
+ * @public
  */
 export class Animator extends Component {
     readonly type = ComponentType.Animator;
@@ -75,6 +77,13 @@ export class Animator extends Component {
             this.play(this.pendingAutoplay);
             this.pendingAutoplay = undefined;
         }
+    }
+
+    /** Stop playback and release the scene binding before remount or removal. */
+    unbindFromScene(): void {
+        this.stop();
+        this.mixer = null;
+        this.pendingAutoplay = this.definition.autoplay;
     }
 
     /** Register or replace a clip in the library. */

@@ -1,7 +1,7 @@
 # Tutorial 15: Canvas2D — Tu primer render 2D sin dependencias 🟢
 
-> **Nivel:** Principiante  
-> **Tiempo estimado:** 15 minutos  
+> **Nivel:** Principiante\
+> **Tiempo estimado:** 15 minutos\
 > **Qué aprenderás:** Renderizar escenas 2D usando el Canvas2D API nativo del navegador, sin Three.js ni ninguna dependencia externa.
 
 ---

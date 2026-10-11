@@ -2,10 +2,12 @@ import { Quat, Vec3 } from '../components/Transform';
 import { Matrix4 } from './Matrix4';
 import * as Vector3 from './Vector3';
 
+/** @public */
 export function createQuat(x: number = 0, y: number = 0, z: number = 0, w: number = 1): Quat {
     return { x, y, z, w };
 }
 
+/** @public */
 export function setFromAxisAngle(axis: Vec3, angle: number): Quat {
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
     // assumes axis is normalized
@@ -20,6 +22,7 @@ export function setFromAxisAngle(axis: Vec3, angle: number): Quat {
     };
 }
 
+/** @public */
 export function multiplyQuaternions(a: Quat, b: Quat): Quat {
     // http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
     const qax = a.x,
@@ -39,6 +42,7 @@ export function multiplyQuaternions(a: Quat, b: Quat): Quat {
     };
 }
 
+/** @public */
 export function setFromRotationMatrix(m: Matrix4): Quat {
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
     // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
@@ -88,6 +92,7 @@ export function setFromRotationMatrix(m: Matrix4): Quat {
     return { x, y, z, w };
 }
 
+/** @public */
 export function lookAtQuaternion(eye: Vec3, target: Vec3, up: Vec3): Quat {
     let zVec = Vector3.normalize(Vector3.sub(eye, target));
 
@@ -135,6 +140,7 @@ export function lookAtQuaternion(eye: Vec3, target: Vec3, up: Vec3): Quat {
     return setFromRotationMatrix(m);
 }
 
+/** @public */
 export function slerp(qa: Quat, qb: Quat, t: number): Quat {
     // http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
     let x = qa.x, y = qa.y, z = qa.z, w = qa.w;

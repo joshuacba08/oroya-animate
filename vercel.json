@@ -7,9 +7,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": "astro",
   "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
+    "deploymentEnabled": false
   },
   "headers": [
     {

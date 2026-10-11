@@ -1,6 +1,32 @@
 # API Reference
 
-Complete reference for all packages in the Oroya Animate ecosystem.
+This is a curated reference for scene-graph APIs, Three.js, SVG, and glTF
+loading. The detailed sections below do not enumerate every v1 export.
+
+For the complete current signatures, build the packages and inspect
+`packages/<package>/dist/index.d.ts`. The source barrels and package guides
+provide the other entry points:
+
+| Package | Source barrel | Guide |
+| --- | --- | --- |
+| `@joroya/core` | [index.ts](../packages/core/src/index.ts) | [README](../packages/core/README.md) |
+| `@joroya/renderer-three` | [index.ts](../packages/renderer-three/src/index.ts) | [README](../packages/renderer-three/README.md) |
+| `@joroya/renderer-svg` | [index.ts](../packages/renderer-svg/src/index.ts) | [README](../packages/renderer-svg/README.md) |
+| `@joroya/renderer-canvas2d` | [index.ts](../packages/renderer-canvas2d/src/index.ts) | [README](../packages/renderer-canvas2d/README.md) |
+| `@joroya/loader-gltf` | [index.ts](../packages/loader-gltf/src/index.ts) | [README](../packages/loader-gltf/README.md) |
+| `@joroya/physics` | [index.ts](../packages/physics/src/index.ts) | [README](../packages/physics/README.md) |
+| `@joroya/assets` | [index.ts](../packages/assets/src/index.ts) | [README](../packages/assets/README.md) |
+| `@joroya/input` | [index.ts](../packages/input/src/index.ts) | [README](../packages/input/README.md) |
+| `@joroya/inspector` | [index.ts](../packages/inspector/src/index.ts) | [README](../packages/inspector/README.md) |
+| `@joroya/react` | [index.ts](../packages/react/src/index.ts) | [README](../packages/react/README.md) |
+| `@joroya/vue` | [index.ts](../packages/vue/src/index.ts) | [README](../packages/vue/README.md) |
+
+Core includes `Animator`, `AnimationMixer`, `Skin`, lights, audio,
+particles, post-processing, instancing, plugins, physics component
+definitions, and geometry factories such as `createTorus` and
+`createCircle`, in addition to the historical sections below.
+See [API Stability](api-stability.md) for experimental exceptions and
+[Migration to v1](migration-v1.md) for upgrade notes.
 
 ---
 
@@ -47,7 +73,7 @@ graph TD
         Node --> Material
         Node --> Camera
         Node -->|"children[]"| Node
-        
+
         Geometry -.->|"uses"| GeometryDef["GeometryDef (union)"]
         Material -.->|"uses"| MaterialDef
         Camera -.->|"uses"| CameraDef["CameraDef (union)"]
@@ -84,7 +110,7 @@ sequenceDiagram
     User->>Node: addComponent(new Material(...))
     User->>Scene: scene.add(node)
     User->>Renderer: renderer.mount(scene)
-    
+
     loop Animation Frame
         User->>Node: transform.rotation = {...}
         User->>Node: transform.updateLocalMatrix()
@@ -142,7 +168,7 @@ export type { Matrix4 } from './math/Matrix4';
 
 El contenedor de nivel superior del scene graph.
 
-**Archivo fuente:** [Scene.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/scene/Scene.ts)
+**Archivo fuente:** [Scene.ts](../packages/core/src/scene/Scene.ts)
 
 ```typescript
 import { Scene } from '@joroya/core';
@@ -196,7 +222,7 @@ console.log(found?.parent?.name); // 'group'
 
 Un elemento del scene graph. Soporta jerarquía padre-hijo y un sistema de componentes ECS.
 
-**Archivo fuente:** [Node.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/nodes/Node.ts)
+**Archivo fuente:** [Node.ts](../packages/core/src/nodes/Node.ts)
 
 ```mermaid
 classDiagram
@@ -286,7 +312,7 @@ console.log(weapon.parent?.name); // 'chest'
 
 Clase base para todos los componentes del sistema ECS.
 
-**Archivo fuente:** [Component.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Component.ts)
+**Archivo fuente:** [Component.ts](../packages/core/src/components/Component.ts)
 
 ```mermaid
 classDiagram
@@ -347,7 +373,7 @@ classDiagram
 
 Define la posición, rotación y escala de un nodo en espacio 3D. Se crea **automáticamente** con cada `Node`.
 
-**Archivo fuente:** [Transform.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Transform.ts)
+**Archivo fuente:** [Transform.ts](../packages/core/src/components/Transform.ts)
 
 #### Propiedades
 
@@ -397,7 +423,7 @@ Los quaterniones `{ x, y, z, w }` representan rotaciones 3D sin gimbal lock.
 
 Define la forma geométrica de un nodo.
 
-**Archivo fuente:** [Geometry.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Geometry.ts)
+**Archivo fuente:** [Geometry.ts](../packages/core/src/components/Geometry.ts)
 
 #### Constructor
 
@@ -502,7 +528,7 @@ graph TD
 
 Define la apariencia visual de un nodo.
 
-**Archivo fuente:** [Material.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Material.ts)
+**Archivo fuente:** [Material.ts](../packages/core/src/components/Material.ts)
 
 #### Constructor
 
@@ -602,7 +628,7 @@ const blurred = new Material({
 const shadowed = new Material({
   fill: { r: 0, g: 0.5, b: 1 },
   filter: {
-    effects: [{ type: 'dropShadow', dx: 4, dy: 4, stdDeviation: 2, floodColor: '#333', floodOpacity: 0.6 }],
+    effects: [{ type: 'dropShadow', dx: 4, dy: 4, stdDeviation: 2, floodColor: { r: 0.2, g: 0.2, b: 0.2 }, floodOpacity: 0.6 }],
   },
 });
 
@@ -685,7 +711,7 @@ graph LR
 
 Define un punto de vista para renderizar la escena. El `ThreeRenderer` busca automáticamente el primer nodo con `Camera` al montar la escena.
 
-**Archivo fuente:** [Camera.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Camera.ts)
+**Archivo fuente:** [Camera.ts](../packages/core/src/components/Camera.ts)
 
 #### Constructor
 
@@ -779,7 +805,7 @@ const svg = renderToSVG(scene, { width: 800, height: 600 });
 
 ### Interactive (componente)
 
-**Archivo fuente:** [Interactive.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Interactive.ts)
+**Archivo fuente:** [Interactive.ts](../packages/core/src/components/Interactive.ts)
 
 Marca un nodo como interactivo, permitiendo que responda a eventos de puntero (click, hover, drag, etc.).
 
@@ -787,7 +813,7 @@ Marca un nodo como interactivo, permitiendo que responda a eventos de puntero (c
 
 ### Animation (componente)
 
-**Archivo fuente:** [Animation.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/components/Animation.ts)
+**Archivo fuente:** [Animation.ts](../packages/core/src/components/Animation.ts)
 
 Permite agregar animaciones SVG nativas (`<animate>` y `<animateTransform>`) a un nodo. Estas animaciones se ejecutan directamente en el navegador sin JavaScript.
 
@@ -928,7 +954,7 @@ button.on('pointerleave', (e) => {
 
 ### EventEmitter
 
-**Archivo fuente:** [EventEmitter.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/events/EventEmitter.ts)
+**Archivo fuente:** [EventEmitter.ts](../packages/core/src/events/EventEmitter.ts)
 
 Sistema de eventos genérico con tipado fuerte. Cada `Node` tiene un `EventEmitter` interno para manejar `InteractionEvent`s.
 
@@ -992,7 +1018,7 @@ node.on('click', (e: InteractionEvent) => {
 
 ### InteractionEvent
 
-**Archivo fuente:** [InteractionEvent.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/events/InteractionEvent.ts)
+**Archivo fuente:** [InteractionEvent.ts](../packages/core/src/events/InteractionEvent.ts)
 
 Eventos de interacción que se disparan cuando el usuario interactúa con nodos marcados como `Interactive`.
 
@@ -1071,7 +1097,7 @@ function createInteractionEvent(
 
 Funciones helper para crear componentes `Geometry` de forma concisa.
 
-**Archivo fuente:** [primitives.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/geometry/primitives.ts)
+**Archivo fuente:** [primitives.ts](../packages/core/src/geometry/primitives.ts)
 
 #### `createBox`
 
@@ -1151,9 +1177,11 @@ const title = createText('Hello', { fontSize: 32, fontFamily: 'monospace', textA
 
 ### Serialización
 
+Consulta [Serialización](serialization.md) para las limitaciones del estado de raíz, componentes del runtime y recursos externos.
+
 Funciones para convertir escenas a JSON y reconstruirlas.
 
-**Archivo fuente:** [json.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/serialization/json.ts)
+**Archivo fuente:** [json.ts](../packages/core/src/serialization/json.ts)
 
 #### `serialize`
 
@@ -1237,7 +1265,7 @@ graph TD
 
 Utilidades matemáticas para transformaciones 3D con matrices 4ÁE.
 
-**Archivo fuente:** [Matrix4.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/Matrix4.ts)
+**Archivo fuente:** [Matrix4.ts](../packages/core/src/math/Matrix4.ts)
 
 #### `Matrix4` (Type)
 
@@ -1304,7 +1332,7 @@ worldMatrix = multiplyMatrices(parent.worldMatrix, this.localMatrix)
 
 ### Math  EBoundingBox
 
-**Archivo fuente:** [BoundingBox.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/core/src/math/BoundingBox.ts)
+**Archivo fuente:** [BoundingBox.ts](../packages/core/src/math/BoundingBox.ts)
 
 Utilidades para calcular y manipular Axis-Aligned Bounding Boxes (AABB).
 
@@ -1354,7 +1382,7 @@ function pointInAABB(point: { x: number; y: number; z: number }, aabb: AABB): bo
 
 Renderer WebGL basado en Three.js.
 
-**Archivo fuente:** [ThreeRenderer.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-three/src/ThreeRenderer.ts)
+**Archivo fuente:** [ThreeRenderer.ts](../packages/renderer-three/src/ThreeRenderer.ts)
 
 ```mermaid
 classDiagram
@@ -1366,7 +1394,7 @@ classDiagram
         -nodeMap: Map~string, THREE.Object3D~
         +constructor(options: ThreeRendererOptions)
         +mount(scene: OroyaScene): void
-        +render(): void
+        +render(dt?: number): void
         +enableInteraction(): void
         +disableInteraction(): void
         +dispose(): void
@@ -1393,8 +1421,8 @@ classDiagram
 
 | Método | Descripción |
 |--------|-------------|
-| `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js, busca la primera cámara, y agrega luces ambientales. Puede llamarse múltiples veces |
-| `render()` | Actualiza las matrices del mundo, sincroniza las posiciones de los objetos Three.js con el scene graph de Oroya, y dibuja el frame. Debe llamarse en un `requestAnimationFrame` loop |
+| `mount(scene)` | Conecta una `Scene` de Oroya. Reconstruye internamente los objetos Three.js, busca la primera cámara, sin añadir luces por defecto. Puede llamarse múltiples veces |
+| `render(dt?)` | Ejecuta `scene.update(dt)`, actualiza matrices y dibuja el frame; `dt` en segundos, por defecto `1 / 60` |
 | `enableInteraction()` | Activa el sistema de interactividad (raycasting, listeners DOM). Debe llamarse después de `mount()`. |
 | `disableInteraction()` | Desactiva el sistema de interactividad y remueve listeners. |
 | `dispose()` | Libera los recursos del WebGLRenderer y limpia listeners de interacción. |
@@ -1411,14 +1439,9 @@ classDiagram
 | `Material` con `opacity < 1` | `THREE.MeshStandardMaterial({ transparent: true })` |
 | Sin `Material` | `THREE.MeshStandardMaterial({ color: 0xcccccc })` (gris por defecto) |
 
-#### Iluminación automática
+#### Iluminación
 
-Al montar una escena, el renderer agrega automáticamente:
-
-| Luz | Configuración |
-|-----|---------------|
-| `AmbientLight` | Color: blanco, Intensidad: 0.5 |
-| `DirectionalLight` | Color: blanco, Intensidad: 1.5, Posición: `(2, 5, 3)` |
+Añade componentes `Light` explícitos. Se admiten Ambient, Directional, Point y Spot. No se crean luces por defecto.
 
 #### Ejemplo
 
@@ -1449,9 +1472,9 @@ renderer.dispose();
 
 ### `renderToSVG`
 
-Función pura que genera un string SVG a partir de una escena.
+Genera un string SVG después de ejecutar `scene.update(dt)` y actualizar las matrices de mundo; no es una función pura.
 
-**Archivo fuente:** [renderSVG.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-svg/src/renderSVG.ts)
+**Archivo fuente:** [renderSVG.ts](../packages/renderer-svg/src/renderSVG.ts)
 
 ```typescript
 function renderToSVG(scene: Scene, options: SvgRenderOptions): string
@@ -1469,7 +1492,7 @@ function renderToSVG(scene: Scene, options: SvgRenderOptions): string
 
 Genera un elemento SVG del DOM (`SVGSVGElement`) con event listeners para interactividad.
 
-**Archivo fuente:** [renderSVG.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/renderer-svg/src/renderSVG.ts)
+**Archivo fuente:** [renderSVG.ts](../packages/renderer-svg/src/renderSVG.ts)
 
 ```typescript
 function renderToSVGElement(
@@ -1534,7 +1557,7 @@ import { writeFileSync } from 'fs';
 writeFileSync('output.svg', svg);
 ```
 
-> **Ventaja clave:** Esta función es **pura** y no requiere DOM. Funciona en Node.js para server-side rendering.
+> **Ventaja clave:** No requiere DOM y funciona en Node.js. Usa `dt: 0` para no avanzar el tiempo; se sigue ejecutando `onUpdate(0)`.
 
 ### `SvJs`
 
@@ -1650,7 +1673,7 @@ const noise = new Noise();
 
 Carga un archivo glTF/GLB y lo traduce al scene graph de Oroya.
 
-**Archivo fuente:** [loadGLTF.ts](file:///c:/devfiles/personal-projects/oroya-animate/packages/loader-gltf/src/loadGLTF.ts)
+**Archivo fuente:** [loadGLTF.ts](../packages/loader-gltf/src/loadGLTF.ts)
 
 ```typescript
 async function loadGLTF(url: string): Promise<GLTFLoadResult>

@@ -5,6 +5,7 @@ import { ColorRGB } from './Material';
 /**
  * A component that defines instanced rendering data for a node.
  * It holds the transformation matrices and optional colors for multiple instances of the same geometry.
+ * @public
  */
 export class InstancedMeshComponent extends Component {
     readonly type = ComponentType.InstancedMesh;

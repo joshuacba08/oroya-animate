@@ -3,6 +3,7 @@ import {
     createBox,
     createSphere,
     Material,
+  ComponentType,
     Node,
     Scene,
 } from '@joroya/core';
@@ -155,7 +156,7 @@ export function createCircleOverlayScene(params: ParamValues) {
       item.node.transform.updateLocalMatrix();
       
       // Update opacity if changed
-      const mat = item.node.getComponent<Material>('Material' as any);
+      const mat = item.node.getComponent<Material>(ComponentType.Material);
       if (mat && mat.definition.opacity !== currentOpacity) {
         mat.definition.opacity = currentOpacity;
       }

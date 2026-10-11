@@ -5,7 +5,6 @@ order: 17
 level: "intermediate"
 duration: "15 min"
 ---
-
 # Tutorial 17: React bindings — `<OroyaCanvas>` and `useFrame`
 
 > **Level:** Intermediate

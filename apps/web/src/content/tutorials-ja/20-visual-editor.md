@@ -5,7 +5,6 @@ order: 20
 level: "beginner"
 duration: "10 min"
 ---
-
 # チュートリアル 20: ビジュアルエディタ（アルファ版）
 
 > **レベル:** 初級

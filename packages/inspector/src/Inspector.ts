@@ -4,6 +4,7 @@ import { collectSceneStats } from './SceneStats';
 
 /**
  * Construction options for `Inspector`.
+ * @public
  */
 export interface InspectorOptions {
     /** Element that hosts the overlay. Default `document.body`. */

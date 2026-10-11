@@ -16,6 +16,7 @@ import * as THREE from 'three';
 
 /**
  * Result of loading a glTF/GLB file.
+ * @public
  */
 export interface GLTFLoadResult {
   scene: OroyaScene;
@@ -28,6 +29,7 @@ export interface GLTFLoadResult {
  * 
  * @param url The URL of the glTF/GLB file to load.
  * @returns A promise that resolves to the Oroya scene and animation clips.
+ * @public
  */
 export async function loadGLTF(url: string): Promise<GLTFLoadResult> {
   const loader = new GLTFLoader();

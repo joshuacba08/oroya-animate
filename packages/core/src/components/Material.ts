@@ -2,6 +2,7 @@ import { Component, ComponentType } from './Component';
 
 /**
  * An interface for representing an RGB color.
+ * @public
  */
 export interface ColorRGB {
   r: number;
@@ -11,6 +12,7 @@ export interface ColorRGB {
 
 /**
  * A gradient color stop.
+ * @public
  */
 export interface GradientStop {
   /** Offset position from 0 to 1. */
@@ -23,6 +25,7 @@ export interface GradientStop {
 
 /**
  * Definition for a linear gradient.
+ * @public
  */
 export interface LinearGradientDef {
   type: 'linear';
@@ -40,6 +43,7 @@ export interface LinearGradientDef {
 
 /**
  * Definition for a radial gradient.
+ * @public
  */
 export interface RadialGradientDef {
   type: 'radial';
@@ -59,19 +63,22 @@ export interface RadialGradientDef {
 
 /**
  * A union of all gradient definitions.
+ * @public
  */
 export type GradientDef = LinearGradientDef | RadialGradientDef;
 
 // ─── SVG Filter Effects ─────────────────────────────────────
 
-/** Gaussian blur effect. */
+/** Gaussian blur effect. * @public
+ */
 export interface SvgBlurEffect {
   type: 'blur';
   /** Standard deviation of the blur. */
   stdDeviation: number;
 }
 
-/** Drop-shadow effect. */
+/** Drop-shadow effect. * @public
+ */
 export interface SvgDropShadowEffect {
   type: 'dropShadow';
   /** Horizontal offset. */
@@ -86,10 +93,12 @@ export interface SvgDropShadowEffect {
   floodOpacity?: number;
 }
 
-/** A union of all SVG filter effect types. */
+/** A union of all SVG filter effect types. * @public
+ */
 export type SvgFilterEffect = SvgBlurEffect | SvgDropShadowEffect;
 
-/** A filter definition containing one or more effects. */
+/** A filter definition containing one or more effects. * @public
+ */
 export interface SvgFilterDef {
   effects: SvgFilterEffect[];
 }
@@ -99,6 +108,7 @@ export interface SvgFilterDef {
 /**
  * A clip-path definition using SVG path commands.
  * The clipped region is defined by the path shape.
+ * @public
  */
 export interface SvgClipPathDef {
   /** Path commands defining the clip region. */
@@ -108,6 +118,7 @@ export interface SvgClipPathDef {
 /**
  * A mask definition using an SVG path with an optional fill opacity.
  * White areas are visible, black areas are hidden.
+ * @public
  */
 export interface SvgMaskDef {
   /** Path commands defining the mask shape. */
@@ -120,6 +131,7 @@ export interface SvgMaskDef {
 
 /**
  * The definition for a material.
+ * @public
  */
 export interface MaterialDef {
   /**
@@ -250,6 +262,7 @@ export interface MaterialDef {
 
 /**
  * A component that defines the material of a node, affecting its appearance.
+ * @public
  */
 export class Material extends Component {
   readonly type = ComponentType.Material;

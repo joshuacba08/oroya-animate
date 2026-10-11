@@ -9,6 +9,7 @@ import type { PhysicsSystem } from './PhysicsSystem';
  * Oroya `Node` representing the wheel's visual — when supplied, the
  * vehicle keeps its world transform in sync with the simulated wheel pose
  * each step.
+ * @public
  */
 export interface WheelOptions {
     /** Chassis-local position of the wheel's hub. */

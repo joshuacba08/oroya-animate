@@ -1,7 +1,7 @@
 # Tutorial 17: Boolean Operations — Crea formas complejas con CSG 🔴
 
-> **Nivel:** Avanzado  
-> **Tiempo estimado:** 25 minutos  
+> **Nivel:** Avanzado\
+> **Tiempo estimado:** 25 minutos\
 > **Qué aprenderás:** Crear geometrías complejas combinando primitivas simples mediante operaciones booleanas (Constructive Solid Geometry): unión, sustracción e intersección.
 
 ---
@@ -14,10 +14,10 @@
 graph LR
     A["🟦 Cubo"] -->|"Subtract"| D["🕳️ Cubo con agujero"]
     B["🟠 Esfera"] -->|"Subtract"| D
-    
+
     E["🟦 Cubo"] -->|"Union"| H["📦 Forma combinada"]
     F["🟠 Esfera"] -->|"Union"| H
-    
+
     I["🟦 Cubo"] -->|"Intersect"| L["💎 Solo la intersección"]
     J["🟠 Esfera"] -->|"Intersect"| L
 ```

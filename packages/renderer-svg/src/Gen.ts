@@ -21,6 +21,7 @@ const randomImpl = ((min: unknown = 0, max: number = 1, float: boolean = false) 
 
 /**
  * A collection of useful functions for generative art.
+ * @public
  */
 export const Gen = {
     /**

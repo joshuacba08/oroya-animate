@@ -74,24 +74,15 @@ This is useful when you want a portable scene model, serialization, multiple ren
 
 ```ts
 import {
-  Camera,
-  CameraType,
-  Material,
-  Node,
-  Scene,
-  createBox,
-  setFromAxisAngle,
+  Camera, CameraType, Light, LightType, Material,
+  Node, Scene, createBox, setFromAxisAngle,
 } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
-
-if (!canvas) {
-  throw new Error('Canvas element not found');
-}
+if (!canvas) throw new Error('Canvas element not found');
 
 const scene = new Scene();
-
 const camera = new Node('camera');
 camera.addComponent(new Camera({
   type: CameraType.Perspective,
@@ -103,9 +94,18 @@ camera.addComponent(new Camera({
 camera.transform.position.z = 5;
 scene.add(camera);
 
+const ambient = new Node('ambient');
+ambient.addComponent(new Light({ type: LightType.Ambient, intensity: 0.6 }));
+scene.add(ambient);
+
+const sun = new Node('sun');
+sun.addComponent(new Light({ type: LightType.Directional, intensity: 1.5 }));
+sun.transform.position = { x: 3, y: 5, z: 4 };
+scene.add(sun);
+
 const cube = new Node('cube');
-cube.addComponent(createBox(1, 1, 1));
-cube.addComponent(new Material({ color: { r: 0.2, g: 0.5, b: 1 } }));
+cube.addComponent(createBox());
+cube.addComponent(new Material({ color: { r: 1, g: 0.2, b: 0.2 } }));
 scene.add(cube);
 
 const renderer = new ThreeRenderer({
@@ -113,20 +113,27 @@ const renderer = new ThreeRenderer({
   width: window.innerWidth,
   height: window.innerHeight,
 });
-
 renderer.mount(scene);
 
-let angle = 0;
-
-function frame() {
-  angle += 0.01;
-  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, angle);
+let previousTime: number | undefined;
+let elapsed = 0;
+let frameId = 0;
+function frame(time: number) {
+  const dt = previousTime === undefined ? 0 : (time - previousTime) / 1000;
+  previousTime = time;
+  elapsed += dt;
+  cube.transform.rotation = setFromAxisAngle({ x: 0, y: 1, z: 0 }, elapsed * 0.5);
   cube.transform.updateLocalMatrix();
-  renderer.render();
-  requestAnimationFrame(frame);
+  renderer.render(dt);
+  frameId = requestAnimationFrame(frame);
 }
+frameId = requestAnimationFrame(frame);
 
-frame();
+function stop() {
+  cancelAnimationFrame(frameId);
+  renderer.dispose();
+}
+window.addEventListener('pagehide', stop, { once: true });
 ```
 
 ## Architecture
@@ -144,6 +151,9 @@ The core package intentionally avoids runtime dependencies on Three.js, `cannon-
 ## Documentation
 
 - [Getting Started](docs/getting-started.md)
+- [API Stability](docs/api-stability.md)
+- [Migration to v1](docs/migration-v1.md)
+- [Maintenance Review](docs/maintenance-review.md)
 - [Architecture](docs/architecture.md)
 - [Scene Graph](docs/scene-graph.md)
 - [API Reference](docs/api-reference.md)
@@ -173,6 +183,8 @@ Workspace packages are consumed through their compiled `dist/` output. After clo
 Common commands:
 
 ```bash
+pnpm docs:check
+pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
