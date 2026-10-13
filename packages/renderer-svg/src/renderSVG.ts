@@ -1,5 +1,6 @@
 import {
   Animation,
+  Animator,
   BoxGeometryDef,
   Camera,
   CameraType,
@@ -138,12 +139,13 @@ class GradientCollector {
   private filterMap = new Map<SvgFilterDef, string>();
   private clipPathMap = new Map<SvgClipPathDef, string>();
   private maskMap = new Map<SvgMaskDef, string>();
+  constructor(private readonly prefix = 'oroya') {}
 
   /** Register a gradient and return its SVG url reference (e.g. "url(#grad-0)"). */
   register(def: GradientDef): string {
     let id = this.map.get(def);
     if (!id) {
-      id = `oroya-grad-${this.counter++}`;
+      id = `${this.prefix}-grad-${this.counter++}`;
       this.map.set(def, id);
     }
     return `url(#${id})`;
@@ -153,7 +155,7 @@ class GradientCollector {
   registerFilter(def: SvgFilterDef): string {
     let id = this.filterMap.get(def);
     if (!id) {
-      id = `oroya-filter-${this.counter++}`;
+      id = `${this.prefix}-filter-${this.counter++}`;
       this.filterMap.set(def, id);
     }
     return `url(#${id})`;
@@ -163,7 +165,7 @@ class GradientCollector {
   registerClipPath(def: SvgClipPathDef): string {
     let id = this.clipPathMap.get(def);
     if (!id) {
-      id = `oroya-clip-${this.counter++}`;
+      id = `${this.prefix}-clip-${this.counter++}`;
       this.clipPathMap.set(def, id);
     }
     return `url(#${id})`;
@@ -173,7 +175,7 @@ class GradientCollector {
   registerMask(def: SvgMaskDef): string {
     let id = this.maskMap.get(def);
     if (!id) {
-      id = `oroya-mask-${this.counter++}`;
+      id = `${this.prefix}-mask-${this.counter++}`;
       this.maskMap.set(def, id);
     }
     return `url(#${id})`;
@@ -1037,5 +1039,303 @@ export function renderToSVGElement(
       nodeElementMap.clear();
     },
   };
+}
+
+/** Options for a persistent, DOM-owned SVG renderer. @public */
+export interface SvgRendererOptions extends Omit<SvgElementRenderOptions, 'dt' | 'advanceScene'> {
+  /** Accessible scene title. Defaults to "Oroya Animate scene". */
+  title?: string;
+  /** Static explanation; applications should announce step changes outside the SVG. */
+  description?: string;
+}
+
+interface SvgNodeBinding {
+  node: Node;
+  group: SVGElement;
+  shape?: SVGElement;
+  geometryKey?: string;
+  geometryAttributes: Map<string, string>;
+  styleKey?: string;
+  animationKey?: string;
+}
+
+const liveSvgStyleAttributes = ['fill', 'stroke', 'stroke-width', 'opacity', 'filter', 'clip-path', 'mask'];
+
+function setSvgAttribute(element: SVGElement, name: string, value: string | undefined): void {
+  if (value === undefined || value === '') {
+    if (element.hasAttribute(name)) element.removeAttribute(name);
+  } else if (element.getAttribute(name) !== value) element.setAttribute(name, value);
+}
+
+/**
+ * Persistent SVG scene renderer. Keeps the SVG root, node groups and unchanged
+ * geometry elements across frames; reconciles structural edits by node ID.
+ *
+ * Does not own a RAF loop. Drive `render(dt)` from one application clock, or use
+ * `render(0, { advanceScene: false })` after seeking an AnimationMixer. Existing
+ * renderToSVG/renderToSVGElement remain snapshot/export APIs.
+ * @public
+ */
+export class SvgRenderer {
+  readonly svg: SVGSVGElement;
+  readonly capabilities: RendererCapabilities = Object.freeze({ ...svgCapabilities, requiresDOM: true });
+  private readonly namespace = 'http://www.w3.org/2000/svg';
+  private readonly prefix = `oroya-${new Node('svg-resource-scope').id}`;
+  private readonly bindings = new Map<string, SvgNodeBinding>();
+  private readonly ownedAnimators = new Set<Animator>();
+  private readonly listenerCleanups: (() => void)[] = [];
+  private scene: Scene | null = null;
+  private disposed = false;
+  private defs?: SVGDefsElement;
+  private defsKey = '';
+  private width: number;
+  private height: number;
+  private viewBox?: string;
+  private readonly titleElement: SVGElement;
+  private readonly descriptionElement: SVGElement;
+
+  constructor(private readonly options: SvgRendererOptions) {
+    this.validateSize(options.width, options.height);
+    if (options.viewBox !== undefined) this.validateViewBox(options.viewBox);
+    this.width = options.width;
+    this.height = options.height;
+    this.viewBox = options.viewBox;
+    this.svg = document.createElementNS(this.namespace, 'svg');
+    this.svg.setAttribute('xmlns', this.namespace);
+    this.svg.setAttribute('role', 'img');
+    this.titleElement = document.createElementNS(this.namespace, 'title');
+    this.descriptionElement = document.createElementNS(this.namespace, 'desc');
+    this.titleElement.id = `${this.prefix}-title`;
+    this.descriptionElement.id = `${this.prefix}-description`;
+    this.svg.append(this.titleElement, this.descriptionElement);
+    this.setAccessibleDescription(options.title ?? 'Oroya Animate scene', options.description ?? '');
+    this.updateViewport();
+    this.installInteractionListeners();
+    options.container?.appendChild(this.svg);
+  }
+
+  /** Attach a scene without advancing its simulation clock. */
+  mount(scene: Scene): void {
+    this.assertActive();
+    if (this.scene !== scene) {
+      this.releaseAnimators();
+      for (const binding of this.bindings.values()) binding.group.remove();
+      this.bindings.clear();
+      this.scene = scene;
+    }
+    this.render(0, { advanceScene: false });
+  }
+
+  /** Draw one frame. Material/text edits are sampled as well as transforms. */
+  render(dt = 1 / 60, options: RenderOptions = {}): void {
+    this.assertActive();
+    if (!this.scene) throw new Error('SvgRenderer.render() requires mount(scene).');
+    if (!Number.isFinite(dt) || dt < 0) throw new Error('SVG frame delta must be finite and non-negative.');
+    this.reconcileAnimators();
+    if (options.advanceScene !== false) this.scene.update(dt);
+    const diagnostic = options.onDiagnostic ?? this.options.onDiagnostic;
+    if (diagnostic) diagnoseScene(this.scene, this.capabilities).forEach(diagnostic);
+    this.scene.updateWorldMatrices();
+    this.updateViewport();
+    const gradients = new GradientCollector(this.prefix);
+    const seen = new Set<string>();
+    const root = this.reconcileNode(this.scene.root, gradients, seen);
+    if (root.parentNode !== this.svg) this.svg.appendChild(root);
+    for (const [id, binding] of this.bindings) {
+      if (!seen.has(id)) { binding.group.remove(); this.bindings.delete(id); }
+    }
+    const defsKey = gradients.toDefsString('');
+    if (defsKey !== this.defsKey) {
+      const next = gradients.toDefsDom(this.namespace);
+      this.defs?.remove();
+      this.defs = next ?? undefined;
+      if (next) this.svg.insertBefore(next, root);
+      this.defsKey = defsKey;
+    }
+  }
+
+  /** Stable group for annotations such as tabindex, role and aria-label. */
+  getNodeElement(id: string): SVGElement | undefined {
+    return this.bindings.get(id)?.group;
+  }
+
+  /** Change dimensions; an explicit viewBox remains independent of display size. */
+  setSize(width: number, height: number): void {
+    this.assertActive();
+    this.validateSize(width, height);
+    this.width = width; this.height = height;
+    this.updateViewport();
+  }
+
+  /** Set an explicit viewBox, or return to camera/default framing with undefined. */
+  setViewBox(viewBox?: string): void {
+    this.assertActive();
+    if (viewBox !== undefined) this.validateViewBox(viewBox);
+    this.viewBox = viewBox;
+    this.updateViewport();
+  }
+
+  /** Set safe text metadata without interpreting markup. */
+  setAccessibleDescription(title: string, description = ''): void {
+    this.assertActive();
+    if (this.titleElement.textContent !== title) this.titleElement.textContent = title;
+    if (this.descriptionElement.textContent !== description) this.descriptionElement.textContent = description;
+    this.svg.setAttribute('aria-labelledby', this.titleElement.id);
+    setSvgAttribute(this.svg, 'aria-describedby', description ? this.descriptionElement.id : undefined);
+  }
+
+  /** Release only renderer-owned bindings/listeners/DOM. Safe to call repeatedly. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.releaseAnimators();
+    this.listenerCleanups.forEach(cleanup => cleanup());
+    this.listenerCleanups.length = 0;
+    this.bindings.clear();
+    this.svg.remove();
+    this.svg.replaceChildren();
+    this.defs = undefined;
+    this.scene = null;
+    this.disposed = true;
+  }
+
+  private reconcileNode(node: Node, gradients: GradientCollector, seen: Set<string>): SVGElement {
+    seen.add(node.id);
+    let binding = this.bindings.get(node.id);
+    if (!binding) {
+      binding = { node, group: document.createElementNS(this.namespace, 'g'), geometryAttributes: new Map() };
+      binding.group.setAttribute('data-oroya-node', node.id);
+      this.bindings.set(node.id, binding);
+    }
+    binding.node = node;
+    setSvgAttribute(binding.group, 'transform', matrix4ToSvgTransform(node.transform.localMatrix));
+    setSvgAttribute(binding.group, 'id', node.cssId);
+    setSvgAttribute(binding.group, 'class', node.cssClass);
+    const interactive = node.getComponent<Interactive>(ComponentType.Interactive);
+    const cursor = interactive?.definition.enabled ? interactive.definition.cursor : '';
+    if (binding.group.style.cursor !== cursor) binding.group.style.cursor = cursor;
+    const geometry = node.getComponent<Geometry>(ComponentType.Geometry);
+    const geometryKey = geometry ? JSON.stringify(geometry.definition) : undefined;
+    let geometryChanged = false;
+    if (geometryKey !== binding.geometryKey) {
+      const candidate = geometry ? geometryToDomElement(geometry, this.namespace) : null;
+      if (!candidate) {
+        binding.shape?.remove(); binding.shape = undefined;
+        binding.geometryAttributes.clear();
+      } else if (binding.shape?.tagName !== candidate.tagName) {
+        binding.shape?.remove(); binding.shape = candidate;
+        candidate.setAttribute('data-oroya-id', node.id);
+        binding.group.insertBefore(candidate, binding.group.firstChild);
+        binding.animationKey = undefined;
+        binding.geometryAttributes = new Map(Array.from(candidate.attributes, attribute => [attribute.name, attribute.value]));
+      } else {
+        const attributes = new Map(Array.from(candidate.attributes, attribute => [attribute.name, attribute.value]));
+        for (const name of binding.geometryAttributes.keys()) if (!attributes.has(name)) binding.shape.removeAttribute(name);
+        for (const [name, value] of attributes) setSvgAttribute(binding.shape, name, value);
+        binding.geometryAttributes = attributes;
+        if (candidate.tagName === 'text') {
+          const text = binding.shape.firstChild;
+          if (text?.nodeType === 3) text.nodeValue = candidate.textContent;
+          else binding.shape.insertBefore(document.createTextNode(candidate.textContent ?? ''), binding.shape.firstChild);
+        }
+      }
+      binding.geometryKey = geometryKey;
+      geometryChanged = true;
+    }
+    if (binding.shape) {
+      const material = node.getComponent<Material>(ComponentType.Material);
+      const styleKey = buildStyleAttrs(material, gradients);
+      if (geometryChanged || styleKey !== binding.styleKey) {
+        for (const name of liveSvgStyleAttributes) setSvgAttribute(binding.shape, name, binding.geometryAttributes.get(name));
+        applyStyleAttrsToElement(binding.shape, material, gradients);
+        binding.styleKey = styleKey;
+      }
+      const animationKey = JSON.stringify(node.getComponent<Animation>(ComponentType.Animation)?.animations);
+      if (animationKey !== binding.animationKey) {
+        for (const child of Array.from(binding.shape.children)) if (child.tagName === 'animate' || child.tagName === 'animateTransform') child.remove();
+        attachAnimationDom(binding.shape, node, this.namespace);
+        binding.animationKey = animationKey;
+      }
+    }
+    let next: ChildNode | null = binding.shape ? binding.shape.nextSibling : binding.group.firstChild;
+    for (const child of node.children) {
+      const group = this.reconcileNode(child, gradients, seen);
+      if (group !== next) binding.group.insertBefore(group, next);
+      next = group.nextSibling;
+    }
+    return binding.group;
+  }
+
+  private reconcileAnimators(): void {
+    const current = new Set<Animator>();
+    this.scene?.traverse(node => {
+      const animator = node.getComponent<Animator>(ComponentType.Animator);
+      if (!animator) return;
+      current.add(animator);
+      if (!animator.currentMixer) { animator.bindToScene(this.scene!); this.ownedAnimators.add(animator); }
+    });
+    for (const animator of this.ownedAnimators) if (!current.has(animator)) {
+      animator.unbindFromScene(); this.ownedAnimators.delete(animator);
+    }
+  }
+
+  private releaseAnimators(): void {
+    this.ownedAnimators.forEach(animator => animator.unbindFromScene());
+    this.ownedAnimators.clear();
+  }
+
+  private installInteractionListeners(): void {
+    const events: [string, InteractionEventType][] = [
+      ['click', InteractionEventType.Click], ['pointerdown', InteractionEventType.PointerDown],
+      ['pointerup', InteractionEventType.PointerUp], ['pointermove', InteractionEventType.PointerMove],
+      ['pointerover', InteractionEventType.PointerEnter], ['pointerout', InteractionEventType.PointerLeave],
+      ['wheel', InteractionEventType.Wheel],
+    ];
+    for (const [name, type] of events) {
+      const listener = (event: Event) => {
+        let element = event.target as Element | null;
+        while (element && element !== this.svg && typeof element.getAttribute === 'function') {
+          const id = element.getAttribute('data-oroya-node');
+          const binding = id ? this.bindings.get(id) : undefined;
+          const interactive = binding?.node.getComponent<Interactive>(ComponentType.Interactive);
+          if (binding && interactive?.definition.enabled) {
+            const pointer = event as PointerEvent;
+            if ((name === 'pointerover' || name === 'pointerout') && pointer.relatedTarget &&
+              binding.group.contains(pointer.relatedTarget as globalThis.Node)) return;
+            binding.node.dispatchInteraction(createInteractionEvent(type, binding.node, event,
+              { x: pointer.clientX ?? 0, y: pointer.clientY ?? 0 }));
+            return;
+          }
+          element = element.parentElement;
+        }
+      };
+      this.svg.addEventListener(name, listener, { passive: name === 'wheel' });
+      this.listenerCleanups.push(() => this.svg.removeEventListener(name, listener));
+    }
+  }
+
+  private updateViewport(): void {
+    setSvgAttribute(this.svg, 'width', String(this.width));
+    setSvgAttribute(this.svg, 'height', String(this.height));
+    let viewBox = this.viewBox;
+    if (!viewBox && this.scene) {
+      const cameraNode = findCameraNode(this.scene);
+      const camera = cameraNode?.getComponent<Camera>(ComponentType.Camera);
+      if (cameraNode && camera?.definition.type === CameraType.Orthographic) viewBox = orthoViewBox(camera.definition, cameraNode);
+    }
+    setSvgAttribute(this.svg, 'viewBox', viewBox ?? `0 0 ${this.width} ${this.height}`);
+  }
+
+  private validateSize(width: number, height: number): void {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) throw new Error('SVG dimensions must be positive finite numbers.');
+  }
+
+  private validateViewBox(value: string): void {
+    const parts = value.trim().split(/[\s,]+/).map(Number);
+    if (parts.length !== 4 || !parts.every(Number.isFinite) || parts[2] <= 0 || parts[3] <= 0) throw new Error('SVG viewBox must have four finite values and positive dimensions.');
+  }
+
+  private assertActive(): void {
+    if (this.disposed) throw new Error('SvgRenderer has been disposed.');
+  }
 }
 

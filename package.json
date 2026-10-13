@@ -1,7 +1,7 @@
 {
   "name": "oroya-animate-monorepo",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Monorepo for Oroya Animate, a 2D/3D web graphics library",
   "author": "Oroya AI Collaborator",
   "license": "MIT",

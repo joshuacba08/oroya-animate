@@ -44,6 +44,15 @@ The project is designed for applications that need a stable graphics model rathe
 | [`@joroya/react`](packages/react) | Experimental React bindings. |
 | [`@joroya/vue`](packages/vue) | Experimental Vue 3 composables. |
 
+## Persistent SVG animation in 1.3
+
+`SvgRenderer` provides live SVG scenes with stable DOM nodes, text/material
+updates, scoped resources and an explicit mount/render/dispose lifecycle.
+Use it with `AnimationMixer.seek` for deterministic educational steps, without
+loading Three.js. Existing string and DOM snapshot APIs remain compatible.
+See the [SVG guide](packages/renderer-svg/README.md) and
+[programming animation requirements](docs/features/OA-012/EPIC.md).
+
 ## Installation
 
 Install the core package and at least one renderer:

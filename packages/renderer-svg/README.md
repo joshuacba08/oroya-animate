@@ -15,6 +15,7 @@ Part of [Oroya Animate](https://github.com/joshuacba08/oroya-animate) - an engin
 - Server-side rendering - Works in Node.js
 - 2D primitives - Box/rect, sphere/circle, path, text, and flattened geometry shapes
 - Export - Save as SVG files or DOM elements
+- Persistent scenes - Stable SVG nodes, live text/material updates and delegated events
 
 ## Installation
 
@@ -69,6 +70,74 @@ renderToSVG(
 ```
 
 Returns an SVG string. For interactive DOM output, use `renderToSVGElement(scene, options)`.
+
+### Persistent SVG scenes (since 1.3.0)
+
+`SvgRenderer` updates a mounted SVG without replacing its root, node groups or
+unchanged geometry elements. Use the 1.3 release of core and renderer together.
+The 1.2.0 snapshot APIs remain available with the same contracts.
+
+```typescript
+import { AnimationMixer, Material, Node, Scene, createBox } from '@joroya/core';
+import { SvgRenderer } from '@joroya/renderer-svg';
+
+const scene = new Scene();
+const cursor = new Node('cursor');
+cursor.addComponent(createBox(60, 40, 0));
+cursor.addComponent(new Material({ fill: { r: 0.95, g: 0.42, b: 0.23 } }));
+scene.add(cursor);
+
+const renderer = new SvgRenderer({
+  width: 640,
+  height: 320,
+  container: document.getElementById('scene')!,
+  title: 'Array iteration',
+  description: 'The highlighted card is the current element.',
+});
+renderer.mount(scene); // Draws the initial state; does not advance time.
+
+const mixer = new AnimationMixer(scene);
+mixer.play({
+  name: 'visit',
+  duration: 2,
+  tracks: [{
+    targetNodeName: 'cursor',
+    property: 'position',
+    times: new Float32Array([0, 1, 2]),
+    values: new Float32Array([100, 160, 0, 260, 160, 0, 420, 160, 0]),
+    interpolation: 'linear',
+  }],
+}, { loop: false });
+mixer.pause();
+
+mixer.seek(1); // Reconstruct a pose without firing step events.
+renderer.render(0, { advanceScene: false });
+
+// Preserve application annotations and focus when frames change.
+renderer.getNodeElement(cursor.id)?.setAttribute('aria-label', 'Current element');
+renderer.setSize(800, 400);
+
+// On unmount: cancel the application's RAF loop, then release this renderer.
+renderer.dispose();
+```
+
+The renderer owns no animation loop. An application can drive `render(dt)`, or
+advance a mixer/scene itself and draw with `advanceScene: false`. Use Transform
+setters (`setPosition`, `setScale`, `setRotation`) for subsequent manual edits;
+changing `position.x` alone does not invalidate a previously drawn matrix.
+Material and text definitions may be edited in place and are sampled on redraw.
+
+`mount` binds unbound Animator components. Only bindings created by this renderer
+are released on disposal. Bind Animators in application code when sharing a scene
+between backends, and advance that scene once. One renderer instance owns its DOM;
+callers may annotate node groups with ARIA/keyboard attributes, but should not
+insert unmanaged children into them. Native SMIL animations have their own SVG
+clock; for one deterministic pedagogical timeline, use mixer-driven poses and
+explicit text/material states rather than mixing independent SMIL playback.
+
+`renderToSVG` and `renderToSVGElement` remain snapshot/export functions. They
+retain their existing output contracts. See the full [educational animation
+requirements](../../docs/features/OA-012/EPIC.md).
 
 ## Generative Art
 

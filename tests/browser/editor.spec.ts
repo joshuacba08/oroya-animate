@@ -28,6 +28,9 @@ test('authoring, undo/redo, save/load and invalid import', async ({ page }) => {
   await page.getByLabel('Add object', { exact: true }).selectOption('sphere');
   page.once('dialog', (dialog) => dialog.accept()); await page.getByLabel('Load scene file', { exact: true }).setInputFiles(path!);
   await expect(page.getByRole('button', { name: 'hero copy', exact: true })).toBeVisible(); await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeDisabled();
+  // Import is asynchronous; wait for the completed load before replacing its input.
+  await expect(page.getByRole('button', { name: 'Load', exact: true })).toBeEnabled();
+  await expect(page.getByLabel('Save status', { exact: true })).toHaveText('Saved');
   await page.getByLabel('Load scene file', { exact: true }).setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from('{"root":null}') });
   await expect(page.getByRole('alert')).toContainText('Expected a node'); await expect(page.getByRole('button', { name: 'hero copy', exact: true })).toBeVisible();
   expect(errors).toEqual([]);

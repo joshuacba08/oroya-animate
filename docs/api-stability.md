@@ -54,6 +54,10 @@ Everything else exported from the `@joroya/core`, `@joroya/renderer-*`,
 
 React/Vue bindings and the plugin registry/lifecycle are `@public` from 1.2.0. Their ownership and update contracts are covered by regression and real browser tests. See [capabilities and acceptance](stability-1.2.md).
 
+`SvgRenderer` and `SvgRendererOptions` are additive `@public` exports from
+`@joroya/renderer-svg` starting in 1.3.0. The snapshot/export APIs keep their
+existing contracts. See [persistent SVG scenes](../packages/renderer-svg/README.md#persistent-svg-scenes-since-130).
+
 ## Tooling
 
 - `pnpm api:check` reports missing tags, exposed internals and unresolved exports across direct declarations, aliases, types and star chains. It remains informational.

@@ -100,11 +100,26 @@ jobs:
         run: pnpm release:check --candidate
       - name: Stable acceptance including physical devices
         if: steps.release.outputs.channel == 'latest'
-        run: pnpm release:check
+        env:
+          ACCEPT_PENDING_DEVICES: ${{ inputs.accept_pending_devices }}
+        run: |
+          args=()
+          if [[ "$ACCEPT_PENDING_DEVICES" == true ]]; then
+            args+=(--accept-pending-devices)
+            echo 'Maintainer requested direct stable publication. Physical Safari/iOS and Chrome/Android acceptance remains pending; all other checks are required.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          pnpm release:check "${args[@]}"
       - name: Publish and verify every compatible package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish:release ${{ steps.release.outputs.channel }}
+          RELEASE_CHANNEL: ${{ steps.release.outputs.channel }}
+          ACCEPT_PENDING_DEVICES: ${{ inputs.accept_pending_devices }}
+        run: |
+          args=()
+          if [[ "$RELEASE_CHANNEL" == latest && "$ACCEPT_PENDING_DEVICES" == true ]]; then
+            args+=(--accept-pending-devices)
+          fi
+          pnpm publish:release "$RELEASE_CHANNEL" "${args[@]}"
       - uses: softprops/action-gh-release@v2
         if: github.event_name == 'push'
         with:

@@ -26,11 +26,11 @@ graph TD
     RS --> SVG
 ```
 
-| Aspecto | `ThreeRenderer` | `renderToSVG` |
+| Aspecto | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` / `SvgRenderer` |
 |---------|----------------|---------------|
-| **Paradigma** | Instancia con estado (class) | String o instantánea DOM |
-| **Output** | Dibuja en un `<canvas>` | Retorna un `string` SVG |
-| **Requiere DOM** | ✅ Sí (`HTMLCanvasElement`) | ❌ No (funciona en Node.js) |
+| **Paradigma** | Instancia con estado (class) | String, instantánea DOM o clase persistente |
+| **Output** | Dibuja en un `<canvas>` | SVG como string o elemento DOM |
+| **Requiere DOM** | Sí (`HTMLCanvasElement`) | String: no; instantánea/clase DOM: sí |
 | **3D** | ✅ Perspectiva, luces, sombras | ❌ Solo 2D |
 | **Vectorial** | ❌ Rasterizado | ✅ Infinitamente escalable |
 
@@ -191,6 +191,42 @@ window.addEventListener('pagehide', stop, { once: true });
 ## `@joroya/renderer-svg` — SVG (2D)
 
 Renderer ligero que genera markup SVG. Ideal para arte generativo, exportación vectorial y server-side rendering.
+
+### `SvgRenderer` — Escenas persistentes en navegador (desde 1.3.0)
+
+Usa `SvgRenderer` para animaciones SVG continuas. Conserva el SVG y los grupos
+por nodo; actualiza transformaciones, texto y materiales, reconcilia cambios
+de estructura y delega interacciones. Requiere DOM; `renderToSVG` sigue siendo
+la API de exportación compatible con servidor.
+
+```typescript
+import { Scene, Node, createBox } from '@joroya/core';
+import { SvgRenderer } from '@joroya/renderer-svg';
+
+const scene = new Scene();
+const card = new Node('card');
+card.addComponent(createBox(80, 40, 0));
+scene.add(card);
+const renderer = new SvgRenderer({
+  width: 640, height: 320, container: document.getElementById('scene')!,
+  title: 'Iteración de arrays', description: 'La tarjeta muestra el elemento activo.',
+});
+renderer.mount(scene); // Dibuja sin avanzar el reloj.
+card.transform.setPosition({ x: 160, y: 120, z: 0 });
+renderer.render(0, { advanceScene: false });
+// Después de detener el RAF de tu aplicación:
+renderer.dispose();
+```
+
+`render(dt)` avanza la escena una vez. Después de `mixer.seek(time)` o
+`scene.update(dt)`, dibuja con `render(0, { advanceScene: false })`. Enlaza
+componentes Animator sin mixer y libera solamente sus propios enlaces; los
+mixers externos siguen bajo control de la aplicación. No inicia RAF.
+`setSize`, `setViewBox`, `setAccessibleDescription` y `getNodeElement(node.id)`
+permiten adaptación de tamaño y anotaciones accesibles que conservan su identidad.
+Para explicaciones didácticas, deriva texto y valores de snapshots deterministas:
+los eventos de clips no deben ser la única fuente del estado.
+Consulta la [guía del paquete](https://github.com/joshuacba08/oroya-animate/blob/main/packages/renderer-svg/README.md).
 
 ### `renderToSVG` — String SVG (server-safe)
 
@@ -708,7 +744,7 @@ const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 ```
 
-`dt: 0` también llama a `onUpdate(0)`. Usa callbacks basados en tiempo, sin efectos que se ejecuten incondicionalmente en cada llamada. SVG y Canvas2D no enlazan los `Animator` automáticamente: llama a `animator.bindToScene(scene)` antes de reproducir. `renderToSVGElement()` genera una instantánea DOM con listeners; no incluye un bucle de render persistente.
+`dt: 0` también llama a `onUpdate(0)`. Usa callbacks basados en tiempo, sin efectos incondicionales por llamada. Los helpers de instantánea SVG y Canvas2D no enlazan `Animator` automáticamente: llama a `animator.bindToScene(scene)` antes de reproducir. `renderToSVGElement()` genera una instantánea DOM con listeners. Para actualizaciones persistentes usa `SvgRenderer`; la aplicación controla su bucle RAF.
 
 `setSize(width, height)` cambia las dimensiones de WebGL y del composer, pero no la proyección de la cámara. Detén tu `requestAnimationFrame` y elimina tus listeners antes de llamar a `dispose()`.
 

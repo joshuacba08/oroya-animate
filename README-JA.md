@@ -82,6 +82,14 @@ Oroya Animateは、シーンロジックをレンダリング実装から分離�
 
 ## 🚀 はじめに
 
+### 1.3 の永続的な SVG アニメーション
+
+`SvgRenderer` は DOM ノードを保持し、テキストとマテリアルを更新します。
+mount/render/dispose と `AnimationMixer.seek` を組み合わせて、Three.js を
+読み込まずに決定的な教育用ステップを表示できます。既存のスナップショットと
+書き出し API は互換性を維持します。[SVG ガイド](packages/renderer-svg/README.md)
+と[プログラミングアニメーションの要件](docs/features/OA-012/EPIC.md)を参照。
+
 ### インストール
 
 #### NPM/PNPM（推奨）

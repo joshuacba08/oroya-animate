@@ -84,6 +84,15 @@ La documentación detallada está disponible en la carpeta [`docs/`](docs/) y en
 
 ## 🚀 Comenzando
 
+### Animaciones SVG persistentes en 1.3
+
+`SvgRenderer` conserva los nodos DOM, actualiza texto/materiales y ofrece un
+ciclo explícito mount/render/dispose. Combinado con `AnimationMixer.seek`,
+permite pasos didácticos deterministas sin cargar Three.js. Las APIs de
+instantánea y exportación siguen siendo compatibles. Consulta la
+[guía SVG](packages/renderer-svg/README.md) y el
+[requerimiento de animaciones de programación](docs/features/OA-012/EPIC.md).
+
 ### Instalación
 
 #### NPM/PNPM (Recomendado)

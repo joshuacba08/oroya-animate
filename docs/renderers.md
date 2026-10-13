@@ -24,9 +24,9 @@ graph TD
     RC --> CANVAS
 ```
 
-| Aspect | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` | `renderToCanvas` / `CanvasRenderer` |
+| Aspect | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` / `SvgRenderer` | `renderToCanvas` / `CanvasRenderer` |
 |---------|----------------|--------------------------------------|----------------------------------------|
-| **Paradigm** | Stateful instance (class) | String output or DOM snapshot helper | One-shot function or persistent class |
+| **Paradigm** | Stateful instance (class) | String output, DOM snapshot or persistent class | One-shot function or persistent class |
 | **Output** | Draws to a WebGL `<canvas>` | Returns an SVG `string` or `SVGSVGElement` | Draws to a Canvas2D `<canvas>` |
 | **Requires DOM** | Yes (`HTMLCanvasElement`) | String mode: no; DOM mode: yes | Yes (`HTMLCanvasElement`) |
 | **3D** | Perspective/orthographic, lights, shadows | 2D projection only | 2D projection only |
@@ -205,6 +205,41 @@ window.addEventListener('pagehide', stop, { once: true });
 ## `@joroya/renderer-svg` — SVG (2D)
 
 Lightweight renderer that generates SVG markup. Ideal for generative art, vector export, and server-side rendering.
+
+### `SvgRenderer` — Persistent browser scenes (since 1.3.0)
+
+Use `SvgRenderer` for live SVG animation. It preserves the SVG root and node
+groups, updates transforms/text/materials, reconciles structural edits and
+delegates interactions without adding listeners on every frame. It requires a
+DOM; `renderToSVG` remains the server-safe export API.
+
+```typescript
+import { Scene, Node, createBox } from '@joroya/core';
+import { SvgRenderer } from '@joroya/renderer-svg';
+
+const scene = new Scene();
+const card = new Node('card');
+card.addComponent(createBox(80, 40, 0));
+scene.add(card);
+const renderer = new SvgRenderer({
+  width: 640, height: 320, container: document.getElementById('scene')!,
+  title: 'Array iteration', description: 'The card shows the active element.',
+});
+renderer.mount(scene); // Initial draw without advancing time.
+card.transform.setPosition({ x: 160, y: 120, z: 0 });
+renderer.render(0, { advanceScene: false });
+// After stopping your own RAF loop:
+renderer.dispose();
+```
+
+`render(dt)` advances the scene once. After `mixer.seek(time)` or an application
+`scene.update(dt)`, use `render(0, { advanceScene: false })` to avoid advancing
+twice. The renderer binds unbound Animator components and releases only those
+bindings; externally owned mixers remain under application control. It starts
+no RAF loop. `setSize`, `setViewBox`, `setAccessibleDescription` and stable
+`getNodeElement(node.id)` support responsive presentation and accessibility.
+For educational scrubbing, derive text and values from deterministic snapshots;
+clip events alone are not a state store. See the [package guide](../packages/renderer-svg/README.md).
 
 ### `renderToSVG` — String output (server-safe)
 
@@ -758,7 +793,7 @@ const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 ```
 
-`dt: 0` still invokes `onUpdate(0)`. Keep callbacks time-based and free of unconditional per-call side effects. SVG and Canvas2D do not bind `Animator` components automatically: call `animator.bindToScene(scene)` before playback. `renderToSVGElement()` builds a DOM snapshot with event listeners; it does not provide a persistent `render()` loop.
+`dt: 0` still invokes `onUpdate(0)`. Keep callbacks time-based and free of unconditional per-call side effects. The SVG snapshot helpers and Canvas2D do not bind `Animator` components automatically: call `animator.bindToScene(scene)` before playback. `renderToSVGElement()` builds a DOM snapshot with event listeners. For persistent DOM updates, use `SvgRenderer`; the application owns its RAF loop.
 
 `setSize(width, height)` updates the WebGL renderer and composer dimensions, not the camera projection. Stop your own `requestAnimationFrame` loop and remove your own listeners before calling `dispose()`.
 

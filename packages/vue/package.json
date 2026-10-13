@@ -1,6 +1,6 @@
 {
   "name": "@joroya/vue",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Vue 3 bindings for Oroya Animate — composables and components for scene-graph composition",
   "keywords": [
     "oroya",
@@ -46,8 +46,8 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@joroya/core": "^1.2.0",
-    "@joroya/renderer-three": "^1.2.0",
+    "@joroya/core": "^1.3.0",
+    "@joroya/renderer-three": "^1.3.0",
     "vue": "^3.4.0"
   },
   "dependencies": {

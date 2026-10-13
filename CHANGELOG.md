@@ -1,13 +1,23 @@
 # Changelog
 
-## [1.2.0] — prepared, not published
+## [1.3.0] — 2026-10-13
+
+- Add `SvgRenderer` with mounted DOM reconciliation, stable root/node/shape identity,
+  transform/text/material updates, scoped SVG definitions and delegated interaction.
+- Add explicit mount/render/resize/viewBox/accessibility/dispose lifecycle and
+  renderer-owned Animator binding without introducing a RAF loop.
+- Define educational programming animation requirements in OA-012, covering
+  deterministic steps, iterators, function calls, shared references, CMS integration
+  and accessibility. Course-editor integration remains separate from the graphics API.
+
+## [1.2.0] — 2026-10-13
 
 - Validate scene graphs and JSON before mutation/import; preserve historical scene data with actionable diagnostics.
 - Reconcile renderer changes, expose capabilities, separate drawing from scene advancement, and clean up asynchronous resources.
 - Preserve glTF bind poses and typed attributes; test assets, input, physics, React 18/19, Vue 3 and plugin ownership.
 - Complete the basic editor with synchronized selection, gizmos, reversible commands and validated save/load.
 - Align all packages at 1.2.0; verify external ESM/CJS/TypeScript consumers and gate coordinated candidate/stable publishing.
-- Add Windows/Linux CI, API compatibility checks, browser coverage, performance budgets and endurance evidence. Physical device acceptance and npm publication remain release gates.
+- Add Windows/Linux CI, API compatibility checks, browser coverage, performance budgets and endurance evidence. Physical device acceptance remains pending under the recorded maintainer release exception.
 
 ## Unreleased — runtime and documentation maintenance
 

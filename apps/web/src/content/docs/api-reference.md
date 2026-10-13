@@ -1495,6 +1495,26 @@ renderer.dispose();
 
 ## `@joroya/renderer-svg`
 
+### `SvgRenderer` (desde 1.3.0)
+
+Renderer DOM persistente para escenas SVG. Se construye con `SvgRendererOptions`:
+`width`, `height`, `viewBox?`, `container?`, `title?`, `description?` y
+`onDiagnostic?`. Mantiene el elemento `svg` y los grupos de los nodos entre frames.
+
+| Método | Contrato |
+| --- | --- |
+| `mount(scene)` | Dibuja el estado inicial sin avanzar la escena |
+| `render(dt?, options?)` | Actualiza escena y DOM; `advanceScene: false` dibuja sin avanzar el reloj |
+| `getNodeElement(id)` | Devuelve el grupo estable para anotar foco y accesibilidad |
+| `setSize(width, height)` | Cambia dimensiones positivas y finitas |
+| `setViewBox(viewBox?)` | Cambia encuadre; omitir restaura cámara/encuadre por defecto |
+| `setAccessibleDescription(title, description?)` | Actualiza título y descripción como texto seguro |
+| `dispose()` | Libera listeners, DOM y enlaces Animator propios; es idempotente |
+
+No inicia RAF. Después de `AnimationMixer.seek(time)`, usa
+`renderer.render(0, { advanceScene: false })`. Las funciones de instantánea
+siguientes conservan sus contratos. Consulta la [guía de renderers](/es/docs/renderers).
+
 ### `renderToSVG`
 
 Genera un string SVG después de ejecutar `scene.update(dt)` y actualizar las matrices de mundo; no es una función pura.

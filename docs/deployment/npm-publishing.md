@@ -55,6 +55,15 @@ Actions for provenance and trusted authentication.
 
 ## Stable release and recovery
 
+For 1.3.0, the maintainer requested direct stable publication. Dispatch version
+`1.3.0`, channel `latest`, and `accept_pending_devices: true` only for that
+explicit exception. The full validation job remains required, including browser,
+consumer, performance and 30-minute endurance checks. The exception skips the
+candidate-first requirement and physical-device gate; Safari/iOS and
+Chrome/Android evidence remains pending and must not be reported as passed.
+The input applies to both a fresh publication and an accepted retry. Defaults
+and tag-triggered releases continue to enforce physical acceptance.
+
 After candidate acceptance, prepare version `1.2.0`, collect physical evidence
 for that version, and dispatch channel `latest`. Stable acceptance remains
 blocking. npm versions are immutable; never attempt to overwrite a version.

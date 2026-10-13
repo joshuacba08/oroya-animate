@@ -26,11 +26,11 @@ graph TD
     RS --> SVG
 ```
 
-| 観点 | `ThreeRenderer` | `renderToSVG` |
+| 観点 | `ThreeRenderer` | `renderToSVG` / `renderToSVGElement` / `SvgRenderer` |
 |------|-----------------|---------------|
-| **パラダイム** | ステートフルなインスタンス（クラス） | 文字列または DOM スナップショット |
-| **出力** | `<canvas>` に描画 | SVG `string` を返す |
-| **DOM必須** | ✅ はい（`HTMLCanvasElement`） | ❌ いいえ（Node.jsで動作） |
+| **パラダイム** | ステートフルなインスタンス（クラス） | 文字列、DOM スナップショット、永続的なクラス |
+| **出力** | `<canvas>` に描画 | SVG 文字列または DOM 要素 |
+| **DOM必須** | はい（`HTMLCanvasElement`） | 文字列: 不要; DOM 出力: 必要 |
 | **3D** | ✅ 透視投影、ライト、シャドウ | ❌ 2Dのみ |
 | **ベクター** | ❌ ラスター化 | ✅ 無限にスケーラブル |
 
@@ -191,6 +191,39 @@ window.addEventListener('pagehide', stop, { once: true });
 ## `@joroya/renderer-svg` — SVG（2D）
 
 SVGマークアップを生成する軽量レンダラー。ジェネラティブアート、ベクターエクスポート、サーバーサイドレンダリングに最適。
+
+### `SvgRenderer` — ブラウザー向けの永続的な SVG（1.3.0 以降）
+
+`SvgRenderer` は SVG のルートとノードのグループを保持し、変換、テキスト、
+マテリアルと階層の変更を更新します。DOM が必要です。サーバー側の書き出しには
+引き続き `renderToSVG` を使用します。
+
+```typescript
+import { Scene, Node, createBox } from '@joroya/core';
+import { SvgRenderer } from '@joroya/renderer-svg';
+
+const scene = new Scene();
+const card = new Node('card');
+card.addComponent(createBox(80, 40, 0));
+scene.add(card);
+const renderer = new SvgRenderer({
+  width: 640, height: 320, container: document.getElementById('scene')!,
+  title: '配列の反復', description: 'カードは現在の要素を示します。',
+});
+renderer.mount(scene); // 時間を進めず初期状態を描画。
+card.transform.setPosition({ x: 160, y: 120, z: 0 });
+renderer.render(0, { advanceScene: false });
+// アプリケーションの RAF を停止した後:
+renderer.dispose();
+```
+
+`render(dt)` はシーンを一度更新します。`mixer.seek(time)` や `scene.update(dt)`
+の後は `render(0, { advanceScene: false })` を使用してください。未接続の Animator
+を接続し、自身が作成した接続だけを解放します。外部の mixer はアプリケーションが
+管理します。RAF は自動開始しません。`setSize`、`setViewBox`、
+`setAccessibleDescription` と `getNodeElement(node.id)` も利用できます。
+教育用の状態は決定的なスナップショットから生成し、クリップのイベントだけに
+依存しないでください。[パッケージガイド](https://github.com/joshuacba08/oroya-animate/blob/main/packages/renderer-svg/README.md)を参照。
 
 ### `renderToSVG` — SVG 文字列（サーバーセーフ）
 
@@ -708,7 +741,7 @@ const svg = renderToSVG(scene, { width: 800, height: 600, dt: 0 });
 renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 ```
 
-`dt: 0` でも `onUpdate(0)` は呼ばれます。コールバックは時間に基づき、呼び出し回数ごとの無条件な副作用を避けてください。SVG と Canvas2D は `Animator` を自動バインドしません。再生前に `animator.bindToScene(scene)` を呼びます。`renderToSVGElement()` はイベントリスナー付き DOM スナップショットを作成しますが、継続的な描画ループは提供しません。
+`dt: 0` でも `onUpdate(0)` は呼ばれます。無条件な副作用を避けてください。SVG スナップショット関数と Canvas2D は `Animator` を自動バインドしません。再生前に `animator.bindToScene(scene)` を呼びます。`renderToSVGElement()` は DOM スナップショットです。永続的な更新には `SvgRenderer` を使用し、RAF はアプリケーションが管理します。
 
 `setSize(width, height)` は WebGL と composer のサイズを変更しますが、カメラ投影は更新しません。`dispose()` の前に描画ループと独自リスナーを停止してください。
 
