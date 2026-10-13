@@ -108,11 +108,14 @@ jobs:
           DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
         run: node scripts/verify-deployment.js
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Install software GL drivers
+        run: sudo apt-get install -y libgl1-mesa-dri libegl1 mesa-utils
       - name: Verify deployed site in browser
         env:
           DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json
           DEPLOYMENT_URL: ${{ steps.target.outputs.environment == 'production' && 'https://oroya-animate.oroyajs.com' || steps.release.outputs.url }}
-        run: pnpm test:browser
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: xvfb-run -a pnpm test:browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

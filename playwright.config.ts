@@ -8,6 +8,7 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], ...(process.platform === 'win32' ? { channel: 'msedge' } : {}) } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'],
+      ...(process.env.CI && process.platform === 'linux' ? { headless: false } : {}),
       // Headless CI runners use software GL drivers; Firefox otherwise blocks WebGL2.
       ...(process.env.CI || process.platform === 'linux' ? { launchOptions: { firefoxUserPrefs: {
         'webgl.force-enabled': true, 'webgl.disabled': false,
