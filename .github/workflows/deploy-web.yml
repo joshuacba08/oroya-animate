@@ -85,7 +85,11 @@ jobs:
       - name: Deploy
         id: release
         run: |
-          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt ${{ steps.target.outputs.flags }} --token="$VERCEL_TOKEN")
+          args=()
+          if [ "${{ steps.target.outputs.environment }}" = production ]; then
+            args+=(--skip-domain)
+          fi
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt ${{ steps.target.outputs.flags }} "${args[@]}" --token="$VERCEL_TOKEN")
           echo "url=$url" >> "$GITHUB_OUTPUT"
           printf '%s\n' "$url" > deployment-url.txt
           printf 'Commit: %s\nDeployment: %s\n' "$GITHUB_SHA" "$url" >> "$GITHUB_STEP_SUMMARY"
@@ -95,6 +99,17 @@ jobs:
         run: |
           pnpm dlx vercel@63.1.2 curl / --deployment "$DEPLOYMENT_URL" --yes -- --silent --show-error --fail --location --header "x-vercel-set-bypass-cookie: true" --cookie-jar "$RUNNER_TEMP/vercel-deployment-cookies.txt" --output /dev/null
           node scripts/deployment-auth.js
+      - name: Verify deployment before promotion
+        env:
+          DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json
+          EXPECTED_COMMIT: ${{ github.sha }}
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: node scripts/verify-deployment.js
+      - name: Promote verified production deployment
+        if: steps.target.outputs.environment == 'production'
+        env:
+          DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
+        run: pnpm dlx vercel@63.1.2 promote "$DEPLOYMENT_URL" --yes --timeout=5m --token="$VERCEL_TOKEN"
       - name: Verify public guides
         env:
           DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json
