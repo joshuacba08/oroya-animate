@@ -36,7 +36,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VALIDATED_RUN: ${{ inputs.validated_run }}
-        run: gh run download "$VALIDATED_RUN" --name release-evidence --dir validation
+        run: |
+          gh run download "$VALIDATED_RUN" --name release-evidence --dir .cache/accepted-evidence
+          cp -a .cache/accepted-evidence/. validation/
       - name: Restore the accepted package version
         run: |
           version=$(node --input-type=module -e 'import {readFileSync} from "node:fs"; console.log(JSON.parse(readFileSync("validation/package-consumers.json", "utf8")).packages[0].version)')
