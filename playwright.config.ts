@@ -1,12 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
 const deployed = !!process.env.DEPLOYMENT_URL;
+const softwareChromium = process.env.CI ? { launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader'] } } : {};
 export default defineConfig({
   testDir: './tests/browser', timeout: 60000,
   use: { baseURL: process.env.DEPLOYMENT_URL || 'http://127.0.0.1:4321',
     viewport: { width: 1280, height: 800 }, storageState: process.env.DEPLOYMENT_STORAGE_STATE,
     trace: process.env.DEPLOYMENT_STORAGE_STATE ? 'off' : 'retain-on-failure' },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'], ...(process.platform === 'win32' ? { channel: 'msedge' } : {}) } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'], ...softwareChromium,
+      ...(process.platform === 'win32' && !process.env.CI ? { channel: 'msedge' } : {}),
+    } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'],
       ...(process.env.CI && process.platform === 'linux' ? { headless: false } : {}),
       // Headless CI runners use software GL drivers; Firefox otherwise blocks WebGL2.
@@ -15,7 +18,7 @@ export default defineConfig({
       } } } : {}),
     } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-chromium', testMatch: /runtime\.spec\.ts/, use: { ...devices['Pixel 7'] } },
+    { name: 'mobile-chromium', testMatch: /runtime\.spec\.ts/, use: { ...devices['Pixel 7'], ...softwareChromium } },
     { name: 'mobile-webkit', testMatch: /runtime\.spec\.ts/, use: { ...devices['iPhone 13'] } },
   ],
   reporter: [['list'], ['html', { open: 'never' }]],
