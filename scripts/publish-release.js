@@ -14,8 +14,8 @@ const version = packages[0].manifest.version;
 if (tag === 'next' && !version.includes('-')) throw new Error('next requires a prerelease version.');
 if (tag === 'latest' && version.includes('-')) throw new Error('latest requires a stable version.');
 if (!process.env.npm_execpath) throw new Error('Run through pnpm.');
-const run = (args, cwd = process.cwd()) => {
-  const result = spawnSync(process.execPath, [process.env.npm_execpath, ...args], { cwd, encoding: 'utf8', windowsHide: true });
+const run = (args, cwd = process.cwd(), env = process.env) => {
+  const result = spawnSync(process.execPath, [process.env.npm_execpath, ...args], { cwd, env, encoding: 'utf8', windowsHide: true });
   if (result.status) throw new Error(result.stdout + result.stderr);
   return result.stdout;
 };
@@ -50,7 +50,16 @@ await Promise.all(packages.map(async ({ manifest }) => {
   console.log('Verified ' + manifest.name + '@' + version);
 }));
 // Update the dist-tag only after every compatible package version is available.
-for (const { manifest } of packages) run(['exec', 'npm', 'dist-tag', 'add', manifest.name + '@' + version, tag]);
+const tagEnvironment = { ...process.env };
+if (tagEnvironment.NODE_AUTH_TOKEN) {
+  // npm prefers OIDC even when a granular token is supplied. Publisher grants
+  // for publication and tag management are independent. Use the explicitly
+  // configured token for tags; keep OIDC and provenance enabled for publishing.
+  delete tagEnvironment.ACTIONS_ID_TOKEN_REQUEST_URL;
+  delete tagEnvironment.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+  delete tagEnvironment.NPM_ID_TOKEN;
+}
+for (const { manifest } of packages) run(['exec', 'npm', 'dist-tag', 'add', manifest.name + '@' + version, tag], process.cwd(), tagEnvironment);
 for (const { manifest } of packages) {
   await waitForRegistry(() => registryTag(manifest.name, tag), version);
 }
