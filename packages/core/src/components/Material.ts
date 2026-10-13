@@ -134,6 +134,8 @@ export interface SvgMaskDef {
  * @public
  */
 export interface MaterialDef {
+  /** Render both front and back faces on 3D backends. Default false. */
+  doubleSided?: boolean;
   /**
    * The color of the material.
    */

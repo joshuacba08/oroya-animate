@@ -5,9 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@joroya/react.svg)](https://www.npmjs.com/package/@joroya/react)
 [![License](https://img.shields.io/npm/l/@joroya/react.svg)](../../LICENSE)
 
-> **⚠ alpha** — all exports are tagged `@experimental`. Prop names and
-> hook signatures may evolve through v1.x. Pin the version if you depend
-> on a specific shape.
+> **Stable in 1.2:** bindings are `@public`; committed props, resize, camera ownership and cleanup are tested. See the repository capability matrix.
 
 ## Install
 

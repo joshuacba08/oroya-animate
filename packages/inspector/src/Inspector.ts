@@ -44,7 +44,7 @@ export interface InspectorOptions {
  * @public
  */
 export class Inspector {
-    private readonly scene: Scene;
+    private scene: Scene;
     private readonly metrics = new FrameMetrics();
     private readonly options: Required<InspectorOptions>;
 
@@ -120,11 +120,20 @@ export class Inspector {
         this.selectedNode = null;
     }
 
+    /** Replace inspected scene and discard selection from the previous tree. */
+    setScene(scene: Scene): void {
+        this.scene = scene;
+        this.selectedNode = null;
+        this.elapsedSinceRefresh = 0;
+        if (this.root) this.refresh();
+    }
+
     /**
      * Frame tick. Records `dt`, throttles DOM refresh to
      * `refreshIntervalMs`.
      */
     update(dt: number): void {
+        if (this.selectedNode && this.scene.findNodeById(this.selectedNode.id) !== this.selectedNode) this.selectedNode = null;
         this.metrics.record(dt);
         this.elapsedSinceRefresh += dt * 1000;
         if (this.elapsedSinceRefresh >= this.options.refreshIntervalMs) {

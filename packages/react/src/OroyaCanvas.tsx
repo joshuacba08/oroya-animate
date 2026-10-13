@@ -3,7 +3,7 @@ import { Scene, Camera, CameraType, Node as OroyaNode } from '@joroya/core';
 import { ThreeRenderer } from '@joroya/renderer-three';
 import { OroyaContext, type FrameCallback, type OroyaContextValue } from './context';
 
-/** @experimental */
+/** @public */
 export interface OroyaCanvasProps {
     /** CSS width of the canvas. Default `100%`. */
     width?: number | string;
@@ -34,7 +34,7 @@ export interface OroyaCanvasProps {
  * Child JSX (`<Box>`, `<Light>`, custom hooks calling `useFrame`) attaches
  * to the scene graph via context — no manual `scene.add(node)` from app code.
  *
- * @experimental — alpha React bindings; prop names may evolve.
+ * @public — stable React bindings.
  */
 export function OroyaCanvas(props: OroyaCanvasProps) {
     const { width = '100%', height = '100%', style, dpr, autoCamera = true, children } = props;
@@ -62,13 +62,14 @@ export function OroyaCanvas(props: OroyaCanvasProps) {
     useEffect(() => {
         if (!autoCamera) return;
         const camNode = new OroyaNode('__oroya_default_camera');
-        camNode.transform.position = { x: 0, y: 0, z: 5 };
+        camNode.transform.setPosition({ x: 0, y: 0, z: 5 });
         camNode.addComponent(new Camera({
             type: CameraType.Perspective,
             fov: 60,
             aspect: 1,
             near: 0.1,
             far: 1000,
+            autoAspect: true,
         }));
         scene.add(camNode);
         return () => {
@@ -99,7 +100,7 @@ export function OroyaCanvas(props: OroyaCanvasProps) {
         let raf = 0;
         let last = performance.now();
         const loop = (now: number) => {
-            const dt = Math.min((now - last) / 1000, 0.1); // cap to 100ms to survive tab-switches
+            const dt = Math.max(0, Math.min((now - last) / 1000, 0.1)); // Clamp the first RAF timestamp and tab switches.
             last = now;
             for (const cb of frameCallbacksRef.current) cb(dt);
             renderer.render(dt);

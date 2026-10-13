@@ -30,7 +30,7 @@ Oroya Animate es una biblioteca de gráficos de alto nivel que desacopla la lóg
 - **🖱️ Interactividad:** Sistema de eventos integrado con raycasting (3D) y eventos DOM (SVG).
 - **🌐 Controles de Órbita:** Controles de cámara con mouse/táctiles para escenas 3D.
 - **🎨 Arte Generativo:** Motor SvJs con ruido, distribuciones y primitivas SVG.
-- **⚛️ Compatible con Frameworks:** Wrappers alfa para React y Vue.
+- **⚛️ Compatible con Frameworks:** Bindings estables para React y Vue desde 1.2.
 - **🧰 Herramientas de Desarrollo:** Inspector, gestor de input, caché de assets, plugins y editor visual de referencia.
 
 ## 📦 Estructura del Proyecto
@@ -47,14 +47,14 @@ Este proyecto se gestiona como un monorepo usando espacios de trabajo de `pnpm`:
 - [`@joroya/assets`](packages/assets): Caché de assets con precarga, progreso y conteo de referencias.
 - [`@joroya/input`](packages/input): Mapeo de acciones para teclado, mouse y gamepad.
 - [`@joroya/inspector`](packages/inspector): Overlay de debug para jerarquía, transforms y métricas de frame.
-- [`@joroya/react`](packages/react): Bindings experimentales para React.
-- [`@joroya/vue`](packages/vue): Composables experimentales para Vue 3.
+- [`@joroya/react`](packages/react): Bindings públicos para React.
+- [`@joroya/vue`](packages/vue): Composables públicos para Vue 3.
 
 ### Aplicaciones
 - [`demo-react`](apps/demo-react): Demostración de Oroya Animate trabajando con React y Three.js.
 - [`demo-vanilla`](apps/demo-vanilla): Ejemplos mínimos usando JavaScript vanilla.
 - [`web`](apps/web): Sitio web de documentación impulsado por Astro (desplegado en Vercel).
-- [`editor`](apps/editor): Editor visual alfa y app de referencia para serialización.
+- [`editor`](apps/editor): Editor visual básico con historial reversible y serialización validada.
 
 ## 📚 Documentación
 
@@ -274,3 +274,7 @@ MIT © [joshuacba08](https://github.com/joshuacba08)
 [Reportar Bug](https://github.com/joshuacba08/oroya-animate/issues) · [Solicitar Característica](https://github.com/joshuacba08/oroya-animate/issues) · [Discusiones](https://github.com/joshuacba08/oroya-animate/discussions)
 
 </div>
+
+[Oroya JS 1.2: stability and acceptance](docs/stability-1.2-es.md)
+
+React/Vue y plugins son públicos desde 1.2.0; el editor básico tiene autoría reversible y persistencia probada. La aceptación física y la publicación npm son comprobaciones separadas.

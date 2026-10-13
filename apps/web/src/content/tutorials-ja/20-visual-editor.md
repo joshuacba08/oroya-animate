@@ -5,88 +5,24 @@ order: 20
 level: "beginner"
 duration: "10 min"
 ---
-# チュートリアル 20: ビジュアルエディタ（アルファ版）
-
+# Tutorial 20: 基本ビジュアルエディター
 > **レベル:** 初級
 > **時間:** 10 分
-> **学ぶこと:** `apps/editor` が何をするか、安定した v1.0 シリアライズ契約をどう使うか、自分のワークフロー用にどう拡張するか。
 
-> **ステータス:** アルファ版。レイアウトと機能セットは 1.x で進化します。書き込むファイル形式（`serialize()` 経由の `.json`）は `@public` で 1.x シリーズ全体で安定。
+Node 24 で依存関係をインストールし、`pnpm build` の後に `pnpm --filter editor dev` を実行します。デスクトップの基本フローは Chromium、Firefox、WebKit で検証しています。
 
----
+1. 階層または viewport で node を選択します。
+2. group、box、sphere、plane を選択中の node または root に追加します。
+3. 名前・parent を編集します。循環する reparent は変更前に拒否します。
+4. 位置、XYZ Euler 回転（度）、scale を編集します。core は quaternion を維持します。
+5. material の色、opacity、roughness、metalness、両面描画を変更します。
+6. W/E/R の gizmo を使用します。操作用カメラは保存するカメラと独立しています。
+7. 複製・削除、Ctrl/Cmd+Z の undo、Ctrl/Cmd+Shift+Z または Ctrl+Y の redo を使用します。ドラッグ全体が一つの操作です。
+8. JSON を保存します。再構築が必要なデータはダウンロード前に警告します。
+9. 正常なファイルは viewport、階層、選択、inspector を同時に交換し履歴を初期化します。不正ファイルでは既存 scene を保持し、未保存の変更を置換する前に確認します。
 
-## ローカル実行
+`EditorController` が scene・選択・履歴を一元管理します。unmount は renderer、gizmo、observer、listener、RAF を解放します。
 
-```bash
-git clone https://github.com/joshuacba08/oroya-animate.git
-cd oroya-animate
-pnpm install
-pnpm build
-pnpm --filter editor dev   # http://localhost:5173
-```
+従来の公開 `serialize()` JSON 形式を維持します。外部 asset、script、正確な再生時刻、物理状態は再構築が必要です。複製は ID を再生成しますが animation/bone 名を自動変更しません。
 
-スターターシーンがロード: hero 立方体、球、ライト付き地面、パースペクティブカメラ。
-
----
-
-## 3 つのパネル
-
-| 領域 | 目的 |
-|---|---|
-| **左** — 階層 | シーンツリー内の全ノードのリスト。クリックで選択。 |
-| **中央** — キャンバス | ライブな `ThreeRenderer` ビュー。 |
-| **右** — インスペクタ | 選択ノードの編集可能 transform（位置 / 回転クォータニオン / スケール）+ 読み取り専用のコンポーネントリスト。 |
-
-ツールバー: **+ Cube**（ランダム色の立方体をスポーン）、**Save**（`scene.json` ダウンロード）、**Load**（ファイルピッカー → `deserialize()` → マウント）、**Delete**。
-
----
-
-## 構造
-
-1. **`OroyaCanvas`** は使われていません — エディタは 3 ペイン グリッドが完全な制御を望むため `ThreeRenderer` を直接マウント。
-2. **シーン変更は `revision` カウンタをバンプ** して React の再レンダリングを強制。
-3. **Save / Load は `serialize()` / `deserialize()`** — v1.0 の公開シリアライズ契約が `Float32Array` を base64 経由で処理。
-4. **Transform 編集**は `node.transform` に直接書き込み、`updateLocalMatrix()` を呼ぶ。
-
-ソースは [`apps/editor/src/`](https://github.com/joshuacba08/oroya-animate/tree/main/apps/editor/src)。
-
----
-
-## まだできないこと
-
-- **ギズモ**: 3D 移動/回転/スケールハンドルなし。数値入力のみ。
-- **Euler 回転**: 生のクォータニオンのみ。
-- **Undo/redo**: なし。頻繁に保存してください。
-- **マテリアルエディタ**: カラーピッカーなし。
-
-すべて v1.0 後のアイテム。
-
----
-
-## 自分のプロジェクト用に拡張
-
-エディタは通常の Vite + React アプリ（`apps/editor/`）なので、フォーク可能:
-
-- カスタムコンポーネント用のパネルを追加。
-- ファイル形式をバックエンドに接続（ブラウザダウンロードの代わりに S3）。
-- `Inspector` パッケージの上にプラグイン対応の可視化を追加。
-
-コアエディタは npm パッケージとしてシップされません — リファレンスアプリです。
-
----
-
-## Save / Load の正式コントラクト
-
-エディタが生成する JSON は任意のコードパスから `serialize(scene)` が生成するのと同じ形式。プロパティ:
-
-- **安定**: 1.x シリーズで形は変わりません。
-- **エンジン非依存**: Three.js への参照なし。ここで保存したシーンは SVG / Canvas2D レンダラーでもロードされます。
-- **ランタイム専用をスキップ**: `InstancedMesh` GPU 状態と `Script` クロージャは意図的にデシリアライズされません。
-
----
-
-## 次のステップ
-
-- **本番ビルド**: `pnpm --filter editor build` で `apps/editor/dist/` に静的バンドルを生成。
-- **Inspector オーバーレイと組み合わせる**: エディタの階層パネルはカスタム React コンポーネント、スタンドアロンの `@joroya/inspector` は DOM オーバーレイ。両者は `collectSceneStats` / `FrameMetrics` を共有。
-- **スターターとして glTF をロード**: `buildStarterScene()` に `loadGLTF()` を投入。
+timeline、project asset 梱包、共同編集は対象外です。[機能と受け入れ基準](/ja/docs/stability-1.2)を参照してください。

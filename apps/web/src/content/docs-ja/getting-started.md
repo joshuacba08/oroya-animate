@@ -40,8 +40,8 @@ pnpm add @joroya/core @joroya/renderer-three three
 | `@joroya/assets` | アセットのキャッシュとプリロード |
 | `@joroya/input` | キーボード、マウス、ゲームパッドのアクション |
 | `@joroya/inspector` | シーンのインスペクターとメトリクス |
-| `@joroya/react` | 実験的な React バインディング |
-| `@joroya/vue` | 実験的な Vue 3 コンポーザブル |
+| `@joroya/react` | 安定した React バインディング |
+| `@joroya/vue` | 安定した Vue 3 コンポーザブル |
 
 > **注意:** `@joroya/renderer-three` と `@joroya/loader-gltf` は `three` をpeer dependencyとして持っています。プロジェクトにインストールされていることを確認してください：`npm install three`
 

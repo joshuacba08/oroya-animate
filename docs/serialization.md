@@ -294,7 +294,11 @@ Git diffs show exactly what changed:
 | Runtime callbacks | `onUpdate` and event handlers are not persisted; register them again after loading |
 | Instancing and custom components | `InstancedMesh`, `Script`, and unknown types are skipped by the reviver; restore with an adapter |
 | IDs are preserved on all nodes | Importing the same scene twice can create duplicate IDs; create new nodes for independent copies (`id` is readonly) |
-| No schema validation | Invalid JSON or unsupported shapes can throw; validate imported data at the application boundary |
+| Schema validation | `validateSceneJSON()` checks structure, IDs, numeric definitions and supported buffers before construction; errors throw `SceneValidationError` |
 | External resources | JSON stores resource URIs and definitions, not texture/audio/model files or live physics state |
 
 Internal adapters save transforms, component definitions and SVG animations. Bound, playing and paused Animator components are safe to serialize; mixers, callbacks, node references and backend resources are excluded. Clip definitions survive loading, but the exact playback instant is not restored.
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](stability-1.2.md) describe the current rendering and persistence contracts.

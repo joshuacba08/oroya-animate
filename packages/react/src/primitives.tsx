@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import {
     Camera,
     CameraType,
@@ -12,6 +12,8 @@ import {
     type Vec3,
     type Quat,
     type ColorRGB,
+    type Component,
+    ComponentType,
 } from '@joroya/core';
 import { OroyaContext, useOroya } from './context';
 
@@ -21,6 +23,18 @@ interface NodeBaseProps {
     rotation?: Partial<Quat>;
     scale?: Partial<Vec3>;
     children?: ReactNode;
+    nodeRef?: { current: OroyaNode | null };
+}
+
+function applyComponent(node: OroyaNode, component: Component & { definition: unknown }): void {
+    const previous = node.components.get(component.type);
+    if (previous && 'definition' in previous && JSON.stringify(previous.definition) === JSON.stringify(component.definition)) return;
+    node.addComponent(component);
+}
+
+function applyColor(node: OroyaNode, color?: ColorRGB): void {
+    if (color) applyComponent(node, new Material({ color }));
+    else node.removeComponent(ComponentType.Material);
 }
 
 /**
@@ -42,24 +56,28 @@ function NodeHost(props: NodeBaseProps & {
     const node = useMemo(
         () => {
             const n = new OroyaNode(props.name ?? 'react-node');
-            props.setup?.(n);
             return n;
         },
         [],
     );
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         parentNode.add(node);
         return () => {
             parentNode.remove(node);
         };
     }, [node, parentNode]);
 
-    // Apply transform props on every render so JSX-driven motion works.
-    if (props.position) Object.assign(node.transform.position, props.position);
-    if (props.rotation) Object.assign(node.transform.rotation, props.rotation);
-    if (props.scale) Object.assign(node.transform.scale, props.scale);
-    node.transform.updateLocalMatrix();
+    // Mutations happen only after React commits; abandoned renders have no effects.
+    useLayoutEffect(() => {
+        node.name = props.name ?? 'react-node';
+        props.setup?.(node);
+        node.transform.setPosition({ x: 0, y: 0, z: 0, ...props.position });
+        node.transform.setRotation({ x: 0, y: 0, z: 0, w: 1, ...props.rotation });
+        node.transform.setScale({ x: 1, y: 1, z: 1, ...props.scale });
+        if (props.nodeRef) props.nodeRef.current = node;
+        return () => { if (props.nodeRef?.current === node) props.nodeRef.current = null; };
+    }, [node, props]);
 
     const childContext = useMemo(() => ({
         scene,
@@ -79,7 +97,7 @@ interface GroupProps extends NodeBaseProps {
     nodeRef?: { current: OroyaNode | null };
 }
 
-/** A transform-only container — analogous to `<group>` in r3f. * @experimental
+/** A transform-only container — analogous to `<group>` in r3f. * @public
  */
 export function Group(props: GroupProps) {
     return (
@@ -97,7 +115,7 @@ interface BoxProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
-/** @experimental */
+/** @public */
 export function Box(props: BoxProps) {
     const [w, h, d] = useMemo<[number, number, number]>(() => {
         if (Array.isArray(props.size)) return props.size;
@@ -109,11 +127,11 @@ export function Box(props: BoxProps) {
             {...props}
             name={props.name ?? 'box'}
             setup={(n) => {
-                n.addComponent(createBox(w, h, d, {
+                applyComponent(n, createBox(w, h, d, {
                     castShadow: props.castShadow,
                     receiveShadow: props.receiveShadow,
                 }));
-                if (props.color) n.addComponent(new Material({ color: props.color }));
+                applyColor(n, props.color);
             }}
         />
     );
@@ -127,20 +145,20 @@ interface SphereProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
-/** @experimental */
+/** @public */
 export function Sphere(props: SphereProps) {
     return (
         <NodeHost
             {...props}
             name={props.name ?? 'sphere'}
             setup={(n) => {
-                n.addComponent(createSphere(
+                applyComponent(n, createSphere(
                     props.radius ?? 0.5,
                     props.segments ?? 16,
                     props.segments ?? 16,
                     { castShadow: props.castShadow, receiveShadow: props.receiveShadow },
                 ));
-                if (props.color) n.addComponent(new Material({ color: props.color }));
+                applyColor(n, props.color);
             }}
         />
     );
@@ -153,21 +171,21 @@ interface PlaneProps extends NodeBaseProps {
     receiveShadow?: boolean;
 }
 
-/** @experimental */
+/** @public */
 export function Plane(props: PlaneProps) {
     return (
         <NodeHost
             {...props}
             name={props.name ?? 'plane'}
             setup={(n) => {
-                n.addComponent(createPlane(
+                applyComponent(n, createPlane(
                     props.width ?? 1,
                     props.height ?? 1,
                     1,
                     1,
                     { receiveShadow: props.receiveShadow },
                 ));
-                if (props.color) n.addComponent(new Material({ color: props.color }));
+                applyColor(n, props.color);
             }}
         />
     );
@@ -177,23 +195,25 @@ interface PerspectiveCameraProps extends NodeBaseProps {
     fov?: number;
     near?: number;
     far?: number;
-    /** If true, mark this as the active scene camera. Currently informational — the renderer picks the first Camera component it finds. */
+    /** Prefer this camera over the default camera. */
     active?: boolean;
 }
 
-/** @experimental */
+/** @public */
 export function PerspectiveCamera(props: PerspectiveCameraProps) {
     return (
         <NodeHost
             {...props}
             name={props.name ?? 'camera'}
             setup={(n) => {
-                n.addComponent(new Camera({
+                applyComponent(n, new Camera({
                     type: CameraType.Perspective,
                     fov: props.fov ?? 60,
                     aspect: 1,
                     near: props.near ?? 0.1,
                     far: props.far ?? 1000,
+                    active: props.active ?? true,
+                    autoAspect: true,
                 }));
             }}
         />
@@ -205,14 +225,14 @@ interface AmbientLightProps extends Omit<NodeBaseProps, 'children'> {
     color?: ColorRGB;
 }
 
-/** @experimental */
+/** @public */
 export function AmbientLight(props: AmbientLightProps) {
     return (
         <NodeHost
             {...props}
             name={props.name ?? 'ambient'}
             setup={(n) => {
-                n.addComponent(new Light({
+                applyComponent(n, new Light({
                     type: LightType.Ambient,
                     color: props.color,
                     intensity: props.intensity ?? 1,
@@ -228,14 +248,14 @@ interface DirectionalLightProps extends Omit<NodeBaseProps, 'children'> {
     castShadow?: boolean;
 }
 
-/** @experimental */
+/** @public */
 export function DirectionalLight(props: DirectionalLightProps) {
     return (
         <NodeHost
             {...props}
             name={props.name ?? 'directional'}
             setup={(n) => {
-                n.addComponent(new Light({
+                applyComponent(n, new Light({
                     type: LightType.Directional,
                     color: props.color,
                     intensity: props.intensity ?? 1,
@@ -246,7 +266,7 @@ export function DirectionalLight(props: DirectionalLightProps) {
     );
 }
 
-/** Bridge for app code that wants to forward a ref to the underlying Oroya node. * @experimental
+/** Bridge for app code that wants to forward a ref to the underlying Oroya node. * @public
  */
 export function useNodeRef() {
     return useRef<OroyaNode | null>(null);

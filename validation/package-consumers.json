@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-10-13T11:27:03.388Z",
+  "artifactDigest": "72ebf5ab8df0e0b704ab42dd9cdbc95cae6cb7d091546857094a58b78bf9960b",
+  "node": "24.19.0",
+  "packages": [
+    {
+      "name": "@joroya/assets",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/core",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/input",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/inspector",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/loader-gltf",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/physics",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/react",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/renderer-canvas2d",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/renderer-svg",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/renderer-three",
+      "version": "1.2.0"
+    },
+    {
+      "name": "@joroya/vue",
+      "version": "1.2.0"
+    }
+  ],
+  "esm": "passed",
+  "cjs": "passed",
+  "typesNodeNextESM": "passed",
+  "typesNodeNextCJS": "passed",
+  "directory": "C:\\Users\\Ander\\AppData\\Local\\Temp\\oroya-consumer-MDqL3E"
+}

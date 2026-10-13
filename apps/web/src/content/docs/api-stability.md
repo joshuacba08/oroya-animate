@@ -42,22 +42,15 @@ export function solve2BoneIK(...) { ... }
 export function makeCacheKey(...) { ... }
 ```
 
-## What ships as `@experimental` in v1.0.0
+## What remains `@experimental` in v1.2.0
 
 These pieces are deliberately tagged experimental because their shape is
 still settling:
 
-- **`@joroya/react`** and **`@joroya/vue`** — alpha framework wrappers.
-  Component prop names and hook signatures may change as the React /
-  Vue communities give feedback.
 - **`solve2BoneIK`** — argument order (world-space vs local-space inputs)
   may be reworked once a multi-bone IK solver lands.
 - **`Vehicle`** — wheel-options shape mirrors cannon-es directly; we may
   introduce friction tweaks per wheel as a follow-up.
-- **`PluginRegistry` / `ComponentHandler`** — the lifecycle (`create` /
-  `update` / `dispose`) is settled, but the host-side dispatch contract
-  (when to call `update` relative to physics / animation) may grow new
-  guarantees.
 - **WASM acceleration hooks** (`registerMathBackend`) — the surface is
   in place but no production WASM ships yet.
 
@@ -65,9 +58,13 @@ Everything else exported from the `@joroya/core`, `@joroya/renderer-*`,
 `@joroya/loader-gltf`, `@joroya/physics`, `@joroya/inspector`,
 `@joroya/input`, and `@joroya/assets` package barrels is `@public`.
 
+React/Vue bindings and the plugin registry/lifecycle are `@public` from 1.2.0. Their ownership and update contracts are covered by regression and real browser tests. See [capabilities and acceptance](/docs/stability-1.2).
+
 ## Tooling
 
 - `pnpm api:check` reports missing tags, exposed internals and unresolved exports across direct declarations, aliases, types and star chains. It remains informational.
+- `pnpm api:compat` compares the public declaration baseline and blocks removals, incompatible property/call signatures and required additions to option/definition contracts. Runtime semantics remain covered by tests.
+- `pnpm architecture:check` enforces package dependency direction.
 - `pnpm api:check:strict` fails on those issues and is required by CI.
 - Per-package `dist/index.d.ts` is the canonical surface. If a symbol is
   in that file, it is part of the public API regardless of in-source

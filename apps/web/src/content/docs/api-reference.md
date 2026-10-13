@@ -34,6 +34,25 @@ definitions, and geometry factories such as `createTorus` and
 See [API Stability](/docs/api-stability) for experimental exceptions and
 [Migration to v1](/docs/migration-v1) for upgrade notes.
 
+## Additive contracts in 1.2
+
+| API | Contract |
+| --- | --- |
+| `RenderOptions.advanceScene` | Defaults to true; false synchronizes/draws the current instant without advancing animation. Three.js accepts options as the second `render(dt, options)` argument. |
+| `RendererCapabilities`, backend capabilities | Query supported geometry/components and DOM/interaction requirements; diagnostic callbacks report unsupported nodes. |
+| `Diagnostic` | Includes code, severity, explanation and optional node ID/path. |
+| `validateSceneJSON`, `SceneValidationError` | Validate IDs, structure, finite numbers, components and buffer consistency before constructing a scene. |
+| `serialize` / `deserialize` options | Optional `onDiagnostic` callbacks preserve existing calls and report omissions or reconstruction requirements. |
+| `CameraDef.autoAspect`, renderer `adjustCameraToViewport` | Explicitly permit viewport projection adjustment; authored projections otherwise remain unchanged. `active` prioritizes explicit cameras. |
+| `Node.removeComponent` | Detaches ownership; the mandatory Transform cannot be removed. |
+| `SkinDef.bindMatrix` | Optional 16-value Float32Array preserves imported glTF bind pose, including transformed mesh nodes. |
+| `parseGLTF`, `GLTFLoadOptions` | Parse local glTF/GLB fixtures with cancellation, resource path and diagnostic callbacks. |
+| `ThreeRenderer.getObject/getCamera/pick/setCameraOverride/addOverlay/getResourceInfo` | Support editor picking, independent viewport navigation and resource inspection. The caller owns overlay disposal. |
+
+React/Vue and validated plugin contracts are `@public`. See the
+[capability and acceptance matrix](/docs/stability-1.2) for supported representations,
+integration ownership and release evidence.
+
 ---
 
 ## Tabla de contenidos

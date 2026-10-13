@@ -397,5 +397,26 @@
     "source": "docs/tutorials/19-cubic-spline.md",
     "target": "apps/web/src/content/tutorials/19-cubic-spline.md",
     "route": "/tutorials/19-cubic-spline"
+  },
+  {
+    "locale": "en",
+    "topic": "stability-1.2",
+    "source": "docs/stability-1.2.md",
+    "target": "apps/web/src/content/docs/stability-1.2.md",
+    "route": "/docs/stability-1.2"
+  },
+  {
+    "locale": "es",
+    "topic": "stability-1.2",
+    "source": "docs/stability-1.2-es.md",
+    "target": "apps/web/src/content/docs-es/stability-1.2.md",
+    "route": "/es/docs/stability-1.2"
+  },
+  {
+    "locale": "ja",
+    "topic": "stability-1.2",
+    "source": "docs/stability-1.2-ja.md",
+    "target": "apps/web/src/content/docs-ja/stability-1.2.md",
+    "route": "/ja/docs/stability-1.2"
   }
 ]

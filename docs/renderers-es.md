@@ -707,3 +707,7 @@ renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 `setSize(width, height)` cambia las dimensiones de WebGL y del composer, pero no la proyección de la cámara. Detén tu `requestAnimationFrame` y elimina tus listeners antes de llamar a `dispose()`.
 
 Three.js conserva la jerarquía padre-hijo y sincroniza matrices locales. Cada frame reconcilia altas, bajas y cambios de padre, limpia la interacción de nodos eliminados y elige una cámara restante o el fallback existente. Eliminación, remount y dispose() idempotente comparten la liberación de geometrías, materiales, texturas, skeletons, audio, mixers, passes y render targets propios. Los hooks liberan los recursos de plugins; las cargas pendientes no pueden adjuntar recursos tras su retirada.
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](stability-1.2-es.md) describe the current rendering and persistence contracts.

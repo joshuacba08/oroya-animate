@@ -182,6 +182,7 @@ function updateSVG() {
     width: 400,
     height: 400,
     viewBox: '0 0 400 400',
+    advanceScene: false,
   });
   document.getElementById('svg-container')!.innerHTML = svgString;
 }
@@ -233,12 +234,12 @@ animate();
 
 | Elemento | Three.js | SVG |
 |----------|----------|-----|
-| `cube` (Box) | ✓ Cubo 3D con sombras | ✗ Sin soporte para Box |
-| `sphere` (Sphere) | ✓ Esfera 3D | ✗ Sin soporte para Sphere |
+| `cube` (Box) | ✓ Cubo 3D con sombras | ✓ Rectángulo 2D |
+| `sphere` (Sphere) | ✓ Esfera 3D | ✓ Círculo 2D |
 | `star` (Path2D) | ✗ Sin soporte para Path2D | ✓ Estrella vectorial |
-| `camera` | ✓ Define el punto de vista | ✗ No aplica |
+| `camera` | ✓ Define el punto de vista | ✓ ViewBox ortográfico o fallback 2D |
 
-Cada renderer ignora los componentes que no sabe manejar. Esto es **intencional** — permite que la misma escena tenga contenido para diferentes backends.
+Consultá las capacidades públicas y usá `onDiagnostic` para detectar componentes no soportados. El renderer Three.js avanza la escena; la vista SVG usa `advanceScene: false`. Esto es **intencional** — permite que la misma escena tenga contenido para diferentes backends.
 
 ---
 

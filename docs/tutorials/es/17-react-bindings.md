@@ -4,7 +4,7 @@
 > **Tiempo:** 15 minutos
 > **Aprenderás:** cómo `@joroya/react` monta una escena Oroya desde JSX, cómo usar `useFrame` para updates por frame, y cómo fluye el contexto del scene-graph por tu árbol de componentes.
 
-> **Estabilidad:** `@joroya/react` es `@experimental` en v1.0. Las firmas de hooks y props pueden evolucionar durante 1.x — fijá la versión (`"@joroya/react": "1.0.0"`) si dependés de una forma específica.
+> **Estabilidad:** Los bindings React son `@public` desde 1.2.0. Props tras commit, React 18/19 StrictMode, resize y desmontaje están probados.
 
 ---
 

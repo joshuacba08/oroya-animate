@@ -4,6 +4,11 @@ import { ComponentType } from '../src/components/Component';
 import { Scene } from '../src/scene/Scene';
 
 describe('PluginRegistry', () => {
+    it('does not update a plugin retired by an earlier hook in the same frame', () => {
+        const registry = new PluginRegistry(); const update = vi.fn(); const retired: Plugin = { name: 'retired', update };
+        registry.register({ name: 'first', update: () => { registry.unregister(retired); } }); registry.register(retired);
+        registry.update(0.1, new Scene()); expect(update).not.toHaveBeenCalled(); registry.dispose();
+    });
     it('registers a plugin and looks up its handlers by component type', () => {
         const registry = new PluginRegistry();
         const handler: ComponentHandler = {

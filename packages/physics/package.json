@@ -1,6 +1,6 @@
 {
   "name": "@joroya/physics",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "Physics integration for Oroya Animate using cannon-es",
   "homepage": "https://oroya-animate.oroyajs.com",
   "type": "module",
@@ -9,7 +9,11 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": {
+        "import": "./dist/index.d.ts",
+        "require": "./dist/index.d.cts",
+        "default": "./dist/index.d.ts"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -30,5 +34,14 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshuacba08/oroya-animate.git",
+    "directory": "packages/physics"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ]
 }

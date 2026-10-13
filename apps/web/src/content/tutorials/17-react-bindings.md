@@ -11,7 +11,7 @@ duration: "15 min"
 > **Time:** 15 minutes
 > **You'll learn:** how `@joroya/react` mounts an Oroya scene from JSX, how to drive per-frame updates with `useFrame`, and how the scene-graph context flows through your component tree.
 
-> **Stability:** `@joroya/react` is `@experimental` in v1.0. Hook signatures and component props may evolve through 1.x — pin the version (`"@joroya/react": "1.0.0"`) if you depend on a specific shape.
+> **Stability:** React bindings are `@public` from 1.2.0. Props apply after commit; React 18/19 StrictMode, resize and cleanup are covered by tests.
 
 ---
 

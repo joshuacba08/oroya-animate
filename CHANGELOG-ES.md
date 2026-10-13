@@ -1,5 +1,14 @@
 # Registro de Cambios
 
+## [1.2.0] — preparada, sin publicar
+
+- Validar grafo y JSON antes de modificar/importar; conservar escenas históricas con diagnósticos.
+- Reconciliar cambios de renderers, consultar capacidades y dibujar sin duplicar el avance de la escena.
+- Conservar bind poses glTF y atributos tipados; probar assets, input, física, React 18/19, Vue 3 y recursos de plugins.
+- Completar el editor básico con selección sincronizada, gizmos, comandos reversibles y guardar/cargar validado.
+- Alinear paquetes en 1.2.0 y comprobar consumidores externos ESM/CJS/TypeScript antes de la publicación coordinada.
+- Añadir CI Windows/Linux, compatibilidad API, pruebas de navegador, presupuestos de rendimiento y ejecución prolongada. Dispositivos físicos y publicación npm siguen pendientes de aceptación.
+
 ## Sin publicar — mantenimiento de runtime y documentación
 
 - Conservar la raíz completa y serializar definiciones de Animator enlazado o en reproducción.

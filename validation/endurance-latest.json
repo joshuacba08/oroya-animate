@@ -1,0 +1,632 @@
+{
+  "mode": "endurance",
+  "timestamp": "2026-10-13T11:26:12.527Z",
+  "artifactDigest": "72ebf5ab8df0e0b704ab42dd9cdbc95cae6cb7d091546857094a58b78bf9960b",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 7 8745HX with Radeon Graphics        ",
+    "cores": 16,
+    "node": "24",
+    "browser": "154.0.4258.62",
+    "viewport": "1280x800",
+    "dpr": 1
+  },
+  "javascriptBytes": 2652064,
+  "errors": [],
+  "durationMs": 1800000,
+  "initial": {
+    "nodes": 4,
+    "geometries": 1,
+    "textures": 0,
+    "programs": 1
+  },
+  "samples": [
+    {
+      "elapsedMs": 30014,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 1806
+    },
+    {
+      "elapsedMs": 60026,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 3607
+    },
+    {
+      "elapsedMs": 90043,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 5408
+    },
+    {
+      "elapsedMs": 120044,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 7208
+    },
+    {
+      "elapsedMs": 150055,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 9008
+    },
+    {
+      "elapsedMs": 180058,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 10808
+    },
+    {
+      "elapsedMs": 210066,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 12609
+    },
+    {
+      "elapsedMs": 240080,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 14410
+    },
+    {
+      "elapsedMs": 270091,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 16210
+    },
+    {
+      "elapsedMs": 300095,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 18011
+    },
+    {
+      "elapsedMs": 330101,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 19811
+    },
+    {
+      "elapsedMs": 360113,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 21612
+    },
+    {
+      "elapsedMs": 390117,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 23412
+    },
+    {
+      "elapsedMs": 420130,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 25213
+    },
+    {
+      "elapsedMs": 450144,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 27014
+    },
+    {
+      "elapsedMs": 480160,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 28815
+    },
+    {
+      "elapsedMs": 510160,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 30615
+    },
+    {
+      "elapsedMs": 540173,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 32415
+    },
+    {
+      "elapsedMs": 570175,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 34215
+    },
+    {
+      "elapsedMs": 600181,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 36016
+    },
+    {
+      "elapsedMs": 630186,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 37816
+    },
+    {
+      "elapsedMs": 660191,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 39616
+    },
+    {
+      "elapsedMs": 690200,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 41417
+    },
+    {
+      "elapsedMs": 720216,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 43218
+    },
+    {
+      "elapsedMs": 750219,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 45018
+    },
+    {
+      "elapsedMs": 780231,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 46819
+    },
+    {
+      "elapsedMs": 810237,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 48619
+    },
+    {
+      "elapsedMs": 840253,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 50420
+    },
+    {
+      "elapsedMs": 870258,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 52220
+    },
+    {
+      "elapsedMs": 900264,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 54021
+    },
+    {
+      "elapsedMs": 930274,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 55821
+    },
+    {
+      "elapsedMs": 960290,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 57622
+    },
+    {
+      "elapsedMs": 990294,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 59423
+    },
+    {
+      "elapsedMs": 1020308,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 61224
+    },
+    {
+      "elapsedMs": 1050312,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 63024
+    },
+    {
+      "elapsedMs": 1080316,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 64824
+    },
+    {
+      "elapsedMs": 1110330,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 66625
+    },
+    {
+      "elapsedMs": 1140343,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 68426
+    },
+    {
+      "elapsedMs": 1170358,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 70226
+    },
+    {
+      "elapsedMs": 1200364,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 72027
+    },
+    {
+      "elapsedMs": 1230369,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 73827
+    },
+    {
+      "elapsedMs": 1260379,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 75628
+    },
+    {
+      "elapsedMs": 1290391,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 77428
+    },
+    {
+      "elapsedMs": 1320407,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 79229
+    },
+    {
+      "elapsedMs": 1350426,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 81030
+    },
+    {
+      "elapsedMs": 1380434,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 82831
+    },
+    {
+      "elapsedMs": 1410446,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 84632
+    },
+    {
+      "elapsedMs": 1440463,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 86433
+    },
+    {
+      "elapsedMs": 1470479,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 88234
+    },
+    {
+      "elapsedMs": 1500487,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 90034
+    },
+    {
+      "elapsedMs": 1530497,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 91835
+    },
+    {
+      "elapsedMs": 1560528,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 93636
+    },
+    {
+      "elapsedMs": 1590558,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 95437
+    },
+    {
+      "elapsedMs": 1620563,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 97238
+    },
+    {
+      "elapsedMs": 1650568,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 99038
+    },
+    {
+      "elapsedMs": 1680580,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 100839
+    },
+    {
+      "elapsedMs": 1710593,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 102640
+    },
+    {
+      "elapsedMs": 1740597,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 104440
+    },
+    {
+      "elapsedMs": 1770612,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 106241
+    },
+    {
+      "elapsedMs": 1800003,
+      "resources": {
+        "nodes": 4,
+        "geometries": 1,
+        "textures": 0,
+        "programs": 1
+      },
+      "frames": 108004
+    }
+  ],
+  "final": {
+    "nodes": 0,
+    "geometries": 0,
+    "textures": 0,
+    "programs": 0
+  }
+}

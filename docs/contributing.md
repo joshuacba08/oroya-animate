@@ -56,7 +56,7 @@ pnpm --filter @joroya/core dev
 pnpm --filter @joroya/core typecheck
 ```
 
-The visual editor is an experimental Vite app:
+The visual editor is an Vite app with tested basic authoring:
 
 ```bash
 pnpm --filter editor dev
@@ -75,12 +75,12 @@ packages/
   assets/             Asset cache and preloading
   input/              Keyboard, mouse and gamepad actions
   inspector/          Scene inspection and frame metrics
-  react/              Experimental React bindings
-  vue/                Experimental Vue 3 composables
+  react/              Stable React bindings
+  vue/                Stable Vue 3 composables
 apps/
   demo-react/         React showcase
   demo-vanilla/       Vanilla examples
-  editor/             Experimental scene editor
+  editor/             Basic scene editor with undo/redo
   web/                Astro documentation site
 docs/                 Repository guides and feature notes
 ```

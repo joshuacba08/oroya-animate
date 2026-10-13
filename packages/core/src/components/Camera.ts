@@ -25,6 +25,10 @@ export interface PerspectiveCameraDef {
    * The aspect ratio of the camera's view.
    */
   aspect: number;
+  /** Adjust projection to the viewport when resized. Default false. */
+  autoAspect?: boolean;
+  /** Prefer this camera over implicit or first cameras. Default false. */
+  active?: boolean;
 
   /**
    * The near clipping plane.
@@ -47,6 +51,10 @@ export interface OrthographicCameraDef {
 
   /** Left boundary of the view. */
   left: number;
+  /** Fit horizontal bounds to the viewport, preserving vertical span. */
+  autoAspect?: boolean;
+  /** Prefer this camera over implicit or first cameras. */
+  active?: boolean;
 
   /** Right boundary of the view. */
   right: number;

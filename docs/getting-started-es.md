@@ -34,8 +34,8 @@ pnpm add @joroya/core @joroya/renderer-three three
 | `@joroya/assets` | Caché y precarga de assets |
 | `@joroya/input` | Acciones de teclado, mouse y gamepad |
 | `@joroya/inspector` | Inspector de escena y métricas |
-| `@joroya/react` | Bindings experimentales para React |
-| `@joroya/vue` | Composables experimentales para Vue 3 |
+| `@joroya/react` | Bindings públicos para React |
+| `@joroya/vue` | Composables públicos para Vue 3 |
 
 > **Nota:** `@joroya/renderer-three` y `@joroya/loader-gltf` tienen `three` como dependencia peer. Asegúrate de instalarlo en tu proyecto: `npm install three`.
 

@@ -1,213 +1,79 @@
 # NPM Publishing Guide
 
-This guide explains how to publish the Oroya Animate 1.x package set to NPM.
+Oroya JS 1.2 distributes eleven packages: core, renderer-three, renderer-svg,
+renderer-canvas2d, loader-gltf, physics, assets, input, inspector, react and vue.
+They share one version and are released together.
 
-## Publishable Packages
+## Authentication and permissions
 
-The monorepo currently publishes 11 workspace packages:
+Configure a trusted publisher for `publish.yml` on every package in npm.
+Allow both direct publication and dist-tag management. The workflow uses a
+GitHub-hosted runner, `id-token: write`, Node 24 and pinned npm 11.21.0.
+OIDC tag management requires that npm version or newer; publishing permission
+alone does not grant tag permission. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 
-- `@joroya/core` - Core scene graph, ECS components, math, serialization, plugins
-- `@joroya/renderer-three` - Three.js/WebGL renderer
-- `@joroya/renderer-svg` - SVG renderer and SVG utilities
-- `@joroya/renderer-canvas2d` - Canvas2D renderer
-- `@joroya/loader-gltf` - glTF/GLB loader
-- `@joroya/physics` - cannon-es physics integration
-- `@joroya/assets` - Asset loading/cache helpers
-- `@joroya/input` - Keyboard, mouse, and gamepad input manager
-- `@joroya/inspector` - Debug/inspection overlay
-- `@joroya/react` - React bindings
-- `@joroya/vue` - Vue bindings
+Local `npm login` / `npm whoami` concern interactive credentials and do not
+prove that GitHub's trusted publisher has been configured. No token is committed
+to the repository.
+The configured `NPM_TOKEN` repository secret is also passed as `NODE_AUTH_TOKEN`
+to the publish step, allowing token authentication when trusted publishing is
+not configured. It needs publication and tag permissions for all eleven packages.
 
-## Prerequisites
+## Required evidence
 
-Create an NPM account, create or join the `@joroya` organization, then authenticate locally:
+Build libraries before applications, since applications import compiled dist.
+The reusable CI checks Windows/Linux, Node 18/20/24 libraries, React 18 and
+Node 24 applications. Before release, the publishing job also checks all package
+manifests and declarations, external consumers, browsers and 30-minute endurance.
+Accepted endurance evidence is reused when its digest matches the newly built
+SDK; stale evidence is refreshed in CI before publication.
 
-```bash
-npm login
-npm whoami
-```
+`validation/performance-latest.json` must pass the 10% budget on the reference's
+own machine and match the built SDK digest. Do not compare unrelated CI hardware
+or overwrite a baseline to hide a regression. Stable release additionally needs
+physical Safari/iOS and Chrome/Android evidence with the exact release version
+and matching digest.
 
-For GitHub Actions publishing, create an NPM automation token and save it as `NPM_TOKEN` in repository secrets.
+`pnpm release:check --candidate` reports candidate evidence gaps;
+`pnpm release:check` includes physical acceptance. These commands do not publish.
 
-Create the token from the NPM website:
+## Candidate first
 
-1. Go to <https://www.npmjs.com/>.
-2. Open your account menu, then **Access Tokens**.
-3. Click **Generate New Token**.
-4. Choose **Automation** for CI publishing.
-5. Name it something like `oroya-animate-github-actions`.
-6. Copy the token immediately.
+Dispatch **Publish to NPM** with version `1.2.0-rc.0` and channel `next`.
+The workflow aligns root/packages/internal peer versions, updates the lockfile,
+builds and validates everything before running the coordinated publisher.
 
-Then add it to the GitHub repository:
+Packaging uses `pnpm pack`, which resolves workspace dependency protocols.
+The publisher creates every tarball first, publishes in dependency order under
+`release-staging`, verifies every registry version, then updates all `next`
+tags. Consumers can install `@joroya/core@next` and matching renderer/binding
+packages. An existing version is verified rather than overwritten on retry.
 
-1. Open the GitHub repository.
-2. Go to **Settings** -> **Secrets and variables** -> **Actions**.
-3. Click **New repository secret**.
-4. Name: `NPM_TOKEN`
-5. Secret: paste the NPM token.
+The local aliases `pnpm publish:release next` and `pnpm publish:packages next`
+also run acceptance first and require an aligned prerelease version. Prefer
+Actions for provenance and trusted authentication.
 
-Avoid committing the token or saving it in `.npmrc`. GitHub Actions reads it from `${{ secrets.NPM_TOKEN }}` during the publish workflow.
+## Stable release and recovery
 
-## Package Configuration
+After candidate acceptance, prepare version `1.2.0`, collect physical evidence
+for that version, and dispatch channel `latest`. Stable acceptance remains
+blocking. npm versions are immutable; never attempt to overwrite a version.
+The publisher also checks that every package's `next` tag names the same
+candidate of this stable version before allowing promotion, and verifies the
+requested tags after updating them.
 
-Each package should keep:
+The coordinated script changes requested tags only after all package versions
+exist. Tag updates are separate registry operations, not an atomic transaction.
+If a tag update fails, retry the same release after fixing permissions; existing
+versions are verified and the remaining tag updates are reapplied.
 
-- `version` aligned across all `packages/*/package.json` files
-- `license`, `author`, `repository`, `homepage`, and `bugs`
-- `main`, `module`, `types`, and an `exports` map with `types` first
-- `files: ["dist"]`
-- package-local `peerDependencies` and `devDependencies`
+After completion verify each package/version and dist-tag, then test clean
+consumer installation. The repository's `verify:packages` checks packed
+ESM/CJS JavaScript plus strict NodeNext ESM/CJS declarations outside the monorepo.
 
-Peer dependencies on Oroya packages should point to the current stable major, for example:
+## Related documentation
 
-```json
-{
-  "peerDependencies": {
-    "@joroya/core": "^1.0.0"
-  }
-}
-```
-
-## Release Workflow
-
-Use the root scripts from the repository root.
-
-```bash
-# 1. Sync all package versions.
-node scripts/sync-versions.js 1.0.1
-
-# 2. Run the same gates CI runs before publish.
-pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-
-# 3. Commit and tag the release.
-git add .
-git commit -m "Release v1.0.1"
-git tag v1.0.1
-
-# 4. Push. The publish workflow runs on v*.*.* tags.
-git push origin main
-git push origin v1.0.1
-```
-
-The publish workflow runs lint, typecheck, tests, build, `publint`, and `@arethetypeswrong/cli` before publishing every package with provenance.
-
-## Manual Publishing
-
-Manual publishing is mostly for dry runs or emergency releases. Prefer the tag-based GitHub Action for normal releases.
-
-```bash
-pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm --filter "./packages/**" publish --access public --no-git-checks
-```
-
-Use `--access public` because the packages are scoped.
-
-## Pre-release Channels
-
-For beta, next, or canary builds, sync a prerelease version and publish with a matching dist-tag.
-
-```bash
-node scripts/sync-versions.js 1.1.0-beta.0
-pnpm build
-pnpm --filter "./packages/**" publish --access public --tag beta --no-git-checks
-```
-
-Consumers install prereleases by tag:
-
-```bash
-npm install @joroya/core@beta
-```
-
-## Post-publish Verification
-
-After the workflow finishes:
-
-```bash
-npm view @joroya/core version
-npm view @joroya/renderer-three version
-npm view @joroya/renderer-svg version
-npm view @joroya/renderer-canvas2d version
-npm view @joroya/loader-gltf version
-```
-
-Test installation in a clean project:
-
-```bash
-mkdir test-oroya
-cd test-oroya
-npm init -y
-npm install @joroya/core @joroya/renderer-three three
-node -e "import('@joroya/core').then(m => console.log(Object.keys(m).length))"
-```
-
-Test CDN resolution:
-
-```html
-<script type="module">
-  import { Scene } from 'https://unpkg.com/@joroya/core@1.0.0/dist/index.js';
-  console.log(Scene);
-</script>
-```
-
-## Troubleshooting
-
-### 403 Forbidden
-
-- Confirm `npm whoami` locally or that `NPM_TOKEN` exists in GitHub Secrets.
-- Confirm the token has publish rights for the `@joroya` organization.
-- Keep `--access public` for scoped packages.
-
-### EOTP One-time Password Required
-
-If GitHub Actions fails with:
-
-```text
-npm error code EOTP
-npm error This operation requires a one-time password from your authenticator.
-```
-
-the `NPM_TOKEN` secret is not allowed to publish non-interactively. This usually
-means the token was created without bypassing 2FA, or it is a token type meant for
-interactive publishing.
-
-For CI, create a token that can publish without an OTP challenge:
-
-- Preferred current npm option: create a granular access token with **bypass 2FA**
-  enabled and publish access to the `@joroya` scope/packages.
-- If your npm UI shows classic token types, use an **Automation** token.
-
-Then replace the existing GitHub secret:
-
-```text
-Repository -> Settings -> Secrets and variables -> Actions -> NPM_TOKEN
-```
-
-Do not add `--otp=<code>` to GitHub Actions. OTP codes expire quickly and are not
-appropriate for automated releases.
-
-### Version Already Published
-
-NPM does not allow re-publishing the same version. Sync a new patch, prerelease, or next version and publish again.
-
-### Workspace Dependencies
-
-Workspace dependencies are resolved during publish. Always run `pnpm build` before publishing so `dist/` and `.d.ts` files exist.
-
-### Type Resolution Issues
-
-Check package `exports` maps, `types` fields, and the contents of `dist/`. The CI workflow runs `publint` and `@arethetypeswrong/cli` to catch this before publishing.
-
-## Related Documentation
-
-- [CDN Setup](./cdn-setup.md)
-- [Package Metadata](./package-metadata.md)
-- [Deployment Checklist](./CHECKLIST.md)
-- [Vercel Deployment](./vercel-deployment.md)
+- [Package metadata](package-metadata.md)
+- [Deployment checklist](CHECKLIST.md)
+- [Documentation deployment and rollback](vercel-deployment.md)
+- [Capabilities and acceptance](../stability-1.2.md)

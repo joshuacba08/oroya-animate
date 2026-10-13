@@ -1,96 +1,31 @@
-# チュートリアル 18: プラグイン — フォークせずにレンダラーを拡張
+# Tutorial 18: Plugins: 安定した lifecycle
 
-> **レベル:** 上級
-> **時間:** 20 分
-> **学ぶこと:** `@joroya/core/plugins` のプラグインシステムで、`ThreeRenderer` を変更せずに新しいコンポーネントタイプを独自のレンダリング動作付きで出荷する方法。
+Plugin と handler は 1.2.0 から公開 API です。最後の登録を優先し、解除すると前の handler を復元します。null を返すと組み込み処理に戻ります。
 
-> **安定性:** `PluginRegistry`、`Plugin`、`ComponentHandler` は v1.0 で `@experimental`。
-
----
-
-## プラグインが必要なとき
-
-組み込みレンダラーは `Geometry`、`Material`、`Camera`、`Light`、`ParticleSystem`、オーディオ、インスタンシング、スキンドメッシュを処理。それ以上 — ボクセルグリッド、カスタムシェーダー、GPU コンピュート出力、サードパーティーの物理ビジュアライザー — はプラグインの領域。
-
-プラグインは小さなモジュール:
-
-1. カスタム `ComponentType` または文字列 ID の `ComponentHandler` を定義。
-2. `create(node)` から `THREE.Object3D`（任意のバックエンドオブジェクト）を返す。
-3. オプションで `update(node, obj, dt)` でフレームごとの同期、`dispose(node, obj)` で GPU リソース解放。
-
-レンダラーは組み込みブランチの**前に**レジストリにクエリ。
-
----
-
-## ステップ 1 — カスタムコンポーネントを定義
+型付き core node には既存の ComponentType を使用します。PluginRegistry の文字列登録だけでは Node.components/Component.type は拡張されません。独自スキーマにはアダプターが必要です。
 
 ```ts
-import { Component } from "@joroya/core";
+import { ComponentType, Geometry, GeometryPrimitive, type ComponentHandler, type Plugin } from '@joroya/core';
+import * as THREE from 'three';
 
-export class VoxelGridComponent extends Component {
-    readonly type = "VoxelGrid";
-    constructor(
-        public readonly size: { x: number; y: number; z: number },
-        public readonly cellSize: number,
-        public readonly voxels: Uint8Array,
-    ) { super(); }
-}
-```
-
----
-
-## ステップ 2 — ハンドラを書く
-
-```ts
-import type { ComponentHandler } from "@joroya/core";
-import * as THREE from "three";
-
-export const voxelHandler: ComponentHandler<THREE.Object3D> = {
-    componentType: "VoxelGrid",
-    create(node) {
-        // THREE.InstancedMesh を構築 — 非ゼロボクセルごとに 1 立方体
-        return mesh;
-    },
-    update(node, mesh, dt) { /* オプション */ },
-    dispose(node, mesh) { /* GPU リソース解放 */ },
-};
-```
-
----
-
-## ステップ 3 — Plugin としてバンドル + 登録
-
-```ts
-import type { Plugin } from "@joroya/core";
-
-export const voxelPlugin: Plugin = {
-    name: "voxel-renderer",
-    handlers: [voxelHandler],
+const handler: ComponentHandler<THREE.Mesh> = {
+  componentType: ComponentType.Geometry,
+  create(node) {
+    const geometry = node.getComponent<Geometry>(ComponentType.Geometry);
+    if (!geometry || geometry.definition.type !== GeometryPrimitive.Box) return null;
+    const definition = geometry.definition;
+    return new THREE.Mesh(new THREE.BoxGeometry(definition.width, definition.height, definition.depth),
+      new THREE.MeshBasicMaterial({ color: 0xff8844 }));
+  },
+  dispose(_node, mesh) {
+    mesh.geometry.dispose();
+    for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) material.dispose();
+  },
 };
 
-renderer.usePlugin(voxelPlugin);
+export const boxPlugin: Plugin = { name: 'custom-box', handlers: [handler] };
+// renderer.usePlugin(boxPlugin);
+// renderer.removePlugin(boxPlugin);
 ```
 
----
-
-## プラグインの優先順位
-
-1. ノードの各コンポーネントに対してプラグインレジストリにクエリ。
-2. ハンドラが存在し非 `null` を返したら、**それ**が使われる。
-3. `null` を返したら、ノードの次のコンポーネントへフォールスルー。
-4. どのハンドラもマッチしなければ、組み込みチェーンを実行。
-
-プラグインはデフォルトを**置き換える**（オブジェクト返却）か、**augment** する（`null` 返却して `update(dt)` だけ受ける）。
-
----
-
-## Dispose ライフサイクル
-
-`renderer.rebuildScene()` と `renderer.dispose()` は各プラグイン管理オブジェクトを走査し、`handler.dispose(node, obj)` を呼ぶ。ここで `geometry.dispose()` / `material.dispose()` / `texture.dispose()` を解放。
-
----
-
-## 次のステップ
-
-- **マルチハンドラプラグイン**: 同じパッケージから複数のコンポーネントタイプ用のハンドラを登録。
-- **プラグインを公開**: `@<your-org>/oroya-plugin-voxels` — 慣習は `componentType` の名前。
+hook は scene 更新後、matrix 同期前です。advanceScene: false の delta はゼロです。handler dispose は plugin dispose より先で、資源は handler が所有します。

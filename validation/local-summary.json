@@ -1,0 +1,130 @@
+{
+  "timestamp": "2026-10-13T11:56:38.452Z",
+  "artifactDigest": "72ebf5ab8df0e0b704ab42dd9cdbc95cae6cb7d091546857094a58b78bf9960b",
+  "unit": {
+    "unit-tests": {
+      "passed": 242,
+      "failed": 0,
+      "files": 41,
+      "success": true
+    },
+    "unit-node18": {
+      "passed": 242,
+      "failed": 0,
+      "files": 41,
+      "success": true
+    },
+    "unit-node20": {
+      "passed": 242,
+      "failed": 0,
+      "files": 41,
+      "success": true
+    },
+    "react18": {
+      "passed": 1,
+      "failed": 0,
+      "files": 1,
+      "success": true
+    }
+  },
+  "browser": {
+    "startTime": "2026-10-13T11:48:39.609Z",
+    "duration": 63329.833000000006,
+    "expected": 37,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "packages": 11,
+  "packageChecks": [
+    {
+      "package": "assets",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "core",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "input",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "inspector",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "loader-gltf",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "physics",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "react",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "renderer-canvas2d",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "renderer-svg",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "renderer-three",
+      "manifest": "passed",
+      "declarations": "passed"
+    },
+    {
+      "package": "vue",
+      "manifest": "passed",
+      "declarations": "passed"
+    }
+  ],
+  "performance": {
+    "nodes1000": {
+      "cpuMedianMs": 5.800000011920929,
+      "frameMedianMs": 16.69999998807907
+    },
+    "instances10000": {
+      "cpuMedianMs": 0.19999998807907104,
+      "frameMedianMs": 16.69999998807907
+    },
+    "physics100": {
+      "cpuMedianMs": 1.300000011920929,
+      "frameMedianMs": 16.69999998807907
+    },
+    "skinned": {
+      "cpuMedianMs": 0.3999999761581421,
+      "frameMedianMs": 16.69999998807907
+    }
+  },
+  "endurance": {
+    "durationMs": 1800000,
+    "samples": 60,
+    "final": {
+      "nodes": 0,
+      "geometries": 0,
+      "textures": 0,
+      "programs": 0
+    }
+  },
+  "errors": [],
+  "pending": [
+    "Physical Safari/iOS and Chrome/Android acceptance",
+    "Remote Windows/Linux CI execution",
+    "npm authentication/configuration and candidate/stable publication"
+  ]
+}

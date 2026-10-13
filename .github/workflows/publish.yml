@@ -1,88 +1,101 @@
 name: Publish to NPM
-
 on:
-    push:
-        tags:
-            - 'v*.*.*'
-
-# Top-level permissions: `contents: write` for the GitHub release;
-# `id-token: write` so npm publish can mint a Sigstore provenance
-# attestation linking each tarball to this exact CI run.
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact version, for example 1.2.0-rc.0'
+        required: true
+        type: string
+      channel:
+        description: 'Candidate or stable channel'
+        required: true
+        type: choice
+        options: [next, latest]
 permissions:
-    contents: write
-    id-token: write
-
+  contents: write
+  id-token: write
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v6
-
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: '24.x'
-                  registry-url: 'https://registry.npmjs.org'
-                  package-manager-cache: false
-
-            - name: Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            # ── Quality gates: every gate must pass before *any* package publishes.
-            - name: Lint
-              run: pnpm lint
-
-            - name: Typecheck
-              run: pnpm typecheck
-
-            - name: Test
-              run: pnpm test
-
-            - name: Build packages
-              run: pnpm build
-
-            # ── Pre-publish manifest validation.
-            #
-            # `publint` checks each `package.json` against the npm specs
-            # (exports map, types-first condition order, file extensions).
-            # `@arethetypeswrong/cli` verifies TypeScript consumers resolve
-            # the `.d.ts` correctly under every module-resolution mode.
-            - name: Validate package manifests (publint)
-              run: |
-                  for pkg in packages/*/; do
-                    if [ -f "$pkg/package.json" ]; then
-                      pnpm dlx publint@latest "$pkg"
-                    fi
-                  done
-
-            - name: Validate type entry points (arethetypeswrong)
-              run: |
-                  for pkg in packages/*/; do
-                    if [ -f "$pkg/package.json" ]; then
-                      pnpm dlx @arethetypeswrong/cli@latest --pack "$pkg" --ignore-rules cjs-resolves-to-esm || true
-                    fi
-                  done
-
-            # Trusted publishing uses the GitHub OIDC token granted above.
-            # npm generates provenance automatically for public packages.
-            - name: Publish @joroya/core to NPM (trusted publishing)
-              working-directory: packages/core
-              run: npm publish --access public
-
-            - name: Extract version from tag
-              id: version
-              run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-            - name: Create GitHub Release
-              uses: softprops/action-gh-release@v1
-              with:
-                  name: "v${{ steps.version.outputs.VERSION }}"
-                  generate_release_notes: true
-                  prerelease: ${{ contains(github.ref, '-') }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  validate:
+    uses: ./.github/workflows/ci.yml
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Install npm with OIDC dist-tag support
+        run: npm install --global npm@11.21.0
+      - name: Verify configured npm token
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: test -n "$NODE_AUTH_TOKEN"
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve release version
+        id: release
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+          REQUESTED_CHANNEL: ${{ inputs.channel }}
+        run: |
+          VERSION="${REQUESTED_VERSION:-${GITHUB_REF#refs/tags/v}}"
+          CHANNEL="${REQUESTED_CHANNEL:-latest}"
+          if [[ "$VERSION" == *-* ]]; then CHANNEL=next; fi
+          node scripts/sync-versions.js "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+      - run: pnpm install --lockfile-only
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm architecture:check
+      - run: pnpm api:check:strict
+      - run: pnpm api:compat
+      - run: pnpm test
+      - run: pnpm verify:packages
+      - name: Block invalid manifests and declaration entry points
+        run: |
+          for package in packages/*/; do
+            pnpm dlx publint@0.3.18 "$package"
+            pnpm dlx @arethetypeswrong/cli@0.18.3 --pack "$package"
+          done
+      - run: pnpm build:apps
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm test:browser
+      - name: Performance regression gate
+        run: pnpm release:check --performance-only
+      - name: Verify or refresh endurance evidence
+        run: |
+          if pnpm release:check --candidate; then
+            echo "Reusing accepted endurance evidence for the identical built SDK."
+          else
+            pnpm test:endurance
+          fi
+      - name: Candidate acceptance
+        if: steps.release.outputs.channel == 'next'
+        run: pnpm release:check --candidate
+      - name: Stable acceptance including physical devices
+        if: steps.release.outputs.channel == 'latest'
+        run: pnpm release:check
+      - name: Publish and verify every compatible package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish:release ${{ steps.release.outputs.channel }}
+      - uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push'
+        with:
+          name: v${{ steps.release.outputs.version }}
+          generate_release_notes: true
+          prerelease: ${{ steps.release.outputs.channel == 'next' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-evidence
+          path: validation/

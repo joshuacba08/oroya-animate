@@ -29,6 +29,8 @@ export interface SkinDef {
      * Three.js's `Matrix4`.
      */
     inverseBindMatrices: Float32Array;
+    /** Optional bind-shape matrix. Imported glTF skins preserve their engine-independent bind pose. */
+    bindMatrix?: Float32Array;
 
     /**
      * Optional name of the root bone of the armature. Helps renderers

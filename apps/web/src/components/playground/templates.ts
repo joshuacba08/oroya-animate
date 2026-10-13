@@ -1531,7 +1531,7 @@ renderer.mount(scene);
 
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min((now - last) / 1000, 0.1);
+  const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
   last = now;
   physics.update(dt, scene);
   renderer.render(dt);
@@ -1623,7 +1623,7 @@ renderer.mount(scene);
 
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min((now - last) / 1000, 0.1);
+  const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
   last = now;
   physics.update(dt, scene);
   renderer.render(dt);
@@ -1732,7 +1732,7 @@ let currentIdx = 0;
 
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min((now - last) / 1000, 0.1);
+  const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
   last = now;
   const elapsed = now / 1000;
   const idx = Math.floor(elapsed / 4) % order.length;
@@ -1792,7 +1792,7 @@ renderer.mount(scene);
 
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min((now - last) / 1000, 0.1);
+  const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
   last = now;
   renderer.render(dt);
   requestAnimationFrame(loop);
@@ -2001,7 +2001,7 @@ renderer.mount(scene);
 let t = 0;
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min((now - last) / 1000, 0.1);
+  const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
   last = now;
   t += dt;
 

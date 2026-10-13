@@ -1,0 +1,7261 @@
+{
+  "packages/assets/src/index.ts:AssetManager": {
+    "members": {
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: AssetEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: AssetEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "registerLoader": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "AssetLoader<T>",
+                "optional": false
+              }
+            ],
+            "returns": "AssetManager"
+          }
+        ],
+        "optional": false
+      },
+      "preload": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "PreloadEntry[]",
+                "optional": false
+              }
+            ],
+            "returns": "Promise<void>"
+          }
+        ],
+        "optional": false
+      },
+      "load": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "string",
+                "optional": true
+              }
+            ],
+            "returns": "Promise<T>"
+          }
+        ],
+        "optional": false
+      },
+      "get": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "T | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "release": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "refCount": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      },
+      "clear": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "AssetManager"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/assets/src/index.ts:AssetType": {
+    "type": "AssetType"
+  },
+  "packages/assets/src/index.ts:PreloadEntry": {
+    "members": {
+      "url": {
+        "type": "string",
+        "optional": false
+      },
+      "type": {
+        "type": "AssetType",
+        "optional": false
+      }
+    }
+  },
+  "packages/assets/src/index.ts:AssetLoader": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          },
+          {
+            "type": "AbortSignal",
+            "optional": false
+          }
+        ],
+        "returns": "Promise<T>"
+      }
+    ]
+  },
+  "packages/assets/src/index.ts:AssetEventMap": {
+    "members": {
+      "progress": {
+        "type": "{ loaded: number; total: number; url: string; }",
+        "optional": false
+      },
+      "loaded": {
+        "type": "{ url: string; }",
+        "optional": false
+      },
+      "error": {
+        "type": "{ url: string; error: unknown; }",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:Vec3": {
+    "members": {
+      "x": {
+        "type": "number",
+        "optional": false
+      },
+      "y": {
+        "type": "number",
+        "optional": false
+      },
+      "z": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:Quat": {
+    "members": {
+      "x": {
+        "type": "number",
+        "optional": false
+      },
+      "y": {
+        "type": "number",
+        "optional": false
+      },
+      "z": {
+        "type": "number",
+        "optional": false
+      },
+      "w": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgAnimateDef": {
+    "members": {
+      "type": {
+        "type": "\"animate\"",
+        "optional": false
+      },
+      "attributeName": {
+        "type": "string",
+        "optional": false
+      },
+      "from": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "to": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "values": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "dur": {
+        "type": "string",
+        "optional": false
+      },
+      "repeatCount": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "begin": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "fill": {
+        "type": "\"freeze\" | \"remove\" | undefined",
+        "optional": true
+      },
+      "keyTimes": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "keySplines": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "calcMode": {
+        "type": "\"discrete\" | \"linear\" | \"paced\" | \"spline\" | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgAnimateTransformDef": {
+    "members": {
+      "type": {
+        "type": "\"animateTransform\"",
+        "optional": false
+      },
+      "transformType": {
+        "type": "\"translate\" | \"scale\" | \"rotate\" | \"skewX\" | \"skewY\"",
+        "optional": false
+      },
+      "from": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "to": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "values": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "dur": {
+        "type": "string",
+        "optional": false
+      },
+      "repeatCount": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "begin": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "fill": {
+        "type": "\"freeze\" | \"remove\" | undefined",
+        "optional": true
+      },
+      "additive": {
+        "type": "\"sum\" | \"replace\" | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgAnimationDef": {
+    "type": "SvgAnimationDef"
+  },
+  "packages/core/src/index.ts:Animation": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Animation",
+        "optional": false
+      },
+      "animations": {
+        "type": "SvgAnimationDef[]",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "SvgAnimationDef[]",
+              "optional": false
+            }
+          ],
+          "returns": "Animation"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:CameraType": {
+    "enumeration": {
+      "Perspective": "Perspective",
+      "Orthographic": "Orthographic"
+    }
+  },
+  "packages/core/src/index.ts:PerspectiveCameraDef": {
+    "members": {
+      "type": {
+        "type": "CameraType.Perspective",
+        "optional": false
+      },
+      "fov": {
+        "type": "number",
+        "optional": false
+      },
+      "aspect": {
+        "type": "number",
+        "optional": false
+      },
+      "near": {
+        "type": "number",
+        "optional": false
+      },
+      "far": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:OrthographicCameraDef": {
+    "members": {
+      "type": {
+        "type": "CameraType.Orthographic",
+        "optional": false
+      },
+      "left": {
+        "type": "number",
+        "optional": false
+      },
+      "right": {
+        "type": "number",
+        "optional": false
+      },
+      "top": {
+        "type": "number",
+        "optional": false
+      },
+      "bottom": {
+        "type": "number",
+        "optional": false
+      },
+      "near": {
+        "type": "number",
+        "optional": false
+      },
+      "far": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:CameraDef": {
+    "type": "CameraDef"
+  },
+  "packages/core/src/index.ts:Camera": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Camera",
+        "optional": false
+      },
+      "definition": {
+        "type": "CameraDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "CameraDef",
+              "optional": false
+            }
+          ],
+          "returns": "Camera"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:ComponentType": {
+    "enumeration": {
+      "Transform": "Transform",
+      "Geometry": "Geometry",
+      "Material": "Material",
+      "Camera": "Camera",
+      "Interactive": "Interactive",
+      "Animation": "Animation",
+      "Light": "Light",
+      "Environment": "Environment",
+      "RigidBody": "RigidBody",
+      "Collider": "Collider",
+      "Script": "Script",
+      "InstancedMesh": "InstancedMesh",
+      "PostProcessing": "PostProcessing",
+      "ParticleSystem": "ParticleSystem",
+      "Animator": "Animator",
+      "AudioListener": "AudioListener",
+      "AudioSource": "AudioSource",
+      "Skin": "Skin"
+    }
+  },
+  "packages/core/src/index.ts:Component": {
+    "members": {
+      "type": {
+        "type": "ComponentType",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "Component"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:FogType": {
+    "enumeration": {
+      "Linear": "Linear",
+      "Exponential": "Exponential"
+    }
+  },
+  "packages/core/src/index.ts:LinearFogDef": {
+    "members": {
+      "type": {
+        "type": "FogType.Linear",
+        "optional": false
+      },
+      "color": {
+        "type": "ColorRGB",
+        "optional": false
+      },
+      "near": {
+        "type": "number",
+        "optional": false
+      },
+      "far": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:ExponentialFogDef": {
+    "members": {
+      "type": {
+        "type": "FogType.Exponential",
+        "optional": false
+      },
+      "color": {
+        "type": "ColorRGB",
+        "optional": false
+      },
+      "density": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:FogDef": {
+    "type": "FogDef"
+  },
+  "packages/core/src/index.ts:EnvironmentDef": {
+    "members": {
+      "background": {
+        "type": "string | ColorRGB | undefined",
+        "optional": true
+      },
+      "fog": {
+        "type": "FogDef | undefined",
+        "optional": true
+      },
+      "ambientLight": {
+        "type": "{ color: ColorRGB; intensity: number; } | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Environment": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Environment",
+        "optional": false
+      },
+      "definition": {
+        "type": "EnvironmentDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "EnvironmentDef",
+              "optional": true
+            }
+          ],
+          "returns": "Environment"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:GeometryPrimitive": {
+    "enumeration": {
+      "Box": "Box",
+      "Sphere": "Sphere",
+      "Cylinder": "Cylinder",
+      "Plane": "Plane",
+      "Cone": "Cone",
+      "Torus": "Torus",
+      "Circle": "Circle",
+      "Path2D": "Path2D",
+      "Text": "Text",
+      "Buffer": "Buffer",
+      "CSG": "CSG"
+    }
+  },
+  "packages/core/src/index.ts:BoxGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Box",
+        "optional": false
+      },
+      "width": {
+        "type": "number",
+        "optional": false
+      },
+      "height": {
+        "type": "number",
+        "optional": false
+      },
+      "depth": {
+        "type": "number",
+        "optional": false
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:SphereGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Sphere",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "widthSegments": {
+        "type": "number",
+        "optional": false
+      },
+      "heightSegments": {
+        "type": "number",
+        "optional": false
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:CylinderGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Cylinder",
+        "optional": false
+      },
+      "radiusTop": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "radiusBottom": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "height": {
+        "type": "number",
+        "optional": false
+      },
+      "radialSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "heightSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "openEnded": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:PlaneGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Plane",
+        "optional": false
+      },
+      "width": {
+        "type": "number",
+        "optional": false
+      },
+      "height": {
+        "type": "number",
+        "optional": false
+      },
+      "widthSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "heightSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:ConeGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Cone",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "height": {
+        "type": "number",
+        "optional": false
+      },
+      "radialSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "heightSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "openEnded": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:TorusGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Torus",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "tube": {
+        "type": "number",
+        "optional": false
+      },
+      "radialSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "tubularSegments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "arc": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:CircleGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Circle",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "segments": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "thetaStart": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "thetaLength": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Path2DCommand": {
+    "members": {
+      "command": {
+        "type": "\"M\" | \"L\" | \"H\" | \"V\" | \"C\" | \"S\" | \"Q\" | \"T\" | \"A\" | \"Z\"",
+        "optional": false
+      },
+      "args": {
+        "type": "number[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:Path2DGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Path2D",
+        "optional": false
+      },
+      "path": {
+        "type": "Path2DCommand[]",
+        "optional": false
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:TextGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Text",
+        "optional": false
+      },
+      "text": {
+        "type": "string",
+        "optional": false
+      },
+      "fontSize": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "fontFamily": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "fontWeight": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "textAnchor": {
+        "type": "\"start\" | \"middle\" | \"end\" | undefined",
+        "optional": true
+      },
+      "dominantBaseline": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:BufferGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.Buffer",
+        "optional": false
+      },
+      "positions": {
+        "type": "Float32Array<ArrayBufferLike>",
+        "optional": false
+      },
+      "normals": {
+        "type": "Float32Array<ArrayBufferLike> | undefined",
+        "optional": true
+      },
+      "uvs": {
+        "type": "Float32Array<ArrayBufferLike> | undefined",
+        "optional": true
+      },
+      "indices": {
+        "type": "Uint16Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike> | undefined",
+        "optional": true
+      },
+      "skinIndices": {
+        "type": "Uint16Array<ArrayBufferLike> | undefined",
+        "optional": true
+      },
+      "skinWeights": {
+        "type": "Float32Array<ArrayBufferLike> | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:CSGOperation": {
+    "enumeration": {
+      "Union": "Union",
+      "Subtract": "Subtract",
+      "Intersect": "Intersect"
+    }
+  },
+  "packages/core/src/index.ts:CSGGeometryDef": {
+    "members": {
+      "type": {
+        "type": "GeometryPrimitive.CSG",
+        "optional": false
+      },
+      "operation": {
+        "type": "CSGOperation",
+        "optional": false
+      },
+      "base": {
+        "type": "GeometryDef",
+        "optional": false
+      },
+      "modifier": {
+        "type": "GeometryDef",
+        "optional": false
+      },
+      "modifierTransform": {
+        "type": "Matrix4 | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:GeometryDef": {
+    "type": "GeometryDef"
+  },
+  "packages/core/src/index.ts:Geometry": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Geometry",
+        "optional": false
+      },
+      "definition": {
+        "type": "GeometryDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "GeometryDef",
+              "optional": false
+            }
+          ],
+          "returns": "Geometry"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:InteractiveDef": {
+    "members": {
+      "enabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "cursor": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "blocksRaycast": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Interactive": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Interactive",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<InteractiveDef>",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "InteractiveDef",
+              "optional": true
+            }
+          ],
+          "returns": "Interactive"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:LightType": {
+    "enumeration": {
+      "Ambient": "Ambient",
+      "Directional": "Directional",
+      "Point": "Point",
+      "Spot": "Spot"
+    }
+  },
+  "packages/core/src/index.ts:AmbientLightDef": {
+    "members": {
+      "type": {
+        "type": "LightType.Ambient",
+        "optional": false
+      },
+      "color": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "intensity": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:DirectionalLightDef": {
+    "members": {
+      "type": {
+        "type": "LightType.Directional",
+        "optional": false
+      },
+      "color": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "intensity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "target": {
+        "type": "{ x: number; y: number; z: number; } | undefined",
+        "optional": true
+      },
+      "shadowBias": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "shadowMapSize": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:PointLightDef": {
+    "members": {
+      "type": {
+        "type": "LightType.Point",
+        "optional": false
+      },
+      "color": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "intensity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "distance": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "decay": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "shadowBias": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "shadowMapSize": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:SpotLightDef": {
+    "members": {
+      "type": {
+        "type": "LightType.Spot",
+        "optional": false
+      },
+      "color": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "intensity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "distance": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "angle": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "penumbra": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "decay": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "target": {
+        "type": "{ x: number; y: number; z: number; } | undefined",
+        "optional": true
+      },
+      "shadowBias": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "shadowMapSize": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:LightDef": {
+    "type": "LightDef"
+  },
+  "packages/core/src/index.ts:Light": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Light",
+        "optional": false
+      },
+      "definition": {
+        "type": "LightDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "LightDef",
+              "optional": false
+            }
+          ],
+          "returns": "Light"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:ColorRGB": {
+    "members": {
+      "r": {
+        "type": "number",
+        "optional": false
+      },
+      "g": {
+        "type": "number",
+        "optional": false
+      },
+      "b": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:GradientStop": {
+    "members": {
+      "offset": {
+        "type": "number",
+        "optional": false
+      },
+      "color": {
+        "type": "ColorRGB",
+        "optional": false
+      },
+      "opacity": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:LinearGradientDef": {
+    "members": {
+      "type": {
+        "type": "\"linear\"",
+        "optional": false
+      },
+      "x1": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "y1": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "x2": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "y2": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "stops": {
+        "type": "GradientStop[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:RadialGradientDef": {
+    "members": {
+      "type": {
+        "type": "\"radial\"",
+        "optional": false
+      },
+      "cx": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "cy": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "r": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "fx": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "fy": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "stops": {
+        "type": "GradientStop[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:GradientDef": {
+    "type": "GradientDef"
+  },
+  "packages/core/src/index.ts:SvgBlurEffect": {
+    "members": {
+      "type": {
+        "type": "\"blur\"",
+        "optional": false
+      },
+      "stdDeviation": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgDropShadowEffect": {
+    "members": {
+      "type": {
+        "type": "\"dropShadow\"",
+        "optional": false
+      },
+      "dx": {
+        "type": "number",
+        "optional": false
+      },
+      "dy": {
+        "type": "number",
+        "optional": false
+      },
+      "stdDeviation": {
+        "type": "number",
+        "optional": false
+      },
+      "floodColor": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "floodOpacity": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgFilterEffect": {
+    "type": "SvgFilterEffect"
+  },
+  "packages/core/src/index.ts:SvgFilterDef": {
+    "members": {
+      "effects": {
+        "type": "SvgFilterEffect[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgClipPathDef": {
+    "members": {
+      "path": {
+        "type": "Path2DCommand[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:SvgMaskDef": {
+    "members": {
+      "path": {
+        "type": "Path2DCommand[]",
+        "optional": false
+      },
+      "fill": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "opacity": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:MaterialDef": {
+    "members": {
+      "color": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "opacity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "fill": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "fillGradient": {
+        "type": "GradientDef | undefined",
+        "optional": true
+      },
+      "stroke": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "strokeGradient": {
+        "type": "GradientDef | undefined",
+        "optional": true
+      },
+      "strokeWidth": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "filter": {
+        "type": "SvgFilterDef | undefined",
+        "optional": true
+      },
+      "clipPath": {
+        "type": "SvgClipPathDef | undefined",
+        "optional": true
+      },
+      "mask": {
+        "type": "SvgMaskDef | undefined",
+        "optional": true
+      },
+      "metalness": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "roughness": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "emissive": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "map": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "normalMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "roughnessMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "metalnessMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "emissiveMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aoMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "envMap": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "normalScale": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "emissiveIntensity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "aoMapIntensity": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "envMapIntensity": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Material": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Material",
+        "optional": false
+      },
+      "definition": {
+        "type": "MaterialDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "MaterialDef",
+              "optional": true
+            }
+          ],
+          "returns": "Material"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:Transform": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Transform",
+        "optional": false
+      },
+      "position": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "rotation": {
+        "type": "Quat",
+        "optional": false
+      },
+      "scale": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "localMatrix": {
+        "type": "Matrix4",
+        "optional": false
+      },
+      "worldMatrix": {
+        "type": "Matrix4",
+        "optional": false
+      },
+      "isDirty": {
+        "type": "boolean",
+        "optional": false
+      },
+      "setPosition": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "setRotation": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Quat",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "setScale": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "updateLocalMatrix": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "lookAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              },
+              {
+                "type": "Vec3",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "rotateOnAxis": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "setFromMatrix": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "Transform"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:EventEmitter": {
+    "members": {
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "EventHandler<EventMap[K]>",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "EventHandler<EventMap[K]>",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "emit": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "EventMap[K]",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "removeAllListeners": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "hasListeners": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "EventEmitter<EventMap>"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:createInteractionEvent": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "InteractionEventType",
+            "optional": false
+          },
+          {
+            "type": "Node",
+            "optional": false
+          },
+          {
+            "type": "unknown",
+            "optional": false
+          },
+          {
+            "type": "{ x: number; y: number; }",
+            "optional": false
+          },
+          {
+            "type": "{ point?: Vec3 | undefined; localPoint?: Vec3 | undefined; delta?: Vec3 | undefined; }",
+            "optional": true
+          }
+        ],
+        "returns": "InteractionEvent"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:InteractionEventType": {
+    "enumeration": {
+      "Click": "click",
+      "PointerDown": "pointerdown",
+      "PointerUp": "pointerup",
+      "PointerMove": "pointermove",
+      "PointerEnter": "pointerenter",
+      "PointerLeave": "pointerleave",
+      "Wheel": "wheel",
+      "DragStart": "dragstart",
+      "Drag": "drag",
+      "DragEnd": "dragend"
+    }
+  },
+  "packages/core/src/index.ts:InteractionEvent": {
+    "members": {
+      "type": {
+        "type": "InteractionEventType",
+        "optional": false
+      },
+      "target": {
+        "type": "Node",
+        "optional": false
+      },
+      "currentTarget": {
+        "type": "Node",
+        "optional": false
+      },
+      "point": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "localPoint": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "screenPosition": {
+        "type": "{ x: number; y: number; }",
+        "optional": false
+      },
+      "nativeEvent": {
+        "type": "unknown",
+        "optional": false
+      },
+      "delta": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "propagationStopped": {
+        "type": "boolean",
+        "optional": false
+      },
+      "stopPropagation": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:InteractionEventMap": {
+    "members": {
+      "click": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "pointerdown": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "pointerup": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "pointermove": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "pointerenter": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "pointerleave": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "wheel": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "dragstart": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "drag": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "dragend": {
+        "type": "InteractionEvent",
+        "optional": false
+      },
+      "collide-begin": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "collide": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "collide-end": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-enter": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-stay": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-exit": {
+        "type": "CollisionEvent",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:CollisionEvent": {
+    "members": {
+      "other": {
+        "type": "Node",
+        "optional": false
+      },
+      "contactPoint": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "contactNormal": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "impulse": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:PhysicsEventMap": {
+    "members": {
+      "collide-begin": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "collide": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "collide-end": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-enter": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-stay": {
+        "type": "CollisionEvent",
+        "optional": false
+      },
+      "trigger-exit": {
+        "type": "CollisionEvent",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:createBox": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createSphere": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createPath2D": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Path2DCommand[]",
+            "optional": false
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createText": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          },
+          {
+            "type": "Omit<TextGeometryDef, \"text\" | \"type\">",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createCylinder": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "boolean",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createPlane": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createCone": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "boolean",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createTorus": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createCircle": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "GeometryOptions | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "Geometry"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:GeometryOptions": {
+    "members": {
+      "castShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "receiveShadow": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:computeLocalAABB": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "GeometryDef",
+            "optional": false
+          }
+        ],
+        "returns": "AABB"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:transformAABB": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "AABB",
+            "optional": false
+          },
+          {
+            "type": "Matrix4",
+            "optional": false
+          }
+        ],
+        "returns": "AABB"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:pointInAABB": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "AABB",
+            "optional": false
+          }
+        ],
+        "returns": "boolean"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:AABB": {
+    "members": {
+      "min": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "max": {
+        "type": "Vec3",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:composeMatrix": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Quat",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Matrix4"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:multiplyMatrices": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Matrix4",
+            "optional": false
+          },
+          {
+            "type": "Matrix4",
+            "optional": false
+          }
+        ],
+        "returns": "Matrix4"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:Matrix4": {
+    "type": "Matrix4"
+  },
+  "packages/core/src/index.ts:Matrix4Identity": {
+    "type": "readonly [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]"
+  },
+  "packages/core/src/index.ts:createQuat": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:setFromAxisAngle": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:multiplyQuaternions": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Quat",
+            "optional": false
+          },
+          {
+            "type": "Quat",
+            "optional": false
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:setFromRotationMatrix": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Matrix4",
+            "optional": false
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:lookAtQuaternion": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:slerp": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Quat",
+            "optional": false
+          },
+          {
+            "type": "Quat",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "Quat"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:createVec3": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          },
+          {
+            "type": "number",
+            "optional": true
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:add": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:sub": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:multiplyScalar": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:dot": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:cross": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:lengthSq": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:length": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:normalize": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:distanceTo": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:copy": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:applyMatrix4": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "readonly number[]",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:cubicSpline": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:hermite": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:lerp": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:lerpVec3": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "Vec3"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:spring": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          },
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "{ value: number; velocity: number; }"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:Easing": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:linear": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInQuad": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeOutQuad": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInOutQuad": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInCubic": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeOutCubic": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInOutCubic": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInSine": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeOutSine": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeInOutSine": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:easeOutElastic": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "number"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:solve2BoneIK": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3",
+            "optional": false
+          },
+          {
+            "type": "Vec3 | undefined",
+            "optional": true
+          }
+        ],
+        "returns": "IK2BoneResult"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:IK2BoneResult": {
+    "members": {
+      "rootRotation": {
+        "type": "Quat",
+        "optional": false
+      },
+      "midRotation": {
+        "type": "Quat",
+        "optional": false
+      },
+      "reached": {
+        "type": "boolean",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:getMathBackend": {
+    "signatures": [
+      {
+        "parameters": [],
+        "returns": "MathBackend"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:registerMathBackend": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "MathBackend | null",
+            "optional": false
+          }
+        ],
+        "returns": "void"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:MathBackend": {
+    "members": {
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "multiplyMatrices": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4",
+                "optional": false
+              },
+              {
+                "type": "Matrix4",
+                "optional": false
+              },
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "Matrix4"
+          }
+        ],
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:Node": {
+    "members": {
+      "id": {
+        "type": "string",
+        "optional": false
+      },
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "parent": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "children": {
+        "type": "Node[]",
+        "optional": false
+      },
+      "components": {
+        "type": "Map<ComponentType, Component>",
+        "optional": false
+      },
+      "cssClass": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "cssId": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "events": {
+        "type": "EventEmitter<InteractionEventMap>",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      },
+      "transform": {
+        "type": "Transform",
+        "optional": false
+      },
+      "addComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Component",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "ComponentType",
+                "optional": false
+              }
+            ],
+            "returns": "T | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "hasComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "ComponentType",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "add": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "remove": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "updateWorldMatrix": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4 | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "traverse": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "(node: Node) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeById": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeByName": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(event: InteractionEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(event: InteractionEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispatchInteraction": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "InteractionEvent",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "string",
+              "optional": false
+            },
+            {
+              "type": "string",
+              "optional": true
+            }
+          ],
+          "returns": "Node"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:Scene": {
+    "members": {
+      "root": {
+        "type": "Node",
+        "optional": false
+      },
+      "add": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "Node",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "remove": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeById": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeByName": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "traverse": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "(node: Node) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "updateWorldMatrices": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "Node",
+              "optional": true
+            }
+          ],
+          "returns": "Scene"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:serialize": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Scene",
+            "optional": false
+          }
+        ],
+        "returns": "string"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:deserialize": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          }
+        ],
+        "returns": "Scene"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:typedArrayReplacer": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          },
+          {
+            "type": "unknown",
+            "optional": false
+          }
+        ],
+        "returns": "unknown"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:typedArrayReviver": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          },
+          {
+            "type": "unknown",
+            "optional": false
+          }
+        ],
+        "returns": "unknown"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:KeyframeTrack": {
+    "members": {
+      "targetNodeName": {
+        "type": "string",
+        "optional": false
+      },
+      "property": {
+        "type": "\"scale\" | \"position\" | \"rotation\"",
+        "optional": false
+      },
+      "times": {
+        "type": "Float32Array<ArrayBufferLike>",
+        "optional": false
+      },
+      "values": {
+        "type": "Float32Array<ArrayBufferLike>",
+        "optional": false
+      },
+      "interpolation": {
+        "type": "InterpolationMode",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:InterpolationMode": {
+    "type": "InterpolationMode"
+  },
+  "packages/core/src/index.ts:AnimationClip": {
+    "members": {
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "duration": {
+        "type": "number",
+        "optional": false
+      },
+      "tracks": {
+        "type": "KeyframeTrack[]",
+        "optional": false
+      },
+      "events": {
+        "type": "KeyframeEvent[] | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:KeyframeEvent": {
+    "members": {
+      "time": {
+        "type": "number",
+        "optional": false
+      },
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "data": {
+        "type": "unknown",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:AnimationMixer": {
+    "members": {
+      "play": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "AnimationClip",
+                "optional": false
+              },
+              {
+                "type": "{ loop?: boolean | undefined; speed?: number | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "crossFade": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "AnimationClip",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "{ loop?: boolean | undefined; speed?: number | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "stop": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "playing": {
+        "type": "boolean",
+        "optional": false
+      },
+      "time": {
+        "type": "number",
+        "optional": false
+      },
+      "pause": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "resume": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "isPaused": {
+        "type": "boolean",
+        "optional": false
+      },
+      "seek": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "{ emitEvents?: boolean | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "sampleAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "AnimationClip | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "AnimationSampledValue[]"
+          }
+        ],
+        "optional": false
+      },
+      "tick": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "resetClock": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: AnimationMixerEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: AnimationMixerEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "Scene",
+              "optional": false
+            },
+            {
+              "type": "AnimationClock",
+              "optional": true
+            }
+          ],
+          "returns": "AnimationMixer"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:AnimationClock": {
+    "members": {
+      "now": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:AnimationMixerEventMap": {
+    "members": {
+      "keyframe-event": {
+        "type": "{ clip: AnimationClip; event: KeyframeEvent; }",
+        "optional": false
+      },
+      "finished": {
+        "type": "{ clip: AnimationClip; }",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:AnimationSampledValue": {
+    "members": {
+      "targetNodeName": {
+        "type": "string",
+        "optional": false
+      },
+      "property": {
+        "type": "\"scale\" | \"position\" | \"rotation\"",
+        "optional": false
+      },
+      "value": {
+        "type": "Vec3 | Quat",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:serializeAnimationClip": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "AnimationClip",
+            "optional": false
+          }
+        ],
+        "returns": "SerializedAnimationClip"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:deserializeAnimationClip": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "SerializedAnimationClip",
+            "optional": false
+          }
+        ],
+        "returns": "AnimationClip"
+      }
+    ]
+  },
+  "packages/core/src/index.ts:SerializedKeyframeTrack": {
+    "members": {
+      "targetNodeName": {
+        "type": "string",
+        "optional": false
+      },
+      "property": {
+        "type": "\"scale\" | \"position\" | \"rotation\"",
+        "optional": false
+      },
+      "times": {
+        "type": "number[]",
+        "optional": false
+      },
+      "values": {
+        "type": "number[]",
+        "optional": false
+      },
+      "interpolation": {
+        "type": "InterpolationMode",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:SerializedAnimationClip": {
+    "members": {
+      "schemaVersion": {
+        "type": "1",
+        "optional": false
+      },
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "duration": {
+        "type": "number",
+        "optional": false
+      },
+      "tracks": {
+        "type": "SerializedKeyframeTrack[]",
+        "optional": false
+      },
+      "events": {
+        "type": "KeyframeEvent[] | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:InstancedMeshComponent": {
+    "members": {
+      "type": {
+        "type": "ComponentType.InstancedMesh",
+        "optional": false
+      },
+      "count": {
+        "type": "number",
+        "optional": false
+      },
+      "capacity": {
+        "type": "number",
+        "optional": false
+      },
+      "instanceMatrix": {
+        "type": "Float32Array<ArrayBufferLike>",
+        "optional": false
+      },
+      "instanceColor": {
+        "type": "Float32Array<ArrayBufferLike> | null",
+        "optional": false
+      },
+      "matricesDirty": {
+        "type": "boolean",
+        "optional": false
+      },
+      "colorsDirty": {
+        "type": "boolean",
+        "optional": false
+      },
+      "setMatrixAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getMatrixAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Matrix4 | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "Matrix4"
+          }
+        ],
+        "optional": false
+      },
+      "setColorAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "ColorRGB",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "number",
+              "optional": false
+            },
+            {
+              "type": "boolean",
+              "optional": true
+            }
+          ],
+          "returns": "InstancedMeshComponent"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:InstancedMesh": {
+    "members": {
+      "instancedMeshComponent": {
+        "type": "InstancedMeshComponent",
+        "optional": false
+      },
+      "setMatrixAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getMatrixAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Matrix4 | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "Matrix4"
+          }
+        ],
+        "optional": false
+      },
+      "setColorAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "ColorRGB",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "instanceMatrixNeedsUpdate": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "instanceColorNeedsUpdate": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "computeBoundingSphere": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "BoundingSphere"
+          }
+        ],
+        "optional": false
+      },
+      "id": {
+        "type": "string",
+        "optional": false
+      },
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "parent": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "children": {
+        "type": "Node[]",
+        "optional": false
+      },
+      "components": {
+        "type": "Map<ComponentType, Component>",
+        "optional": false
+      },
+      "cssClass": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "cssId": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "events": {
+        "type": "EventEmitter<InteractionEventMap>",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      },
+      "transform": {
+        "type": "Transform",
+        "optional": false
+      },
+      "addComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Component",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "ComponentType",
+                "optional": false
+              }
+            ],
+            "returns": "T | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "hasComponent": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "ComponentType",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "add": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "remove": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "updateWorldMatrix": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4 | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "traverse": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "(node: Node) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeById": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "findNodeByName": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "Node | undefined"
+          }
+        ],
+        "optional": false
+      },
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(event: InteractionEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(event: InteractionEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispatchInteraction": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "InteractionEvent",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "GeometryDef | Geometry",
+              "optional": false
+            },
+            {
+              "type": "MaterialDef | Material",
+              "optional": false
+            },
+            {
+              "type": "number",
+              "optional": false
+            },
+            {
+              "type": "boolean",
+              "optional": true
+            }
+          ],
+          "returns": "InstancedMesh"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:BoundingSphere": {
+    "members": {
+      "center": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "set": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "BoundingSphere"
+          }
+        ],
+        "optional": false
+      },
+      "applyMatrix4": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "BoundingSphere"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "Vec3",
+              "optional": true
+            },
+            {
+              "type": "number",
+              "optional": true
+            }
+          ],
+          "returns": "BoundingSphere"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:Frustum": {
+    "members": {
+      "planes": {
+        "type": "Plane[]",
+        "optional": false
+      },
+      "setFromProjectionMatrix": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Matrix4",
+                "optional": false
+              }
+            ],
+            "returns": "Frustum"
+          }
+        ],
+        "optional": false
+      },
+      "intersectsSphere": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "BoundingSphere",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "Frustum"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:ToneMapping": {
+    "enumeration": {
+      "None": "None",
+      "Reinhard": "Reinhard",
+      "Cineon": "Cineon",
+      "ACESFilmic": "ACESFilmic"
+    }
+  },
+  "packages/core/src/index.ts:BloomOptions": {
+    "members": {
+      "enabled": {
+        "type": "boolean",
+        "optional": false
+      },
+      "threshold": {
+        "type": "number",
+        "optional": false
+      },
+      "strength": {
+        "type": "number",
+        "optional": false
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:PostProcessingDef": {
+    "members": {
+      "toneMapping": {
+        "type": "ToneMapping | undefined",
+        "optional": true
+      },
+      "exposure": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "bloom": {
+        "type": "BloomOptions | undefined",
+        "optional": true
+      },
+      "antialiasing": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:PostProcessing": {
+    "members": {
+      "type": {
+        "type": "ComponentType.PostProcessing",
+        "optional": false
+      },
+      "definition": {
+        "type": "PostProcessingDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "PostProcessingDef",
+              "optional": true
+            }
+          ],
+          "returns": "PostProcessing"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:Particle": {
+    "members": {
+      "position": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "velocity": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "life": {
+        "type": "number",
+        "optional": false
+      },
+      "maxLife": {
+        "type": "number",
+        "optional": false
+      },
+      "color": {
+        "type": "{ r: number; g: number; b: number; a: number; }",
+        "optional": false
+      },
+      "size": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/core/src/index.ts:ParticleSystemDef": {
+    "members": {
+      "maxParticles": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "emissionRate": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "texture": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "startColor": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "endColor": {
+        "type": "{ r: number; g: number; b: number; } | undefined",
+        "optional": true
+      },
+      "startSize": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "endSize": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "speed": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "gravity": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:ParticleSystem": {
+    "members": {
+      "type": {
+        "type": "ComponentType.ParticleSystem",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<Omit<ParticleSystemDef, \"texture\" | \"startColor\" | \"endColor\">> & { texture?: string | undefined; startColor: { r: number; g: number; b: number; }; endColor: { r: number; g: number; b: number; }; }",
+        "optional": false
+      },
+      "particles": {
+        "type": "Particle[]",
+        "optional": false
+      },
+      "onUpdate": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "ParticleSystemDef",
+              "optional": true
+            }
+          ],
+          "returns": "ParticleSystem"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:AnimatorDef": {
+    "members": {
+      "playing": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "loop": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "timeScale": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "currentAnimation": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "animations": {
+        "type": "Record<string, AnimationClip> | undefined",
+        "optional": true
+      },
+      "autoplay": {
+        "type": "string | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Animator": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Animator",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<Omit<AnimatorDef, \"autoplay\">> & { autoplay?: string | undefined; }",
+        "optional": false
+      },
+      "bindToScene": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Scene",
+                "optional": false
+              },
+              {
+                "type": "AnimationClock | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "unbindFromScene": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "addClip": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "AnimationClip",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "play": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "{ loop?: boolean | undefined; speed?: number | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "crossFade": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "{ loop?: boolean | undefined; speed?: number | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "stop": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "pause": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "resume": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "seek": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "{ emitEvents?: boolean | undefined; }",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "sampleAt": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "string",
+                "optional": true
+              }
+            ],
+            "returns": "AnimationSampledValue[]"
+          }
+        ],
+        "optional": false
+      },
+      "tick": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: AnimationMixerEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "currentMixer": {
+        "type": "AnimationMixer | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "AnimatorDef",
+              "optional": true
+            }
+          ],
+          "returns": "Animator"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:AudioListenerDef": {
+    "members": {
+      "masterVolume": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:AudioListener": {
+    "members": {
+      "type": {
+        "type": "ComponentType.AudioListener",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<AudioListenerDef>",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "AudioListenerDef",
+              "optional": true
+            }
+          ],
+          "returns": "AudioListener"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:AudioSourceDef": {
+    "members": {
+      "url": {
+        "type": "string",
+        "optional": false
+      },
+      "loop": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "volume": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "autoplay": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "refDistance": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "rolloffFactor": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "distanceModel": {
+        "type": "\"linear\" | \"inverse\" | \"exponential\" | undefined",
+        "optional": true
+      },
+      "maxDistance": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "coneInnerAngle": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "coneOuterAngle": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "coneOuterGain": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:AudioSource": {
+    "members": {
+      "type": {
+        "type": "ComponentType.AudioSource",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<Omit<AudioSourceDef, \"url\">> & { url: string; }",
+        "optional": false
+      },
+      "shouldPlay": {
+        "type": "boolean",
+        "optional": false
+      },
+      "shouldStop": {
+        "type": "boolean",
+        "optional": false
+      },
+      "play": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "stop": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "AudioSourceDef",
+              "optional": false
+            }
+          ],
+          "returns": "AudioSource"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:RigidBodyType": {
+    "enumeration": {
+      "Dynamic": "Dynamic",
+      "Static": "Static",
+      "Kinematic": "Kinematic"
+    }
+  },
+  "packages/core/src/index.ts:RigidBodyDef": {
+    "members": {
+      "mass": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "type": {
+        "type": "RigidBodyType | undefined",
+        "optional": true
+      },
+      "linearDamping": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "angularDamping": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "fixedRotation": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:RigidBody": {
+    "members": {
+      "type": {
+        "type": "ComponentType.RigidBody",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<RigidBodyDef>",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "RigidBodyDef",
+              "optional": true
+            }
+          ],
+          "returns": "RigidBody"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:ColliderShape": {
+    "enumeration": {
+      "Box": "Box",
+      "Sphere": "Sphere",
+      "Plane": "Plane",
+      "Cylinder": "Cylinder"
+    }
+  },
+  "packages/core/src/index.ts:ColliderDef": {
+    "members": {
+      "shape": {
+        "type": "ColliderShape",
+        "optional": false
+      },
+      "halfExtents": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "radius": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "height": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "center": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "friction": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "restitution": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "isTrigger": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "collisionGroup": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "collisionMask": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Collider": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Collider",
+        "optional": false
+      },
+      "definition": {
+        "type": "Required<ColliderDef>",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "ColliderDef",
+              "optional": false
+            }
+          ],
+          "returns": "Collider"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:SkinDef": {
+    "members": {
+      "boneNames": {
+        "type": "string[]",
+        "optional": false
+      },
+      "inverseBindMatrices": {
+        "type": "Float32Array<ArrayBufferLike>",
+        "optional": false
+      },
+      "skeletonRoot": {
+        "type": "string | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:Skin": {
+    "members": {
+      "type": {
+        "type": "ComponentType.Skin",
+        "optional": false
+      },
+      "definition": {
+        "type": "SkinDef",
+        "optional": false
+      },
+      "node": {
+        "type": "Node | null",
+        "optional": false
+      },
+      "onUpdate": {
+        "type": "((dt: number) => void) | undefined",
+        "optional": true
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "SkinDef",
+              "optional": false
+            }
+          ],
+          "returns": "Skin"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:PluginRegistry": {
+    "members": {
+      "register": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Plugin",
+                "optional": false
+              }
+            ],
+            "returns": "Plugin"
+          }
+        ],
+        "optional": false
+      },
+      "unregister": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Plugin",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "getHandler": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "ComponentHandler<unknown> | null"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Scene",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispose": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "list": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "readonly Plugin[]"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "PluginRegistry"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/core/src/index.ts:Plugin": {
+    "members": {
+      "name": {
+        "type": "string",
+        "optional": false
+      },
+      "handlers": {
+        "type": "ComponentHandler<unknown>[] | undefined",
+        "optional": true
+      },
+      "update": {
+        "type": "((dt: number, scene: Scene) => void) | undefined",
+        "optional": true
+      },
+      "dispose": {
+        "type": "(() => void) | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/core/src/index.ts:ComponentHandler": {
+    "members": {
+      "componentType": {
+        "type": "string",
+        "optional": false
+      },
+      "create": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "BackendObject | null"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "type": "((node: Node, backendObject: BackendObject, dt: number) => void) | undefined",
+        "optional": true
+      },
+      "dispose": {
+        "type": "((node: Node, backendObject: BackendObject) => void) | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/input/src/index.ts:InputManager": {
+    "members": {
+      "pointer": {
+        "type": "{ x: number; y: number; }",
+        "optional": false
+      },
+      "wheelDelta": {
+        "type": "number",
+        "optional": false
+      },
+      "on": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: InputEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "off": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "K",
+                "optional": false
+              },
+              {
+                "type": "(e: InputEventMap[K]) => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "bindAction": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "ActionBinding[]",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "unbindAction": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "isActionActive": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "isKeyDown": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "isMouseButtonDown": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "isGamepadButtonDown": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "GamepadButton",
+                "optional": false
+              }
+            ],
+            "returns": "boolean"
+          }
+        ],
+        "optional": false
+      },
+      "getGamepadAxis": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      },
+      "attach": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "detach": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "HTMLElement | Window",
+              "optional": true
+            }
+          ],
+          "returns": "InputManager"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/input/src/index.ts:ActionBinding": {
+    "members": {
+      "key": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "mouseButton": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "gamepad": {
+        "type": "GamepadButton | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/input/src/index.ts:InputEventMap": {
+    "members": {
+      "action-down": {
+        "type": "{ name: string; }",
+        "optional": false
+      },
+      "action": {
+        "type": "{ name: string; }",
+        "optional": false
+      },
+      "action-up": {
+        "type": "{ name: string; }",
+        "optional": false
+      },
+      "gamepad-connected": {
+        "type": "{ index: number; id: string; }",
+        "optional": false
+      },
+      "gamepad-disconnected": {
+        "type": "{ index: number; }",
+        "optional": false
+      }
+    }
+  },
+  "packages/input/src/index.ts:GamepadButton": {
+    "type": "GamepadButton"
+  },
+  "packages/inspector/src/index.ts:Inspector": {
+    "members": {
+      "attach": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "detach": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "select": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node | null",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getSelected": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "Node | null"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "Scene",
+              "optional": false
+            },
+            {
+              "type": "InspectorOptions",
+              "optional": true
+            }
+          ],
+          "returns": "Inspector"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/inspector/src/index.ts:InspectorOptions": {
+    "members": {
+      "container": {
+        "type": "HTMLElement | undefined",
+        "optional": true
+      },
+      "refreshIntervalMs": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "position": {
+        "type": "\"top-left\" | \"top-right\" | \"bottom-left\" | \"bottom-right\" | undefined",
+        "optional": true
+      },
+      "startCollapsed": {
+        "type": "boolean | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/inspector/src/index.ts:FrameMetrics": {
+    "members": {
+      "record": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "avgFrameTimeMs": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      },
+      "fps": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      },
+      "maxFrameTimeMs": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "number",
+              "optional": true
+            }
+          ],
+          "returns": "FrameMetrics"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/inspector/src/index.ts:collectSceneStats": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Scene",
+            "optional": false
+          }
+        ],
+        "returns": "SceneStats"
+      }
+    ]
+  },
+  "packages/inspector/src/index.ts:SceneStats": {
+    "members": {
+      "nodeCount": {
+        "type": "number",
+        "optional": false
+      },
+      "componentCount": {
+        "type": "number",
+        "optional": false
+      },
+      "perComponent": {
+        "type": "Partial<Record<ComponentType, number>>",
+        "optional": false
+      }
+    }
+  },
+  "packages/loader-gltf/src/index.ts:loadGLTF": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "string",
+            "optional": false
+          }
+        ],
+        "returns": "Promise<GLTFLoadResult>"
+      }
+    ]
+  },
+  "packages/loader-gltf/src/index.ts:GLTFLoadResult": {
+    "members": {
+      "scene": {
+        "type": "Scene",
+        "optional": false
+      },
+      "animations": {
+        "type": "AnimationClip[]",
+        "optional": false
+      }
+    }
+  },
+  "packages/physics/src/index.ts:PhysicsSystem": {
+    "members": {
+      "world": {
+        "type": "World",
+        "optional": false
+      },
+      "gravity": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "update": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "Scene",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getBody": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "Body | null"
+          }
+        ],
+        "optional": false
+      },
+      "removeNode": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "addHingeConstraint": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "{ pivotA: Vec3; pivotB: Vec3; axisA?: Vec3 | undefined; axisB?: Vec3 | undefined; }",
+                "optional": false
+              }
+            ],
+            "returns": "HingeConstraint | null"
+          }
+        ],
+        "optional": false
+      },
+      "addPointToPointConstraint": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "{ pivotA: Vec3; pivotB: Vec3; maxForce?: number | undefined; }",
+                "optional": false
+              }
+            ],
+            "returns": "PointToPointConstraint | null"
+          }
+        ],
+        "optional": false
+      },
+      "addDistanceConstraint": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "Node",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "DistanceConstraint | null"
+          }
+        ],
+        "optional": false
+      },
+      "removeConstraint": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Constraint",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "raycast": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              },
+              {
+                "type": "Vec3",
+                "optional": false
+              }
+            ],
+            "returns": "PhysicsRaycastHit | null"
+          }
+        ],
+        "optional": false
+      },
+      "raycastAll": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Vec3",
+                "optional": false
+              },
+              {
+                "type": "Vec3",
+                "optional": false
+              }
+            ],
+            "returns": "PhysicsRaycastHit[]"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "PhysicsSystemOptions",
+              "optional": true
+            }
+          ],
+          "returns": "PhysicsSystem"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/physics/src/index.ts:PhysicsSystemOptions": {
+    "members": {
+      "gravity": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "fixedTimeStep": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "maxSubSteps": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "defaultFriction": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "defaultRestitution": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/physics/src/index.ts:PhysicsRaycastHit": {
+    "members": {
+      "node": {
+        "type": "Node",
+        "optional": false
+      },
+      "point": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "normal": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "distance": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  },
+  "packages/physics/src/index.ts:Vehicle": {
+    "members": {
+      "raw": {
+        "type": "RaycastVehicle",
+        "optional": false
+      },
+      "addWheel": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "WheelOptions",
+                "optional": false
+              }
+            ],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      },
+      "drive": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "steer": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "brake": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "syncWheelNodes": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispose": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "{ chassisNode: Node; physics: PhysicsSystem; indexForwardAxis?: number | undefined; indexRightAxis?: number | undefined; indexUpAxis?: number | undefined; }",
+              "optional": false
+            }
+          ],
+          "returns": "Vehicle"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/physics/src/index.ts:WheelOptions": {
+    "members": {
+      "chassisPosition": {
+        "type": "Vec3",
+        "optional": false
+      },
+      "directionLocal": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "axleLocal": {
+        "type": "Vec3 | undefined",
+        "optional": true
+      },
+      "radius": {
+        "type": "number",
+        "optional": false
+      },
+      "suspensionRestLength": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "suspensionStiffness": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "maxSuspensionTravel": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "frictionSlip": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "isDriving": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "isSteering": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "node": {
+        "type": "Node | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/react/src/index.ts:useFrame": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "FrameCallback",
+            "optional": false
+          }
+        ],
+        "returns": "void"
+      }
+    ]
+  },
+  "packages/react/src/index.ts:useScene": {
+    "signatures": [
+      {
+        "parameters": [],
+        "returns": "Scene"
+      }
+    ]
+  },
+  "packages/react/src/index.ts:useParentNode": {
+    "signatures": [
+      {
+        "parameters": [],
+        "returns": "Node"
+      }
+    ]
+  },
+  "packages/renderer-canvas2d/src/index.ts:renderToCanvas": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Scene",
+            "optional": false
+          },
+          {
+            "type": "HTMLCanvasElement",
+            "optional": false
+          },
+          {
+            "type": "Canvas2DRenderOptions",
+            "optional": false
+          }
+        ],
+        "returns": "void"
+      }
+    ]
+  },
+  "packages/renderer-canvas2d/src/index.ts:CanvasRenderer": {
+    "members": {
+      "mount": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "HTMLElement",
+                "optional": false
+              },
+              {
+                "type": "Canvas2DRenderOptions",
+                "optional": false
+              }
+            ],
+            "returns": "HTMLCanvasElement"
+          }
+        ],
+        "optional": false
+      },
+      "unmount": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "render": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Scene",
+                "optional": false
+              },
+              {
+                "type": "Canvas2DRenderOptions",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "startLoop": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "() => void",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "stopLoop": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "getCanvas": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "HTMLCanvasElement | null"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "CanvasRenderer"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/renderer-canvas2d/src/index.ts:Canvas2DRenderOptions": {
+    "members": {
+      "width": {
+        "type": "number",
+        "optional": false
+      },
+      "height": {
+        "type": "number",
+        "optional": false
+      },
+      "backgroundColor": {
+        "type": "ColorRGB | undefined",
+        "optional": true
+      },
+      "antialias": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "dt": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    }
+  },
+  "packages/renderer-svg/src/index.ts:renderToSVG": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Scene",
+            "optional": false
+          },
+          {
+            "type": "SvgRenderOptions",
+            "optional": false
+          }
+        ],
+        "returns": "string"
+      }
+    ]
+  },
+  "packages/renderer-svg/src/index.ts:renderToSVGElement": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Scene",
+            "optional": false
+          },
+          {
+            "type": "SvgElementRenderOptions",
+            "optional": false
+          }
+        ],
+        "returns": "{ svg: SVGSVGElement; dispose: () => void; }"
+      }
+    ]
+  },
+  "packages/renderer-svg/src/index.ts:Gen": {
+    "type": "{ chance(n1?: number, n2?: number | null): boolean; constrain(num: number, min: number, max: number): number; dist(x1: number, y1: number, x2: number, y2: number): number; gaussian(mean?: number, sigma?: number, float?: boolean): number; interp(start: number, stop: number, amount?: number): number; map(value: number, start1: number, stop1: number, start2: number, stop2: number, float?: boolean): number; pareto(min: number, float?: boolean): number; random: RandomFn; }"
+  },
+  "packages/renderer-svg/src/index.ts:Noise": {
+    "members": {
+      "get": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "number"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [],
+          "returns": "Noise"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/renderer-svg/src/index.ts:SvJs": {
+    "members": {
+      "element": {
+        "type": "SVGElement",
+        "optional": false
+      },
+      "cursorX": {
+        "type": "number | null",
+        "optional": false
+      },
+      "cursorY": {
+        "type": "number | null",
+        "optional": false
+      },
+      "child": {
+        "type": "SvJs | null",
+        "optional": false
+      },
+      "addEventListener": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "EventListenerOrEventListenerObject",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "addTo": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Element",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "animate": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Keyframe[] | PropertyIndexedKeyframes",
+                "optional": false
+              },
+              {
+                "type": "number | KeyframeAnimationOptions",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "content": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "create": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "createCurve": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number[][]",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "createFilter": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "createGradient": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "\"linear\" | \"radial\"",
+                "optional": false
+              },
+              {
+                "type": "string[]",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "createPattern": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "delete": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "get": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              }
+            ],
+            "returns": "string | null"
+          }
+        ],
+        "optional": false
+      },
+      "getCentre": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "{ x: number; y: number; }"
+          }
+        ],
+        "optional": false
+      },
+      "moveTo": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "rotate": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number | null",
+                "optional": true
+              },
+              {
+                "type": "number | null",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "save": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "scale": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number | null",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "set": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Record<string, string | number>",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "trackCursor": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "((e: PointerEvent) => void) | null",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "rect": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "circle": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "ellipse": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "line": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "polyline": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number[] | number[][]",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "text": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": true
+              },
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "g": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "group": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "fill": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "number | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "stroke": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string",
+                "optional": false
+              },
+              {
+                "type": "number | undefined",
+                "optional": true
+              },
+              {
+                "type": "number | undefined",
+                "optional": true
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      },
+      "strokeDash": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "string | number[]",
+                "optional": false
+              }
+            ],
+            "returns": "SvJs"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "string | SVGElement",
+              "optional": true
+            },
+            {
+              "type": "string",
+              "optional": true
+            }
+          ],
+          "returns": "SvJs"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/renderer-three/src/index.ts:ThreeRenderer": {
+    "members": {
+      "mount": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Scene",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "usePlugin": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Plugin",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "removePlugin": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "Plugin",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "render": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": true
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "setSize": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "number",
+                "optional": false
+              },
+              {
+                "type": "number",
+                "optional": false
+              }
+            ],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "enableInteraction": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "disableInteraction": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "enableOrbitControls": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "disableOrbitControls": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispose": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "ThreeRendererOptions",
+              "optional": false
+            }
+          ],
+          "returns": "ThreeRenderer"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/renderer-three/src/index.ts:OrbitControlsWrapper": {
+    "members": {
+      "update": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "dispose": {
+        "signatures": [
+          {
+            "parameters": [],
+            "returns": "void"
+          }
+        ],
+        "optional": false
+      },
+      "nativeControls": {
+        "type": "OrbitControls",
+        "optional": false
+      }
+    },
+    "constructors": {
+      "signatures": [
+        {
+          "parameters": [
+            {
+              "type": "Camera",
+              "optional": false
+            },
+            {
+              "type": "HTMLElement",
+              "optional": false
+            }
+          ],
+          "returns": "OrbitControlsWrapper"
+        }
+      ]
+    },
+    "statics": {}
+  },
+  "packages/vue/src/index.ts:useOroyaCanvas": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "Ref<HTMLCanvasElement | undefined, HTMLCanvasElement | undefined>",
+            "optional": false
+          },
+          {
+            "type": "{ dpr?: number | undefined; autoCamera?: boolean | undefined; cameraPosition?: Vec3 | undefined; }",
+            "optional": true
+          }
+        ],
+        "returns": "{ scene: Scene; }"
+      }
+    ]
+  },
+  "packages/vue/src/index.ts:useOroya": {
+    "signatures": [
+      {
+        "parameters": [],
+        "returns": "OroyaContext"
+      }
+    ]
+  },
+  "packages/vue/src/index.ts:useFrame": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "FrameCallback",
+            "optional": false
+          }
+        ],
+        "returns": "void"
+      }
+    ]
+  },
+  "packages/vue/src/index.ts:useNode": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "(node: Node) => void",
+            "optional": false
+          }
+        ],
+        "returns": "Ref<Node, Node>"
+      }
+    ]
+  },
+  "packages/vue/src/index.ts:FrameCallback": {
+    "signatures": [
+      {
+        "parameters": [
+          {
+            "type": "number",
+            "optional": false
+          }
+        ],
+        "returns": "void"
+      }
+    ]
+  },
+  "packages/vue/src/index.ts:OroyaContext": {
+    "members": {
+      "scene": {
+        "type": "Scene",
+        "optional": false
+      },
+      "parentNode": {
+        "type": "Node",
+        "optional": false
+      },
+      "registerFrameCallback": {
+        "signatures": [
+          {
+            "parameters": [
+              {
+                "type": "FrameCallback",
+                "optional": false
+              }
+            ],
+            "returns": "() => void"
+          }
+        ],
+        "optional": false
+      }
+    }
+  }
+}

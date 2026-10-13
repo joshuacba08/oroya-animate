@@ -1,149 +1,64 @@
-import type { Node as OroyaNode, Vec3 } from '@joroya/core';
+import { useEffect, useState } from 'react';
+import { ComponentType, Material, type Vec3 } from '@joroya/core';
+import { Euler, Quaternion } from 'three';
+import { EditorController, captureTransform } from './EditorController';
 
-/**
- * Right-side panel: shows the selected node's transform with editable
- * number inputs for every axis. Edits dispatch through `onChange` —
- * the parent applies them to `node.transform` and bumps a revision so
- * the panels re-render with the new values.
- *
- * Rotation is displayed as a quaternion (x, y, z, w) for fidelity with
- * what the engine actually stores. A future iteration will offer
- * Euler-angle editing as a UI mode toggle.
- */
-export function TransformInspector(props: {
-    node: OroyaNode | null;
-    onChange: (axis: 'position' | 'rotation' | 'scale', component: keyof Vec3 | 'w', value: number) => void;
-    onDelete: () => void;
-}) {
-    if (!props.node) {
-        return (
-            <div style={{ padding: '12px', color: '#666' }}>
-                <div style={headerStyle}>Inspector</div>
-                <div style={{ fontSize: '12px', padding: '8px 0' }}>
-                    Select a node from the hierarchy to edit its transform.
-                </div>
-            </div>
-        );
-    }
-
-    const t = props.node.transform;
-
-    return (
-        <div style={{ padding: '0' }}>
-            <div style={headerStyle}>Inspector</div>
-            <div style={subheaderStyle}>{props.node.name}</div>
-
-            <Section title="Position">
-                <AxisRow label="X" value={t.position.x} onChange={(v) => props.onChange('position', 'x', v)} />
-                <AxisRow label="Y" value={t.position.y} onChange={(v) => props.onChange('position', 'y', v)} />
-                <AxisRow label="Z" value={t.position.z} onChange={(v) => props.onChange('position', 'z', v)} />
-            </Section>
-
-            <Section title="Rotation (quaternion)">
-                <AxisRow label="X" value={t.rotation.x} step={0.01} onChange={(v) => props.onChange('rotation', 'x', v)} />
-                <AxisRow label="Y" value={t.rotation.y} step={0.01} onChange={(v) => props.onChange('rotation', 'y', v)} />
-                <AxisRow label="Z" value={t.rotation.z} step={0.01} onChange={(v) => props.onChange('rotation', 'z', v)} />
-                <AxisRow label="W" value={t.rotation.w} step={0.01} onChange={(v) => props.onChange('rotation', 'w', v)} />
-            </Section>
-
-            <Section title="Scale">
-                <AxisRow label="X" value={t.scale.x} onChange={(v) => props.onChange('scale', 'x', v)} />
-                <AxisRow label="Y" value={t.scale.y} onChange={(v) => props.onChange('scale', 'y', v)} />
-                <AxisRow label="Z" value={t.scale.z} onChange={(v) => props.onChange('scale', 'z', v)} />
-            </Section>
-
-            <Section title="Components">
-                <div style={{ fontSize: '12px', fontFamily: 'monospace', padding: '4px 0', color: '#bbb' }}>
-                    {Array.from(props.node.components.keys()).join(', ')}
-                </div>
-            </Section>
-
-            <button onClick={props.onDelete} style={deleteButtonStyle}>
-                Delete node
-            </button>
-        </div>
-    );
+function Field(props: { label: string; value: number; onCommit: (value: number) => void; min?: number; max?: number }) {
+  const [text, setText] = useState(String(props.value));
+  useEffect(() => setText(String(Number(props.value.toFixed(5)))), [props.value]);
+  return <label style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '4px 0' }}>{props.label}
+    <input aria-label={props.label} type="number" step="0.1" min={props.min} max={props.max} value={text} style={{ width: 105 }}
+      onChange={(event) => setText(event.currentTarget.value)}
+      onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); }}
+      onBlur={() => { const value = Number(text); if (text.trim() && Number.isFinite(value) &&
+        (props.min === undefined || value >= props.min) && (props.max === undefined || value <= props.max)) props.onCommit(value); else setText(String(props.value)); }} />
+  </label>;
 }
 
-function Section(props: { title: string; children: React.ReactNode }) {
-    return (
-        <div style={{ padding: '6px 12px', borderBottom: '1px solid #2a2a2a' }}>
-            <div style={sectionTitleStyle}>{props.title}</div>
-            {props.children}
-        </div>
-    );
+export function TransformInspector({ model, onError }: { model: EditorController; onError: (message: string) => void }) {
+  const node = model.selected;
+  if (!node) return <div style={{ padding: 14 }}>Select an object to edit.</div>;
+  const transform = node.transform;
+  const euler = new Euler().setFromQuaternion(new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w), 'XYZ');
+  const material = node.getComponent<Material>(ComponentType.Material);
+  const possibleParents = [model.scene.root];
+  model.scene.traverse((candidate) => {
+    if (candidate === model.scene.root) return;
+    let parent = candidate;
+    while (parent.parent && parent !== node) parent = parent.parent;
+    if (parent !== node) possibleParents.push(candidate);
+  });
+  const guard = (action: () => void) => { try { action(); onError(''); } catch (error) { onError(error instanceof Error ? error.message : String(error)); } };
+  const color = material?.definition.color ?? { r: 1, g: 1, b: 1 };
+  const hex = '#' + [color.r, color.g, color.b].map((value) => Math.round(Math.max(0, Math.min(1, value)) * 255).toString(16).padStart(2, '0')).join('');
+  return <div style={{ padding: 14 }} key={node.id}>
+    <h2 style={{ fontSize: 15, marginTop: 0 }}>Inspector</h2>
+    <label>Name <input key={node.id + node.name} aria-label="Node name" defaultValue={node.name} onBlur={(event) => model.rename(node, event.currentTarget.value)} /></label>
+    <label style={{ display: 'block', marginTop: 10 }}>Parent <select aria-label="Parent node" value={node.parent?.id ?? ''} onChange={(event) => {
+      const parent = model.scene.findNodeById(event.currentTarget.value); if (parent) guard(() => model.reparent(node, parent));
+    }}>{possibleParents.map((parent) => <option key={parent.id} value={parent.id}>{parent.name}</option>)}</select></label>
+    {(['position', 'rotation', 'scale'] as const).map((channel) => <fieldset key={channel} style={{ marginTop: 12, border: '1px solid #454b57' }}>
+      <legend>{channel === 'rotation' ? 'Rotation (degrees, XYZ)' : channel === 'position' ? 'Position' : 'Scale'}</legend>
+      {(['x', 'y', 'z'] as const).map((axis) => <Field key={axis} label={(channel === 'rotation' ? 'Rotation' : channel === 'position' ? 'Position' : 'Scale') + ' ' + axis.toUpperCase()}
+        value={channel === 'rotation' ? euler[axis] * 180 / Math.PI : transform[channel][axis]}
+        onCommit={(value) => {
+          const next = captureTransform(node);
+          if (channel === 'rotation') {
+            const angles = new Euler(euler.x, euler.y, euler.z, 'XYZ'); angles[axis] = value * Math.PI / 180;
+            const q = new Quaternion().setFromEuler(angles); next.rotation = { x: q.x, y: q.y, z: q.z, w: q.w };
+          } else (next[channel] as Vec3)[axis] = value;
+          model.setTransform(node, next);
+        }} />)}
+    </fieldset>)}
+    {material && <fieldset style={{ marginTop: 12, border: '1px solid #454b57' }}><legend>Material</legend>
+      <label>Color <input aria-label="Material color" type="color" value={hex} onChange={(event) => {
+        const value = event.currentTarget.value; model.setMaterial(node, { ...material.definition, color: { r: parseInt(value.slice(1, 3), 16) / 255, g: parseInt(value.slice(3, 5), 16) / 255, b: parseInt(value.slice(5, 7), 16) / 255 } });
+      }} /></label>
+      {(['opacity', 'metalness', 'roughness'] as const).map((key) => <Field key={key} label={'Material ' + key} value={material.definition[key] ?? (key === 'metalness' ? 0 : 1)} min={0} max={1}
+        onCommit={(value) => model.setMaterial(node, { ...material.definition, [key]: value })} />)}
+      <label><input aria-label="Double sided" type="checkbox" checked={material.definition.doubleSided ?? false} onChange={(event) => model.setMaterial(node, { ...material.definition, doubleSided: event.currentTarget.checked })} /> Double sided</label>
+    </fieldset>}
+    <p style={{ fontSize: 12 }}>Components: {Array.from(node.components.keys()).join(', ')}</p>
+    <div style={{ display: 'flex', gap: 8 }}><button onClick={() => guard(() => { model.duplicate(); })}>Duplicate</button><button onClick={() => model.delete()}>Delete node</button></div>
+  </div>;
 }
-
-function AxisRow(props: { label: string; value: number; step?: number; onChange: (v: number) => void }) {
-    return (
-        <label style={axisRowStyle}>
-            <span style={{ width: '14px', color: '#888', fontFamily: 'monospace', fontSize: '11px' }}>{props.label}</span>
-            <input
-                type="number"
-                value={Number(props.value.toFixed(4))}
-                step={props.step ?? 0.1}
-                onChange={(e) => {
-                    const v = Number(e.currentTarget.value);
-                    if (!Number.isNaN(v)) props.onChange(v);
-                }}
-                style={inputStyle}
-            />
-        </label>
-    );
-}
-
-const headerStyle: React.CSSProperties = {
-    padding: '8px 12px',
-    fontSize: '11px',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: '#888',
-    borderBottom: '1px solid #2a2a2a',
-};
-
-const subheaderStyle: React.CSSProperties = {
-    padding: '6px 12px',
-    fontSize: '13px',
-    fontFamily: 'monospace',
-    color: '#ddd',
-    borderBottom: '1px solid #2a2a2a',
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-    fontSize: '10px',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: '#666',
-    marginBottom: '4px',
-};
-
-const axisRowStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '2px 0',
-};
-
-const inputStyle: React.CSSProperties = {
-    flex: 1,
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    color: '#ddd',
-    padding: '3px 6px',
-    fontFamily: 'monospace',
-    fontSize: '12px',
-    borderRadius: '2px',
-};
-
-const deleteButtonStyle: React.CSSProperties = {
-    margin: '12px',
-    padding: '6px 12px',
-    background: '#5a1a1a',
-    border: '1px solid #722',
-    color: '#fee',
-    fontSize: '12px',
-    cursor: 'pointer',
-    borderRadius: '3px',
-};

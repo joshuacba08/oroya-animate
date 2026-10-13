@@ -10,4 +10,5 @@ export default defineConfig({
   treeshake: true,
   minify: true,
   external: ['three'],
+  noExternal: [/^three\/(?:addons|examples)/],
 });

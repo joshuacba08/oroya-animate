@@ -227,7 +227,7 @@ docs/
 
 ## Project Status
 
-The v1 public API is stable for the core scene graph, renderers, serialization, animation, and physics packages. React, Vue, and the visual editor are still considered experimental and may change more quickly.
+The v1 public API is stable for the core scene graph, renderers, serialization, animation, and physics packages. React/Vue bindings and plugins are public from 1.2.0; the basic editor has reversible authoring and tested persistence. Physical device acceptance and npm publication remain separate release gates.
 
 Breaking changes are reserved for major versions. New minor releases should extend the API without requiring existing projects to rewrite working scenes.
 
@@ -246,3 +246,7 @@ See [Contributing](docs/contributing.md) and [Programming Principles](docs/progr
 ## License
 
 MIT © [joshuacba08](https://github.com/joshuacba08)
+
+[Oroya JS 1.2: stability and acceptance](docs/stability-1.2.md)
+
+React/Vue bindings and plugins are public from 1.2.0; the basic editor has reversible authoring and tested persistence. Physical device acceptance and npm publication remain separate release gates.

@@ -304,3 +304,7 @@ Gitの差分で変更内容が正確に表示されます：
 | 外部リソース | URI と定義を保存。テクスチャ、音声、モデルのファイルや物理の実行状態は保存しない |
 
 内部アダプターは transform、コンポーネント定義と SVG アニメーションだけを保存します。バインド済み、再生中、停止中の Animator もシリアライズできます。mixer、コールバック、ノード参照とバックエンドのリソースは除外します。クリップ定義は復元しますが、再生の正確な時点は復元しません。
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](/ja/docs/stability-1.2) describe the current rendering and persistence contracts.

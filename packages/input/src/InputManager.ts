@@ -193,8 +193,11 @@ export class InputManager {
      * and emits `action` for any held actions.
      */
     update(_dt: number): void {
+        const previous = new Set(this.activeActions);
         this.pollGamepads();
         this.recomputeActiveActions();
+        for (const name of previous) if (!this.activeActions.has(name)) this.emitter.emit('action-up', { name });
+        for (const name of this.activeActions) if (!previous.has(name)) this.emitter.emit('action-down', { name });
         for (const name of this.activeActions) {
             this.emitter.emit('action', { name });
         }
@@ -239,6 +242,7 @@ export class InputManager {
         // so without this, keys "stick" silently.
         this.keysDown.clear();
         this.mouseButtonsDown.clear();
+        this.gamepadButtonsDown.clear();
         this.maybeFireActionUp();
     };
 
@@ -248,6 +252,7 @@ export class InputManager {
 
     private onGamepadDisconnected = (e: GamepadEvent): void => {
         this.gamepadButtonsDown.delete(e.gamepad.index);
+        this.maybeFireActionUp();
         this.emitter.emit('gamepad-disconnected', { index: e.gamepad.index });
     };
 
@@ -263,7 +268,7 @@ export class InputManager {
         const pads = navigator.getGamepads();
         for (let i = 0; i < pads.length; i++) {
             const gp = pads[i];
-            if (!gp) continue;
+            if (!gp) { this.gamepadButtonsDown.delete(i); continue; }
             const buttonsDown = this.gamepadButtonsDown.get(i) ?? new Set<GamepadButton>();
             for (let b = 0; b < gp.buttons.length && b < STANDARD_BUTTON_NAMES.length; b++) {
                 const name = STANDARD_BUTTON_NAMES[b];

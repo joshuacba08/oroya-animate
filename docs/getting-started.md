@@ -44,7 +44,7 @@ The library ships as 11 small, focused packages. Install only what you need.
 | `@joroya/input` | Keyboard / mouse / gamepad layer with declarative action mapping |
 | `@joroya/assets` | Asset cache with deduplication, ref-counting, progress events |
 
-**Framework wrappers** (`@experimental`)
+**Framework wrappers** (`@public` from 1.2)
 
 | Package | Description |
 |---|---|
@@ -490,7 +490,7 @@ renderer.mount(restored);
 
 ## React Integration
 
-For React apps, install the experimental `@joroya/react` package:
+For React apps, install the stable `@joroya/react` package:
 
 ```tsx
 import { OroyaCanvas, AmbientLight, DirectionalLight, Box } from '@joroya/react';

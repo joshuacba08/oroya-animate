@@ -51,8 +51,25 @@ export class Node {
    * @param component The component to add.
    */
   addComponent(component: Component): void {
+    if (component.node && component.node !== this) {
+      throw new Error('A component cannot belong to more than one node.');
+    }
+    if (component.type === ComponentType.Transform && !(component instanceof Transform)) {
+      throw new Error('The Transform component must be a Transform instance.');
+    }
+    const previous = this.components.get(component.type);
+    if (previous && previous !== component) previous.node = null;
     this.components.set(component.type, component);
     component.node = this;
+  }
+
+  /** Remove a component, except the mandatory Transform. */
+  removeComponent(type: ComponentType): boolean {
+    if (type === ComponentType.Transform) throw new Error('A node must retain its Transform.');
+    const component = this.components.get(type);
+    if (!component) return false;
+    component.node = null;
+    return this.components.delete(type);
   }
 
   /**
@@ -78,6 +95,22 @@ export class Node {
    * @param node The node to add as a child.
    */
   add(node: Node): void {
+    if (node === this) throw new Error('Adding this node would create a scene graph cycle.');
+    for (let ancestor: Node | null = this.parent; ancestor; ancestor = ancestor.parent) {
+      if (ancestor === node) throw new Error('Adding this node would create a scene graph cycle.');
+    }
+    if (node.parent === this) return;
+    let root: Node = this.parent ?? this;
+    while (root.parent) root = root.parent;
+    const incoming = new Map<string, Node>();
+    node.traverse((child) => {
+      if (incoming.has(child.id)) throw new Error('Duplicate node ID: ' + child.id);
+      incoming.set(child.id, child);
+    });
+    root.traverse((child) => {
+      const source = incoming.get(child.id);
+      if (source && source !== child) throw new Error('Duplicate node ID: ' + child.id);
+    });
     if (node.parent) {
       node.parent.remove(node);
     }
@@ -139,7 +172,7 @@ export class Node {
     }
 
     // 3. Update children
-    for (const child of this.children) {
+    for (const child of [...this.children]) {
       child.update(dt);
     }
   }

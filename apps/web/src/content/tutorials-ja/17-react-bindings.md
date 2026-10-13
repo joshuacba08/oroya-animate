@@ -11,7 +11,7 @@ duration: "15 min"
 > **時間:** 15 分
 > **学ぶこと:** `@joroya/react` が JSX から Oroya シーンをマウントする方法、`useFrame` でフレームごとに更新する方法、シーングラフコンテキストがコンポーネントツリーを通る方法。
 
-> **安定性:** `@joroya/react` は v1.0 で `@experimental`。フックとプロパティの形は 1.x で進化する可能性 — バージョンを固定してください。
+> **安定性:** React bindings は 1.2.0 から `@public`。commit 後の props、React 18/19 StrictMode、resize と cleanup を検証しています。
 
 ---
 

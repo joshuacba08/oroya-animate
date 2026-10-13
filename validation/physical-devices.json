@@ -1,0 +1,18 @@
+{
+  "safari-ios": {
+    "status": "pending",
+    "device": null,
+    "browserVersion": null,
+    "testedVersion": null,
+    "evidence": null,
+    "artifactDigest": null
+  },
+  "chrome-android": {
+    "status": "pending",
+    "device": null,
+    "browserVersion": null,
+    "testedVersion": null,
+    "evidence": null,
+    "artifactDigest": null
+  }
+}

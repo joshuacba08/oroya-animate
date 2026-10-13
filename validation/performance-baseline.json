@@ -1,0 +1,35 @@
+{
+  "mode": "performance",
+  "timestamp": "2026-10-13T11:26:22.641Z",
+  "artifactDigest": "72ebf5ab8df0e0b704ab42dd9cdbc95cae6cb7d091546857094a58b78bf9960b",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 7 8745HX with Radeon Graphics        ",
+    "cores": 16,
+    "node": "24",
+    "browser": "154.0.4258.62",
+    "viewport": "1280x800",
+    "dpr": 1
+  },
+  "javascriptBytes": 2708727,
+  "errors": [],
+  "scenarios": {
+    "nodes1000": {
+      "cpuMedianMs": 5.5,
+      "frameMedianMs": 16.69999998807907
+    },
+    "instances10000": {
+      "cpuMedianMs": 0.19999998807907104,
+      "frameMedianMs": 16.69999998807907
+    },
+    "physics100": {
+      "cpuMedianMs": 1.2000000476837158,
+      "frameMedianMs": 16.69999998807907
+    },
+    "skinned": {
+      "cpuMedianMs": 0.40000003576278687,
+      "frameMedianMs": 16.69999998807907
+    }
+  }
+}

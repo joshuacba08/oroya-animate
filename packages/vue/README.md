@@ -5,8 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@joroya/vue.svg)](https://www.npmjs.com/package/@joroya/vue)
 [![License](https://img.shields.io/npm/l/@joroya/vue.svg)](../../LICENSE)
 
-> **⚠ alpha** — all exports are tagged `@experimental`. Composable signatures
-> may evolve through v1.x. Pin the version if you depend on specific shapes.
+> **Stable in 1.2:** all exports are `@public`; host context, camera replacement, resize and cleanup are tested.
 
 ## Install
 

@@ -21,6 +21,7 @@ import { Interactive } from '../components/Interactive';
 import { Node } from '../nodes/Node';
 import { Scene } from '../scene/Scene';
 import { typedArrayReplacer, typedArrayReviver } from './typedArrays';
+import { validateSceneJSON, SceneValidationError, type PersistenceOptions } from './validation';
 
 // A serializable representation of the scene graph
 interface SerializableComponent {
@@ -43,25 +44,27 @@ interface SerializableScene {
 
 // Only JSON data and the supported typed arrays belong to definitions. Reject
 // class instances before JSON can invoke backend toJSON() methods.
-function snapshot(value: unknown, ancestors = new Set<object>()): unknown {
+function snapshot(value: unknown, ancestors = new Set<object>(), onOmission?: (message: string) => void): unknown {
   if (value === null || typeof value !== 'object') {
+    if (typeof value === 'function' || typeof value === 'symbol') onOmission?.('Functions and symbols require application reconstruction.');
     return typeof value === 'function' || typeof value === 'symbol' ? undefined : value;
   }
   if (value instanceof Float32Array || value instanceof Uint8Array ||
       value instanceof Uint16Array || value instanceof Uint32Array) return value;
-  if (ancestors.has(value)) return undefined;
+  if (ancestors.has(value)) { onOmission?.('Circular definition data is omitted.'); return undefined; }
   if (!Array.isArray(value) && Object.getPrototypeOf(value) !== Object.prototype &&
-      Object.getPrototypeOf(value) !== null) return undefined;
+      Object.getPrototypeOf(value) !== null) { onOmission?.('Runtime class instances are omitted from declarative data.'); return undefined; }
   ancestors.add(value);
   const result = Array.isArray(value)
-    ? value.map((item) => snapshot(item, ancestors))
-    : Object.fromEntries(Object.entries(value).map(([key, item]) => [key, snapshot(item, ancestors)]));
+    ? value.map((item) => snapshot(item, ancestors, onOmission))
+    : Object.fromEntries(Object.entries(value).map(([key, item]) => [key, snapshot(item, ancestors, onOmission)]));
   ancestors.delete(value);
   return result;
 }
 
 // Explicit adapters persist declarative data, never component runtime fields.
-function serializeComponent(component: Component): SerializableComponent | undefined {
+function serializeComponent(component: Component, options: PersistenceOptions): SerializableComponent | undefined {
+  const omitted = (message: string) => options.onDiagnostic?.({ code: 'OMITTED_RUNTIME_DATA', nodeId: component.node?.id, severity: 'warning', message });
   if (component instanceof Transform) {
     return { type: component.type,
       position: { x: component.position.x, y: component.position.y, z: component.position.z },
@@ -69,7 +72,7 @@ function serializeComponent(component: Component): SerializableComponent | undef
       scale: { x: component.scale.x, y: component.scale.y, z: component.scale.z } };
   }
   if (component instanceof Animation) {
-    return { type: component.type, animations: snapshot(component.animations) };
+    return { type: component.type, animations: snapshot(component.animations, new Set(), omitted) };
   }
   if (component instanceof Camera ||
       component instanceof Geometry ||
@@ -85,7 +88,7 @@ function serializeComponent(component: Component): SerializableComponent | undef
       component instanceof AudioSource ||
       component instanceof Skin ||
       component instanceof Interactive) {
-    return { type: component.type, definition: snapshot(component.definition) };
+    return { type: component.type, definition: snapshot(component.definition, new Set(), omitted) };
   }
   return undefined;
 }
@@ -97,12 +100,16 @@ function reviveDefinition<D, C extends Component>(ctor: new (definition: D) => C
   return new ctor(data.definition as D);
 }
 
-function serializeNode(node: Node): SerializableNode {
+function serializeNode(node: Node, options: PersistenceOptions): SerializableNode {
   const components: SerializableComponent[] = [];
   for (const [, component] of node.components.entries()) {
-    const data = serializeComponent(component);
+    const data = serializeComponent(component, options);
     if (data) components.push(data);
+    else options.onDiagnostic?.({ code: 'OMITTED_COMPONENT', nodeId: node.id, severity: 'warning',
+      message: component.type + ' requires an application adapter.' });
   }
+  if (node.onUpdate) options.onDiagnostic?.({ code: 'RUNTIME_STATE', nodeId: node.id, severity: 'warning', message: 'onUpdate and event listeners must be reconstructed by the application.' });
+  if (node.hasComponent(ComponentType.Animator) || node.hasComponent(ComponentType.RigidBody)) options.onDiagnostic?.({ code: 'RUNTIME_STATE', nodeId: node.id, severity: 'warning', message: 'Playback time and live physics state are not persisted.' });
 
   return {
     id: node.id,
@@ -110,14 +117,14 @@ function serializeNode(node: Node): SerializableNode {
     ...(node.cssClass ? { cssClass: node.cssClass } : {}),
     ...(node.cssId ? { cssId: node.cssId } : {}),
     components: components,
-    children: node.children.map(serializeNode),
+    children: node.children.map((child) => serializeNode(child, options)),
   };
 }
 
 /** @public */
-export function serialize(scene: Scene): string {
+export function serialize(scene: Scene, options: PersistenceOptions = {}): string {
   const serializableScene: SerializableScene = {
-    root: serializeNode(scene.root),
+    root: serializeNode(scene.root, options),
   };
   return JSON.stringify(serializableScene, typedArrayReplacer, 2);
 }
@@ -204,9 +211,13 @@ function reviveComponent(sComp: SerializableComponent): Component | undefined {
 }
 
 /** @public */
-export function deserialize(jsonString: string): Scene {
+export function deserialize(jsonString: string, options: PersistenceOptions = {}): Scene {
+  const validation = validateSceneJSON(jsonString);
+  validation.diagnostics.forEach((diagnostic) => options.onDiagnostic?.(diagnostic));
+  if (!validation.valid) throw new SceneValidationError(validation.diagnostics);
   const sScene: SerializableScene = JSON.parse(jsonString, typedArrayReviver);
   return new Scene(deserializeNode(sScene.root));
 }
 
 export { typedArrayReplacer, typedArrayReviver } from './typedArrays';
+export { validateSceneJSON, SceneValidationError, type PersistenceOptions, type SceneValidationResult } from './validation';

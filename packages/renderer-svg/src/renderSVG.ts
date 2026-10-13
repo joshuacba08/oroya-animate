@@ -31,11 +31,15 @@ import {
   SvgFilterDef,
   SvgMaskDef,
   TextGeometryDef,
+  type RenderOptions,
+  type RendererCapabilities,
+  diagnoseScene,
 } from '@joroya/core';
 
 // ─── Shared Helpers ─────────────────────────────────────────
 
-interface SvgRenderOptions {
+/** SVG string rendering options. @public */
+export interface SvgRenderOptions extends RenderOptions {
   width: number;
   height: number;
   viewBox?: string;
@@ -45,6 +49,13 @@ interface SvgRenderOptions {
    */
   dt?: number;
 }
+
+/** SVG backend translation capabilities. @public */
+export const svgCapabilities: RendererCapabilities = Object.freeze({
+  backend: 'svg', geometry: Object.freeze(Object.values(GeometryPrimitive).filter((type) => type !== GeometryPrimitive.Buffer && type !== GeometryPrimitive.CSG)),
+  components: Object.freeze([ComponentType.Transform, ComponentType.Geometry, ComponentType.Material, ComponentType.Camera, ComponentType.Animation, ComponentType.Animator, ComponentType.Interactive]),
+  interaction: true, requiresDOM: false,
+});
 
 function toCssColor(color: ColorRGB | undefined, defaultColor: string): string {
   if (!color) return defaultColor;
@@ -692,7 +703,8 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
   // Advance scene logic first (Animator, custom onUpdate hooks). The SVG
   // backend is pure render so `dt` defaults to a single 60Hz tick — callers
   // driving their own loop should pass `options.dt` for accurate motion.
-  scene.update(options.dt ?? 1 / 60);
+  if (options.advanceScene !== false) scene.update(options.dt ?? 1 / 60);
+  if (options.onDiagnostic) diagnoseScene(scene, svgCapabilities).forEach(options.onDiagnostic);
   // Ensure all matrices are up-to-date before rendering.
   scene.updateWorldMatrices();
 
@@ -728,7 +740,8 @@ export function renderToSVG(scene: Scene, options: SvgRenderOptions): string {
 
 // ─── Interactive SVG (DOM mode) ─────────────────────────────
 
-interface SvgElementRenderOptions extends SvgRenderOptions {
+/** Live SVG options; this entry point requires a DOM. @public */
+export interface SvgElementRenderOptions extends SvgRenderOptions {
   /** Target container to append the SVG element to. */
   container?: HTMLElement;
 }
@@ -972,7 +985,8 @@ export function renderToSVGElement(
   options: SvgElementRenderOptions,
 ): { svg: SVGSVGElement; dispose: () => void } {
   // See `renderToSVG` for the rationale behind running scene logic first.
-  scene.update(options.dt ?? 1 / 60);
+  if (options.advanceScene !== false) scene.update(options.dt ?? 1 / 60);
+  if (options.onDiagnostic) diagnoseScene(scene, svgCapabilities).forEach(options.onDiagnostic);
   scene.updateWorldMatrices();
 
   const NS = 'http://www.w3.org/2000/svg';

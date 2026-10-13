@@ -8,6 +8,8 @@ import {
     ColliderShape,
     type CollisionEvent,
     type Vec3,
+    Transform,
+    type Diagnostic,
 } from '@joroya/core';
 import * as CANNON from 'cannon-es';
 
@@ -16,6 +18,7 @@ import * as CANNON from 'cannon-es';
  * @public
  */
 export interface PhysicsSystemOptions {
+    onDiagnostic?: (diagnostic: Diagnostic) => void;
     /** World gravity vector. Default `{ x: 0, y: -9.82, z: 0 }`. */
     gravity?: Vec3;
     /** Fixed simulation timestep in seconds. Default `1/60`. */
@@ -74,11 +77,17 @@ export class PhysicsSystem {
     private readonly defaultMaterial: CANNON.Material;
     private readonly fixedTimeStep: number;
     private readonly maxSubSteps: number;
+    private readonly onDiagnostic?: (diagnostic: Diagnostic) => void;
+    private readonly reported = new Set<string>();
+    private disposed = false;
+    private readonly bodyListeners = new Map<CANNON.Body, (event: { contact: CANNON.ContactEquation; body: CANNON.Body }) => void>();
 
     constructor(options: PhysicsSystemOptions = {}) {
+        this.onDiagnostic = options.onDiagnostic;
         const g = options.gravity ?? { x: 0, y: -9.82, z: 0 };
         this.fixedTimeStep = options.fixedTimeStep ?? 1 / 60;
         this.maxSubSteps = options.maxSubSteps ?? 3;
+        if (!Number.isFinite(this.fixedTimeStep) || this.fixedTimeStep <= 0 || !Number.isInteger(this.maxSubSteps) || this.maxSubSteps < 1) throw new Error('Physics timestep and maxSubSteps must be positive.');
 
         this.world = new CANNON.World();
         this.world.gravity.set(g.x, g.y, g.z);
@@ -113,6 +122,9 @@ export class PhysicsSystem {
      * Advance the simulation by `dt` and synchronize node transforms.
      */
     update(dt: number, scene: Scene): void {
+        if (this.disposed) throw new Error('Cannot update a disposed PhysicsSystem.');
+        if (!Number.isFinite(dt) || dt < 0) throw new Error('Physics delta must be finite and non-negative.');
+        scene.updateWorldMatrices();
         this.syncScene(scene);
         this.world.step(this.fixedTimeStep, dt, this.maxSubSteps);
         this.dispatchContacts();
@@ -130,6 +142,7 @@ export class PhysicsSystem {
      * Returns `null` if the node has no `RigidBody` component.
      */
     getBody(node: Node): CANNON.Body | null {
+        if (this.disposed) return null;
         const existing = this.bodyMap.get(node.id);
         if (existing) return existing;
         if (!node.hasComponent(ComponentType.RigidBody)) return null;
@@ -144,10 +157,26 @@ export class PhysicsSystem {
     removeNode(node: Node): void {
         const body = this.bodyMap.get(node.id);
         if (!body) return;
+        const listener = this.bodyListeners.get(body);
+        if (listener) body.removeEventListener('collide', listener);
+        this.bodyListeners.delete(body);
+        for (const constraint of [...this.world.constraints]) {
+            if (constraint.bodyA === body || constraint.bodyB === body) this.world.removeConstraint(constraint);
+        }
         this.world.removeBody(body);
         this.bodyMap.delete(node.id);
         this.nodeMap.delete(node.id);
         this.bodyToNode.delete(body);
+    }
+
+    /** Release all bodies, constraints, contacts and world event listeners. Idempotent. */
+    dispose(): void {
+        if (this.disposed) return;
+        this.disposed = true;
+        for (const node of [...this.nodeMap.values()]) this.removeNode(node);
+        this.world.removeEventListener('beginContact', this.onBeginContact);
+        this.world.removeEventListener('endContact', this.onEndContact);
+        this.prevContacts.clear(); this.reported.clear();
     }
 
     // ── Constraints / Joints ──────────────────────────────────
@@ -275,14 +304,31 @@ export class PhysicsSystem {
     // ── Internals ─────────────────────────────────────────────
 
     private syncScene(scene: Scene): void {
+        const live = new Map<string, Node>();
+        const rootScale = scene.root.transform.scale;
+        const scaledRoot = rootScale.x !== 1 || rootScale.y !== 1 || rootScale.z !== 1;
         scene.root.traverse((node) => {
+            if (node.hasComponent(ComponentType.RigidBody)) {
+                if (node.parent !== scene.root || scaledRoot) {
+                    if (!this.reported.has(node.id)) this.onDiagnostic?.({ code: scaledRoot ? 'UNSUPPORTED_PHYSICS_ROOT_SCALE' : 'UNSUPPORTED_PHYSICS_PARENT', nodeId: node.id, severity: 'warning', message: 'Rigid bodies require direct children of an unscaled scene root.' });
+                    this.reported.add(node.id);
+                    return;
+                }
+                live.set(node.id, node);
+            }
+        });
+        for (const [id, node] of this.nodeMap) if (live.get(id) !== node) this.removeNode(node);
+        for (const node of live.values()) {
             if (node.hasComponent(ComponentType.RigidBody) && !this.bodyMap.has(node.id)) {
                 this.createBody(node);
             }
-        });
+        }
     }
 
     private createBody(node: Node): void {
+        let root = node;
+        while (root.parent) root = root.parent;
+        root.updateWorldMatrix();
         const rb = node.getComponent<RigidBody>(ComponentType.RigidBody)!;
         const collider = node.getComponent<Collider>(ComponentType.Collider);
 
@@ -308,12 +354,13 @@ export class PhysicsSystem {
         // Initial pose is taken from world matrix so the rigid body spawns
         // wherever the user placed the node in scene space.
         const wm = node.transform.worldMatrix;
+        const pose = new Transform(); pose.setFromMatrix(wm);
         body.position.set(wm[12], wm[13], wm[14]);
         body.quaternion.set(
-            node.transform.rotation.x,
-            node.transform.rotation.y,
-            node.transform.rotation.z,
-            node.transform.rotation.w,
+            pose.rotation.x,
+            pose.rotation.y,
+            pose.rotation.z,
+            pose.rotation.w,
         );
 
         if (collider) {
@@ -327,9 +374,11 @@ export class PhysicsSystem {
         // Per-body `collide` fires only for solid contacts (not triggers) and
         // carries the ContactEquation. Use it to enrich continuous `collide`
         // events with point/normal/impulse data.
-        body.addEventListener('collide', (e: { contact: CANNON.ContactEquation; body: CANNON.Body }) => {
+        const listener = (e: { contact: CANNON.ContactEquation; body: CANNON.Body }) => {
             this.onBodyCollide(node, body, e);
-        });
+        };
+        this.bodyListeners.set(body, listener);
+        body.addEventListener('collide', listener);
 
         this.world.addBody(body);
         this.bodyMap.set(node.id, body);
@@ -357,14 +406,16 @@ export class PhysicsSystem {
         for (const [nodeId, body] of this.bodyMap) {
             const node = this.nodeMap.get(nodeId);
             if (!node || body.type === CANNON.Body.STATIC) continue;
-            node.transform.position = { x: body.position.x, y: body.position.y, z: body.position.z };
-            node.transform.rotation = {
-                x: body.quaternion.x,
-                y: body.quaternion.y,
-                z: body.quaternion.z,
-                w: body.quaternion.w,
-            };
-            node.transform.updateLocalMatrix();
+            const parent = node.parent;
+            const position = body.position.clone(); const rotation = body.quaternion.clone();
+            if (parent) {
+                const pose = new Transform(); pose.setFromMatrix(parent.transform.worldMatrix);
+                position.x -= pose.position.x; position.y -= pose.position.y; position.z -= pose.position.z;
+                const inverse = new CANNON.Quaternion(pose.rotation.x, pose.rotation.y, pose.rotation.z, pose.rotation.w).conjugate();
+                inverse.vmult(position, position); inverse.mult(rotation, rotation);
+            }
+            node.transform.setPosition({ x: position.x, y: position.y, z: position.z });
+            node.transform.setRotation({ x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w });
         }
     }
 

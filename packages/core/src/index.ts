@@ -1,4 +1,5 @@
 export * from './components/Animation';
+export * from './rendering';
 export * from './components/Camera';
 export * from './components/Component';
 export * from './components/Environment';

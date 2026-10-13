@@ -10,9 +10,67 @@ import {
   InterpolationMode,
   Skin as OroyaSkin,
   type SkinDef,
+  type MaterialDef,
+  type Diagnostic,
 } from '@joroya/core';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
+
+/** Cancellation and recoverable translation diagnostics. @public */
+export interface GLTFLoadOptions {
+  signal?: AbortSignal;
+  resourcePath?: string;
+  onDiagnostic?: (diagnostic: Diagnostic) => void;
+}
+
+function diagnostic(options: GLTFLoadOptions, message: string, nodeId?: string): void {
+  options.onDiagnostic?.({ code: 'UNSUPPORTED_GLTF_FEATURE', message, nodeId, severity: 'warning' });
+}
+
+function translateResult(gltf: Awaited<ReturnType<GLTFLoader['parseAsync']>>, options: GLTFLoadOptions): GLTFLoadResult {
+  const oroyaScene = new OroyaScene();
+  const names = new Set<string>(['root']);
+  const aliases = new Map<string, string>();
+  gltf.scene.traverse((node) => {
+    const previous = node.name;
+    const base = previous || 'gltf-node'; let name = base; let suffix = 1;
+    while (names.has(name)) name = base + '_' + ++suffix;
+    if (previous && name !== previous) diagnostic(options, 'Renamed duplicate node to keep animation/skeleton targets unique: ' + previous + ' -> ' + name);
+    aliases.set(node.uuid, name); if (previous && !aliases.has(previous)) aliases.set(previous, name);
+    node.name = name; names.add(name);
+  });
+  try {
+    if (options.signal?.aborted) throw new DOMException('glTF load cancelled.', 'AbortError');
+    const source = gltf.parser.json as { animations?: Array<{ channels?: Array<{ target?: { path?: string } }> }> };
+    for (const animation of source.animations ?? []) for (const channel of animation.channels ?? []) {
+      if (channel.target?.path === 'weights') diagnostic(options, 'Morph-weight animation is not translated.');
+    }
+    for (const child of gltf.scene.children) oroyaScene.root.add(translateNode(child, options));
+    const animations = gltf.animations.map((animation) => translateAnimation(animation, options, aliases));
+    return { scene: oroyaScene, animations };
+  } finally {
+    const textures = new Set<THREE.Texture>(); const geometries = new Set<THREE.BufferGeometry>(); const materials = new Set<THREE.Material>();
+    gltf.scene.traverse((node) => {
+      if (!(node instanceof THREE.Mesh)) return;
+      geometries.add(node.geometry);
+      for (const material of Array.isArray(node.material) ? node.material : [node.material]) {
+        materials.add(material);
+        for (const value of Object.values(material)) if (value instanceof THREE.Texture) textures.add(value);
+      }
+      if (node instanceof THREE.SkinnedMesh) node.skeleton.dispose();
+    });
+    const bitmaps = new Set<ImageBitmap>();
+    textures.forEach((texture) => { if (typeof ImageBitmap !== 'undefined' && texture.image instanceof ImageBitmap) bitmaps.add(texture.image); texture.dispose(); });
+    bitmaps.forEach((bitmap) => bitmap.close()); geometries.forEach((geometry) => geometry.dispose()); materials.forEach((material) => material.dispose());
+  }
+}
+
+/** Parse local glTF JSON or a GLB buffer without an initial network fetch. @public */
+export async function parseGLTF(data: string | ArrayBuffer, options: GLTFLoadOptions = {}): Promise<GLTFLoadResult> {
+  if (options.signal?.aborted) throw new DOMException('glTF load cancelled.', 'AbortError');
+  const gltf = await new GLTFLoader().parseAsync(data, options.resourcePath ?? '');
+  return translateResult(gltf, options);
+}
 
 /**
  * Result of loading a glTF/GLB file.
@@ -31,33 +89,25 @@ export interface GLTFLoadResult {
  * @returns A promise that resolves to the Oroya scene and animation clips.
  * @public
  */
-export async function loadGLTF(url: string): Promise<GLTFLoadResult> {
-  const loader = new GLTFLoader();
-  const gltf = await loader.loadAsync(url);
-
-  const oroyaScene = new OroyaScene();
-
-  // Convert the Three.js scene hierarchy to Oroya nodes
-  gltf.scene.children.forEach(child => {
-    oroyaScene.root.add(translateNode(child));
-  });
-
-  // Convert animations
-  const animations = gltf.animations.map(anim => translateAnimation(anim));
-
-  return { scene: oroyaScene, animations };
+export async function loadGLTF(url: string, options: GLTFLoadOptions = {}): Promise<GLTFLoadResult> {
+  const response = await fetch(url, { signal: options.signal });
+  if (!response.ok) throw new Error('glTF request failed: HTTP ' + response.status);
+  const data = await response.arrayBuffer();
+  const base = typeof document !== 'undefined' ? document.baseURI : 'http://localhost/';
+  return parseGLTF(data, { ...options, resourcePath: options.resourcePath ?? new URL('.', new URL(url, base)).href });
 }
 
 /**
  * Translate a Three.js Object3D to an Oroya Node.
  */
-function translateNode(threeNode: THREE.Object3D): OroyaNode {
+function translateNode(threeNode: THREE.Object3D, options: GLTFLoadOptions): OroyaNode {
   const oroyaNode = new OroyaNode(threeNode.name || 'gltf-node');
+  if (threeNode instanceof THREE.Line || threeNode instanceof THREE.Points || threeNode instanceof THREE.Camera || threeNode instanceof THREE.Light) diagnostic(options, 'Non-mesh glTF drawing nodes require an application translator.', oroyaNode.id);
 
   // 1. Translate Transform
-  oroyaNode.transform.position = { x: threeNode.position.x, y: threeNode.position.y, z: threeNode.position.z };
-  oroyaNode.transform.rotation = { x: threeNode.quaternion.x, y: threeNode.quaternion.y, z: threeNode.quaternion.z, w: threeNode.quaternion.w };
-  oroyaNode.transform.scale = { x: threeNode.scale.x, y: threeNode.scale.y, z: threeNode.scale.z };
+  oroyaNode.transform.setPosition(threeNode.position);
+  oroyaNode.transform.setRotation(threeNode.quaternion);
+  oroyaNode.transform.setScale(threeNode.scale);
 
   // 2. Translate Geometry & Material. SkinnedMesh is a Mesh subclass so the
   //    same path covers static and skinned meshes; the skin component is
@@ -69,7 +119,8 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
       oroyaNode.addComponent(geometry);
     }
 
-    const material = translateMaterial(threeNode.material);
+    const material = translateMaterial(threeNode.material, options, oroyaNode.id);
+    if (Object.keys(threeNode.geometry.morphAttributes).length) diagnostic(options, 'Morph targets are not translated.', oroyaNode.id);
     if (material) {
       oroyaNode.addComponent(material);
     }
@@ -84,7 +135,7 @@ function translateNode(threeNode: THREE.Object3D): OroyaNode {
 
   // 3. Recursively translate children
   threeNode.children.forEach(child => {
-    oroyaNode.add(translateNode(child));
+    oroyaNode.add(translateNode(child, options));
   });
 
   return oroyaNode;
@@ -111,9 +162,9 @@ function translateGeometry(threeGeo: THREE.BufferGeometry, isSkinned = false): O
 
   const def: BufferGeometryDef = {
     type: GeometryPrimitive.Buffer,
-    positions: new Float32Array(positions.array),
-    normals: normals ? new Float32Array(normals.array) : undefined,
-    uvs: uvs ? new Float32Array(uvs.array) : undefined,
+    positions: copyAttribute(positions, 3),
+    normals: normals ? copyAttribute(normals, 3) : undefined,
+    uvs: uvs ? copyAttribute(uvs, 2) : undefined,
     indices: indices
       ? (indices.array instanceof Uint16Array
           ? new Uint16Array(indices.array)
@@ -124,11 +175,22 @@ function translateGeometry(threeGeo: THREE.BufferGeometry, isSkinned = false): O
   if (isSkinned) {
     const skinIdx = threeGeo.getAttribute('skinIndex');
     const skinWeight = threeGeo.getAttribute('skinWeight');
-    if (skinIdx) def.skinIndices = new Uint16Array(skinIdx.array);
-    if (skinWeight) def.skinWeights = new Float32Array(skinWeight.array);
+    if (skinIdx) def.skinIndices = new Uint16Array(copyAttribute(skinIdx, 4));
+    if (skinWeight) def.skinWeights = copyAttribute(skinWeight, 4);
   }
 
   return new OroyaGeometry(def);
+}
+
+function copyAttribute(attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute, width: number): Float32Array {
+  const result = new Float32Array(attribute.count * width);
+  for (let index = 0; index < attribute.count; index++) {
+    result[index * width] = attribute.getX(index);
+    if (width > 1) result[index * width + 1] = attribute.getY(index);
+    if (width > 2) result[index * width + 2] = attribute.getZ(index);
+    if (width > 3) result[index * width + 3] = attribute.getW(index);
+  }
+  return result;
 }
 
 /**
@@ -152,6 +214,7 @@ function translateSkin(mesh: THREE.SkinnedMesh): OroyaSkin | null {
   const def: SkinDef = {
     boneNames,
     inverseBindMatrices: ibmFlat,
+    bindMatrix: new Float32Array(mesh.bindMatrix.elements),
   };
   return new OroyaSkin(def);
 }
@@ -159,10 +222,10 @@ function translateSkin(mesh: THREE.SkinnedMesh): OroyaSkin | null {
 /**
  * Translate a Three.js Material to an Oroya Material component.
  */
-function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMaterial | null {
+function translateMaterial(threeMat: THREE.Material | THREE.Material[], options: GLTFLoadOptions, nodeId: string): OroyaMaterial | null {
   // Handle material arrays (use first material)
   if (Array.isArray(threeMat) && threeMat.length > 1) {
-    console.warn(`[oroya-gltf] Multi-material mesh detected (${threeMat.length} materials). Only the first material will be used.`);
+    diagnostic(options, 'Multi-material meshes currently use only the first material.', nodeId);
   }
   const mat = Array.isArray(threeMat) ? threeMat[0] : threeMat;
 
@@ -172,14 +235,8 @@ function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMa
 
   // Built incrementally from Three's heterogeneous material types.
   // Each `if` block narrows once a Three subclass is detected.
-  const def: Partial<{
-    color: { r: number; g: number; b: number };
-    metalness: number;
-    roughness: number;
-    emissive: { r: number; g: number; b: number };
-    emissiveIntensity: number;
-    opacity: number;
-  }> & Record<string, unknown> = {};
+  const def: MaterialDef = {};
+  if (Object.values(mat).some((value) => value instanceof THREE.Texture)) diagnostic(options, 'Texture images require an application asset adapter; texture maps are not persisted by this translator.', nodeId);
 
   // Extract color
   if ('color' in mat && mat.color instanceof THREE.Color) {
@@ -221,11 +278,11 @@ function translateMaterial(threeMat: THREE.Material | THREE.Material[]): OroyaMa
 /**
  * Translate a Three.js AnimationClip to an Oroya AnimationClip.
  */
-function translateAnimation(threeClip: THREE.AnimationClip): AnimationClip {
+function translateAnimation(threeClip: THREE.AnimationClip, options: GLTFLoadOptions, aliases: Map<string, string>): AnimationClip {
   const tracks: KeyframeTrack[] = [];
 
   for (const threeTrack of threeClip.tracks) {
-    const track = translateTrack(threeTrack);
+    const track = translateTrack(threeTrack, options, aliases);
     if (track) {
       tracks.push(track);
     }
@@ -246,17 +303,18 @@ function translateAnimation(threeClip: THREE.AnimationClip): AnimationClip {
  * 3 values per keyframe (in-tangent, value, out-tangent), so the total
  * values count is `keyframes * components * 3`.
  */
-function translateTrack(threeTrack: THREE.KeyframeTrack): KeyframeTrack | null {
+function translateTrack(threeTrack: THREE.KeyframeTrack, options: GLTFLoadOptions, aliases: Map<string, string>): KeyframeTrack | null {
   // Parse the track name to extract node name and property
   // Format: "nodeName.property" (e.g., "Cube.position", "Armature|Bone.quaternion")
-  const parts = threeTrack.name.split('.');
-  if (parts.length < 2) {
-    console.warn(`[oroya-gltf] Could not parse track name: "${threeTrack.name}", skipping.`);
+  const separator = threeTrack.name.lastIndexOf('.');
+  if (separator < 0) {
+    diagnostic(options, 'Could not parse track name: ' + threeTrack.name);
     return null;
   }
 
-  const targetNodeName = parts[0];
-  const propertyName = parts[1];
+  const target = threeTrack.name.slice(0, separator);
+  const targetNodeName = aliases.get(target) ?? target;
+  const propertyName = threeTrack.name.slice(separator + 1);
 
   // Map Three.js property names to Oroya property names
   let property: 'position' | 'rotation' | 'scale';
@@ -267,7 +325,7 @@ function translateTrack(threeTrack: THREE.KeyframeTrack): KeyframeTrack | null {
   } else if (propertyName === 'scale') {
     property = 'scale';
   } else {
-    console.warn(`[oroya-gltf] Unsupported track property: "${propertyName}" in "${threeTrack.name}", skipping.`);
+    diagnostic(options, 'Unsupported animation track: ' + threeTrack.name);
     return null;
   }
 

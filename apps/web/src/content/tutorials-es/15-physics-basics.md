@@ -91,7 +91,7 @@ const physics = new PhysicsSystem({ gravity: { x: 0, y: -9.82, z: 0 } });
 
 let last = performance.now();
 function frame(now: number) {
-    const dt = Math.min((now - last) / 1000, 0.1);
+    const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
     last = now;
     physics.update(dt, scene);   // step + sync transforms
     renderer.render(dt);

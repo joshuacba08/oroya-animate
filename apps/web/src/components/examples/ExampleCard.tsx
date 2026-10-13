@@ -63,7 +63,7 @@ export function DemoRenderer({ example, eager = false }: RendererProps) {
             try {
               const seconds = time * 0.001;
               result.animate(seconds);
-              renderer!.render(Math.min(seconds - previous, 0.1));
+              renderer!.render(Math.max(0, Math.min(seconds - previous, 0.1)));
               previous = seconds;
               frame = requestAnimationFrame(loop);
             } catch (error) { console.error(error); setStatus("error"); }

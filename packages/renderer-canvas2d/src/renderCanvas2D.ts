@@ -17,13 +17,16 @@ import {
     GradientDef,
     LinearGradientDef,
     RadialGradientDef,
+    type RenderOptions,
+    type RendererCapabilities,
+    diagnoseScene,
 } from '@joroya/core';
 
 /**
  * Options for Canvas2D rendering.
  * @public
  */
-export interface Canvas2DRenderOptions {
+export interface Canvas2DRenderOptions extends RenderOptions {
     width: number;
     height: number;
     /** Background color (default: transparent) */
@@ -37,6 +40,13 @@ export interface Canvas2DRenderOptions {
      */
     dt?: number;
 }
+
+/** Canvas2D backend translation capabilities. @public */
+export const canvas2DCapabilities: RendererCapabilities = Object.freeze({
+    backend: 'canvas2d', geometry: Object.freeze(['Box', 'Sphere', 'Circle', 'Plane', 'Path2D', 'Text']),
+    components: Object.freeze([ComponentType.Transform, ComponentType.Geometry, ComponentType.Material, ComponentType.Camera, ComponentType.Animator]),
+    interaction: false, requiresDOM: true,
+});
 
 /**
  * Convert ColorRGB to CSS color string.
@@ -96,7 +106,7 @@ function applyCameraTransform(
         const camOffsetX = camPos[12] * scaleX;
         const camOffsetY = camPos[13] * scaleY;
 
-        ctx.setTransform(scaleX, 0, 0, scaleY, tx + camOffsetX, ty + camOffsetY);
+        ctx.setTransform(scaleX, 0, 0, scaleY, tx - camOffsetX, ty - camOffsetY);
     } else {
         // Perspective camera: use simple centered coordinate system
         ctx.translate(width / 2, height / 2);
@@ -164,8 +174,8 @@ function applyMaterial(
     // Fill
     if (def.fillGradient) {
         ctx.fillStyle = createGradient(ctx, def.fillGradient, width, height);
-    } else if (def.fill) {
-        ctx.fillStyle = toCssColor(def.fill, 'black');
+    } else if (def.fill || def.color) {
+        ctx.fillStyle = toCssColor(def.fill ?? def.color, 'black');
     } else {
         ctx.fillStyle = 'none';
     }
@@ -181,7 +191,7 @@ function applyMaterial(
 
     // Opacity
     if (def.opacity !== undefined) {
-        ctx.globalAlpha = def.opacity;
+        ctx.globalAlpha *= def.opacity;
     }
 }
 
@@ -198,12 +208,13 @@ function renderGeometry(
     applyMaterial(ctx, mat, width, height);
 
     switch (geo.definition.type) {
-        case GeometryPrimitive.Box: {
+        case GeometryPrimitive.Box:
+        case GeometryPrimitive.Plane: {
             const boxDef = geo.definition as BoxGeometryDef;
             const x = -boxDef.width / 2;
             const y = -boxDef.height / 2;
 
-            if (mat?.definition.fill) {
+            if (mat?.definition.fill || mat?.definition.color || mat?.definition.fillGradient) {
                 ctx.fillRect(x, y, boxDef.width, boxDef.height);
             }
             if (mat?.definition.stroke) {
@@ -212,12 +223,13 @@ function renderGeometry(
             break;
         }
 
+        case GeometryPrimitive.Circle:
         case GeometryPrimitive.Sphere: {
             const sphereDef = geo.definition as SphereGeometryDef;
             ctx.beginPath();
             ctx.arc(0, 0, sphereDef.radius, 0, Math.PI * 2);
 
-            if (mat?.definition.fill) {
+            if (mat?.definition.fill || mat?.definition.color || mat?.definition.fillGradient) {
                 ctx.fill();
             }
             if (mat?.definition.stroke) {
@@ -228,6 +240,12 @@ function renderGeometry(
 
         case GeometryPrimitive.Path2D: {
             const pathDef = geo.definition as Path2DGeometryDef;
+            if (typeof Path2D !== 'undefined') {
+                const path = new Path2D(pathDef.path.map((command) => command.command + ' ' + command.args.join(' ')).join(' '));
+                if (mat?.definition.fill || mat?.definition.color || mat?.definition.fillGradient) ctx.fill(path);
+                if (mat?.definition.stroke || mat?.definition.strokeGradient) ctx.stroke(path);
+                break;
+            }
             ctx.beginPath();
 
             for (const cmd of pathDef.path) {
@@ -251,7 +269,7 @@ function renderGeometry(
                 }
             }
 
-            if (mat?.definition.fill) {
+            if (mat?.definition.fill || mat?.definition.color || mat?.definition.fillGradient) {
                 ctx.fill();
             }
             if (mat?.definition.stroke) {
@@ -270,7 +288,7 @@ function renderGeometry(
             ctx.textAlign = (textDef.textAnchor ?? 'start') as CanvasTextAlign;
             ctx.textBaseline = (textDef.dominantBaseline ?? 'alphabetic') as CanvasTextBaseline;
 
-            if (mat?.definition.fill) {
+            if (mat?.definition.fill || mat?.definition.color || mat?.definition.fillGradient) {
                 ctx.fillText(textDef.text, 0, 0);
             }
             if (mat?.definition.stroke) {
@@ -326,8 +344,12 @@ export function renderToCanvas(
     }
 
     // Set canvas size
-    canvas.width = options.width;
-    canvas.height = options.height;
+    if (!Number.isFinite(options.width) || !Number.isFinite(options.height) || options.width <= 0 || options.height <= 0) throw new Error('Viewport dimensions must be positive and finite.');
+    if (options.dt !== undefined && (!Number.isFinite(options.dt) || options.dt < 0)) throw new Error('Frame delta must be finite and non-negative.');
+    if (canvas.width !== options.width) canvas.width = options.width;
+    if (canvas.height !== options.height) canvas.height = options.height;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
 
     // Configure rendering
     if (options.antialias !== false) {
@@ -345,7 +367,8 @@ export function renderToCanvas(
 
     // Advance scene logic (Animator, ParticleSystem, user onUpdate) before
     // computing world matrices, so the rendered frame reflects this tick.
-    scene.update(options.dt ?? 1 / 60);
+    if (options.advanceScene !== false) scene.update(options.dt ?? 1 / 60);
+    if (options.onDiagnostic) diagnoseScene(scene, canvas2DCapabilities).forEach(options.onDiagnostic);
     scene.updateWorldMatrices();
 
     // Apply camera transform
@@ -358,9 +381,7 @@ export function renderToCanvas(
     }
 
     // Render scene graph
-    for (const child of scene.root.children) {
-        renderNode(ctx, child, options.width, options.height);
-    }
+    renderNode(ctx, scene.root, options.width, options.height);
 }
 
 /**
@@ -368,6 +389,7 @@ export function renderToCanvas(
  * @public
  */
 export class CanvasRenderer {
+    readonly capabilities = canvas2DCapabilities;
     private canvas: HTMLCanvasElement | null = null;
     private animationFrameId: number | null = null;
     private renderCallback: (() => void) | null = null;
@@ -376,6 +398,7 @@ export class CanvasRenderer {
      * Mount the renderer to a container element.
      */
     mount(container: HTMLElement, options: Canvas2DRenderOptions): HTMLCanvasElement {
+        this.unmount();
         this.canvas = document.createElement('canvas');
         this.canvas.width = options.width;
         this.canvas.height = options.height;
@@ -409,11 +432,12 @@ export class CanvasRenderer {
      * Start an animation loop.
      */
     startLoop(callback: () => void): void {
+        this.stopLoop();
         this.renderCallback = callback;
         const loop = () => {
             if (this.renderCallback) {
                 this.renderCallback();
-                this.animationFrameId = requestAnimationFrame(loop);
+                this.scheduleLoop(loop);
             }
         };
         loop();
@@ -428,6 +452,10 @@ export class CanvasRenderer {
             this.animationFrameId = null;
         }
         this.renderCallback = null;
+    }
+
+    private scheduleLoop(loop: () => void): void {
+        if (this.renderCallback) this.animationFrameId = requestAnimationFrame(loop);
     }
 
     /**

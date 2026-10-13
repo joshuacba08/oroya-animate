@@ -117,19 +117,24 @@ export class AssetManager {
      */
     async load<T = unknown>(url: string, type: AssetType | string = 'binary'): Promise<T> {
         let entry = this.cache.get(url);
+        if (entry && entry.type !== type) throw new Error('Asset URL already acquired with a different type: ' + url);
         if (!entry) {
             const loader = this.loaders.get(type);
             if (!loader) {
                 throw new Error(`No loader registered for asset type "${type}"`);
             }
             const abort = new AbortController();
-            const promise = loader(url, abort.signal)
-                .then((value) => {
-                    const e = this.cache.get(url);
-                    if (e) e.value = value;
+            const candidate: CacheEntry = { type, abort, refCount: 0,
+                promise: Promise.resolve().then(() => loader(url, abort.signal)).then((value) => {
+                    if (abort.signal.aborted) throw new DOMException('Asset acquisition cancelled.', 'AbortError');
+                    if (this.cache.get(url) === candidate) candidate.value = value;
                     return value;
-                });
-            entry = { type, promise, refCount: 0, abort };
+                }).catch((error: unknown) => {
+                    if (this.cache.get(url) === candidate) this.cache.delete(url);
+                    throw error;
+                }),
+            };
+            entry = candidate;
             this.cache.set(url, entry);
         }
         entry.refCount++;
@@ -177,11 +182,15 @@ export class AssetManager {
 
     // ── Built-in loaders ──────────────────────────────────────
 
-    private loadImage: AssetLoader<HTMLImageElement> = (url) => new Promise((resolve, reject) => {
+    private loadImage: AssetLoader<HTMLImageElement> = (url, signal) => new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+        const cleanup = () => { img.onload = null; img.onerror = null; signal.removeEventListener('abort', abort); };
+        const abort = () => { cleanup(); img.src = ''; reject(new DOMException('Image load cancelled.', 'AbortError')); };
+        if (signal.aborted) { abort(); return; }
+        signal.addEventListener('abort', abort, { once: true });
+        img.onload = () => { cleanup(); resolve(img); };
+        img.onerror = () => { cleanup(); reject(new Error(`Failed to load image: ${url}`)); };
         img.src = url;
     });
 

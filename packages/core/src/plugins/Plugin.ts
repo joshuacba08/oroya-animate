@@ -14,7 +14,7 @@ import type { Node } from '../nodes/Node';
  * renderer adapts its own `BackendObject` (e.g. `THREE.Object3D` for the
  * Three.js backend, a SVG element for the SVG backend). Plugins targeting
  * a specific backend declare it via the generic.
- * @experimental
+ * @public
  */
 export interface ComponentHandler<BackendObject = unknown> {
     /** The component type this handler responds to. */
@@ -45,7 +45,7 @@ export interface ComponentHandler<BackendObject = unknown> {
  *
  * Plugins remain valid across `renderer.mount()` calls — they are owned
  * by the plugin host (the renderer or scene), not by the scene graph.
- * @experimental
+ * @public
  */
 export interface Plugin {
     /** Human-readable plugin identifier. Used for telemetry / debug. */
@@ -65,7 +65,7 @@ export interface Plugin {
  * plugins is O(n) but `n` is the count of *active plugins*, which is
  * small in practice (single-digit) — no performance concern.
  *
- * @experimental
+ * @public
  */
 export class PluginRegistry {
     private readonly plugins: Plugin[] = [];
@@ -88,13 +88,8 @@ export class PluginRegistry {
         const idx = this.plugins.indexOf(plugin);
         if (idx < 0) return false;
         this.plugins.splice(idx, 1);
-        if (plugin.handlers) {
-            for (const h of plugin.handlers) {
-                if (this.handlers.get(h.componentType) === h) {
-                    this.handlers.delete(h.componentType);
-                }
-            }
-        }
+        this.handlers.clear();
+        for (const current of this.plugins) for (const handler of current.handlers ?? []) this.handlers.set(handler.componentType, handler);
         plugin.dispose?.();
         return true;
     }
@@ -106,16 +101,17 @@ export class PluginRegistry {
 
     /** Invoke every plugin's per-frame `update`, if any. */
     update(dt: number, scene: Scene): void {
-        for (const p of this.plugins) {
-            p.update?.(dt, scene);
+        for (const p of [...this.plugins]) {
+            if (this.plugins.includes(p)) p.update?.(dt, scene);
         }
     }
 
     /** Dispose every plugin and clear the registry. */
     dispose(): void {
-        for (const p of this.plugins) p.dispose?.();
+        const plugins = this.plugins.splice(0);
         this.plugins.length = 0;
         this.handlers.clear();
+        for (const p of plugins) p.dispose?.();
     }
 
     /** Read-only list of registered plugins (for debug / inspector use). */

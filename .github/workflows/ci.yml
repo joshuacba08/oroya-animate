@@ -9,10 +9,12 @@ permissions:
   contents: read
 jobs:
   libraries:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        node: [18, 20]
+        os: [ubuntu-latest, windows-latest]
+        node: [18, 20, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -22,12 +24,31 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint:packages
+      - run: pnpm architecture:check
       - run: pnpm typecheck:packages
       - run: pnpm api:check:strict
+      - run: pnpm api:compat
       - run: pnpm test
       - run: pnpm build
-  applications:
+      - run: pnpm verify:packages
+  react18:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @joroya/react add -D react@18.3.1 react-dom@18.3.1 @types/react@18.3.0 @types/react-dom@18.3.7
+      - run: pnpm test -- packages/react/tests
+  applications:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -42,12 +63,12 @@ jobs:
       - run: pnpm docs:validate
       - run: pnpm typecheck:apps
       - run: pnpm build:apps
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm test:browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-report
+          name: browser-report-${{ matrix.os }}
           path: |
             playwright-report
             test-results

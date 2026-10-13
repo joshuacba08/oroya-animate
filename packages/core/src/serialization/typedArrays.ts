@@ -41,7 +41,8 @@ function isEncoded(v: unknown): v is EncodedTypedArray {
         v !== null &&
         '__typedArray' in v &&
         'base64' in v &&
-        typeof (v as EncodedTypedArray).__typedArray === 'string'
+        typeof (v as EncodedTypedArray).__typedArray === 'string' &&
+        typeof (v as EncodedTypedArray).base64 === 'string'
     );
 }
 
@@ -125,8 +126,10 @@ export const typedArrayReplacer = (_key: string, value: unknown): unknown => {
 export const typedArrayReviver = (_key: string, value: unknown): unknown => {
     if (!isEncoded(value)) return value;
     const Ctor = SUPPORTED[value.__typedArray];
-    if (!Ctor) return value;
+    if (!Ctor) throw new Error('Unknown typed array encoding.');
+    if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value.base64)) throw new Error('Invalid base64 buffer.');
     const bytes = base64ToBytes(value.base64);
+    if (bytes.byteLength % Ctor.BYTES_PER_ELEMENT !== 0) throw new Error('Misaligned typed array buffer.');
     // Construct over the same buffer so we avoid copying. Use byteOffset/length
     // explicitly — the bytes returned from base64ToBytes are tightly packed.
     return new Ctor(

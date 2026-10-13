@@ -713,3 +713,7 @@ renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 `setSize(width, height)` は WebGL と composer のサイズを変更しますが、カメラ投影は更新しません。`dispose()` の前に描画ループと独自リスナーを停止してください。
 
 Three.js は親子構造を保持し、ローカル行列を同期します。各フレームで追加・削除・親の変更を反映し、削除ノードの操作状態を解除して、残るカメラか既存のフォールバックを選択します。削除、再マウント、冪等な dispose() は所有する geometry、material、texture、skeleton、audio、mixer、pass と render target を解放します。プラグインは hook で所有リソースを解放します。解放後に非同期ロードがリソースを再接続することはありません。
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](/ja/docs/stability-1.2) describe the current rendering and persistence contracts.

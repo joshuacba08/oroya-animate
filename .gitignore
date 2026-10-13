@@ -25,3 +25,5 @@ Thumbs.db
 # Browser validation
 playwright-report/
 test-results/
+*.tgz
+.cache/

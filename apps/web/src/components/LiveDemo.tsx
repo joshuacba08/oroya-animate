@@ -30,8 +30,9 @@ export default function LiveDemo({ createScene, className = "" }: LiveDemoProps)
     const container = containerRef.current;
     if (!canvas || !container || !sceneRef.current) return;
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = Math.max(1, container.clientWidth);
+    const height = Math.max(1, container.clientHeight);
+    rendererRef.current?.setSize(width, height);
     const aspect = width / height;
 
     // Update camera aspect
@@ -49,8 +50,8 @@ export default function LiveDemo({ createScene, className = "" }: LiveDemoProps)
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = Math.max(1, container.clientWidth);
+    const height = Math.max(1, container.clientHeight);
 
     let abandoned = false, frameId = 0;
     let renderer: ThreeRenderer | undefined;
@@ -66,7 +67,7 @@ export default function LiveDemo({ createScene, className = "" }: LiveDemoProps)
         const loop = (time: number) => {
           if (abandoned) return;
           const t = time * 0.001;
-          result.animate(t); renderer!.render(Math.min(t - previous, 0.1)); previous = t;
+          result.animate(t); renderer!.render(Math.max(0, Math.min(t - previous, 0.1))); previous = t;
           frameId = requestAnimationFrame(loop);
         };
         frameId = requestAnimationFrame(loop);

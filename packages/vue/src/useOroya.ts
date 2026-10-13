@@ -1,4 +1,4 @@
-import { inject, onBeforeUnmount, provide, shallowRef, watch, type InjectionKey, type Ref } from 'vue';
+import { getCurrentInstance, inject, onBeforeUnmount, provide, shallowRef, watch, type ComponentInternalInstance, type InjectionKey, type Ref } from 'vue';
 import {
     Camera,
     CameraType,
@@ -11,11 +11,11 @@ import { ThreeRenderer } from '@joroya/renderer-three';
 /**
  * Per-frame callback. Receives `dt` in seconds — same convention as the
  * core renderer.
- * @experimental
+ * @public
  */
 export type FrameCallback = (dt: number) => void;
 
-/** @experimental */
+/** @public */
 export interface OroyaContext {
     scene: Scene;
     parentNode: OroyaNode;
@@ -23,6 +23,7 @@ export interface OroyaContext {
 }
 
 const OROYA_KEY: InjectionKey<OroyaContext> = Symbol('oroya');
+const localContexts = new WeakMap<ComponentInternalInstance, OroyaContext>();
 
 /**
  * Mount an Oroya scene + ThreeRenderer onto a `<canvas>` `ref`. Returns
@@ -52,7 +53,7 @@ const OROYA_KEY: InjectionKey<OroyaContext> = Symbol('oroya');
  * </template>
  * ```
  */
-/** @experimental — alpha Vue 3 composable; signature may evolve. */
+/** @public — stable Vue 3 composable. */
 export function useOroyaCanvas(
     canvasRef: Ref<HTMLCanvasElement | undefined>,
     options: {
@@ -65,14 +66,18 @@ export function useOroyaCanvas(
     const scene = new Scene();
     const frameCallbacks = new Set<FrameCallback>();
 
-    provide(OROYA_KEY, {
+    const context: OroyaContext = {
         scene,
         parentNode: scene.root,
         registerFrameCallback: (cb) => {
             frameCallbacks.add(cb);
             return () => frameCallbacks.delete(cb);
         },
-    });
+    };
+    provide(OROYA_KEY, context);
+    const instance = getCurrentInstance();
+    if (instance) localContexts.set(instance, context);
+    onBeforeUnmount(() => { if (instance) localContexts.delete(instance); frameCallbacks.clear(); });
 
     // Wait for the canvas ref to populate (Vue mounts asynchronously) before
     // creating the renderer. Re-runs if the user swaps the canvas element.
@@ -80,16 +85,18 @@ export function useOroyaCanvas(
     watch(canvasRef, (canvas, _old, onCleanup) => {
         if (!canvas) return;
 
+        let camNode: OroyaNode | undefined;
         if (options.autoCamera !== false) {
-            const camNode = new OroyaNode('__oroya_default_camera');
+            camNode = new OroyaNode('__oroya_default_camera');
             const cp = options.cameraPosition ?? { x: 0, y: 0, z: 5 };
-            camNode.transform.position = cp;
+            camNode.transform.setPosition(cp);
             camNode.addComponent(new Camera({
                 type: CameraType.Perspective,
                 fov: 60,
                 aspect: 1,
                 near: 0.1,
                 far: 1000,
+                autoAspect: true,
             }));
             scene.add(camNode);
         }
@@ -110,7 +117,7 @@ export function useOroyaCanvas(
         let raf = 0;
         let last = performance.now();
         const loop = (now: number) => {
-            const dt = Math.min((now - last) / 1000, 0.1);
+            const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
             last = now;
             for (const cb of frameCallbacks) cb(dt);
             renderer.render(dt);
@@ -122,6 +129,7 @@ export function useOroyaCanvas(
             cancelAnimationFrame(raf);
             ro.disconnect();
             renderer.dispose?.();
+            if (camNode) scene.remove(camNode);
         });
     }, { immediate: true });
 
@@ -132,10 +140,11 @@ export function useOroyaCanvas(
  * Access the context inside a child composable. Throws if no
  * `useOroyaCanvas` ancestor is mounted.
  *
- * @experimental
+ * @public
  */
 export function useOroya(): OroyaContext {
-    const ctx = inject(OROYA_KEY);
+    const instance = getCurrentInstance();
+    const ctx = (instance && localContexts.get(instance)) || inject(OROYA_KEY);
     if (!ctx) {
         throw new Error('@joroya/vue composables must be used inside a component that called useOroyaCanvas().');
     }
@@ -145,7 +154,7 @@ export function useOroya(): OroyaContext {
 /**
  * Register a per-frame callback. Auto-deregistered on component unmount.
  *
- * @experimental
+ * @public
  */
 export function useFrame(cb: FrameCallback): void {
     const { registerFrameCallback } = useOroya();
@@ -158,7 +167,7 @@ export function useFrame(cb: FrameCallback): void {
  * parent, and run `setup` once with the node. Returns a ref to the
  * underlying node so template / script code can mutate transforms.
  *
- * @experimental
+ * @public
  */
 export function useNode(setup: (node: OroyaNode) => void): Ref<OroyaNode> {
     const { parentNode } = useOroya();

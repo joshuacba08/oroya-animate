@@ -272,3 +272,7 @@ MIT © [joshuacba08](https://github.com/joshuacba08)
 [バグ報告](https://github.com/joshuacba08/oroya-animate/issues) · [機能リクエスト](https://github.com/joshuacba08/oroya-animate/issues) · [ディスカッション](https://github.com/joshuacba08/oroya-animate/discussions)
 
 </div>
+
+[Oroya JS 1.2: stability and acceptance](docs/stability-1.2-ja.md)
+
+React/Vue と plugin は 1.2.0 から公開 API です。基本 editor は undo/redo と保存・読込を検証しています。実機確認と npm 公開は別のリリース条件です。

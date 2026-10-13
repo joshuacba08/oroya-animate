@@ -1,6 +1,6 @@
 {
   "name": "@joroya/loader-gltf",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "glTF/GLB 3D model loader for Oroya Animate scene graphs",
   "keywords": [
     "oroya",
@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshuacba08/oroya-animate.git",
+    "url": "git+https://github.com/joshuacba08/oroya-animate.git",
     "directory": "packages/loader-gltf"
   },
   "homepage": "https://oroya-animate.oroyajs.com",
@@ -33,7 +33,11 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": {
+        "import": "./dist/index.d.ts",
+        "require": "./dist/index.d.cts",
+        "default": "./dist/index.d.ts"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -47,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@joroya/core": "^1.0.0",
+    "@joroya/core": "^1.2.0",
     "three": "^0.165.0"
   },
   "dependencies": {

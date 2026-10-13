@@ -769,3 +769,7 @@ renderToCanvas(scene, canvas2D, { width: 800, height: 600, dt: 0 });
 `setSize(width, height)` updates the WebGL renderer and composer dimensions, not the camera projection. Stop your own `requestAnimationFrame` loop and remove your own listeners before calling `dispose()`.
 
 Three.js preserves parent-child structure and synchronizes local matrices. Every frame reconciles added, removed and reparented nodes, clears interaction for removed nodes, and selects a remaining camera or the existing fallback. Removal, remount and idempotent dispose() share cleanup for owned geometry, materials, textures, skeletons, audio, mixers, passes and render targets. Plugin-owned resources are released through plugin hooks; asynchronous loads cannot attach after retirement.
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](/docs/stability-1.2) describe the current rendering and persistence contracts.

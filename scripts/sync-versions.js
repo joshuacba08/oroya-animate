@@ -30,6 +30,7 @@ console.log(`📦 Syncing version to ${newVersion}...\n`);
 
 // Find all package.json files in packages/
 const packagePaths = globSync('./packages/*/package.json');
+packagePaths.push('package.json');
 
 if (packagePaths.length === 0) {
   console.error('❌ Error: No packages found in ./packages/');
@@ -46,6 +47,9 @@ packagePaths.forEach(path => {
     
     const oldVersion = pkg.version;
     pkg.version = newVersion;
+    for (const name of Object.keys(pkg.peerDependencies ?? {})) {
+      if (name.startsWith('@joroya/')) pkg.peerDependencies[name] = '^' + newVersion;
+    }
     
     writeFileSync(fullPath, JSON.stringify(pkg, null, 2) + '\n');
     

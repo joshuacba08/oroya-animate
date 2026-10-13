@@ -1,0 +1,57 @@
+[
+  {
+    "package": "assets",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "core",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "input",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "inspector",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "loader-gltf",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "physics",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "react",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "renderer-canvas2d",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "renderer-svg",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "renderer-three",
+    "manifest": "passed",
+    "declarations": "passed"
+  },
+  {
+    "package": "vue",
+    "manifest": "passed",
+    "declarations": "passed"
+  }
+]

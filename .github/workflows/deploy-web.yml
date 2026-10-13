@@ -107,7 +107,7 @@ jobs:
           PUBLIC_URL: ${{ steps.target.outputs.environment == 'production' && 'https://oroya-animate.oroyajs.com' || '' }}
           DEPLOYMENT_URL: ${{ steps.release.outputs.url }}
         run: node scripts/verify-deployment.js
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Verify deployed site in browser
         env:
           DEPLOYMENT_STORAGE_STATE: ${{ runner.temp }}/vercel-deployment-state.json

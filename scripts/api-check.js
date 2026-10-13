@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import ts from 'typescript';
 import { readdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { Node, Scene } from '@joroya/core';
 import { useOroya, type FrameCallback } from './context';
 
@@ -12,12 +12,12 @@ import { useOroya, type FrameCallback } from './context';
  *   nodeRef.current.transform.position.x += speed * dt;
  * });
  *
- * @experimental
+ * @public
  */
 export function useFrame(callback: FrameCallback): void {
     const { registerFrameCallback } = useOroya();
     const ref = useRef<FrameCallback>(callback);
-    ref.current = callback;
+    useLayoutEffect(() => { ref.current = callback; }, [callback]);
     useEffect(() => {
         const cb: FrameCallback = (dt) => ref.current(dt);
         return registerFrameCallback(cb);
@@ -27,7 +27,7 @@ export function useFrame(callback: FrameCallback): void {
 /**
  * Access to the underlying Oroya `Scene`. Stable for the canvas's lifetime.
  *
- * @experimental
+ * @public
  */
 export function useScene(): Scene {
     return useOroya().scene;
@@ -36,7 +36,7 @@ export function useScene(): Scene {
 /**
  * Access to the JSX parent node — the node child components attach to.
  *
- * @experimental
+ * @public
  */
 export function useParentNode(): Node {
     return useOroya().parentNode;

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
-import { Scene, Node, Geometry, GeometryPrimitive, Material, Camera, CameraType, ComponentType, Interactive, AudioSource, Skin, Animator, Environment, type Plugin } from '@joroya/core';
+import { Scene, Node, Geometry, GeometryPrimitive, Material, Camera, CameraType, ComponentType, Interactive, AudioSource, AudioListener, Skin, Animator, Environment, type Plugin } from '@joroya/core';
 import { ThreeRenderer } from '../src/ThreeRenderer';
 
 vi.mock('three', async (importOriginal) => {
@@ -46,6 +46,78 @@ function mesh(name = 'mesh') {
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe('Three.js scene reconciliation and ownership', () => {
+  it('generates normals for optional-normal buffer geometry', () => {
+    const { renderer, state } = setup(); const scene = new Scene(); const node = new Node('triangle');
+    node.addComponent(new Geometry({ type: GeometryPrimitive.Buffer, positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]) })); scene.add(node); renderer.mount(scene);
+    expect(Array.from((state.nodeMap.get(node.id) as THREE.Mesh).geometry.getAttribute('normal').array)).toEqual([0, 0, 1, 0, 0, 1, 0, 0, 1]); renderer.dispose();
+  });
+  it('composes audio listener/source roles with camera and mesh nodes', () => {
+    const createAudioNode = () => ({ connect: vi.fn(), disconnect: vi.fn(), gain: { value: 1, setTargetAtTime: vi.fn() }, setPosition: vi.fn(), setOrientation: vi.fn() });
+    const context = { createGain: createAudioNode, createPanner: createAudioNode, destination: {}, listener: { setPosition: vi.fn(), setOrientation: vi.fn() }, currentTime: 0 };
+    vi.spyOn(THREE.AudioContext, 'getContext').mockReturnValue(context as unknown as AudioContext);
+    vi.spyOn(THREE.AudioLoader.prototype, 'loadAsync').mockReturnValue(new Promise(() => {}));
+    const master = vi.spyOn(THREE.AudioListener.prototype, 'setMasterVolume');
+    const { renderer, state } = setup(); const scene = new Scene(); const camera = new Node('camera');
+    camera.addComponent(new Camera({ type: CameraType.Perspective, fov: 60, aspect: 1, near: 0.1, far: 100 }));
+    camera.addComponent(new AudioListener({ masterVolume: 0.75 })); scene.add(camera);
+    const node = mesh(); node.addComponent(new AudioSource({ url: 'pending.wav' })); scene.add(node); renderer.mount(scene);
+    expect(state.nodeMap.get(camera.id)!.children.some((child) => child instanceof THREE.AudioListener)).toBe(true);
+    const audio = state.nodeMap.get(node.id)!.children.find((child): child is THREE.PositionalAudio => child instanceof THREE.PositionalAudio)!;
+    expect(audio).toBeDefined(); expect(master).toHaveBeenCalledWith(0.75);
+    const disconnect = vi.spyOn(audio.gain, 'disconnect'); scene.remove(node); renderer.render(0); expect(disconnect).toHaveBeenCalledOnce(); renderer.dispose();
+  });
+  it('preserves explicit glTF bind shape under a transformed skinned mesh', () => {
+    const { renderer, state } = setup(); const scene = new Scene(); const joint = new Node('joint');
+    joint.transform.setRotation({ x: 0, y: 0, z: Math.SQRT1_2, w: Math.SQRT1_2 }); scene.add(joint);
+    const node = new Node('skin'); node.transform.setPosition({ x: 3, y: 0, z: 0 });
+    const identity = new Float32Array(new THREE.Matrix4().elements);
+    node.addComponent(new Geometry({ type: GeometryPrimitive.Buffer, positions: new Float32Array([1, 0, 0]), skinIndices: new Uint16Array([0, 0, 0, 0]), skinWeights: new Float32Array([1, 0, 0, 0]) }));
+    node.addComponent(new Skin({ boneNames: ['joint'], inverseBindMatrices: identity, bindMatrix: identity })); scene.add(node);
+    renderer.mount(scene); renderer.render(0);
+    const native = state.nodeMap.get(node.id) as THREE.SkinnedMesh;
+    const worldVertex = native.applyBoneTransform(0, new THREE.Vector3(1, 0, 0)).applyMatrix4(native.matrixWorld);
+    expect(worldVertex.x).toBeCloseTo(0); expect(worldVertex.y).toBeCloseTo(1); renderer.dispose();
+  });
+  it('leaves plugin material synchronization to its handler', () => {
+    const { renderer, state } = setup(); const scene = new Scene(); const node = mesh(); scene.add(node);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); const geometry = new THREE.BoxGeometry();
+    renderer.usePlugin({ name: 'basic', handlers: [{ componentType: ComponentType.Geometry, create: () => new THREE.Mesh(geometry, material), dispose: () => { geometry.dispose(); material.dispose(); } }] });
+    renderer.mount(scene); renderer.render(0);
+    expect((state.nodeMap.get(node.id) as THREE.Mesh).material).toBe(material); expect(material.color.getHex()).toBe(0x00ff00); renderer.dispose();
+  });
+  it('draws without advancing and rebuilds replaced or mutated components', () => {
+    const { renderer, state } = setup(); const scene = new Scene(); const node = mesh(); scene.add(node);
+    let ticks = 0; node.onUpdate = () => { ticks++; };
+    renderer.mount(scene); renderer.render(0.1, { advanceScene: false }); expect(ticks).toBe(0);
+    const first = state.nodeMap.get(node.id) as THREE.Mesh; const released = vi.spyOn(first.geometry, 'dispose');
+    const geometry = node.getComponent<Geometry>(ComponentType.Geometry)!;
+    if (geometry.definition.type === GeometryPrimitive.Box) geometry.definition.width = 3;
+    renderer.render(0.1); expect(ticks).toBe(1); expect(released).toHaveBeenCalledOnce();
+    const second = state.nodeMap.get(node.id) as THREE.Mesh;
+    expect((second.geometry as THREE.BoxGeometry).parameters.width).toBe(3);
+    node.addComponent(new Material({ roughness: 0.2, doubleSided: true })); renderer.render(0);
+    const material = (state.nodeMap.get(node.id) as THREE.Mesh).material as THREE.MeshStandardMaterial;
+    expect(material.roughness).toBe(0.2); expect(material.side).toBe(THREE.DoubleSide); renderer.dispose();
+  });
+  it('resizes opted-in cameras and retains manually authored projection', () => {
+    const { renderer, state } = setup(); const scene = new Scene();
+    const automatic = new Node('automatic'); const manual = new Node('manual');
+    automatic.addComponent(new Camera({ type: CameraType.Perspective, fov: 50, aspect: 1, near: 0.1, far: 100, autoAspect: true }));
+    manual.addComponent(new Camera({ type: CameraType.Perspective, fov: 50, aspect: 1.25, near: 0.1, far: 100 }));
+    scene.add(automatic); scene.add(manual); renderer.mount(scene); renderer.setSize(1200, 600);
+    expect((state.nodeMap.get(automatic.id) as THREE.PerspectiveCamera).aspect).toBe(2);
+    expect((state.nodeMap.get(manual.id) as THREE.PerspectiveCamera).aspect).toBe(1.25); renderer.dispose();
+  });
+  it('pauses on context loss, restores the tree and cleans 100 mount cycles', () => {
+    const { renderer, state, canvas } = setup(); const scene = new Scene(); const node = mesh(); scene.add(node);
+    const tick = vi.fn(); node.onUpdate = tick;
+    for (let cycle = 0; cycle < 100; cycle++) { renderer.mount(scene); renderer.render(0); expect(state.nodeMap.size).toBe(2); }
+    const previous = state.nodeMap.get(node.id); const before = tick.mock.calls.length;
+    const lost = new Event('webglcontextlost', { cancelable: true }); canvas.dispatchEvent(lost); renderer.render(0.1);
+    expect(lost.defaultPrevented).toBe(true); expect(tick).toHaveBeenCalledTimes(before);
+    canvas.dispatchEvent(new Event('webglcontextrestored')); renderer.render(0.1);
+    expect(state.nodeMap.get(node.id)).not.toBe(previous); renderer.dispose(); renderer.dispose(); expect(state.nodeMap.size).toBe(0);
+  });
   it('matches core world matrices across nested translation, rotation and nonuniform scale', () => {
     const { renderer, state } = setup();
     const scene = new Scene(); const a = new Node(); const b = new Node(); const c = mesh();

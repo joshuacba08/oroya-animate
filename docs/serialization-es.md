@@ -298,3 +298,7 @@ Los diffs de Git muestran exactamente qué cambió:
 | Recursos externos | El JSON guarda URIs y definiciones, no archivos de texturas, audio, modelos ni el estado físico en ejecución |
 
 Los adaptadores internos guardan transforms, definiciones y animaciones SVG. Se puede serializar un Animator enlazado, reproduciendo o pausado; se excluyen mixers, callbacks, referencias a nodos y recursos del backend. Se restauran las definiciones de clips, sin garantizar el instante exacto de reproducción.
+
+## 1.2
+
+[Capabilities, diagnostics and acceptance](stability-1.2-es.md) describe the current rendering and persistence contracts.

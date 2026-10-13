@@ -19,6 +19,7 @@ export class Scene {
    * @param parent The parent node. Defaults to the scene's root.
    */
   add(node: Node, parent: Node = this.root): void {
+    if (this.root.findNodeById(parent.id) !== parent) throw new Error('Parent must belong to this scene.');
     parent.add(node);
   }
 
@@ -71,6 +72,7 @@ export class Scene {
    * @param dt Time elapsed since last frame in seconds.
    */
   update(dt: number): void {
+    if (!Number.isFinite(dt) || dt < 0) throw new Error('Scene delta must be finite and non-negative.');
     this.root.update(dt);
   }
 }
