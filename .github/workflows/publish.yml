@@ -13,16 +13,23 @@ on:
         required: true
         type: choice
         options: [next, latest]
+      validated_run:
+        description: 'Optional accepted run to retry without changing SDK inputs'
+        required: false
+        type: string
 permissions:
   contents: write
+  actions: read
   id-token: write
 concurrency:
   group: npm-release
   cancel-in-progress: false
 jobs:
   validate:
+    if: ${{ !inputs.validated_run }}
     uses: ./.github/workflows/ci.yml
   publish:
+    if: ${{ !inputs.validated_run }}
     needs: validate
     runs-on: ubuntu-latest
     steps:
@@ -103,4 +110,51 @@ jobs:
         if: always()
         with:
           name: release-evidence
+          path: validation/
+  retry:
+    if: ${{ inputs.validated_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify unchanged SDK and accepted release validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_RUN: ${{ inputs.validated_run }}
+          RETRY_CHANNEL: ${{ inputs.channel }}
+        run: |
+          test "$RETRY_CHANNEL" = next
+          node scripts/check-release-retry.js "$VALIDATED_RUN"
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11.21.0
+      - run: pnpm install --frozen-lockfile
+      - name: Restore accepted release evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATED_RUN: ${{ inputs.validated_run }}
+        run: |
+          gh run download "$VALIDATED_RUN" --name release-evidence --dir .cache/accepted-evidence
+          cp -a .cache/accepted-evidence/. validation/
+      - name: Restore the accepted package version
+        run: |
+          version=$(node --input-type=module -e 'import {readFileSync} from "node:fs"; console.log(JSON.parse(readFileSync("validation/package-consumers.json", "utf8")).packages[0].version)')
+          node scripts/sync-versions.js "$version"
+          pnpm install --lockfile-only
+      - run: pnpm build
+      - run: pnpm test scripts/tests/registry-version.test.ts
+      - run: pnpm verify:packages
+      - run: pnpm release:check --candidate
+      - name: Finish publication and verify next tags
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish:release next
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-retry-evidence
           path: validation/

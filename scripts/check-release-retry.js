@@ -14,7 +14,7 @@ const publication = jobs.find((job) => job.name === 'publish');
 if (!publication?.steps.some((step) => step.name === 'Candidate acceptance' && step.conclusion === 'success') ||
     !publication.steps.some((step) => step.name === 'Publish and verify every compatible package' && step.conclusion === 'failure')) throw new Error('This retry requires accepted candidate evidence and a failed publication step.');
 const allowed = new Set(['scripts/publish-release.js', 'scripts/registry-version.js', 'scripts/check-release-retry.js',
-  'scripts/tests/registry-version.test.ts', '.github/workflows/retry-release.yml', '.github/workflows/deploy-web.yml']);
+  'scripts/tests/registry-version.test.ts', '.github/workflows/retry-release.yml', '.github/workflows/publish.yml', '.github/workflows/deploy-web.yml']);
 const changes = command('git', ['diff', '--name-only', run.head_sha, 'HEAD']).trim().split('\n').filter(Boolean);
 if (changes.some((file) => !allowed.has(file))) throw new Error('SDK or validation inputs changed since acceptance; run full release validation.');
 appendFileSync(process.env.GITHUB_STEP_SUMMARY, 'Reusing all nine successful validation jobs and accepted candidate evidence from ' + run.html_url + '. SDK, lockfile, build configuration and browser tests are unchanged.\n');
