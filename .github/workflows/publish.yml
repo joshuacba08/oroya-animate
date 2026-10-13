@@ -138,12 +138,11 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm install --global npm@11.21.0
       - run: pnpm install --frozen-lockfile
-      - name: Verify configured token identity and package permissions
+      - name: Verify configured token identity
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm whoami
-          npm access list packages --json
       - name: Restore accepted release evidence
         env:
           GH_TOKEN: ${{ github.token }}
