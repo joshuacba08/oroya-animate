@@ -41,9 +41,14 @@ while (pending.size) {
   const exists = await registryVersion(ready.manifest.name, version);
   const archive = resolve(tarballs, ready.manifest.name.replace('@', '').replace('/', '-') + '-' + version + '.tgz');
   if (!exists) console.log(run(['exec', 'npm', 'publish', archive, '--access', 'public', '--tag', 'release-staging', '--provenance'], resolve('packages', ready.directory)));
-  await waitForRegistry(() => registryVersion(ready.manifest.name, version), version);
-  pending.delete(ready.manifest.name); console.log('Verified ' + ready.manifest.name + '@' + version);
+  pending.delete(ready.manifest.name);
 }
+// Registry replicas can cache a missing version for over a minute. Publish in
+// dependency order, then verify all versions together before moving public tags.
+await Promise.all(packages.map(async ({ manifest }) => {
+  await waitForRegistry(() => registryVersion(manifest.name, version), version);
+  console.log('Verified ' + manifest.name + '@' + version);
+}));
 // Update the dist-tag only after every compatible package version is available.
 for (const { manifest } of packages) run(['exec', 'npm', 'dist-tag', 'add', manifest.name + '@' + version, tag]);
 for (const { manifest } of packages) {

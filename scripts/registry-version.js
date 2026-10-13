@@ -16,9 +16,9 @@ export async function registryTag(name, tag, fetcher = fetch) {
   return result?.['dist-tags']?.[tag];
 }
 export async function waitForRegistry(read, expected, wait = (ms) => new Promise((done) => setTimeout(done, ms))) {
-  for (let attempt = 0; attempt < 30; attempt++) {
+  for (let attempt = 0; attempt < 90; attempt++) {
     if (await read() === expected) return;
-    if (attempt < 29) await wait(2000);
+    if (attempt < 89) await wait(2000);
   }
   throw new Error('Registry propagation timeout for ' + expected);
 }
