@@ -1,8 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 const deployed = !!process.env.DEPLOYMENT_URL;
-const softwareChromium = process.env.CI ? { launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader'] } } : {};
+const softwareChromium = process.env.CI ? {
+  headless: process.platform !== 'win32',
+  launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader'] },
+} : {};
 export default defineConfig({
   testDir: './tests/browser', timeout: 60000,
+  workers: process.env.CI ? 1 : undefined,
   use: { baseURL: process.env.DEPLOYMENT_URL || 'http://127.0.0.1:4321',
     viewport: { width: 1280, height: 800 }, storageState: process.env.DEPLOYMENT_STORAGE_STATE,
     trace: process.env.DEPLOYMENT_STORAGE_STATE ? 'off' : 'retain-on-failure' },
