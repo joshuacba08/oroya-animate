@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { registryVersion, registryTag, waitForRegistry } from './registry-version.js';
 
 const tag = process.argv[2];
 if (!['next', 'latest'].includes(tag)) throw new Error('Choose next or latest explicitly.');
@@ -23,7 +24,7 @@ if (acceptance.status !== 0) throw new Error(acceptance.stdout + acceptance.stde
 if (tag === 'latest') {
   const candidates = new Set();
   for (const { manifest } of packages) {
-    const candidate = JSON.parse(run(['view', manifest.name, 'dist-tags.next', '--json']));
+    const candidate = await registryTag(manifest.name, 'next');
     if (typeof candidate !== 'string' || !candidate.startsWith(version + '-')) throw new Error('Publish an accepted ' + version + ' candidate under next before promoting ' + manifest.name);
     candidates.add(candidate);
   }
@@ -36,15 +37,14 @@ while (pending.size) {
   const ready = [...pending.values()].find(({ manifest }) => Object.keys(manifest.dependencies ?? {}).every((name) => !pending.has(name)));
   if (!ready) throw new Error('Workspace dependency cycle.');
   // A partial npm publication can be retried: never replace an existing version.
-  const exists = spawnSync(process.execPath, [process.env.npm_execpath, 'view', ready.manifest.name + '@' + version, 'version', '--json'], { encoding: 'utf8', windowsHide: true });
+  const exists = await registryVersion(ready.manifest.name, version);
   const archive = resolve(tarballs, ready.manifest.name.replace('@', '').replace('/', '-') + '-' + version + '.tgz');
-  if (exists.status !== 0) run(['exec', 'npm', 'publish', archive, '--access', 'public', '--tag', 'release-staging', '--provenance'], resolve('packages', ready.directory));
-  const published = JSON.parse(run(['view', ready.manifest.name + '@' + version, 'version', '--json']));
-  if (published !== version) throw new Error('Registry verification failed for ' + ready.manifest.name);
+  if (!exists) console.log(run(['exec', 'npm', 'publish', archive, '--access', 'public', '--tag', 'release-staging', '--provenance'], resolve('packages', ready.directory)));
+  await waitForRegistry(() => registryVersion(ready.manifest.name, version), version);
   pending.delete(ready.manifest.name); console.log('Verified ' + ready.manifest.name + '@' + version);
 }
 // Update the dist-tag only after every compatible package version is available.
 for (const { manifest } of packages) run(['exec', 'npm', 'dist-tag', 'add', manifest.name + '@' + version, tag]);
 for (const { manifest } of packages) {
-  if (JSON.parse(run(['view', manifest.name, 'dist-tags.' + tag, '--json'])) !== version) throw new Error('Dist-tag verification failed for ' + manifest.name);
+  await waitForRegistry(() => registryTag(manifest.name, tag), version);
 }
