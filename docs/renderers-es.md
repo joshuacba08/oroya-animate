@@ -194,12 +194,13 @@ de estructura y delega interacciones. Requiere DOM; `renderToSVG` sigue siendo
 la API de exportación compatible con servidor.
 
 ```typescript
-import { Scene, Node, createBox } from '@joroya/core';
+import { Scene, Node, Material, createBox } from '@joroya/core';
 import { SvgRenderer } from '@joroya/renderer-svg';
 
 const scene = new Scene();
 const card = new Node('card');
 card.addComponent(createBox(80, 40, 0));
+card.addComponent(new Material({ fill: { r: 0.95, g: 0.42, b: 0.23 } }));
 scene.add(card);
 const renderer = new SvgRenderer({
   width: 640, height: 320, container: document.getElementById('scene')!,

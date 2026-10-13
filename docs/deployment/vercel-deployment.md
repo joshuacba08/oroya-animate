@@ -1,6 +1,6 @@
 # Vercel Deployment Guide
 
-Updated: October 11, 2026. Deployment status is recorded in [the maintenance report](../maintenance-review.md).
+Updated: October 13, 2026. Deployment status is recorded in [the maintenance report](../maintenance-review.md).
 
 The static Astro app in `apps/web` consumes compiled workspace packages.
 Install and build from the monorepo root. Production is [oroya-animate.oroyajs.com](https://oroya-animate.oroyajs.com).
@@ -56,7 +56,11 @@ does not create deployments alongside Actions.
    Browser checks cover navigation, WebGL, SVG interaction, gallery mount cycles and Monaco execution.
 5. Integrate into `main` only after the preview succeeds. The production workflow repeats
    validation, captures the current production deployment, then builds and deploys production.
-6. HTTP checks also verify the public custom domain. Verification failure rolls back to
+6. Production deploys with `--skip-domain`, verifies the immutable deployment URL,
+   then explicitly promotes that verified build with `vercel promote`. This also
+   handles disabled automatic domain assignment after a previous rollback; see
+   [Vercel's rollback guidance](https://vercel.com/docs/instant-rollback).
+   HTTP checks then verify the public custom domain. Verification failure rolls back to
    the captured deployment; successful deployments record their commit and URL in the run summary/artifact.
 
 Path filters include apps, packages, docs, scripts, browser tests, workflows, README files,
