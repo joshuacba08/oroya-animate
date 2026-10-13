@@ -7,7 +7,12 @@ export default defineConfig({
     trace: process.env.DEPLOYMENT_STORAGE_STATE ? 'off' : 'retain-on-failure' },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], ...(process.platform === 'win32' ? { channel: 'msedge' } : {}) } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'],
+      // Linux runners have software GL drivers; Firefox otherwise blocks WebGL2.
+      ...(process.platform === 'linux' ? { launchOptions: { firefoxUserPrefs: {
+        'webgl.force-enabled': true, 'webgl.disabled': false,
+      } } } : {}),
+    } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     { name: 'mobile-chromium', testMatch: /runtime\.spec\.ts/, use: { ...devices['Pixel 7'] } },
     { name: 'mobile-webkit', testMatch: /runtime\.spec\.ts/, use: { ...devices['iPhone 13'] } },
