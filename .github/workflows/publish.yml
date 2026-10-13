@@ -17,6 +17,11 @@ on:
         description: 'Optional accepted run to retry without changing SDK inputs'
         required: false
         type: string
+      accept_pending_devices:
+        description: 'Explicit maintainer exception: publish latest with physical device acceptance pending'
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: write
   actions: read
@@ -124,7 +129,7 @@ jobs:
           VALIDATED_RUN: ${{ inputs.validated_run }}
           RETRY_CHANNEL: ${{ inputs.channel }}
         run: |
-          test "$RETRY_CHANNEL" = next
+          test "$RETRY_CHANNEL" = next || test "$RETRY_CHANNEL" = latest
           node scripts/check-release-retry.js "$VALIDATED_RUN"
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -133,6 +138,12 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm install --global npm@11.21.0
       - run: pnpm install --frozen-lockfile
+      - name: Verify configured token identity and package permissions
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm whoami
+          npm access list packages --json
       - name: Restore accepted release evidence
         env:
           GH_TOKEN: ${{ github.token }}
@@ -140,19 +151,30 @@ jobs:
         run: |
           gh run download "$VALIDATED_RUN" --name release-evidence --dir .cache/accepted-evidence
           cp -a .cache/accepted-evidence/. validation/
-      - name: Restore the accepted package version
+      - name: Resolve version from the accepted candidate
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+          REQUESTED_CHANNEL: ${{ inputs.channel }}
         run: |
-          version=$(node --input-type=module -e 'import {readFileSync} from "node:fs"; console.log(JSON.parse(readFileSync("validation/package-consumers.json", "utf8")).packages[0].version)')
-          node scripts/sync-versions.js "$version"
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const accepted=JSON.parse(readFileSync("validation/package-consumers.json", "utf8")).packages[0].version; const expected=process.env.REQUESTED_CHANNEL === "latest" ? accepted.split("-")[0] : accepted; if (process.env.REQUESTED_VERSION !== expected) throw new Error("Requested version does not match accepted candidate");'
+          node scripts/sync-versions.js "$REQUESTED_VERSION"
           pnpm install --lockfile-only
       - run: pnpm build
       - run: pnpm test scripts/tests/registry-version.test.ts
       - run: pnpm verify:packages
       - run: pnpm release:check --candidate
-      - name: Finish publication and verify next tags
+      - name: Finish publication and verify requested tags
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish:release next
+          REQUESTED_CHANNEL: ${{ inputs.channel }}
+          ACCEPT_PENDING_DEVICES: ${{ inputs.accept_pending_devices }}
+        run: |
+          args=()
+          if [[ "$ACCEPT_PENDING_DEVICES" == true ]]; then
+            args+=(--accept-pending-devices)
+            echo 'Maintainer explicitly requested latest before physical Safari/iOS and Chrome/Android acceptance. These checks remain pending, not passed.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          pnpm publish:release "$REQUESTED_CHANNEL" "${args[@]}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

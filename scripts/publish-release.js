@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { registryVersion, registryTag, waitForRegistry } from './registry-version.js';
 
 const tag = process.argv[2];
+const acceptPendingDevices = process.argv.includes('--accept-pending-devices');
 if (!['next', 'latest'].includes(tag)) throw new Error('Choose next or latest explicitly.');
 const packages = readdirSync('packages').map((directory) => ({ directory, manifest: JSON.parse(readFileSync(resolve('packages', directory, 'package.json'), 'utf8')) }));
 const versions = new Set(packages.map(({ manifest }) => manifest.version));
@@ -19,9 +20,9 @@ const run = (args, cwd = process.cwd()) => {
   return result.stdout;
 };
 // Keep direct CLI publication subject to the same evidence gate as Actions.
-const acceptance = spawnSync(process.execPath, ['scripts/release-check.js', ...(tag === 'next' ? ['--candidate'] : [])], { encoding: 'utf8', windowsHide: true });
+const acceptance = spawnSync(process.execPath, ['scripts/release-check.js', ...(tag === 'next' ? ['--candidate'] : []), ...(acceptPendingDevices ? ['--accept-pending-devices'] : [])], { encoding: 'utf8', windowsHide: true });
 if (acceptance.status !== 0) throw new Error(acceptance.stdout + acceptance.stderr);
-if (tag === 'latest') {
+if (tag === 'latest' && !acceptPendingDevices) {
   const candidates = new Set();
   for (const { manifest } of packages) {
     const candidate = await registryTag(manifest.name, 'next');

@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { artifactDigest } from './artifact-digest.js';
 const candidate = process.argv.includes('--candidate');
+const acceptPendingDevices = process.argv.includes('--accept-pending-devices');
 const failures = [];
 const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
 const read = (file) => { try { return JSON.parse(readFileSync(file, 'utf8')); } catch { failures.push('Missing evidence: ' + file); return undefined; } };
@@ -20,11 +21,12 @@ if (process.argv.includes('--performance-only')) {
 const endurance = read('validation/endurance-latest.json');
 if (endurance?.artifactDigest !== artifactDigest()) failures.push('Endurance evidence does not match current built packages.');
 if (endurance && (endurance.durationMs < 1800000 || endurance.errors.length || endurance.final.nodes || endurance.final.geometries || endurance.final.textures)) failures.push('30 minute endurance acceptance failed.');
-if (!candidate) {
+if (!candidate && !acceptPendingDevices) {
   const devices = read('validation/physical-devices.json');
   for (const name of ['safari-ios', 'chrome-android']) {
     const result = devices?.[name];
     if (!result || result.status !== 'passed' || !result.device || !result.browserVersion || !result.evidence || result.testedVersion !== version || result.artifactDigest !== artifactDigest()) failures.push('Physical device acceptance pending or stale: ' + name);
   }
 }
+if (!candidate && acceptPendingDevices) console.warn('Release exception requested by maintainer: physical Safari/iOS and Chrome/Android acceptance remains pending. All other acceptance checks remain required.');
 failures.forEach((failure) => console.error(failure)); console.log('Release acceptance: ' + failures.length + ' outstanding checks.'); process.exitCode = failures.length ? 1 : 0;
